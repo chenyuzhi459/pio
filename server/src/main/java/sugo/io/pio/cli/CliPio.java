@@ -10,6 +10,7 @@ import sugo.io.pio.guice.LazySingleton;
 import sugo.io.pio.guice.LifecycleModule;
 import sugo.io.pio.initialization.jetty.JettyServerInitializer;
 import sugo.io.pio.server.EngineResource;
+import sugo.io.pio.server.TaskResource;
 import sugo.io.pio.services.ServerRunnable;
 
 import java.util.List;
@@ -28,9 +29,11 @@ public class CliPio extends ServerRunnable {
                     @Override
                     public void configure(Binder binder) {
                         Jerseys.addResource(binder, EngineResource.class);
+                        Jerseys.addResource(binder, TaskResource.class);
 
-                        binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
-                        LifecycleModule.register(binder, EngineResource.class);
+                        binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);
+//                        LifecycleModule.register(binder, EngineResource.class);
+//                        LifecycleModule.register(binder, TaskResource.class);
                         LifecycleModule.register(binder, Server.class);
                     }
                 });

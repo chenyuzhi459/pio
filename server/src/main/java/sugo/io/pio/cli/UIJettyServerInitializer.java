@@ -8,23 +8,38 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.resource.ResourceCollection;
 import sugo.io.pio.initialization.jetty.JettyServerInitUtils;
 import sugo.io.pio.initialization.jetty.JettyServerInitializer;
 
 /**
  */
-public class QueryJettyServerInitializer implements JettyServerInitializer {
+public class UIJettyServerInitializer implements JettyServerInitializer {
     @Override
     public void initialize(Server server, Injector injector) {
         final ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        root.addServlet(new ServletHolder(new DefaultServlet()), "/*");
+        root.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+        root.setWelcomeFiles(new String[]{"index.html"});
+
+        ServletHolder holderPwd = new ServletHolder("default", DefaultServlet.class);
+
+        root.addServlet(holderPwd, "/");
+        root.setBaseResource(
+                new ResourceCollection(
+                        new String[]{
+                                this.getClass().getClassLoader().getResource("static").toExternalForm(),
+                        }
+                )
+        );
+
         JettyServerInitUtils.addExtensionFilters(root, injector);
         root.addFilter(JettyServerInitUtils.defaultGzipFilterHolder(), "/*", null);
 
-        root.addFilter(GuiceFilter.class, "/*", null);
+        root.addFilter(GuiceFilter.class, "/pio/*", null);
 
-        final HandlerList handlerList = new HandlerList();
+        HandlerList handlerList = new HandlerList();
         handlerList.setHandlers(new Handler[]{JettyServerInitUtils.getJettyRequestLogHandler(), root});
+
         server.setHandler(handlerList);
     }
 }

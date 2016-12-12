@@ -21,7 +21,7 @@ public class Main {
                 .withDescription("Run one of the Pio server types.")
                 .withDefaultCommand(Help.class)
                 .withCommands(
-                        CliPio.class, CliUI.class
+                        CliPio.class
                 );
 
 
