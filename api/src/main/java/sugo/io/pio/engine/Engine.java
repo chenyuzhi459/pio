@@ -11,6 +11,7 @@ public class Engine {
     @JsonCreator
     public Engine(String id,
                   String location) {
+        this.location = location;
         this.id = id;
     }
 

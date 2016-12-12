@@ -23,6 +23,7 @@ public class GuiceInjectors {
                     @Override
                     public void configure(Binder binder) {
                         binder.bind(PioSecondaryModule.class);
+                        JsonConfigProvider.bind(binder, "pio.extensions", ExtensionsConfig.class);
                     }
                 }
         );
