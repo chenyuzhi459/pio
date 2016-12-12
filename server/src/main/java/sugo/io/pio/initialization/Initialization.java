@@ -9,9 +9,11 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import com.metamx.common.ISE;
 import sugo.io.pio.guice.LifecycleModule;
+import sugo.io.pio.guice.MetadataConfigModule;
 import sugo.io.pio.guice.PioSecondaryModule;
 import sugo.io.pio.guice.annotations.Json;
 import sugo.io.pio.initialization.jetty.JettyServerModule;
+import sugo.io.pio.metadata.storage.derby.DerbyMetadataStoragePioModule;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +26,9 @@ public class Initialization {
         final ModuleList defaultModules = new ModuleList(baseInjector);
         defaultModules.addModules(
             new LifecycleModule(),
-            new JettyServerModule()
+            new JettyServerModule(),
+            new MetadataConfigModule(),
+            new DerbyMetadataStoragePioModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);

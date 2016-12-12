@@ -9,7 +9,9 @@ import sugo.io.pio.guice.Jerseys;
 import sugo.io.pio.guice.LazySingleton;
 import sugo.io.pio.guice.LifecycleModule;
 import sugo.io.pio.initialization.jetty.JettyServerInitializer;
+import sugo.io.pio.metadata.SQLMetadataEngineStorage;
 import sugo.io.pio.server.EngineResource;
+import sugo.io.pio.server.EngineStorage;
 import sugo.io.pio.server.TaskResource;
 import sugo.io.pio.services.ServerRunnable;
 
@@ -33,6 +35,9 @@ public class CliPio extends ServerRunnable {
 
                         binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
+
+                        binder.bind(EngineStorage.class).to(SQLMetadataEngineStorage.class).in(LazySingleton.class);
+                        LifecycleModule.register(binder, SQLMetadataEngineStorage.class);
                     }
                 });
     }

@@ -13,7 +13,12 @@
         <module>api</module>
         <module>processing</module>
         <module>server</module>
+
+        <!--extensions-->
         <module>extensions-core/druid-extensions</module>
+
+        <!--engines-->
+        <module>engines/template-engine</module>
     </modules>
 
     <properties>
@@ -102,6 +107,11 @@
                 <groupId>io.airlift</groupId>
                 <artifactId>airline</artifactId>
                 <version>0.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-dbcp2</artifactId>
+                <version>2.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
@@ -241,6 +251,22 @@
                 <artifactId>spark-yarn_2.10</artifactId>
                 <version>2.0.1</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>10.13.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbynet</artifactId>
+                <version>10.13.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbyclient</artifactId>
+                <version>10.13.1.1</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>junit</groupId>

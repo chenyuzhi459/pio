@@ -5,16 +5,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 /**
  */
 public class Engine {
-    private String name;
+    private String id;
+    private String location;
 
     @JsonCreator
-    public Engine(String name) {
-        this.name = name;
+    public Engine(String id,
+                  String location) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-
+    public String getLocation() {
+        return location;
+    }
 }

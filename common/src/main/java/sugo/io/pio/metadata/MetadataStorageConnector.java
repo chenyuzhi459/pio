@@ -10,4 +10,6 @@ public interface MetadataStorageConnector {
             final String key,
             final byte[] value
     ) throws Exception;
+
+    void createEngineTable();
 }

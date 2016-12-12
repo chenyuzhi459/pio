@@ -1,16 +1,17 @@
 package sugo.io.pio.server;
 
+import com.google.common.base.Optional;
 import sugo.io.pio.engine.Engine;
-import sugo.io.pio.metadata.EntryExistsException;
 
 /**
  */
 public interface EngineStorage {
     /**
-     * Adds a task to the storage facility with a particular status.
+     * Adds a engine to the storage facility with a particular status.
      *
-     * @param engine task status
-     * @throws sugo.io.pio.metadata.EntryExistsException if the task ID already exists
+     * @param engine Engine
      */
-    public void insert(Engine engine) throws EntryExistsException;
+    public void register(Engine engine);
+
+    public Optional<Engine> get(String id);
 }

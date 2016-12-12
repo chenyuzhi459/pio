@@ -1,9 +1,12 @@
 package sugo.io.pio.metadata;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import com.metamx.common.RetryUtils;
 import com.metamx.common.logger.Logger;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.exceptions.DBIException;
 import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
@@ -20,12 +23,19 @@ import java.util.concurrent.Callable;
  */
 public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     private static final Logger log = new Logger(SQLMetadataConnector.class);
+    private static final String PAYLOAD_TYPE = "BLOB";
 
     public static final int DEFAULT_MAX_TRIES = 10;
 
+    private final Supplier<MetadataStorageConnectorConfig> config;
+    private final Supplier<MetadataStorageTablesConfig> tablesConfigSupplier;
     private final Predicate<Throwable> shouldRetry;
 
-    public SQLMetadataConnector() {
+    public SQLMetadataConnector(
+        Supplier<MetadataStorageConnectorConfig> config,
+        Supplier<MetadataStorageTablesConfig> tablesConfigSupplier) {
+        this.config = config;
+        this.tablesConfigSupplier = tablesConfigSupplier;
         this.shouldRetry = new Predicate<Throwable>()
         {
             @Override
@@ -36,7 +46,23 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         };
     }
 
+    /**
+     * SQL type to use for payload data (e.g. JSON blobs).
+     * Must be a binary type, which values can be accessed using ResultSet.getBytes()
+     * <p/>
+     * The resulting string will be interpolated into the table creation statement, e.g.
+     * <code>CREATE TABLE druid_table ( payload <type> NOT NULL, ... )</code>
+     *
+     * @return String representing the SQL type
+     */
+    protected String getPayloadType()
+    {
+        return PAYLOAD_TYPE;
+    }
+
     public abstract boolean tableExists(Handle handle, final String tableName);
+
+    public String getValidationQuery() { return "SELECT 1"; }
 
     public <T> T retryWithHandle(
             final HandleCallback<T> callback,
@@ -177,4 +203,46 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     }
 
     public abstract DBI getDBI();
+
+    public MetadataStorageConnectorConfig getConfig() { return config.get(); }
+
+    protected BasicDataSource getDatasource()
+    {
+        MetadataStorageConnectorConfig connectorConfig = getConfig();
+
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setUsername(connectorConfig.getUser());
+        dataSource.setPassword(connectorConfig.getPassword());
+        String uri = connectorConfig.getConnectURI();
+        dataSource.setUrl(uri);
+
+        dataSource.setValidationQuery(getValidationQuery());
+        dataSource.setTestOnBorrow(true);
+
+        return dataSource;
+    }
+
+    public void createEngineTable(final String tableName)
+    {
+        createTable(
+                tableName,
+                ImmutableList.of(
+                        String.format(
+                                "CREATE TABLE %1$s (\n"
+                                        + "  id VARCHAR(255) NOT NULL,\n"
+                                        + "  payload %2$s NOT NULL,\n"
+                                        + "  PRIMARY KEY (id)\n"
+                                        + ")",
+                                tableName, getPayloadType()
+                        )
+                )
+        );
+    }
+
+    @Override
+    public void createEngineTable() {
+        if (config.get().isCreateTables()) {
+            createEngineTable(tablesConfigSupplier.get().getEngineTable());
+        }
+    }
 }
