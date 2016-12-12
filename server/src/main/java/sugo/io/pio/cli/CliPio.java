@@ -32,8 +32,6 @@ public class CliPio extends ServerRunnable {
                         Jerseys.addResource(binder, TaskResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);
-//                        LifecycleModule.register(binder, EngineResource.class);
-//                        LifecycleModule.register(binder, TaskResource.class);
                         LifecycleModule.register(binder, Server.class);
                     }
                 });

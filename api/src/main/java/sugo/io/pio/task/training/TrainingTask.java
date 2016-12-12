@@ -5,9 +5,7 @@ import sugo.io.pio.task.Task;
 
 /**
  */
-public class TrainingTask implements Task {
-
-
+public abstract class TrainingTask implements Task {
     @JsonCreator
     public TrainingTask() {
 
