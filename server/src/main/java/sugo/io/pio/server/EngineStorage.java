@@ -1,17 +1,17 @@
 package sugo.io.pio.server;
 
 import com.google.common.base.Optional;
-import sugo.io.pio.engine.Engine;
+import sugo.io.pio.engine.EngineInstance;
 
 /**
  */
 public interface EngineStorage {
     /**
-     * Adds a engine to the storage facility with a particular status.
+     * Adds a engineInstance to the storage facility with a particular status.
      *
-     * @param engine Engine
+     * @param engineInstance EngineInstance
      */
-    public void register(Engine engine);
+    public void register(EngineInstance engineInstance);
 
-    public Optional<Engine> get(String id);
+    public Optional<EngineInstance> get(String id);
 }

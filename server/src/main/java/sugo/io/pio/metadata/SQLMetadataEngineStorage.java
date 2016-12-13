@@ -10,7 +10,7 @@ import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.util.ByteArrayMapper;
-import sugo.io.pio.engine.Engine;
+import sugo.io.pio.engine.EngineInstance;
 import sugo.io.pio.guice.ManageLifecycle;
 import sugo.io.pio.server.EngineStorage;
 
@@ -53,8 +53,8 @@ public class SQLMetadataEngineStorage implements EngineStorage {
     }
 
     @Override
-    public void register(Engine engine) {
-        Preconditions.checkNotNull(engine, "engine");
+    public void register(EngineInstance engineInstance) {
+        Preconditions.checkNotNull(engineInstance, "engineInstance");
 
         try {
             final DBI dbi = connector.getDBI();
@@ -65,7 +65,7 @@ public class SQLMetadataEngineStorage implements EngineStorage {
                             return handle.createQuery(
                                     String.format("SELECT id FROM %s WHERE id=:id", config.getEngineTable())
                             )
-                                    .bind("id", engine.getId())
+                                    .bind("id", engineInstance.getId())
                                     .list();
                         }
                     }
@@ -80,8 +80,8 @@ public class SQLMetadataEngineStorage implements EngineStorage {
                         @Override
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(statement)
-                                    .bind("id", engine.getId())
-                                    .bind("payload", engine)
+                                    .bind("id", engineInstance.getId())
+                                    .bind("payload", engineInstance)
                                     .execute();
 
                             return null;
@@ -94,13 +94,13 @@ public class SQLMetadataEngineStorage implements EngineStorage {
     }
 
     @Override
-    public Optional<Engine> get(String id) {
+    public Optional<EngineInstance> get(String id) {
         Preconditions.checkNotNull(id, "id");
 
         return connector.retryWithHandle(
-                new HandleCallback<Optional<Engine>>() {
+                new HandleCallback<Optional<EngineInstance>>() {
                     @Override
-                    public Optional<Engine> withHandle(Handle handle) throws Exception {
+                    public Optional<EngineInstance> withHandle(Handle handle) throws Exception {
                         byte[] res = handle.createQuery(
                                 String.format("SELECT payload FROM %s WHERE id = :id", config.getEngineTable())
                         )
@@ -109,7 +109,7 @@ public class SQLMetadataEngineStorage implements EngineStorage {
                                 .first();
 
                         return Optional.fromNullable(
-                                res == null ? null : jsonMapper.<Engine>readValue(res, Engine.class)
+                                res == null ? null : jsonMapper.<EngineInstance>readValue(res, EngineInstance.class)
                         );
                     }
                 }

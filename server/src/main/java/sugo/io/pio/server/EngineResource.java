@@ -1,16 +1,13 @@
 package sugo.io.pio.server;
 
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
-import sugo.io.pio.data.input.BatchEventHose;
-import sugo.io.pio.engine.Engine;
+import sugo.io.pio.engine.EngineInstance;
 import sugo.io.pio.guice.annotations.Json;
 import sugo.io.pio.metadata.SQLMetadataEngineStorage;
 
@@ -43,10 +40,10 @@ public class EngineResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEngine(@PathParam("id") String engineId) {
         final ObjectWriter jsonWriter = jsonMapper.writer();
-        final Optional<String> response = engineStorage.get(engineId).transform(new Function<Engine, String>() {
+        final Optional<String> response = engineStorage.get(engineId).transform(new Function<EngineInstance, String>() {
             @Nullable
             @Override
-            public String apply(@Nullable Engine engine) {
+            public String apply(@Nullable EngineInstance engine) {
                 try {
                     return jsonWriter.writeValueAsString(engine);
                 } catch (JsonProcessingException e) {
@@ -55,7 +52,7 @@ public class EngineResource {
             }
         });
 
-        return Response.status(Response.Status.ACCEPTED).entity(response.or("Engine not existed")).build();
+        return Response.status(Response.Status.ACCEPTED).entity(response.or("EngineInstance not existed")).build();
     }
 
     @POST
@@ -67,8 +64,8 @@ public class EngineResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            final Engine engine = jsonMapper.readValue(in, Engine.class);
-            engineStorage.register(engine);
+            final EngineInstance engineInstance = jsonMapper.readValue(in, EngineInstance.class);
+            engineStorage.register(engineInstance);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,7 @@
 package sugo.io.pio.druid;
 
+import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 import sugo.io.pio.data.input.BatchEventHose;
 import sugo.io.pio.data.input.Event;
@@ -18,7 +20,7 @@ public class DruidBatchEventHose implements BatchEventHose {
     }
 
     @Override
-    public RDD<Event> find() {
+    public RDD<Event> find(JavaSparkContext sc) {
         return null;
     }
 }

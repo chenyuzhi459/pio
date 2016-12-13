@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
  */
-public class Engine {
+public class EngineInstance {
     private String id;
     private String location;
 
     @JsonCreator
-    public Engine(String id,
-                  String location) {
+    public EngineInstance(String id,
+                          String location) {
         this.location = location;
         this.id = id;
     }
