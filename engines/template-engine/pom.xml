@@ -16,7 +16,7 @@
         <dependency>
             <groupId>sugo.io</groupId>
             <artifactId>api</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
