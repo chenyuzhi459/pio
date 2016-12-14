@@ -1,9 +1,9 @@
 package sugo.io.pio.data.input;
 
-import org.apache.spark.streaming.dstream.DStream;
+import org.apache.spark.streaming.api.java.JavaDStream;
 
 /**
  */
 public interface RealtimeEventHose {
-    DStream<Event> find();
+    JavaDStream<Event> find();
 }

@@ -12,6 +12,11 @@
 
     <artifactId>druid-extensions</artifactId>
 
+    <properties>
+        <lucene.version>5.3.1</lucene.version>
+        <httpclient.version>4.2.6</httpclient.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>sugo.io</groupId>
@@ -21,6 +26,22 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.10</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
