@@ -23,4 +23,12 @@ public class Event {
     public Map<String, Object> getProperties() {
         return properties;
     }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "timestamp=" + timestamp +
+                ", properties=" + properties +
+                '}';
+    }
 }

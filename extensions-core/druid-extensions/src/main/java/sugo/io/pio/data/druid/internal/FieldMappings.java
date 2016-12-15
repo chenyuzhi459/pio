@@ -7,9 +7,11 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -37,6 +39,14 @@ public class FieldMappings {
                 break;
             }
         }
+        List<Field> fields = MAPPER.readValue(stream, new TypeReference<List<Field>>() {});
+        return new FieldMappings(getFieldTypes(fields));
+    }
+
+    public static FieldMappings buildFrom(String path) throws IOException {
+        ZipFile zipfile = new ZipFile(path);
+        ZipEntry entry = zipfile.getEntry(FILE_NAME);
+        InputStream stream = zipfile.getInputStream(entry);
         List<Field> fields = MAPPER.readValue(stream, new TypeReference<List<Field>>() {});
         return new FieldMappings(getFieldTypes(fields));
     }

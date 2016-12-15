@@ -10,12 +10,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +43,6 @@ public class DruidInputFormat extends InputFormat<DateTime, Map> implements Conf
     public List<InputSplit> getSplits(JobContext context) throws IOException, InterruptedException {
         HttpGet getRequest = new HttpGet(getUrl());
         HttpResponse response = httpclient.execute(getRequest);
-//        String string = EntityUtils.toString(response.getEntity());
         List<Map<String, Object>> segments = objectMapper.readValue(response.getEntity().getContent(), new TypeReference<List<Map<String, Object>>>()
         {
 
