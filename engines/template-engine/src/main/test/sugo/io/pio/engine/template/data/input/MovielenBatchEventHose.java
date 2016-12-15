@@ -42,9 +42,9 @@ public class MovielenBatchEventHose implements BatchEventHose {
         public Event call(String str) throws Exception {
             String[] res = str.split(seperator);
             Map<String, Object> map = Maps.newHashMap();
-            map.put("userId", res[0]);
-            map.put("movieId", res[1]);
-            map.put("rating", res[2]);
+            map.put("userId", Integer.parseInt(res[0]));
+            map.put("movieId", Integer.parseInt(res[1]));
+            map.put("rating", Float.parseFloat(res[2]));
 
             return new Event(DateTime.now(), map);
         }
