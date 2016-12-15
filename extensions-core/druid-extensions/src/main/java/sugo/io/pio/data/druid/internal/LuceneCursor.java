@@ -75,15 +75,15 @@ public class LuceneCursor {
         if(hasMultipleValues) {
             return new IntMultiDimensionSelector(this, leafReader, dimension);
         } else {
-            return new IntMultiDimensionSelector(this, leafReader, dimension);
+            return new IntSingleDimensionSelector(this, leafReader, dimension);
         }
     }
 
     public LongDimensionSelector makeLongDimensionSelector(String dimension, boolean hasMultipleValues) throws IOException {
         if(hasMultipleValues) {
-            return new LongSingleDimensionSelector(this, leafReader, dimension);
-        } else {
             return new LongMultiDimensionSelector(this, leafReader, dimension);
+        } else {
+            return new LongSingleDimensionSelector(this, leafReader, dimension);
         }
     }
 
