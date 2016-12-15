@@ -5,7 +5,7 @@ package sugo.io.pio.engine;
 public interface EngineFactory<TD, PD, MD> {
     DataSource<TD> createDatasource();
 
-    Preparator<PD> createPreparator();
+    Preparator<TD, PD> createPreparator();
 
-    Algorithm<MD> createAlgorithm();
+    Algorithm<PD, MD> createAlgorithm();
 }

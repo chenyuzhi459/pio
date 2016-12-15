@@ -4,6 +4,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 
 /**
  */
-public interface Algorithm<MD> {
-    MD train(JavaSparkContext sc);
+public interface Algorithm<PD, MD> {
+    MD train(JavaSparkContext sc, PD pd);
 }

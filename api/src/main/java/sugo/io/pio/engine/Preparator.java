@@ -4,6 +4,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 
 /**
  */
-public interface Preparator<PD> {
-    PD prepare(JavaSparkContext sc);
+public interface Preparator<TD, PD> {
+    PD prepare(JavaSparkContext sc, TD td);
 }
