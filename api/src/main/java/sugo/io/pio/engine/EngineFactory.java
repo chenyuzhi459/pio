@@ -8,4 +8,6 @@ public interface EngineFactory<TD, PD, MD> {
     Preparator<TD, PD> createPreparator();
 
     Algorithm<PD, MD> createAlgorithm();
+
+    Model<MD> createModel();
 }
