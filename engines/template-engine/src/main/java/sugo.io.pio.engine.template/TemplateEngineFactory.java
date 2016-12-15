@@ -20,12 +20,12 @@ public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData
     }
 
     @Override
-    public Preparator<TemplatePreparedData> createPreparator() {
+    public Preparator<TemplateTrainingData, TemplatePreparedData> createPreparator() {
         return new TemplatePreparator();
     }
 
     @Override
-    public Algorithm<TemplateModelData> createAlgorithm() {
+    public Algorithm<TemplatePreparedData, TemplateModelData> createAlgorithm() {
         return new TemplateAlgorithm();
     }
 }
