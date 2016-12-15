@@ -1,9 +1,6 @@
 package sugo.io.pio.engine.template;
 
-import sugo.io.pio.engine.Algorithm;
-import sugo.io.pio.engine.DataSource;
-import sugo.io.pio.engine.EngineFactory;
-import sugo.io.pio.engine.Preparator;
+import sugo.io.pio.engine.*;
 import sugo.io.pio.engine.template.data.TemplateModelData;
 import sugo.io.pio.engine.template.data.TemplatePreparedData;
 import sugo.io.pio.engine.template.data.TemplateTrainingData;
@@ -27,5 +24,10 @@ public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData
     @Override
     public Algorithm<TemplatePreparedData, TemplateModelData> createAlgorithm() {
         return new TemplateAlgorithm();
+    }
+
+    @Override
+    public Model<TemplateModelData> createModel() {
+        return null;
     }
 }
