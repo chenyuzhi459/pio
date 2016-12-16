@@ -1,0 +1,165 @@
+  <configuration>
+    
+    <property>
+      <name>hadoop.http.staticuser.user</name>
+      <value>yarn</value>
+    </property>
+    
+    <property>
+      <name>yarn.acl.enable</name>
+      <value>false</value>
+    </property>
+    
+    <property>
+      <name>yarn.admin.acl</name>
+      <value>yarn</value>
+    </property>
+    
+    <property>
+      <name>yarn.client.failover-proxy-provider</name>
+      <value>org.apache.hadoop.yarn.client.ConfiguredRMFailoverProxyProvider</value>
+    </property>
+    
+    <property>
+      <name>yarn.http.policy</name>
+      <value>HTTP_ONLY</value>
+    </property>
+    
+    <property>
+      <name>yarn.log-aggregation-enable</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>yarn.log-aggregation.retain-check-interval-seconds</name>
+      <value>86400</value>
+    </property>
+    
+    <property>
+      <name>yarn.log-aggregation.retain-seconds</name>
+      <value>5184000</value>
+    </property>
+    
+    <property>
+      <name>yarn.nodemanager.aux-services</name>
+      <value>mapreduce_shuffle</value>
+    </property>
+    
+    <property>
+      <name>yarn.nodemanager.local-dirs</name>
+      <value>/data2/hadoop/hd_space/tmp/nm-local-dir</value>
+    </property>
+    
+    <property>
+      <name>yarn.nodemanager.log-dirs</name>
+      <value>/data2/hadoop/nm/logs</value>
+    </property>
+    
+    <property>
+      <name>yarn.nodemanager.log.retain-seconds</name>
+      <value>10800</value>
+    </property>
+    
+    <property>
+      <name>yarn.nodemanager.remote-app-log-dir</name>
+      <value>/remote-app-log/logs</value>
+    </property>
+    
+    <property>
+      <name>yarn.nodemanager.remote-app-log-dir-suffix</name>
+      <value>logs</value>
+    </property>
+    
+    <property>
+      <name>yarn.nodemanager.resource.memory-mb</name>
+      <value>30720</value>
+    </property>
+    
+    <property>
+      <name>yarn.nodemanager.vmem-pmem-ratio</name>
+      <value>4.1</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.cluster-id</name>
+      <value>sugo-rm</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.ha.automatic-failover.embedded</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.ha.automatic-failover.enabled</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.ha.enabled</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.ha.rm-ids</name>
+      <value>rm1,rm2</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.hostname.rm1</name>
+      <value>dev5.sugo.net</value>
+    </property>
+
+    <property>
+      <name>yarn.resourcemanager.hostname.rm2</name>
+      <value>dev6.sugo.net</value>
+    </property>
+
+      <property>
+          <name>yarn.resourcemanager.address.rm1</name>
+          <value>dev5.sugo.net:8032</value>
+      </property>
+      <property>
+          <name>yarn.resourcemanager.address.rm2</name>
+          <value>dev6.sugo.net:8032</value>
+      </property>
+      <property>
+          <name>yarn.resourcemanager.scheduler.address.rm1</name>
+          <value>dev5.sugo.net:8030</value>
+      </property>
+      <property>
+          <name>yarn.resourcemanager.scheduler.address.rm2</name>
+          <value>dev6.sugo.net:8030</value>
+      </property>
+    
+    <property>
+      <name>yarn.resourcemanager.recovery.enabled</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.scheduler.class</name>
+      <value>org.apache.hadoop.yarn.server.resourcemanager.scheduler.fair.FairScheduler</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.store.class</name>
+      <value>org.apache.hadoop.yarn.server.resourcemanager.recovery.ZKRMStateStore</value>
+    </property>
+    
+    <property>
+      <name>yarn.resourcemanager.zk-address</name>
+      <value>dev3.sugo.net:2181,dev2.sugo.net:2181,dev1.sugo.net:2181</value>
+    </property>
+    
+    <property>
+      <name>yarn.scheduler.fair.allocation.file</name>
+      <value>/opt/apps/hadoop_sugo/etc/hadoop/sugo-scheduler.xml</value>
+    </property>
+    
+    <property>
+      <name>yarn.web-proxy.address</name>
+      <value>dev5.sugo.net:8083</value>
+    </property>
+    
+  </configuration>
