@@ -3,13 +3,16 @@ package sugo.io.pio.engine.template;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.Test;
+import sugo.io.pio.data.output.Repository;
 import sugo.io.pio.engine.Algorithm;
 import sugo.io.pio.engine.DataSource;
+import sugo.io.pio.engine.Model;
 import sugo.io.pio.engine.Preparator;
 import sugo.io.pio.engine.template.data.TemplateModelData;
 import sugo.io.pio.engine.template.data.TemplatePreparedData;
 import sugo.io.pio.engine.template.data.TemplateTrainingData;
 import sugo.io.pio.engine.template.data.input.MovielenBatchEventHose;
+import sugo.io.pio.engine.template.data.output.LocalFileRepository;
 
 /**
  */
@@ -32,6 +35,12 @@ public class TemplateEngineTest {
 
         Algorithm<TemplatePreparedData, TemplateModelData> modelDataAlgorithm = factory.createAlgorithm();
         TemplateModelData modelData = modelDataAlgorithm.train(sc, preparedData);
+
+        Model<TemplateModelData> model = factory.createModel();
+        Repository repository = new LocalFileRepository("/tmp/modelfile");
+
+        model.save(modelData, repository);
+        TemplateModelData model2 = model.read(repository);
 
         System.out.print("ok");
     }

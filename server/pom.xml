@@ -69,7 +69,10 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyclient</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>twirl-api_2.10</artifactId>
+        </dependency>
 
         <!-- Tests -->
         <dependency>

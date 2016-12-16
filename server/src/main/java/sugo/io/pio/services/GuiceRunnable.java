@@ -26,18 +26,6 @@ public abstract class GuiceRunnable implements Runnable {
 
     protected abstract List<? extends Module> getModules();
 
-    public Injector makeInjector()
-    {
-        try {
-            return Initialization.makeInjectorWithModules(
-                    baseInjector, getModules()
-            );
-        }
-        catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
-    }
-
     public Lifecycle initLifecycle(Injector injector)
     {
         try {
@@ -52,6 +40,18 @@ public abstract class GuiceRunnable implements Runnable {
             }
 
             return lifecycle;
+        }
+        catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    public Injector makeInjector()
+    {
+        try {
+            return Initialization.makeInjectorWithModules(
+                    baseInjector, getModules()
+            );
         }
         catch (Exception e) {
             throw Throwables.propagate(e);

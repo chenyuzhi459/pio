@@ -6,6 +6,7 @@ import sugo.io.pio.engine.template.data.TemplatePreparedData;
 import sugo.io.pio.engine.template.data.TemplateTrainingData;
 import sugo.io.pio.engine.template.engine.TemplateAlgorithm;
 import sugo.io.pio.engine.template.engine.TemplateDatasource;
+import sugo.io.pio.engine.template.engine.TemplateModel;
 import sugo.io.pio.engine.template.engine.TemplatePreparator;
 
 /**
@@ -28,6 +29,6 @@ public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData
 
     @Override
     public Model<TemplateModelData> createModel() {
-        return null;
+        return new TemplateModel();
     }
 }
