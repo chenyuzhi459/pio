@@ -81,7 +81,7 @@ public class SQLMetadataEngineStorage implements EngineStorage {
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(statement)
                                     .bind("id", engineInstance.getId())
-                                    .bind("payload", engineInstance)
+                                    .bind("payload", jsonMapper.writeValueAsBytes(engineInstance))
                                     .execute();
 
                             return null;
