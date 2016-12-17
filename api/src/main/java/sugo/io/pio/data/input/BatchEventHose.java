@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 
 /**
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "eventHoseType")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public interface BatchEventHose {
     JavaRDD<Event> find(JavaSparkContext sc);
 
