@@ -1,6 +1,5 @@
 package sugo.io.pio.engine.template;
 
-import org.apache.spark.MapOutputStatistics;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.Test;

@@ -16,6 +16,7 @@
 
         <!--extensions-->
         <module>extensions-core/druid-extensions</module>
+        <module>extensions-core/hdfs-extensions</module>
         <module>extensions-core/mysql-metadata-storage</module>
         <module>extensions-core/postgresql-metadata-storage</module>
 

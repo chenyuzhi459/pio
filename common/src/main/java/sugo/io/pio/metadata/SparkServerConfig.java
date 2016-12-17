@@ -17,7 +17,6 @@ public class SparkServerConfig {
     private String historyLogDir;
 
     public SparkServerConfig() {
-        System.out.println();
     }
 
     public String getHistoryServer() {
