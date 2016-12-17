@@ -53,7 +53,7 @@ public class TaskResource {
             @Context final HttpServletRequest req
     ) {
         //http://localhost:8080/pio/task?pretty=YARN
-        //{"type":"training","id":"555","url":"ttt"}
+        //{"type":"training","id":"1","url":"ttt"}
 
         final String reqContentType = req.getContentType();
         final ObjectWriter jsonWriter = pretty != null
