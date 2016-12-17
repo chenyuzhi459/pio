@@ -170,7 +170,7 @@ public class Initialization {
             new JettyServerModule(),
             new MetadataConfigModule(),
             new DerbyMetadataStoragePioModule(),
-            new SparkServerConfigModule()
+            new SparkConfigModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);

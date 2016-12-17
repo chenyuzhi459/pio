@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  */
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+
 public class EngineInstance {
     private String id;
     private String location;
@@ -17,11 +17,11 @@ public class EngineInstance {
         this.location = location;
         this.id = id;
     }
-
+    @JsonProperty
     public String getId() {
         return id;
     }
-
+    @JsonProperty
     public String getLocation() {
         return location;
     }
