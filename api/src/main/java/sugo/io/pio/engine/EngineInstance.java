@@ -1,6 +1,7 @@
 package sugo.io.pio.engine;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  */
@@ -9,8 +10,8 @@ public class EngineInstance {
     private String location;
 
     @JsonCreator
-    public EngineInstance(String id,
-                          String location) {
+    public EngineInstance(@JsonProperty("id") String id,
+                          @JsonProperty("location") String location) {
         this.location = location;
         this.id = id;
     }
