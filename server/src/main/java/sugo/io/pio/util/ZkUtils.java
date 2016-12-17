@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by kitty on 16-12-14.
- */
+
 public class ZkUtils {
     private ZkUtils(){}
     private static final ZkUtils zkUtils = new ZkUtils();

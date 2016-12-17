@@ -7,14 +7,18 @@ import com.google.inject.Inject;
 
 public class SparkServerConfig {
 
-    @JsonProperty("yarn.historyServer.address")
+    @JsonProperty("historyServer")
     private String historyServer;
 
-    @JsonProperty("eventLog.dir")
+    @JsonProperty("eventLogDir")
     private String eventLogDir;
 
-    @JsonProperty("history.fs.logDirectory")
-    private String historyLogDir = "aaaa";
+    @JsonProperty("historyLogDir")
+    private String historyLogDir;
+
+    public SparkServerConfig() {
+        System.out.println();
+    }
 
     public String getHistoryServer() {
         return historyServer;
@@ -26,5 +30,17 @@ public class SparkServerConfig {
 
     public String getHistoryLogDir() {
         return historyLogDir;
+    }
+
+    public void setHistoryServer(String historyServer) {
+        this.historyServer = historyServer;
+    }
+
+    public void setEventLogDir(String eventLogDir) {
+        this.eventLogDir = eventLogDir;
+    }
+
+    public void setHistoryLogDir(String historyLogDir) {
+        this.historyLogDir = historyLogDir;
     }
 }

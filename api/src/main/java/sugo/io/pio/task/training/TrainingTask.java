@@ -5,7 +5,7 @@ import sugo.io.pio.task.Task;
 /**
  */
 public abstract class TrainingTask implements Task {
-    public TrainingTask() {
+    public TrainingTask(String id, String url) {
 
     }
 

@@ -11,7 +11,7 @@ public class SparkServerConfigModule implements Module {
     @Override
     public void configure(Binder binder) {
 
-        JsonConfigProvider.bind(binder,"spark", SparkServerConfig.class);
+        JsonConfigProvider.bind(binder,"spark.history", SparkServerConfig.class);
 
     }
 }
