@@ -1,27 +1,23 @@
-package sugo.io.pio.data.druid;
+package sugo.io.pio.data.hdfs;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
-import com.google.inject.Key;
-import com.google.inject.multibindings.MapBinder;
 import sugo.io.pio.initialization.PioModule;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  */
-public class DruidPioModule implements PioModule {
+public class HdfsPioModule implements PioModule {
     @Override
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
-                new SimpleModule(DruidPioModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(DruidBatchEventHose.class, "druid")));
+                new SimpleModule(HdfsPioModule.class.getSimpleName())
+                        .registerSubtypes(new NamedType(HdfsRepository.class, "hdfs")));
     }
-
     @Override
     public void configure(Binder binder) {
 
