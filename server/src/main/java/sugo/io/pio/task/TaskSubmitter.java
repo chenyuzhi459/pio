@@ -78,7 +78,7 @@ public class TaskSubmitter {
         primaryArgs.put(SubmitArgs.USER_JAR,userJar);
         //业务参数
         List<String> businessArgs = new ArrayList<>();
-        businessArgs.add("enginClassPath="+customEngin);
+        businessArgs.add(SubmitArgs.ENGIN_CLASS+"="+customEngin);
 
         //spark参数
         Map<String,String> sparkArgs = new HashMap();
@@ -148,20 +148,5 @@ public class TaskSubmitter {
         }
     }
 
-    private static void loadResource(String resourcePath,Map<String,String> sysProps,String sep) {
-        InputStream in = TaskSubmitter.class.getResourceAsStream(resourcePath);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line = null;
-        try {
-            while((line = reader.readLine())!=null){
-                String [] kv = line.split(sep);
-                if(kv.length==2){
-                    sysProps.put(kv[0],kv[1]);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 }
