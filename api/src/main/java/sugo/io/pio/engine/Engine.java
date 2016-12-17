@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public class Engine {
     private String id;
     private String location;
-    private String customEnginJar;
-    private String customEnginClass;
+    private String customEngineJar;
+    private String customEngineClass;
 
     @JsonCreator
     public Engine(String id,
@@ -20,8 +20,8 @@ public class Engine {
         this.location = location;
         this.id = id;
 
-        this.customEnginJar = customEnginJar;
-        this.customEnginClass = customEnginClass;
+        this.customEngineJar = customEnginJar;
+        this.customEngineClass = customEnginClass;
     }
 
     public String getId() {
@@ -33,11 +33,11 @@ public class Engine {
         return location;
     }
 
-    public String getCustomEnginClass() {
-        return customEnginClass;
+    public String getCustomEngineJar() {
+        return customEngineJar;
     }
 
-    public String getCustomEnginJar() {
-        return customEnginJar;
+    public String getCustomEngineClass() {
+        return customEngineClass;
     }
 }

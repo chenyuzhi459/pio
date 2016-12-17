@@ -17,8 +17,10 @@ public class LocalDruidBatchEventHoseTest {
         sparkConf.setAppName("test");
         sparkConf.setMaster("local");
         JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
+        long t1 = System.currentTimeMillis();
         long c = hose.find(sparkContext, DateTime.parse("2016-01-01"), DateTime.parse("2016-12-10")).count();
         System.out.println(c);
+        System.out.println(System.currentTimeMillis() - t1);
     }
 
 }
