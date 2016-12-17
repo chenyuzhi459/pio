@@ -17,7 +17,7 @@ public class GuiceInjectors {
         return ImmutableList.<Module>of(
                 new PioGuiceExtensions(),
                 new JacksonModule(),
-                new PropertiesModule(Arrays.asList("common.runtime.properties", "runtime.properties","spark.server.properties")),
+                new PropertiesModule(Arrays.asList("runtime.properties","spark.server.properties")),
                 new ConfigModule(),
                 new Module() {
                     @Override

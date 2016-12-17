@@ -40,7 +40,7 @@ public class TemplateEngineTest {
         Repository repository = new LocalFileRepository("/tmp/modelfile");
 
         model.save(modelData, repository);
-        TemplateModelData model2 = model.read(repository);
+//        TemplateModelData model2 = model.read(repository);
 
         System.out.print("ok");
     }

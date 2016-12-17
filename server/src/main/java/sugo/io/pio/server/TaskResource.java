@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import sugo.io.pio.data.input.BatchEventHose;
 import sugo.io.pio.guice.annotations.Json;
+import sugo.io.pio.metadata.MetadataStorageConnectorConfig;
+import sugo.io.pio.metadata.MetadataStorageTablesConfig;
+import sugo.io.pio.metadata.SparkServerConfig;
 import sugo.io.pio.task.Task;
 import sugo.io.pio.task.TaskSubmitter;
 
@@ -21,10 +24,13 @@ import java.io.InputStream;
 @Path("/pio/task/")
 public class TaskResource {
     private final ObjectMapper jsonMapper;
+    private final SparkServerConfig sparkServerConfig;
 
     @Inject
-    public TaskResource(@Json ObjectMapper jsonMapper) {
+    public TaskResource(@Json ObjectMapper jsonMapper,
+                        SparkServerConfig sparkServerConfig) {
         this.jsonMapper = jsonMapper;
+        this.sparkServerConfig = sparkServerConfig;
     }
 
     @GET
