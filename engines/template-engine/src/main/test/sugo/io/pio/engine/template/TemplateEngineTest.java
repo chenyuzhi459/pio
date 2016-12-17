@@ -1,5 +1,6 @@
 package sugo.io.pio.engine.template;
 
+import org.apache.spark.MapOutputStatistics;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class TemplateEngineTest {
         Repository repository = new LocalFileRepository("/tmp/modelfile");
 
         model.save(modelData, repository);
-//        TemplateModelData model2 = model.read(repository);
+        TemplateModelData model2 = model.read(repository);
 
         System.out.print("ok");
     }
