@@ -13,10 +13,7 @@ import com.google.inject.util.Modules;
 import com.metamx.common.ISE;
 import com.metamx.common.logger.Logger;
 import org.apache.commons.io.FileUtils;
-import sugo.io.pio.guice.ExtensionsConfig;
-import sugo.io.pio.guice.LifecycleModule;
-import sugo.io.pio.guice.MetadataConfigModule;
-import sugo.io.pio.guice.PioSecondaryModule;
+import sugo.io.pio.guice.*;
 import sugo.io.pio.guice.annotations.Json;
 import sugo.io.pio.initialization.jetty.JettyServerModule;
 import sugo.io.pio.metadata.storage.derby.DerbyMetadataStoragePioModule;
@@ -172,7 +169,8 @@ public class Initialization {
             new LifecycleModule(),
             new JettyServerModule(),
             new MetadataConfigModule(),
-            new DerbyMetadataStoragePioModule()
+            new DerbyMetadataStoragePioModule(),
+            new SparkServerConfigModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);
