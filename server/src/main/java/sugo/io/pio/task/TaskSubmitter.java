@@ -48,22 +48,14 @@ public class TaskSubmitter {
             return null;
         }
         EngineInstance engineInstance = oe.get();
-        String location = engineInstance.getLocation();
-        if(location == null ){
-            return null;
-        }
-        String []  arr = location.split(";");
-        if(arr.length != 2){
-            return null;
-        }
+        String customJar = engineInstance.getJarPath();
+        String customEngin = engineInstance.getClassPath();
 
         String userJar = sparkConfig.getUserJar();
         String mainClass = sparkConfig.getMainClass();
         // "/home/kitty/WorkSpace/intellij/Sugo-pio/testjar/target/testjar.jar";
         // "hdfs://sugo/user/kitty/share/lib/testjar.jar";
-        String customJar = arr[0];
         // "com.sugo.io.pio.test.testjar.UREngin";
-        String customEngin = arr[1];
         if(userJar.isEmpty() || mainClass.isEmpty() || customJar.isEmpty() || customEngin.isEmpty() ){
             return null;
         }
