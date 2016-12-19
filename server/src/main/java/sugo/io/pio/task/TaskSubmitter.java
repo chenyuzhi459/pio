@@ -39,9 +39,8 @@ public class TaskSubmitter {
 
     public String submit(ClusterType clusterType, Task task)
             throws IOException, InterruptedException {
-
         //get engineInstance from engineStorage
-        EngineInstance engineInstance = getEnginInstance(task);
+        EngineInstance engineInstance = getEngineInstance(task);
         if (engineInstance == null) {
             return null;
         }
@@ -53,24 +52,18 @@ public class TaskSubmitter {
             return null;
         }
         List<String> businessArgs = new ArrayList<>();
-        businessArgs.add(SubmitArgs.ENGIN_CLASS + "=" + customEngin);
+        businessArgs.add(SubmitArgs.ENGINE_CLASS + "=" + customEngin);
         String[] args = initAppArgs(userJar, mainClass, businessArgs);
-
         Configuration hadoopConf = initHadoopConfig();
-
         SparkConf sparkConf = initSparkConfig(clusterType, customJar);
-
         return submitApp(args, sparkConf, hadoopConf);
-
     }
 
     private String submitApp(String[] args, SparkConf sparkConf, Configuration hadoopConf) {
-
         ClientArguments cArgs = new ClientArguments(args);
         Client client = new Client(cArgs, hadoopConf, sparkConf);
         ApplicationId appId = client.submitApplication();
         return appId.toString();
-
     }
 
     /**
@@ -80,7 +73,6 @@ public class TaskSubmitter {
      * @return
      */
     private String[] initAppArgs(String userJar, String mainClass, List<String> businessArgs) {
-
         List<String> args = new LinkedList<>();
         args.add(SubmitArgs.MAIN_CLASS);
         args.add(mainClass);
@@ -93,16 +85,13 @@ public class TaskSubmitter {
         String[] argsArr = new String[args.size()];
         args.toArray(argsArr);
         return argsArr;
-
     }
 
-    /**
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    private Configuration initHadoopConfig() throws IOException, InterruptedException {
+    private static void addHadoopConfig(Configuration config, String filePath) {
+        config.addResource(TaskSubmitter.class.getResourceAsStream(filePath));
+    }
 
+    private Configuration initHadoopConfig() throws IOException, InterruptedException {
         Configuration config = new Configuration();
         addHadoopConfig(config, "/hadoop/core-site.xml");
         addHadoopConfig(config, "/hadoop/hdfs-site.xml");
@@ -115,34 +104,35 @@ public class TaskSubmitter {
         config.set(RESOURCEMANAGER_ADDRESS, config.get(RESOURCEMANAGER_ADDRESS + "." + activeRM));
         config.set(RESOURCEMANAGER_SCHEDULER_ADDRESS, config.get(RESOURCEMANAGER_SCHEDULER_ADDRESS + "." + activeRM));
         return config;
+    }
+
+    private static void loadSparkArgs(SparkConf conf, Map<String, Object> configs) {
+        if (configs != null) {
+            for (Map.Entry<String, Object> otherArg : configs.entrySet()) {
+                conf.set(otherArg.getKey(), (String) otherArg.getValue());
+            }
+        }
 
     }
 
-    /**
-     * @param clusterType
-     * @return
-     */
     private SparkConf initSparkConfig(ClusterType clusterType, String customJar) {
-
         SparkConf conf = new SparkConf();
         loadSparkArgs(conf, appConfig.getEnv());
         loadSparkArgs(conf, appConfig.getApp());
         if (ClusterType.YARN == clusterType) {
             System.setProperty(SubmitArgs.SPARK_YARN_MODE, Boolean.TRUE.toString());
-            //need cluster model
+            //need cluster mode
             conf.set(SubmitArgs.DEPLOY_MODE, "cluster");
         }
         conf.set(SubmitArgs.SPARK_YARN_DIST_JARS, customJar);
         return conf;
-
     }
 
     /**
      * @param task
      * @return
      */
-    private EngineInstance getEnginInstance(Task task) {
-
+    private EngineInstance getEngineInstance(Task task) {
         if (task == null) {
             return null;
         }
@@ -156,22 +146,5 @@ public class TaskSubmitter {
             return null;
         }
         return oe.get();
-
     }
-
-
-    private static void loadSparkArgs(SparkConf conf, Map<String, Object> configs) {
-
-        if (configs != null) {
-            for (Map.Entry<String, Object> otherArg : configs.entrySet()) {
-                conf.set(otherArg.getKey(), (String) otherArg.getValue());
-            }
-        }
-
-    }
-
-    private static void addHadoopConfig(Configuration config, String filePath) {
-        config.addResource(TaskSubmitter.class.getResourceAsStream(filePath));
-    }
-
 }
