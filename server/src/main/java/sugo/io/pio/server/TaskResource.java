@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import sugo.io.pio.guice.annotations.Json;
-import sugo.io.pio.metadata.SparkConfig;
 import sugo.io.pio.task.ClusterType;
 import sugo.io.pio.task.Task;
 import sugo.io.pio.task.TaskSubmitter;
@@ -22,17 +21,15 @@ import java.io.InputStream;
 @Path("/pio/task/")
 public class TaskResource {
     private final ObjectMapper jsonMapper;
-    private final EngineStorage engineStorage;
-    private final SparkConfig sparkConfig;
+    private final TaskSubmitter taskSubmitter;
+
 
     @Inject
     public TaskResource(@Json ObjectMapper jsonMapper
-            , EngineStorage engineStorage
-            , SparkConfig sparkConfig
+            ,TaskSubmitter taskSubmitter
     ) {
         this.jsonMapper = jsonMapper;
-        this.engineStorage = engineStorage;
-        this.sparkConfig = sparkConfig;
+        this.taskSubmitter = taskSubmitter;
 
     }
 
@@ -52,19 +49,16 @@ public class TaskResource {
             @QueryParam("pretty") String pretty,
             @Context final HttpServletRequest req
     ) {
-        //http://localhost:8080/pio/task?pretty=YARN
-        //{"type":"training","id":"1","url":"ttt"}
 
         final String reqContentType = req.getContentType();
         final ObjectWriter jsonWriter = pretty != null
                 ? jsonMapper.writerWithDefaultPrettyPrinter()
                 : jsonMapper.writer();
 
-        System.out.println(engineStorage.toString());
         String appId = null;
         try {
             Task task = jsonMapper.readValue(in, Task.class);
-            appId = TaskSubmitter.submit(ClusterType.YARN,task,engineStorage, sparkConfig);
+            appId = taskSubmitter.submit(ClusterType.YARN,task);
         } catch (IOException e) {
             e.printStackTrace();
         }

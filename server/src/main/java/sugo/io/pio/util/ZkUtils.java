@@ -13,7 +13,9 @@ public class ZkUtils {
     private static ZKClient zk = null;
 
     public static ZkUtils getInstance(String host) throws IOException {
-        zk = new ZKClient(host);
+        if(zk == null){
+            zk = new ZKClient(host);
+        }
         return zkUtils;
     }
 
