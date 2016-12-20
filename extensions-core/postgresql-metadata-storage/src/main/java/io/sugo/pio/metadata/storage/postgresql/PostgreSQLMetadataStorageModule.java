@@ -1,15 +1,14 @@
-package sugo.io.pio.metadata.storage.postgresql;
+package io.sugo.pio.metadata.storage.postgresql;
 
-import com.fasterxml.jackson.databind.Module;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import com.google.inject.Key;
-import sugo.io.pio.guice.LazySingleton;
-import sugo.io.pio.guice.PolyBind;
-import sugo.io.pio.guice.SQLMetadataStoragePioModule;
-import sugo.io.pio.initialization.PioModule;
-import sugo.io.pio.metadata.MetadataStorageConnector;
-import sugo.io.pio.metadata.SQLMetadataConnector;
+import io.sugo.pio.guice.LazySingleton;
+import io.sugo.pio.guice.PolyBind;
+import io.sugo.pio.guice.SQLMetadataStoragePioModule;
+import io.sugo.pio.initialization.PioModule;
+import io.sugo.pio.metadata.MetadataStorageConnector;
+import io.sugo.pio.metadata.SQLMetadataConnector;
 
 import java.util.List;
 

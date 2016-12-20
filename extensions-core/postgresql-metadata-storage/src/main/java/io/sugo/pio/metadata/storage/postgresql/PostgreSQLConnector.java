@@ -1,20 +1,16 @@
-package sugo.io.pio.metadata.storage.postgresql;
+package io.sugo.pio.metadata.storage.postgresql;
 
 import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import com.metamx.common.ISE;
 import com.metamx.common.logger.Logger;
-import com.mysql.jdbc.exceptions.MySQLTransientException;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.tweak.HandleCallback;
-import org.skife.jdbi.v2.util.BooleanMapper;
 import org.skife.jdbi.v2.util.StringMapper;
-import sugo.io.pio.metadata.MetadataStorageConnectorConfig;
-import sugo.io.pio.metadata.MetadataStorageTablesConfig;
-import sugo.io.pio.metadata.SQLMetadataConnector;
+import io.sugo.pio.metadata.MetadataStorageConnectorConfig;
+import io.sugo.pio.metadata.MetadataStorageTablesConfig;
+import io.sugo.pio.metadata.SQLMetadataConnector;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
