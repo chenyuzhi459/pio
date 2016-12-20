@@ -69,6 +69,14 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyclient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.tesla.aether</groupId>
+            <artifactId>tesla-aether</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
+        </dependency>
 
         <!-- Tests -->
         <dependency>

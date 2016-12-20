@@ -36,6 +36,9 @@ public class ExtensionsConfig
   private String directory = "extensions";
 
   @JsonProperty
+  private String hadoopDependenciesDir = "hadoop-dependencies";
+
+  @JsonProperty
   private List<String> loadList;
 
   public boolean searchCurrentClassloader()
@@ -52,6 +55,11 @@ public class ExtensionsConfig
   public List<String> getLoadList()
   {
     return loadList;
+  }
+
+  public String getHadoopDependenciesDir()
+  {
+    return hadoopDependenciesDir;
   }
 
   @Override

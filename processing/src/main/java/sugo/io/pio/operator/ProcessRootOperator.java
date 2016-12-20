@@ -1,0 +1,47 @@
+package sugo.io.pio.operator;
+
+import sugo.io.pio.ports.InputPorts;
+import sugo.io.pio.Process;
+
+/**
+ */
+public final class ProcessRootOperator extends OperatorChain {
+    /** The process which is connected to this process operator. */
+    private Process process;
+
+    public ProcessRootOperator(OperatorDescription description) {
+        this(description, null);
+    }
+
+    public ProcessRootOperator(OperatorDescription description, Process process) {
+        super(description, "Main Process");
+        setProcess(process);
+        rename("Root");
+    }
+
+    /**
+     * Convenience backport method to get the results of a process.
+     *
+     * @param omitNullResults
+     *            if set to <code>false</code> the returned {@link IOContainer} will contain
+     *            <code>null</code> values for empty results instead of omitting them.
+     */
+    public IOContainer getResults(boolean omitNullResults) {
+        InputPorts innerSinks = getSubprocess(0).getInnerSinks();
+        return innerSinks.createIOContainer(false, omitNullResults);
+    }
+
+    /** Sets the process. */
+    public void setProcess(Process process) {
+        this.process = process;
+        registerOperator(this.process);
+    }
+
+    /**
+     * Returns the process of this operator if available. Overwrites the method from the superclass.
+     */
+    @Override
+    public Process getProcess() {
+        return process;
+    }
+}

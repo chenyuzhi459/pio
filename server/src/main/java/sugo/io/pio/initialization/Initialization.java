@@ -13,10 +13,11 @@ import com.google.inject.util.Modules;
 import com.metamx.common.ISE;
 import com.metamx.common.logger.Logger;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import sugo.io.pio.guice.*;
 import sugo.io.pio.guice.annotations.Json;
-import sugo.io.pio.initialization.jetty.JettyServerModule;
 import sugo.io.pio.metadata.storage.derby.DerbyMetadataStoragePioModule;
+import sugo.io.pio.server.initialization.jetty.JettyServerModule;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -135,6 +136,40 @@ public class Initialization {
             }
         }
         return extensionsToLoad == null ? new File[]{} : extensionsToLoad;
+    }
+
+    /**
+     * Find all the hadoop dependencies that should be loaded by druid
+     *
+     * @param hadoopDependencyCoordinates e.g.["org.apache.hadoop:hadoop-client:2.3.0"]
+     * @param extensionsConfig            ExtensionsConfig configured by druid.extensions.xxx
+     *
+     * @return an array of hadoop dependency files that will be loaded by druid process
+     */
+    public static File[] getHadoopDependencyFilesToLoad(
+            List<String> hadoopDependencyCoordinates,
+            ExtensionsConfig extensionsConfig
+    )
+    {
+        final File rootHadoopDependenciesDir = new File(extensionsConfig.getHadoopDependenciesDir());
+        if (rootHadoopDependenciesDir.exists() && !rootHadoopDependenciesDir.isDirectory()) {
+            throw new ISE("Root Hadoop dependencies directory [%s] is not a directory!?", rootHadoopDependenciesDir);
+        }
+        final File[] hadoopDependenciesToLoad = new File[hadoopDependencyCoordinates.size()];
+        int i = 0;
+        for (final String coordinate : hadoopDependencyCoordinates) {
+            final DefaultArtifact artifact = new DefaultArtifact(coordinate);
+            final File hadoopDependencyDir = new File(rootHadoopDependenciesDir, artifact.getArtifactId());
+            final File versionDir = new File(hadoopDependencyDir, artifact.getVersion());
+            // find the hadoop dependency with the version specified in coordinate
+            if (!hadoopDependencyDir.isDirectory() || !versionDir.isDirectory()) {
+                throw new ISE(
+                        String.format("Hadoop dependency [%s] didn't exist!?", versionDir.getAbsolutePath())
+                );
+            }
+            hadoopDependenciesToLoad[i++] = versionDir;
+        }
+        return hadoopDependenciesToLoad;
     }
 
     /**
