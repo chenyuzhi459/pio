@@ -4,6 +4,7 @@ import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.Ports;
+import io.sugo.pio.ports.metadata.MetaData;
 
 /**
  */
@@ -14,6 +15,10 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
 
     private InputPort connectedTo;
 
+    private MetaData metaData;
+
+    private MetaData realMetaData;
+
     @Override
     public InputPort getDestination() {
         return connectedTo;
@@ -22,6 +27,18 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
     @Override
     public boolean isConnected() {
         return connectedTo != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends MetaData> T getMetaData(Class<T> desiredClass){
+        if (realMetaData != null) {
+            return (T) realMetaData;
+        } else {
+            if (metaData != null) {
+            }
+            return (T) metaData;
+        }
     }
 
     /*

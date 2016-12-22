@@ -107,6 +107,11 @@ public class ExecutionUnit {
         return operators.elements();
     }
 
+    /** Returns an unmodifiable view of the operators contained in this process. */
+    public List<Operator> getEnabledOperators() {
+        return new EnabledOperatorView(operators);
+    }
+
     /** Returns the operator that contains this process as a subprocess. */
     public OperatorChain getEnclosingOperator() {
         return enclosingOperator;

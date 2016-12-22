@@ -8,7 +8,7 @@ import io.sugo.pio.spark.ports.SparkOutputPortImpl;
 
 /**
  */
-public class SparkOperator extends Operator implements KillableOperation {
+public abstract class SparkOperator extends Operator implements KillableOperation {
     private SparkNest sparkNest = null;
 
     public SparkOperator(OperatorDescription description) {
