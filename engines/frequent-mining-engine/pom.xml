@@ -5,24 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>pio</artifactId>
-        <groupId>sugo.io</groupId>
+        <groupId>io.sugo</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <groupId>sugo.io</groupId>
+
     <artifactId>frequent-mining-engine</artifactId>
-    <version>1.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
-            <groupId>sugo.io</groupId>
-            <artifactId>api</artifactId>
+            <groupId>io.sugo</groupId>
+            <artifactId>pio-api</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>sugo.io</groupId>
+            <groupId>io.sugo</groupId>
             <artifactId>hdfs-extensions</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
