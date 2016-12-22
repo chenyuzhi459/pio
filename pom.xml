@@ -17,6 +17,7 @@
         <module>service</module>
 
         <!--extensions-->
+        <module>extensions-core/dl4j-extensions</module>
         <module>extensions-core/druid-extensions</module>
         <module>extensions-core/hdfs-extensions</module>
         <module>extensions-core/mysql-metadata-storage</module>
