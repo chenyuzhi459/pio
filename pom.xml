@@ -25,6 +25,8 @@
 
         <!--engines-->
         <module>engines/template-engine</module>
+        <module>engines/ur-detail-engine</module>
+        <module>engines/frequent-mining-engine</module>
     </modules>
 
     <properties>

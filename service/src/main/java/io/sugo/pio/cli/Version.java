@@ -30,5 +30,6 @@ public class Version implements Runnable
   @Override
   public void run()
   {
+    System.out.println("sugo-pio version:0.0.1");
   }
 }

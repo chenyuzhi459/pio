@@ -56,7 +56,7 @@ public class PropertiesModule implements Module
       InputStream stream = ClassLoader.getSystemResourceAsStream(propertiesFile);
       try {
         if (stream == null) {
-          File workingDirectoryFile = new File(systemProps.getProperty("druid.properties.file", propertiesFile));
+          File workingDirectoryFile = new File(systemProps.getProperty("pio.properties.file", propertiesFile));
           if (workingDirectoryFile.exists()) {
             stream = new BufferedInputStream(new FileInputStream(workingDirectoryFile));
           }

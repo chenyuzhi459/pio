@@ -35,4 +35,8 @@ public class HdfsRepository implements Repository {
         }
         return null;
     }
+
+    public String getPath() {
+        return path;
+    }
 }
