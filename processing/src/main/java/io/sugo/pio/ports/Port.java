@@ -1,6 +1,7 @@
 package io.sugo.pio.ports;
 
 import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.ports.metadata.MetaData;
 
 /**
  */
@@ -19,6 +20,27 @@ public interface Port {
 
     /** Returns true if connected to another Port. */
     public boolean isConnected();
+
+    /**
+     * Returns the meta data of the desired class or throws an UserError if available meta data
+     * cannot be cast to the desired class. If no meta data is present at all, <code>null</code> is
+     * returned.
+     *
+     */
+    public <T extends MetaData> T getMetaData(Class<T> desiredClass);
+
+    /**
+     * This method returns the object of the desired class or throws an UserError if no object is
+     * present or cannot be casted to the desiredClass. * @throws UserError if data is missing or of
+     * wrong class.
+     */
+    public <T extends IOObject> T getData(Class<T> desiredClass);
+
+    /**
+     * Returns the last object delivered to the connected {@link InputPort} or received from the
+     * connected {@link OutputPort}
+     */
+    public <T extends IOObject> T getDataOrNull(Class<T> desiredClass);
 
     /**
      * Returns the last object delivered to the connected {@link InputPort} or received from the

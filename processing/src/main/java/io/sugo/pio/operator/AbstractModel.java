@@ -2,5 +2,5 @@ package io.sugo.pio.operator;
 
 /**
  */
-public abstract class AbstractModel implements Model {
+public abstract class AbstractModel extends ResultObjectAdapter implements Model {
 }

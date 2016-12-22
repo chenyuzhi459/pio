@@ -1,7 +1,11 @@
 package io.sugo.pio.operator;
 
 import io.sugo.pio.Process;
+import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.InputPorts;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -43,5 +47,11 @@ public final class ProcessRootOperator extends OperatorChain {
     @Override
     public Process getProcess() {
         return process;
+    }
+
+    @Override
+    public List<ParameterType> getParameterTypes() {
+        List<ParameterType> types = super.getParameterTypes();
+        return types;
     }
 }

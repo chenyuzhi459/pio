@@ -1,6 +1,7 @@
 package io.sugo.pio.operator;
 
 import io.sugo.pio.Process;
+import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.InputPorts;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.OutputPorts;
@@ -9,14 +10,20 @@ import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
 import io.sugo.pio.ports.InputPort;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  */
-public abstract class Operator {
+public abstract class Operator implements ParameterHandler {
     private String name;
 
     private OperatorDescription operatorDescription = null;
 
     private boolean enabled = true;
+
+    /** Parameters for this Operator. */
+    private Parameters parameters = null;
 
     // / SIMONS NEUERUNGEN
     private final PortOwner portOwner = new PortOwner() {
@@ -102,6 +109,17 @@ public abstract class Operator {
     }
 
     /**
+     * Implement this method in subclasses.
+     *
+     * @deprecated use doWork()
+     */
+    @Deprecated
+    public IOObject[] apply() {
+        throw new UnsupportedOperationException("apply() is deprecated. Implement doWork().");
+    }
+
+
+    /**
      * Performs the actual work of the operator and must be implemented by subclasses. Replaces the
      * old method <code>apply()</code>.
      */
@@ -112,6 +130,147 @@ public abstract class Operator {
         if (isEnabled()) {
             doWork();
         }
+    }
+
+
+    /**
+     * The default implementation returns an input description that consumes the input IOObject
+     * without a user parameter. Subclasses may override this method to allow other input handling
+     * behaviors.
+     *
+     * @deprecated
+     */
+    @Deprecated
+    protected InputDescription getInputDescription(Class<?> inputClass) {
+        return new InputDescription(inputClass);
+    }
+
+    /**
+     * Returns a list of <tt>ParameterTypes</tt> describing the parameters of this operator. The
+     * default implementation returns an empty list if no input objects can be retained and special
+     * parameters for those input objects which can be prevented from being consumed.
+     *
+     * ATTENTION! This will create new parameterTypes. For calling already existing parameter types
+     * use getParameters().getParameterTypes();
+     */
+    @Override
+    public List<ParameterType> getParameterTypes() {
+        return new LinkedList<>();
+    }
+
+    /**
+     * Returns a collection of all parameters of this operator. If the parameters object has not
+     * been created yet, it will now be created. Creation had to be moved out of constructor for
+     * meta data handling in subclasses needing a port.
+     */
+    @Override
+    public Parameters getParameters() {
+        if (parameters == null) {
+            // if not loaded already: do now
+            parameters = new Parameters(getParameterTypes());
+        }
+        return parameters;
+    }
+
+    /**
+     * Returns a single parameter retrieved from the {@link Parameters} of this Operator.
+     */
+    @Override
+    public String getParameter(String key)  {
+        try {
+            return getParameters().getParameter(key);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    /** Returns a single named parameter and casts it to String. */
+    @Override
+    public String getParameterAsString(String key) {
+        return getParameter(key);
+    }
+
+    /** Returns a single named parameter and casts it to char. */
+    @Override
+    public char getParameterAsChar(String key) {
+        String parameterValue = getParameter(key);
+        if (parameterValue.length() > 0) {
+            return parameterValue.charAt(0);
+        }
+        return 0;
+    }
+
+    /** Returns a single named parameter and casts it to int. */
+    @Override
+    public int getParameterAsInt(String key) {
+        ParameterType type = this.getParameters().getParameterType(key);
+        String value = getParameter(key);
+        if (type != null) {
+            if (type instanceof ParameterTypeCategory) {
+                String parameterValue = value;
+                try {
+                    return Integer.valueOf(parameterValue);
+                } catch (NumberFormatException e) {
+                    ParameterTypeCategory categoryType = (ParameterTypeCategory) type;
+                    return categoryType.getIndex(parameterValue);
+                }
+            }
+        }
+        try {
+            return Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Expected integer but found '" + value + "'.");
+        }
+    }
+
+    /** Returns a single named parameter and casts it to long. */
+    @Override
+    public long getParameterAsLong(String key) {
+        ParameterType type = this.getParameters().getParameterType(key);
+        String value = getParameter(key);
+        if (type != null) {
+            if (type instanceof ParameterTypeCategory) {
+                String parameterValue = value;
+                try {
+                    return Long.valueOf(parameterValue);
+                } catch (NumberFormatException e) {
+                    ParameterTypeCategory categoryType = (ParameterTypeCategory) type;
+                    return categoryType.getIndex(parameterValue);
+                }
+            }
+        }
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Expected long but found '" + value + "'.");
+        }
+    }
+
+    /** Returns a single named parameter and casts it to double. */
+    @Override
+    public double getParameterAsDouble(String key) {
+        String value = getParameter(key);
+        if (value == null) {
+            throw new RuntimeException("");
+        }
+        try {
+            return Double.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Expected real number but found '" + value + "'.");
+        }
+    }
+
+    /**
+     * Returns a single named parameter and casts it to boolean. This method never throws an
+     * exception since there are no non-optional boolean parameters.
+     */
+    @Override
+    public boolean getParameterAsBoolean(String key) {
+        try {
+            return Boolean.valueOf(getParameter(key));
+        } catch (Exception e) {
+        }
+        return false; // cannot happen
     }
 
     /** Returns the ExecutionUnit that contains this operator. */

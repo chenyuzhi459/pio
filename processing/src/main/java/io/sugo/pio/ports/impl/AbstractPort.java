@@ -41,6 +41,33 @@ public abstract class AbstractPort implements Port {
     }
 
     @Override
+    public <T extends IOObject> T getData(Class<T> desiredClass) {
+        IOObject data = getAnyDataOrNull();
+        if (data == null) {
+            // TODO: Maybe change this to a checked exception
+            throw new RuntimeException("");
+        } else if (desiredClass.isAssignableFrom(data.getClass())) {
+            return desiredClass.cast(data);
+        } else {
+            // TODO: Maybe change this to a checked exception
+            throw new RuntimeException("");
+        }
+    }
+
+    @Override
+    public <T extends IOObject> T getDataOrNull(Class<T> desiredClass) {
+        IOObject data = getAnyDataOrNull();
+        if (data == null) {
+            return null;
+        } else if (desiredClass.isAssignableFrom(data.getClass())) {
+            return desiredClass.cast(data);
+        } else {
+            // TODO: Maybe change this to a checked exception
+            throw new RuntimeException("");
+        }
+    }
+
+    @Override
     public final String getName() {
         return name;
     }
