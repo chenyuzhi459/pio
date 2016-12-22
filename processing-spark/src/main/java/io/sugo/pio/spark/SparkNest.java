@@ -5,7 +5,6 @@ import io.sugo.pio.spark.datahandler.HadoopContext;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler;
 import io.sugo.pio.operator.OperatorDescription;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**

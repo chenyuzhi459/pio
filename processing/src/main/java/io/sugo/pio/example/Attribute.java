@@ -7,6 +7,25 @@ import java.io.Serializable;
 /**
  */
 public interface Attribute extends Cloneable, Serializable {
+
+    /** Clones this attribute. */
+    public Object clone();
+
+    /** Returns the name of the attribute. */
+    public String getName();
+
+    /** Sets the name of the attribute. */
+    public void setName(String name);
+
+    /**
+     * Sets the Attributes instance to which this attribute belongs. This instance will be notified
+     * when the attribute renames itself. This method must not be called except by the
+     * {@link Attributes} to which this AttributeRole is added.
+     */
+    public void addOwner(Attributes attributes);
+
+    public void removeOwner(Attributes attributes);
+
     /** Sets the construction description. */
     public void setConstruction(String description);
 
