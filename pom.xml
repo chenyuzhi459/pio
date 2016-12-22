@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>sugo.io</groupId>
+    <groupId>io.sugo</groupId>
     <artifactId>pio</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -12,9 +12,12 @@
         <module>common</module>
         <module>api</module>
         <module>processing</module>
+        <module>processing-spark</module>
         <module>server</module>
+        <module>service</module>
 
         <!--extensions-->
+        <module>extensions-core/dl4j-extensions</module>
         <module>extensions-core/druid-extensions</module>
         <module>extensions-core/hdfs-extensions</module>
         <module>extensions-core/mysql-metadata-storage</module>
@@ -255,6 +258,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_2.10</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
                 <artifactId>spark-yarn_2.10</artifactId>
                 <version>${spark.version}</version>
                 <exclusions>
@@ -317,6 +325,22 @@
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derbyclient</artifactId>
                 <version>10.13.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.tesla.aether</groupId>
+                <artifactId>tesla-aether</artifactId>
+                <version>0.0.5</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.aether</groupId>
+                <artifactId>aether-api</artifactId>
+                <version>0.9.0.M2</version>
             </dependency>
 
             <dependency>

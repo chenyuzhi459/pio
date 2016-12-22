@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>pio</artifactId>
-        <groupId>sugo.io</groupId>
+        <groupId>io.sugo</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>server</artifactId>
+    <artifactId>pio-server</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>sugo.io</groupId>
-            <artifactId>processing</artifactId>
+            <groupId>io.sugo</groupId>
+            <artifactId>pio-processing</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -68,6 +68,14 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.tesla.aether</groupId>
+            <artifactId>tesla-aether</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
         </dependency>
 
         <!-- Tests -->

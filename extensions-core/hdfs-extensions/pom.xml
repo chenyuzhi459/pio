@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>pio</artifactId>
-        <groupId>sugo.io</groupId>
+        <groupId>io.sugo</groupId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
@@ -14,8 +14,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>sugo.io</groupId>
-            <artifactId>api</artifactId>
+            <groupId>io.sugo</groupId>
+            <artifactId>pio-api</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
