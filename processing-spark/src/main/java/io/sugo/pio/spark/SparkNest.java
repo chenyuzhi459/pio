@@ -1,5 +1,6 @@
 package io.sugo.pio.spark;
 
+import io.sugo.pio.operator.OperatorChain;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.spark.datahandler.HadoopContext;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler;
@@ -9,7 +10,7 @@ import java.util.List;
 
 /**
  */
-public class SparkNest extends SparkOperator {
+public class SparkNest extends OperatorChain {
     private volatile HadoopContext hadoopContext;
 
     public SparkNest(OperatorDescription description) {
@@ -17,12 +18,16 @@ public class SparkNest extends SparkOperator {
     }
 
     public MapReduceHDFSHandler getMapReduceHDFSHandler() {
-        return this.hadoopContext == null?null:this.hadoopContext.getMapReduceHDFSHandler();
+        return hadoopContext == null ? null : hadoopContext.getMapReduceHDFSHandler();
     }
 
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
         return types;
+    }
+
+    public boolean isCleaningEnabled() {
+        return getParameterAsBoolean("cleaning");
     }
 }

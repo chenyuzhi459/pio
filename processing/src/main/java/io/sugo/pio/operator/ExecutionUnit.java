@@ -3,11 +3,10 @@ package io.sugo.pio.operator;
 import io.sugo.pio.Process;
 import io.sugo.pio.operator.execution.UnitExecutionFactory;
 import io.sugo.pio.operator.execution.UnitExecutor;
-import io.sugo.pio.ports.InputPorts;
-import io.sugo.pio.ports.OutputPorts;
-import io.sugo.pio.ports.PortOwner;
+import io.sugo.pio.ports.*;
 
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  */
@@ -117,6 +116,141 @@ public class ExecutionUnit {
         return enclosingOperator;
     }
 
+    private void unwire(boolean recursive) {
+        getInnerSources().disconnectAll();
+        for (Operator op : getOperators()) {
+            unwire(op, recursive);
+        }
+    }
+
+    private void unwire(Operator op, boolean recursive) {
+        op.getOutputPorts().disconnectAll();
+        if (recursive) {
+            if (op instanceof OperatorChain) {
+                for (ExecutionUnit subprocess : ((OperatorChain) op).getSubprocesses()) {
+                    subprocess.unwire(recursive);
+                }
+            }
+        }
+    }
+
+    private void autoWire(InputPorts inputPorts, LinkedList<OutputPort> readyOutputs)  {
+        boolean success = false;
+        do {
+            Set<InputPort> complete = new HashSet<InputPort>();
+            for (InputPort in : inputPorts.getAllPorts()) {
+                success = false;
+                if (!in.isConnected() && !complete.contains(in)
+                        && in.getPorts().getOwner().getOperator().shouldAutoConnect(in)) {
+                    Iterator<OutputPort> outIterator;
+                    outIterator = readyOutputs.descendingIterator();
+                    while (outIterator.hasNext()) {
+                        OutputPort outCandidate = outIterator.next();
+                        // TODO: Remove shouldAutoConnect() in later versions
+                        Operator owner = outCandidate.getPorts().getOwner().getOperator();
+                        if (owner.shouldAutoConnect(outCandidate)) {
+                            if (outCandidate.getMetaData() != null) {
+                                if (in.isInputCompatible(outCandidate.getMetaData())) {
+                                    readyOutputs.remove(outCandidate);
+                                    outCandidate.connectTo(in);
+                                    // we cannot continue with the remaining input ports
+                                    // since connecting may have triggered the creation of new input
+                                    // ports
+                                    // which would result in undefined behavior and a
+                                    // ConcurrentModificationException
+                                    success = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    // no port found.
+                    complete.add(in);
+                    if (success) {
+                        break;
+                    }
+                }
+            }
+        } while (success);
+    }
+
+    /**
+     * Transforms the meta data of the enclosing operator. Required in {@link #autoWire(List, LinkedList, boolean, boolean)} ()} after
+     * each Operator that has been wired.
+     */
+    private void transformMDNeighbourhood() {
+        getEnclosingOperator().transformMetaData();
+    }
+
+
+    /**
+     * Connects the ports automatically in a first-fit approach. Operators are connected in their
+     * ordering within the {@link #operators} list. Every input of every operator is connected to
+     * the first compatible output of an operator "left" of this operator. This corresponds to the
+     * way, IOObjects were consumed in the pre-5.0 version. Disabled operators are skipped.
+     *
+     * <br/>
+     *
+     * @param keepConnections
+     *            if true, don't unwire old connections before rewiring.
+     */
+    public void autoWire(boolean keepConnections, boolean recursive) {
+        if (!keepConnections) {
+            unwire(recursive);
+        }
+        // store all outputs. Scan them to find matching inputs.
+        LinkedList<OutputPort> readyOutputs = new LinkedList<OutputPort>();
+        addReadyOutputs(readyOutputs, getInnerSources());
+        List<Operator> enabled = new LinkedList<Operator>();
+        for (Operator op : getOperators()) {
+            if (op.isEnabled()) {
+                enabled.add(op);
+            }
+        }
+        autoWire(enabled, readyOutputs, recursive, true);
+    }
+
+    /**
+     * @param wireNew
+     *            If true, OutputPorts of operators will be added to readyOutputs once they are
+     *            wired.
+     */
+    private void autoWire(List<Operator> operators, LinkedList<OutputPort> readyOutputs,
+                          boolean recursive, boolean wireNew) {
+        transformMDNeighbourhood();
+
+        for (Operator op : operators) {
+            readyOutputs = op.preAutoWire(readyOutputs);
+            autoWire(op.getInputPorts(), readyOutputs);
+            transformMDNeighbourhood();
+            if (recursive) {
+                if (op instanceof OperatorChain) {
+                    for (ExecutionUnit subprocess : ((OperatorChain) op).getSubprocesses()) {
+                        // we have already removed all connections, so keepConnections=true in
+                        // recursive call
+                        subprocess.autoWire(true, recursive);
+                    }
+                }
+            }
+            if (wireNew) {
+                addReadyOutputs(readyOutputs, op.getOutputPorts());
+            }
+        }
+        autoWire(getInnerSinks(), readyOutputs);
+        transformMDNeighbourhood();
+    }
+
+
+    private void addReadyOutputs(LinkedList<OutputPort> readyOutputs, OutputPorts ports) {
+        // add the parameters in a stack-like fashion like in pre-5.0
+        Iterator<OutputPort> i = new LinkedList<OutputPort>(ports.getAllPorts()).descendingIterator();
+        while (i.hasNext()) {
+            OutputPort port = i.next();
+            if (!port.isConnected() && port.shouldAutoConnect()) {
+                readyOutputs.addLast(port);
+            }
+        }
+    }
 
     /** Executes the inner operators. */
     public void execute() {

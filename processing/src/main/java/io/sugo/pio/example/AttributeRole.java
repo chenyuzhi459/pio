@@ -38,7 +38,7 @@ public class AttributeRole implements Serializable {
      * is added.
      */
     protected void addOwner(Attributes attributes) {
-        this.owners.add(attributes);
+        owners.add(attributes);
     }
 
     /**
@@ -46,7 +46,7 @@ public class AttributeRole implements Serializable {
      * is added.
      */
     protected void removeOwner(Attributes attributes) {
-        this.owners.remove(attributes);
+        owners.remove(attributes);
     }
 
     public Attribute getAttribute() {

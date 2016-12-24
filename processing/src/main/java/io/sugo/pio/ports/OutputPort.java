@@ -28,4 +28,9 @@ public interface OutputPort extends Port {
 
     /** Returns the destination input port. */
     public InputPort getDestination();
+
+    /**
+     * Asks the owning operator
+     */
+    public boolean shouldAutoConnect();
 }

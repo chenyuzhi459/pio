@@ -42,4 +42,14 @@ public interface Attribute extends Cloneable, Serializable {
      * attributes.
      */
     public void setMapping(NominalMapping nominalMapping);
+
+
+    /** Returns true if the attribute is nominal. */
+    public boolean isNominal();
+
+    /** Returns true if the attribute is numerical. */
+    public boolean isNumerical();
+
+    /** Returns true if the attribute is date_time. */
+    public boolean isDateTime();
 }

@@ -65,7 +65,7 @@ public abstract class SparkSubmissionHandler {
 
             while(var6.hasNext()) {
                 String depPath = (String)var6.next();
-                jars.add(depPath.startsWith("hdfs://")?depPath:"hdfs://" + depPath);
+                jars.add(depPath.startsWith("hdfs://") ? depPath:"hdfs://" + depPath);
             }
 
             additionalJarsList.addAll(jars);
@@ -81,7 +81,7 @@ public abstract class SparkSubmissionHandler {
         }
     }
 
-    protected abstract void setAdditionalJars(List<String> var1);
+    protected abstract void setAdditionalJars(List<String> additionalJarsList);
 
     public void setUserArguments(String commonParams, String params, String argFilePath) {
         if(commonParams != null && !commonParams.isEmpty()) {

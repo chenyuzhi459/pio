@@ -2,13 +2,11 @@ package io.sugo.pio.operator;
 
 import io.sugo.pio.Process;
 import io.sugo.pio.parameter.*;
-import io.sugo.pio.ports.InputPorts;
-import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.OutputPorts;
-import io.sugo.pio.ports.PortOwner;
+import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
-import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.metadata.MDTransformationRule;
+import io.sugo.pio.ports.metadata.MDTransformer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +33,7 @@ public abstract class Operator implements ParameterHandler {
 
     private final InputPorts inputPorts;
     private final OutputPorts outputPorts;
+    private final MDTransformer transformer = new MDTransformer(this);
 
     private ExecutionUnit enclosingExecutionUnit;
 
@@ -273,10 +272,6 @@ public abstract class Operator implements ParameterHandler {
         return false; // cannot happen
     }
 
-    /** Returns the ExecutionUnit that contains this operator. */
-    public final ExecutionUnit getExecutionUnit() {
-        return enclosingExecutionUnit;
-    }
 
     /**
      * This method returns the {@link InputPorts} object that gives access to all defined
@@ -328,6 +323,54 @@ public abstract class Operator implements ParameterHandler {
     }
 
 
+    /**
+     * This method returns the {@link MDTransformer} object of this operator. This object will
+     * process all meta data of all ports of this operator according to the rules registered to it.
+     * This method can be used to get the transformer and register new Rules for
+     * MetaDataTransformation for the ports using the
+     * {@link MDTransformer#addRule(MDTransformationRule)}
+     * method or one of it's more specialized sisters.
+     */
+    public final MDTransformer getTransformer() {
+        return transformer;
+    }
+
+    /** Returns the ExecutionUnit that contains this operator. */
+    public final ExecutionUnit getExecutionUnit() {
+        return enclosingExecutionUnit;
+    }
+
+    /**
+     * If this method is called for perform the meta data transformation on this operator. It needs
+     * the meta data on the input Ports to be already calculated.
+     */
+    public void transformMetaData() {
+        if (!isEnabled()) {
+            return;
+        }
+        getInputPorts().checkPreconditions();
+        getTransformer().transformMetaData();
+    }
+
+    /**
+     * By default, all ports will be auto-connected by
+     * {@link ExecutionUnit#autoWire(boolean, boolean)}. Optional outputs were
+     * handled up to version 4.4 by parameters. From 5.0 on, optional outputs are computed iff the
+     * corresponding port is connected. For backward compatibility, operators can check if we should
+     * auto-connect a port by overriding this method (e.g. by checking a deprecated parameter).
+     * TODO: Remove in later versions
+     */
+    public boolean shouldAutoConnect(OutputPort outputPort) {
+        return true;
+    }
+
+    /**
+     * @see #shouldAutoConnect(OutputPort)
+     */
+    public boolean shouldAutoConnect(InputPort inputPort) {
+        return true;
+    }
+
     final protected void setEnclosingProcess(ExecutionUnit parent) {
         if (parent != null && this.enclosingExecutionUnit != null) {
             throw new IllegalStateException("Parent already set.");
@@ -344,6 +387,15 @@ public abstract class Operator implements ParameterHandler {
         } else {
             return null;
         }
+    }
+
+    /**
+     * This method is called before auto-wiring an operator. Operators can reorder outputs in order
+     * to influence how subsequent operators are wired. This is only necessary for legacy operators
+     * like IOConsumer or IOSelector. Don't override this method for new operators.
+     */
+    protected LinkedList<OutputPort> preAutoWire(LinkedList<OutputPort> readyOutputs) {
+        return readyOutputs;
     }
 
     /**

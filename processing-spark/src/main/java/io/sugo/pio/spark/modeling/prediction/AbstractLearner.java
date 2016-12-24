@@ -11,7 +11,7 @@ import io.sugo.pio.ports.OutputPort;
 /**
  */
 public abstract class AbstractLearner extends SparkOperator {
-    private final SparkOperation sparkOperation;
+    protected final SparkOperation sparkOperation;
     private final InputPort exampleSetInput = (InputPort)getInputPorts().createPort("training set");
     private final OutputPort modelOutput = createOutputPort("model");
     private final OutputPort performanceOutput = createOutputPort("estimated performance", this.canEstimatePerformance());
@@ -21,6 +21,12 @@ public abstract class AbstractLearner extends SparkOperator {
     public AbstractLearner(OperatorDescription description, SparkOperation sparkOperation) {
         super(description);
         this.sparkOperation = sparkOperation;
+    }
+
+    public void doWork() {
+        HadoopExampleSet inputHes = getHesFromInputPort(exampleSetInput);
+        PredictionModel model = learn(inputHes);
+        modelOutput.deliver(model);
     }
 
     public abstract PredictionModel learn(HadoopExampleSet exampleSet);

@@ -29,6 +29,20 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
         return connectedTo != null;
     }
 
+    @Override
+    public boolean shouldAutoConnect() {
+        return getPorts().getOwner().getOperator().shouldAutoConnect(this);
+    }
+
+    @Override
+    public MetaData getMetaData() {
+        if (realMetaData != null) {
+            return realMetaData;
+        } else {
+            return metaData;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends MetaData> T getMetaData(Class<T> desiredClass){

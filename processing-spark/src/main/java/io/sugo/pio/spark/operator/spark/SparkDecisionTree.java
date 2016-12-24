@@ -5,6 +5,7 @@ import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler.SparkOperation;
 import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.learner.PredictionModel;
+import io.sugo.pio.spark.transfer.model.ModelTransferObject;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,11 @@ public class SparkDecisionTree extends AbstractSparkLearner {
 
     @Override
     protected void postProcessModel(PredictionModel model, HadoopExampleSet exampleSet) {
+    }
+
+    @Override
+    protected PredictionModel convertModelFromMTO(ModelTransferObject mto, HadoopExampleSet exampleSet) {
+        return null;
     }
 
     public List<ParameterType> getParameterTypes() {
