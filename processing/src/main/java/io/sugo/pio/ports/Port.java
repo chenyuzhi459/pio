@@ -22,6 +22,14 @@ public interface Port {
     public boolean isConnected();
 
     /**
+     * Returns the meta data currently assigned to this port.
+     *
+     * @deprecated use {@link #getMetaData(Class)} instead
+     */
+    @Deprecated
+    public MetaData getMetaData();
+
+    /**
      * Returns the meta data of the desired class or throws an UserError if available meta data
      * cannot be cast to the desired class. If no meta data is present at all, <code>null</code> is
      * returned.

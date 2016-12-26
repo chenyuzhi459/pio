@@ -5,6 +5,8 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
+import io.sugo.pio.ports.metadata.MDTransformationRule;
+import io.sugo.pio.ports.metadata.MDTransformer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,17 +33,16 @@ public abstract class Operator implements ParameterHandler {
 
     private final InputPorts inputPorts;
     private final OutputPorts outputPorts;
+    private final MDTransformer transformer = new MDTransformer(this);
 
     private ExecutionUnit enclosingExecutionUnit;
 
-    public Operator() {
-        this.inputPorts = createInputPorts(portOwner);
-        this.outputPorts = createOutputPorts(portOwner);
-    }
-
-    public void setOperatorDescription(OperatorDescription description) {
+    public Operator(OperatorDescription description) {
         this.operatorDescription = description;
         this.name = description.getKey();
+
+        this.inputPorts = createInputPorts(portOwner);
+        this.outputPorts = createOutputPorts(portOwner);
     }
 
     public String getName() {
@@ -170,11 +171,6 @@ public abstract class Operator implements ParameterHandler {
         return parameters;
     }
 
-    @Override
-    public void setParameters(Parameters parameters) {
-        this.parameters = parameters;
-    }
-
     /**
      * Returns a single parameter retrieved from the {@link Parameters} of this Operator.
      */
@@ -185,24 +181,6 @@ public abstract class Operator implements ParameterHandler {
         } catch (Exception e) {
             throw e;
         }
-    }
-
-    /**
-     * Sets the given single parameter to the Parameters object of this operator. For parameter list
-     * the method {@link #setListParameter(String, List)} should be used.
-     */
-    @Override
-    public void setParameter(String key, String value) {
-        getParameters().setParameter(key, value);
-    }
-
-    /**
-     * Sets the given parameter list to the Parameters object of this operator. For single
-     * parameters the method {@link #setParameter(String, String)} should be used.
-     */
-    @Override
-    public void setListParameter(String key, List<String[]> list) {
-        getParameters().setParameter(key, ParameterTypeList.transformList2String(list));
     }
 
     /** Returns a single named parameter and casts it to String. */
@@ -294,10 +272,6 @@ public abstract class Operator implements ParameterHandler {
         return false; // cannot happen
     }
 
-    /** Returns the ExecutionUnit that contains this operator. */
-    public final ExecutionUnit getExecutionUnit() {
-        return enclosingExecutionUnit;
-    }
 
     /**
      * This method returns the {@link InputPorts} object that gives access to all defined
@@ -349,6 +323,54 @@ public abstract class Operator implements ParameterHandler {
     }
 
 
+    /**
+     * This method returns the {@link MDTransformer} object of this operator. This object will
+     * process all meta data of all ports of this operator according to the rules registered to it.
+     * This method can be used to get the transformer and register new Rules for
+     * MetaDataTransformation for the ports using the
+     * {@link MDTransformer#addRule(MDTransformationRule)}
+     * method or one of it's more specialized sisters.
+     */
+    public final MDTransformer getTransformer() {
+        return transformer;
+    }
+
+    /** Returns the ExecutionUnit that contains this operator. */
+    public final ExecutionUnit getExecutionUnit() {
+        return enclosingExecutionUnit;
+    }
+
+    /**
+     * If this method is called for perform the meta data transformation on this operator. It needs
+     * the meta data on the input Ports to be already calculated.
+     */
+    public void transformMetaData() {
+        if (!isEnabled()) {
+            return;
+        }
+        getInputPorts().checkPreconditions();
+        getTransformer().transformMetaData();
+    }
+
+    /**
+     * By default, all ports will be auto-connected by
+     * {@link ExecutionUnit#autoWire(boolean, boolean)}. Optional outputs were
+     * handled up to version 4.4 by parameters. From 5.0 on, optional outputs are computed iff the
+     * corresponding port is connected. For backward compatibility, operators can check if we should
+     * auto-connect a port by overriding this method (e.g. by checking a deprecated parameter).
+     * TODO: Remove in later versions
+     */
+    public boolean shouldAutoConnect(OutputPort outputPort) {
+        return true;
+    }
+
+    /**
+     * @see #shouldAutoConnect(OutputPort)
+     */
+    public boolean shouldAutoConnect(InputPort inputPort) {
+        return true;
+    }
+
     final protected void setEnclosingProcess(ExecutionUnit parent) {
         if (parent != null && this.enclosingExecutionUnit != null) {
             throw new IllegalStateException("Parent already set.");
@@ -368,25 +390,12 @@ public abstract class Operator implements ParameterHandler {
     }
 
     /**
-     * Performs a deep clone on the most parts of this operator. The breakpointThread is empty (as
-     * it is in initialization). The parent will be clone in the method of OperatorChain overwriting
-     * this one. The in- and output containers are only cloned by reference copying. Use this method
-     * only if you are sure what you are doing.
-     *
-     * @param name
-     *            This parameter is not longer used.
+     * This method is called before auto-wiring an operator. Operators can reorder outputs in order
+     * to influence how subsequent operators are wired. This is only necessary for legacy operators
+     * like IOConsumer or IOSelector. Don't override this method for new operators.
      */
-    public Operator cloneOperator(String name, boolean forParallelExecution) {
-        Operator clone = null;
-        try {
-            clone = operatorDescription.createOperatorInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Can not create clone of operator '" + getName(), e);
-        }
-        clone.setName(getName());
-        clone.enabled = enabled;
-
-        return clone;
+    protected LinkedList<OutputPort> preAutoWire(LinkedList<OutputPort> readyOutputs) {
+        return readyOutputs;
     }
 
     /**

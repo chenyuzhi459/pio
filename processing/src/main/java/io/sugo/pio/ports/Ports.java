@@ -1,6 +1,7 @@
 package io.sugo.pio.ports;
 
 import io.sugo.pio.operator.IOContainer;
+import io.sugo.pio.operator.Operator;
 
 import java.util.List;
 import java.util.Observer;
@@ -19,6 +20,14 @@ public interface Ports<T> {
      * ports.
      */
     public IOContainer createIOContainer(boolean onlyConnected, boolean omitNullResults);
+
+    /** Disconnects all ports. */
+    public void disconnectAll();
+
+    /**
+     * Disconnects all ports with exception to those connections to operators in the given list.
+     */
+    public void disconnectAllBut(List<Operator> exception);
 
     /** Returns an immutable view of the ports. */
     public List<T> getAllPorts();

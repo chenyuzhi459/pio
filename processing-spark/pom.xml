@@ -21,6 +21,13 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.10</artifactId>
         </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

@@ -1,5 +1,8 @@
 package io.sugo.pio.spark;
 
+import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorDescription;
@@ -36,5 +39,12 @@ public abstract class SparkOperator extends Operator implements KillableOperatio
         return out;
     }
 
+    public HadoopExampleSet getHesFromInputPort(InputPort port) {
+        IOObject exampleSet = port.getAnyDataOrNull();
+        if (exampleSet instanceof HadoopExampleSet) {
+            return (HadoopExampleSet)exampleSet;
+        }
 
+        throw new RuntimeException("Not an HadoopExampleSet, not acceptable.");
+    }
 }
