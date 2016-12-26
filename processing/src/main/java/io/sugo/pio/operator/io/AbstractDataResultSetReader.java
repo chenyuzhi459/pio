@@ -36,12 +36,16 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
 	}
 
 	@Override
-	public ExampleSet read() throws OperatorException {
+	public ExampleSet read() {
 		// loading data result set
-		final ExampleSet exampleSet;
+		ExampleSet exampleSet = null;
 		try (DataResultSetFactory dataResultSetFactory = getDataResultSetFactory();
 			 DataResultSet dataResultSet = dataResultSetFactory.makeDataResultSet(this)) {
-			exampleSet = transformDataResultSet(dataResultSet);
+			try {
+				exampleSet = transformDataResultSet(dataResultSet);
+			} catch (OperatorException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return exampleSet;
 	}

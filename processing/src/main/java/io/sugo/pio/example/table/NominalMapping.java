@@ -33,11 +33,4 @@ public interface NominalMapping extends Cloneable, Serializable {
      */
     public List<String> getValues();
 
-    /**
-     * Returns the internal double representation (actually an integer index) for the given nominal
-     * value without creating a mapping if none exists.
-     *
-     * @return the integer of the index or -1 if no mapping for this value exists
-     */
-    public int getIndex(String nominalValue);
 }

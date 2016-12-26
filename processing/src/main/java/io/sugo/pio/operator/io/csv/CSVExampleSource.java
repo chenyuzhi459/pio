@@ -22,8 +22,10 @@ package io.sugo.pio.operator.io.csv;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.io.AbstractDataResultSetReader;
 import io.sugo.pio.operator.io.AbstractReader;
+import io.sugo.pio.parameter.Parameters;
 
 import java.text.NumberFormat;
+import java.util.List;
 
 
 /**
@@ -59,4 +61,10 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
 	protected String getFileExtension() {
 		return "csv";
 	}
+
+	public static void main(String[] args) {
+		System.out.println();
+	}
+
+
 }

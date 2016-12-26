@@ -25,6 +25,8 @@ public abstract class AbstractAttribute implements Attribute {
 	/** The current attribute construction description object. */
 	private String constructionDescription = null;
 
+	private int tableIndex;
+
 	// --------------------------------------------------------------------------------
 
 	/**
@@ -94,6 +96,18 @@ public abstract class AbstractAttribute implements Attribute {
 	/** Sets the name of the attribute. */
 	@Override
 	public void setName(String v) {
+	}
+
+	/** Returns the index in the example table. */
+	@Override
+	public int getTableIndex() {
+		return tableIndex;
+	}
+
+	/** Sets the index in the example table. */
+	@Override
+	public void setTableIndex(int i) {
+		tableIndex = i;
 	}
 
 	/** Returns the construction description. */

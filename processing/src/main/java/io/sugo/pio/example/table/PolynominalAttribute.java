@@ -105,7 +105,7 @@ public class PolynominalAttribute extends NominalAttribute {
 		return false;
 	}
 
-	@Override
+//	@Override
 	public String getAsString(double value, int digits, boolean quoteNominal) {
 		return null;
 	}

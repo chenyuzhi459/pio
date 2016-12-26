@@ -1,5 +1,7 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.Process;
 import io.sugo.pio.operator.execution.UnitExecutionFactory;
 import io.sugo.pio.operator.execution.UnitExecutor;
@@ -20,15 +22,30 @@ public class ExecutionUnit {
 
     private String name;
 
-    private final OperatorChain enclosingOperator;
-    private final InputPorts innerInputPorts;
-    private final OutputPorts innerOutputPorts;
-    private Vector<Operator> operators = new Vector<Operator>();
+    private OperatorChain enclosingOperator;
+    private InputPorts innerInputPorts;
+    private OutputPorts innerOutputPorts;
+    private List<Operator> operators;
 
-    public ExecutionUnit(OperatorChain enclosingOperator, String name) {
+//    public ExecutionUnit(OperatorChain enclosingOperator, String name) {
+//        this.name = name;
+//        this.enclosingOperator = enclosingOperator;
+//
+//        innerInputPorts = enclosingOperator.createInnerSinks(portOwner);
+//        innerOutputPorts = enclosingOperator.createInnerSources(portOwner);
+//    }
+
+    @JsonCreator
+    public ExecutionUnit(
+            @JsonProperty("operators") List<Operator> operators,
+            @JsonProperty("name") String name
+    ) {
         this.name = name;
-        this.enclosingOperator = enclosingOperator;
+        this.operators = operators;
+    }
 
+    public void setEnclosingOperator(OperatorChain enclosingOperator) {
+        this.enclosingOperator = enclosingOperator;
         innerInputPorts = enclosingOperator.createInnerSinks(portOwner);
         innerOutputPorts = enclosingOperator.createInnerSources(portOwner);
     }
@@ -51,9 +68,8 @@ public class ExecutionUnit {
     /**
      * Adds the operator to this execution unit.
      *
-     * @param registerWithProcess
-     *            Typically true. If false, the operator will not be registered with its parent
-     *            process.
+     * @param registerWithProcess Typically true. If false, the operator will not be registered with its parent
+     *                            process.
      * @return the new index of the operator.
      */
     public int addOperator(Operator operator, boolean registerWithProcess) {
@@ -93,7 +109,9 @@ public class ExecutionUnit {
         }
     }
 
-    /** Returns an unmodifiable view of the operators contained in this process. */
+    /**
+     * Returns an unmodifiable view of the operators contained in this process.
+     */
     public List<Operator> getOperators() {
         return Collections.unmodifiableList(new ArrayList<>(operators));
     }
@@ -102,16 +120,20 @@ public class ExecutionUnit {
      * Use this method only in cases where you are sure that you don't want a
      * ConcurrentModificationException to occur when the list of operators is modified.
      */
-    public Enumeration<Operator> getOperatorEnumeration() {
-        return operators.elements();
+    public Iterator<Operator> getOperatorIterator() {
+        return operators.iterator();
     }
 
-    /** Returns an unmodifiable view of the operators contained in this process. */
+    /**
+     * Returns an unmodifiable view of the operators contained in this process.
+     */
     public List<Operator> getEnabledOperators() {
         return new EnabledOperatorView(operators);
     }
 
-    /** Returns the operator that contains this process as a subprocess. */
+    /**
+     * Returns the operator that contains this process as a subprocess.
+     */
     public OperatorChain getEnclosingOperator() {
         return enclosingOperator;
     }
@@ -134,7 +156,7 @@ public class ExecutionUnit {
         }
     }
 
-    private void autoWire(InputPorts inputPorts, LinkedList<OutputPort> readyOutputs)  {
+    private void autoWire(InputPorts inputPorts, LinkedList<OutputPort> readyOutputs) {
         boolean success = false;
         do {
             Set<InputPort> complete = new HashSet<InputPort>();
@@ -188,11 +210,10 @@ public class ExecutionUnit {
      * ordering within the {@link #operators} list. Every input of every operator is connected to
      * the first compatible output of an operator "left" of this operator. This corresponds to the
      * way, IOObjects were consumed in the pre-5.0 version. Disabled operators are skipped.
-     *
+     * <p>
      * <br/>
      *
-     * @param keepConnections
-     *            if true, don't unwire old connections before rewiring.
+     * @param keepConnections if true, don't unwire old connections before rewiring.
      */
     public void autoWire(boolean keepConnections, boolean recursive) {
         if (!keepConnections) {
@@ -211,9 +232,8 @@ public class ExecutionUnit {
     }
 
     /**
-     * @param wireNew
-     *            If true, OutputPorts of operators will be added to readyOutputs once they are
-     *            wired.
+     * @param wireNew If true, OutputPorts of operators will be added to readyOutputs once they are
+     *                wired.
      */
     private void autoWire(List<Operator> operators, LinkedList<OutputPort> readyOutputs,
                           boolean recursive, boolean wireNew) {
@@ -252,7 +272,9 @@ public class ExecutionUnit {
         }
     }
 
-    /** Executes the inner operators. */
+    /**
+     * Executes the inner operators.
+     */
     public void execute() {
         UnitExecutor executor = UnitExecutionFactory.getInstance().getExecutor(this);
         executor.execute(this);

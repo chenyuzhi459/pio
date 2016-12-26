@@ -77,7 +77,7 @@ public class NumericalAttribute extends AbstractAttribute {
 	 * case of DEFAULT_NUMBER_OF_DIGITS or an unlimited number of digits in case of
 	 * UNLIMITED_NUMBER_OF_DIGITS. For the value NaN a &quot;?&quot; will be returned.
 	 */
-	@Override
+//	@Override
 	public String getAsString(double value, int numberOfDigits, boolean quoteNominal) {
 		if (Double.isNaN(value)) {
 			return "?";

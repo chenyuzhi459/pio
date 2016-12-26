@@ -16,8 +16,6 @@ import java.util.List;
 public abstract class Operator implements ParameterHandler {
     private String name;
 
-    private OperatorDescription operatorDescription = null;
-
     private boolean enabled = true;
 
     /** Parameters for this Operator. */
@@ -37,10 +35,7 @@ public abstract class Operator implements ParameterHandler {
 
     private ExecutionUnit enclosingExecutionUnit;
 
-    public Operator(OperatorDescription description) {
-        this.operatorDescription = description;
-        this.name = description.getKey();
-
+    public Operator() {
         this.inputPorts = createInputPorts(portOwner);
         this.outputPorts = createOutputPorts(portOwner);
     }
@@ -181,6 +176,21 @@ public abstract class Operator implements ParameterHandler {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    @Override
+    public void setParameters(Parameters parameters) {
+        this.parameters = parameters;
+    }
+
+    @Override
+    public void setParameter(String key, String value) {
+        getParameters().setParameter(key, value);
+    }
+
+    @Override
+    public void setListParameter(String key, List<String[]> list) {
+        getParameters().setParameter(key, ParameterTypeList.transformList2String(list));
     }
 
     /** Returns a single named parameter and casts it to String. */

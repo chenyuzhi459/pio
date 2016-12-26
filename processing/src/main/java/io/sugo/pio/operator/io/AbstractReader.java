@@ -27,7 +27,7 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
 
 
 	/** Creates (or reads) the ExampleSet that will be returned by {@link #apply()}. */
-	public abstract T read() throws OperatorException;
+	public abstract T read();
 
 	@Override
 	public void doWork() {

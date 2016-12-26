@@ -2,6 +2,7 @@ package io.sugo.pio.example.table;
 
 
 import io.sugo.pio.tools.Ontology;
+import io.sugo.pio.tools.Tools;
 
 /**
  * This class holds all information on a single binary attribute. In addition to the generic
@@ -51,6 +52,11 @@ public class BinominalAttribute extends NominalAttribute {
 	}
 
 	@Override
+	public boolean isNumerical() {
+		return false;
+	}
+
+	@Override
 	public double getValue(DataRow row) {
 		return 0;
 	}
@@ -63,5 +69,23 @@ public class BinominalAttribute extends NominalAttribute {
 	@Override
 	public boolean isDateTime() {
 		return false;
+	}
+
+	@Override
+	public String getAsString(double value, int digits, boolean quoteNominal) {
+		if (Double.isNaN(value)) {
+			return "?";
+		} else {
+			try {
+				String result = getMapping().mapIndex((int) value);
+				if (quoteNominal) {
+					result = Tools.escape(result);
+					result = "\"" + result + "\"";
+				}
+				return result;
+			} catch (Throwable e) {
+				return "?";
+			}
+		}
 	}
 }

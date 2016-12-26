@@ -641,29 +641,6 @@ public class Tools {
     }
 
     /**
-     * Clones a {@link List} of {@link Operator}s including connections.
-     *
-     * @param operators List of operators.
-     * @return Cloned list of operators.
-     */
-    public static List<Operator> cloneOperators(List<Operator> operators) {
-        List<Operator> clonedOperators = new ArrayList<>(operators.size());
-        Map<Operator, Operator> originalToClone = new HashMap<>(operators.size());
-
-        for (Operator operator : operators) {
-            // clone operator
-            Operator clone = operator.cloneOperator(operator.getName(), false);
-            clonedOperators.add(clone);
-            // create mapping from original to cloned operator
-            originalToClone.put(operator, clone);
-        }
-
-        return clonedOperators;
-    }
-
-    // ====================================
-
-    /**
      * Reads the output of the reader and delivers it as string.
      */
     public static String readOutput(BufferedReader in) throws IOException {

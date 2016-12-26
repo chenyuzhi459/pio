@@ -34,7 +34,7 @@ import java.util.ResourceBundle;
  * 
  * @author Ingo Mierswa, Simon Fischer, Sebastian Land
  */
-public class OperatorException extends Exception {
+public class OperatorException extends RuntimeException {
 
 	private static final long serialVersionUID = 3626738574540303240L;
 
