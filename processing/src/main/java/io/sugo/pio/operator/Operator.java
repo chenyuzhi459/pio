@@ -2,13 +2,9 @@ package io.sugo.pio.operator;
 
 import io.sugo.pio.Process;
 import io.sugo.pio.parameter.*;
-import io.sugo.pio.ports.InputPorts;
-import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.OutputPorts;
-import io.sugo.pio.ports.PortOwner;
+import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
-import io.sugo.pio.ports.InputPort;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -38,12 +34,14 @@ public abstract class Operator implements ParameterHandler {
 
     private ExecutionUnit enclosingExecutionUnit;
 
-    public Operator(OperatorDescription description) {
-        this.operatorDescription = description;
-        this.name = description.getKey();
-
+    public Operator() {
         this.inputPorts = createInputPorts(portOwner);
         this.outputPorts = createOutputPorts(portOwner);
+    }
+
+    public void setOperatorDescription(OperatorDescription description) {
+        this.operatorDescription = description;
+        this.name = description.getKey();
     }
 
     public String getName() {
@@ -172,6 +170,11 @@ public abstract class Operator implements ParameterHandler {
         return parameters;
     }
 
+    @Override
+    public void setParameters(Parameters parameters) {
+        this.parameters = parameters;
+    }
+
     /**
      * Returns a single parameter retrieved from the {@link Parameters} of this Operator.
      */
@@ -182,6 +185,24 @@ public abstract class Operator implements ParameterHandler {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    /**
+     * Sets the given single parameter to the Parameters object of this operator. For parameter list
+     * the method {@link #setListParameter(String, List)} should be used.
+     */
+    @Override
+    public void setParameter(String key, String value) {
+        getParameters().setParameter(key, value);
+    }
+
+    /**
+     * Sets the given parameter list to the Parameters object of this operator. For single
+     * parameters the method {@link #setParameter(String, String)} should be used.
+     */
+    @Override
+    public void setListParameter(String key, List<String[]> list) {
+        getParameters().setParameter(key, ParameterTypeList.transformList2String(list));
     }
 
     /** Returns a single named parameter and casts it to String. */
@@ -344,6 +365,28 @@ public abstract class Operator implements ParameterHandler {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Performs a deep clone on the most parts of this operator. The breakpointThread is empty (as
+     * it is in initialization). The parent will be clone in the method of OperatorChain overwriting
+     * this one. The in- and output containers are only cloned by reference copying. Use this method
+     * only if you are sure what you are doing.
+     *
+     * @param name
+     *            This parameter is not longer used.
+     */
+    public Operator cloneOperator(String name, boolean forParallelExecution) {
+        Operator clone = null;
+        try {
+            clone = operatorDescription.createOperatorInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Can not create clone of operator '" + getName(), e);
+        }
+        clone.setName(getName());
+        clone.enabled = enabled;
+
+        return clone;
     }
 
     /**

@@ -66,6 +66,11 @@ public class SimpleAttributes extends AbstractAttributes {
         };
     }
 
+    @Override
+    public void add(AttributeRole attributeRole) {
+        register(attributeRole, false);
+    }
+
     /**
      * @param onlyMaps
      *            add only to maps, not to list.

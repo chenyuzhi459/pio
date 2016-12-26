@@ -1,5 +1,8 @@
 package io.sugo.pio;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.inject.Inject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.operator.IOContainer;
@@ -7,10 +10,20 @@ import io.sugo.pio.util.OperatorService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  */
 public class Process {
+
+    private final String id = UUID.randomUUID().toString();
+
+    /**
+     * This map holds the names of all operators in the process. Operators are automatically
+     * registered during adding and unregistered after removal.
+     */
+    private Map<String, Operator> operatorNameMap = new HashMap<>();
+
     private ProcessRootOperator rootOperator;
 
     /**
@@ -19,33 +32,34 @@ public class Process {
      */
     private boolean omitNullResults = true;
 
-    public Process() {
+    @JsonCreator
+    public Process(
+        @JsonProperty("rootOperator") ProcessRootOperator rootOperator
+    ) {
         try {
-            ProcessRootOperator root = OperatorService.createOperator(ProcessRootOperator.class);
-            root.rename(root.getName());
-            setRootOperator(root);
+            setRootOperator(rootOperator);
         } catch (Exception e) {
             throw new RuntimeException("Cannot initialize root operator of the process: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * This map holds the names of all operators in the process. Operators are automatically
-     * registered during adding and unregistered after removal.
-     */
-    private Map<String, Operator> operatorNameMap = new HashMap<>();
+    @JsonProperty
+    public String getId() {
+        return id;
+    }
 
     public void setRootOperator(ProcessRootOperator rootOperator) {
         this.rootOperator = rootOperator;
         this.operatorNameMap.clear();
         this.rootOperator.setProcess(this);
+        this.rootOperator.rename("Root");
     }
 
     /** Delivers the current root operator. */
+    @JsonProperty("rootOperator")
     public ProcessRootOperator getRootOperator() {
         return rootOperator;
     }
-
 
     public boolean isOmitNullResults() {
         return omitNullResults;

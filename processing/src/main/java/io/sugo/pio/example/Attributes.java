@@ -16,6 +16,9 @@ public interface Attributes extends Iterable<Attribute>, Cloneable, Serializable
     /** The name of the special attribute label. */
     public static final String LABEL_NAME = "label";
 
+    /** The name of regular attributes. */
+    public static final String ATTRIBUTE_NAME = "attribute";
+
     /** Returns a clone of this attribute set. */
     public Object clone();
 
@@ -30,6 +33,9 @@ public interface Attributes extends Iterable<Attribute>, Cloneable, Serializable
 
     /** Returns the number of all attributes, i.e. of the regular and the special attributes. */
     public int allSize();
+
+    /** Adds a new attribute role. */
+    public void add(AttributeRole attributeRole);
 
     /** Returns the special attribute for the given special name. */
     public Attribute getSpecial(String name);

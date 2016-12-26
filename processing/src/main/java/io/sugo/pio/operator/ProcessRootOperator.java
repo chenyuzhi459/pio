@@ -1,5 +1,7 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.Process;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.InputPorts;
@@ -13,14 +15,12 @@ public final class ProcessRootOperator extends OperatorChain {
     /** The process which is connected to this process operator. */
     private Process process;
 
-    public ProcessRootOperator(OperatorDescription description) {
-        this(description, null);
-    }
-
-    public ProcessRootOperator(OperatorDescription description, Process process) {
-        super(description, "Main Process");
-        setProcess(process);
+    @JsonCreator
+    public ProcessRootOperator(
+            @JsonProperty("units") ExecutionUnit[] execUnits
+    ) {
         rename("Root");
+        setExecUnits(execUnits);
     }
 
     /**

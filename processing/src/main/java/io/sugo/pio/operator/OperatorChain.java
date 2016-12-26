@@ -15,30 +15,14 @@ import java.util.List;
  */
 public abstract class OperatorChain extends Operator {
 
-    private ExecutionUnit[] subprocesses;
+    private ExecutionUnit[] execUnits;
 
-    public OperatorChain(OperatorDescription description, String... subprocessNames) {
-        super(description);
-        subprocesses = new ExecutionUnit[subprocessNames.length];
-        for (int i = 0; i < subprocesses.length; i++) {
-            subprocesses[i] = new ExecutionUnit(this, subprocessNames[i]);
+    public void setExecUnits(ExecutionUnit[] execUnits) {
+        this.execUnits = execUnits;
+        for (int i = 0; i < execUnits.length; i++) {
+            execUnits[i].setEnclosingOperator(this);
         }
     }
-
-    /**
-     * Adds the given operator at the given position. Please note that all operators (including the
-     * disabled operators) are used for position calculations.
-     */
-    public final int addOperator(Operator operator, int index) {
-        if (index < subprocesses.length) {
-            subprocesses[index].addOperator(operator);
-            return index;
-        } else {
-            throw new UnsupportedOperationException(
-                    "addOperator() is no longer supported. Try getSubprocess(int).addOperator()");
-        }
-    }
-
 
     /**
      * This method returns an arbitrary implementation of {@link InputPorts} for inner sink port
@@ -72,21 +56,21 @@ public abstract class OperatorChain extends Operator {
 
     @Override
     public void doWork() {
-        for (ExecutionUnit subprocess : subprocesses) {
+        for (ExecutionUnit subprocess : execUnits) {
             subprocess.execute();
         }
     }
 
     public ExecutionUnit getSubprocess(int index) {
-        return subprocesses[index];
+        return execUnits[index];
     }
 
     public int getNumberOfSubprocesses() {
-        return subprocesses.length;
+        return execUnits.length;
     }
 
     /** Returns an immutable view of all subprocesses */
     public List<ExecutionUnit> getSubprocesses() {
-        return Arrays.asList(subprocesses);
+        return Arrays.asList(execUnits);
     }
 }

@@ -13,6 +13,24 @@ public interface  ParameterHandler {
 
     public String getParameter(String key);
 
+    /**
+     * Sets all parameters of this operator. The given parameters are not allowed to be null and
+     * must correspond to the parameter types defined by this parameter handler.
+     */
+    public void setParameters(Parameters parameters);
+
+    /**
+     * Sets the given single parameter to the Parameters object of this operator. For parameter list
+     * the method {@link #setListParameter(String, List)} should be used.
+     */
+    public void setParameter(String key, String value);
+
+    /**
+     * Sets the given parameter list to the Parameters object of this operator. For single
+     * parameters the method {@link #setParameter(String, String)} should be used.
+     */
+    public void setListParameter(String key, List<String[]> list);
+
     /** Returns a single named parameter and casts it to String. */
     public String getParameterAsString(String key);
 

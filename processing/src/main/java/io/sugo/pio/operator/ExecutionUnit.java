@@ -1,5 +1,7 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.Process;
 import io.sugo.pio.operator.execution.UnitExecutionFactory;
 import io.sugo.pio.operator.execution.UnitExecutor;
@@ -21,15 +23,29 @@ public class ExecutionUnit {
 
     private String name;
 
-    private final OperatorChain enclosingOperator;
-    private final InputPorts innerInputPorts;
-    private final OutputPorts innerOutputPorts;
-    private Vector<Operator> operators = new Vector<Operator>();
+    private OperatorChain enclosingOperator;
+    private InputPorts innerInputPorts;
+    private OutputPorts innerOutputPorts;
+    private List<Operator> operators;
 
-    public ExecutionUnit(OperatorChain enclosingOperator, String name) {
+    @JsonCreator
+    public ExecutionUnit(
+            @JsonProperty("operators") List<Operator> operators,
+            @JsonProperty("name") String name
+    ) {
         this.name = name;
-        this.enclosingOperator = enclosingOperator;
+        this.operators = operators;
+    }
 
+    /**
+     * Returns the operator that contains this process as a subprocess.
+     */
+    public OperatorChain getEnclosingOperator() {
+        return enclosingOperator;
+    }
+
+    public void setEnclosingOperator(OperatorChain enclosingOperator) {
+        this.enclosingOperator = enclosingOperator;
         innerInputPorts = enclosingOperator.createInnerSinks(portOwner);
         innerOutputPorts = enclosingOperator.createInnerSources(portOwner);
     }
@@ -40,34 +56,6 @@ public class ExecutionUnit {
 
     public OutputPorts getInnerSources() {
         return innerOutputPorts;
-    }
-
-    /**
-     * Same as {@link #addOperator(Operator, boolean)}.
-     */
-    public int addOperator(Operator operator) {
-        return addOperator(operator, true);
-    }
-
-    /**
-     * Adds the operator to this execution unit.
-     *
-     * @param registerWithProcess
-     *            Typically true. If false, the operator will not be registered with its parent
-     *            process.
-     * @return the new index of the operator.
-     */
-    public int addOperator(Operator operator, boolean registerWithProcess) {
-        if (operator == null) {
-            throw new NullPointerException("operator cannot be null!");
-        }
-        if (operator instanceof ProcessRootOperator) {
-            throw new IllegalArgumentException(
-                    "'Process' operator cannot be added. It must always be the top-level operator!");
-        }
-        operators.add(operator);
-        registerOperator(operator, registerWithProcess);
-        return operators.size() - 1;
     }
 
     /**
@@ -94,7 +82,9 @@ public class ExecutionUnit {
         }
     }
 
-    /** Returns an unmodifiable view of the operators contained in this process. */
+    /**
+     * Returns an unmodifiable view of the operators contained in this process.
+     */
     public List<Operator> getOperators() {
         return Collections.unmodifiableList(new ArrayList<>(operators));
     }
@@ -103,22 +93,20 @@ public class ExecutionUnit {
      * Use this method only in cases where you are sure that you don't want a
      * ConcurrentModificationException to occur when the list of operators is modified.
      */
-    public Enumeration<Operator> getOperatorEnumeration() {
-        return operators.elements();
+    public Iterator<Operator> getOperatorIterator() {
+        return operators.iterator();
     }
 
-    /** Returns an unmodifiable view of the operators contained in this process. */
+    /**
+     * Returns an unmodifiable view of the operators contained in this process.
+     */
     public List<Operator> getEnabledOperators() {
         return new EnabledOperatorView(operators);
     }
 
-    /** Returns the operator that contains this process as a subprocess. */
-    public OperatorChain getEnclosingOperator() {
-        return enclosingOperator;
-    }
-
-
-    /** Executes the inner operators. */
+    /**
+     * Executes the inner operators.
+     */
     public void execute() {
         UnitExecutor executor = UnitExecutionFactory.getInstance().getExecutor(this);
         executor.execute(this);

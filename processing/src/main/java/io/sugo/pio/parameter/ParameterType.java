@@ -110,6 +110,16 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
         return key;
     }
 
+    /** Returns a short description. */
+    public String getDescription() {
+        return description;
+    }
+
+    /** Sets the short description. */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     /** Returns a string representation of this value. */
     public String toString(Object value) {
         if (value == null) {
