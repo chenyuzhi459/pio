@@ -6,6 +6,8 @@ import com.google.inject.Module;
 import io.airlift.airline.Command;
 import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.metadata.SQLMetadataEngineStorage;
+import io.sugo.pio.server.process.ProcessManager;
+import io.sugo.pio.server.process.ProcessResource;
 import io.sugo.pio.server.EngineResource;
 import io.sugo.pio.server.EngineStorage;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
@@ -32,12 +34,14 @@ public class CliPio extends ServerRunnable {
                     public void configure(Binder binder) {
                         Jerseys.addResource(binder, EngineResource.class);
                         Jerseys.addResource(binder, TaskResource.class);
+                        Jerseys.addResource(binder, ProcessResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
 
                         binder.bind(EngineStorage.class).to(SQLMetadataEngineStorage.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, SQLMetadataEngineStorage.class);
+                        LifecycleModule.register(binder, ProcessManager.class);
                     }
                 });
     }

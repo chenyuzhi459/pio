@@ -55,4 +55,41 @@ public class ParameterTypeInt extends ParameterTypeNumber {
     public double getMaxValue() {
         return min;
     }
+
+    /** Returns true. */
+    @Override
+    public boolean isNumerical() {
+        return true;
+    }
+
+    @Override
+    public String getRange() {
+        String range = "integer; ";
+        if (min == -Integer.MAX_VALUE) {
+            range += "-\u221E";
+        } else {
+            range += min;
+        }
+        range += "-";
+        if (max == Integer.MAX_VALUE) {
+            range += "+\u221E";
+        } else {
+            range += max;
+        }
+        if (!noDefault) {
+            range += "; default: " + getStringRepresentation(defaultValue);
+        }
+        return range;
+    }
+
+    public String getStringRepresentation(int value) {
+        String valueString = value + "";
+        if (value == Integer.MAX_VALUE) {
+            valueString = "+\u221E";
+        } else if (value == Integer.MIN_VALUE) {
+            valueString = "-\u221E";
+        }
+        return valueString;
+    }
+
 }

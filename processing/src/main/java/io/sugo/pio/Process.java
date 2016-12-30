@@ -7,6 +7,7 @@ import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.util.OperatorService;
+import org.joda.time.DateTime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.UUID;
  */
 public class Process {
 
-    private final String id = UUID.randomUUID().toString();
+    private final String id;
 
     /**
      * This map holds the names of all operators in the process. Operators are automatically
@@ -31,16 +32,21 @@ public class Process {
      * <code>null</code> values for empty results.
      */
     private boolean omitNullResults = true;
+    private final String name;
+
+    @JsonProperty
+    public String getName() {
+        return name;
+    }
 
     @JsonCreator
     public Process(
-        @JsonProperty("rootOperator") ProcessRootOperator rootOperator
+            @JsonProperty("name") String name,
+            @JsonProperty("rootOperator") ProcessRootOperator rootOperator
     ) {
-        try {
-            setRootOperator(rootOperator);
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot initialize root operator of the process: " + e.getMessage(), e);
-        }
+        this.name = name;
+        this.id = String.format("Process-%s-%d", name, new DateTime().getMillis());
+        setRootOperator(rootOperator);
     }
 
     @JsonProperty
@@ -52,10 +58,12 @@ public class Process {
         this.rootOperator = rootOperator;
         this.operatorNameMap.clear();
         this.rootOperator.setProcess(this);
-        this.rootOperator.rename("Root");
+        this.rootOperator.rename(ProcessRootOperator.TYPE);
     }
 
-    /** Delivers the current root operator. */
+    /**
+     * Delivers the current root operator.
+     */
     @JsonProperty("rootOperator")
     public ProcessRootOperator getRootOperator() {
         return rootOperator;
@@ -102,7 +110,9 @@ public class Process {
         }
     }
 
-    /** This method is used for unregistering a name from the operator name map. */
+    /**
+     * This method is used for unregistering a name from the operator name map.
+     */
     public void unregisterName(final String name) {
         operatorNameMap.remove(name);
     }

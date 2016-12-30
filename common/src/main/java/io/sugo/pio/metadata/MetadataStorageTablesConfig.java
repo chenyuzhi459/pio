@@ -14,13 +14,18 @@ public class MetadataStorageTablesConfig {
     @JsonProperty("engines")
     private String engineTable;
 
+    @JsonProperty("process_instance")
+    private String processInstanceTable;
+
     @JsonCreator
     public MetadataStorageTablesConfig(
         @JsonProperty("base") String base,
-        @JsonProperty("engines") String engineTable
+        @JsonProperty("engines") String engineTable,
+        @JsonProperty("process_instance") String processInstanceTable
     ) {
         this.base = (base == null) ? DEFAULT_BASE : base;
         this.engineTable = makeTableName(engineTable, "engines");;
+        this.processInstanceTable = makeTableName(processInstanceTable, "process_instances");
     }
 
     private String makeTableName(String explicitTableName, String defaultSuffix)
@@ -38,5 +43,16 @@ public class MetadataStorageTablesConfig {
     public String getEngineTable()
     {
         return engineTable;
+    }
+
+    public String getProcessInstanceTable() {
+        return processInstanceTable;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s{base=%s,engineTable=%s,processInstanceTable=%s}",
+                MetadataStorageTablesConfig.class.getSimpleName(),
+                base, engineTable, processInstanceTable);
     }
 }

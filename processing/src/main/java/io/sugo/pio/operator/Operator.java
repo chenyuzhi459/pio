@@ -1,6 +1,10 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.Process;
+import io.sugo.pio.operator.io.csv.CSVExampleSource;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
@@ -8,18 +12,26 @@ import io.sugo.pio.ports.impl.OutputPortsImpl;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MDTransformer;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- */
-public abstract class Operator implements ParameterHandler {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "operatorType")
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class),
+        @JsonSubTypes.Type(name = CSVExampleSource.TYPE, value = CSVExampleSource.class)
+})
+public abstract class Operator implements ParameterHandler, Serializable {
+    @JsonProperty
     private String name;
 
     private boolean enabled = true;
 
     /** Parameters for this Operator. */
     private Parameters parameters = null;
+
+    @JsonProperty
+    private Status status;
 
     // / SIMONS NEUERUNGEN
     private final PortOwner portOwner = new PortOwner() {
@@ -49,9 +61,20 @@ public abstract class Operator implements ParameterHandler {
      * name was already used in the process. Please use the method {@link #rename(String)} for usual
      * renaming.
      */
-    private final void setName(String newName) {
+    public void setName(String newName) {
         this.name = newName;
     }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+//    @JsonProperty("type")
+//    public abstract String getType();
 
     /**
      * This method unregisters the old name if this operator is already part of a {@link Process}.
@@ -122,7 +145,14 @@ public abstract class Operator implements ParameterHandler {
 
     public void execute() {
         if (isEnabled()) {
-            doWork();
+            try {
+                setStatus(Status.RUNNING);
+                doWork();
+                setStatus(Status.SUCCESS);
+            } catch (OperatorException oe) {
+                setStatus(Status.FAILED);
+                throw oe;
+            }
         }
     }
 
@@ -191,6 +221,17 @@ public abstract class Operator implements ParameterHandler {
     @Override
     public void setListParameter(String key, List<String[]> list) {
         getParameters().setParameter(key, ParameterTypeList.transformList2String(list));
+    }
+
+    /**
+     * Returns a single named parameter and casts it to List. The list returned by this method
+     * contains the user defined key-value pairs. Each element is a String array of length 2. The
+     * first element is the key, the second the parameter value. The caller have to perform the
+     * casts to the correct types himself.
+     */
+    @Override
+    public List<String[]> getParameterList(String key) throws UndefinedParameterError {
+        return ParameterTypeList.transformString2List(getParameter(key));
     }
 
     /** Returns a single named parameter and casts it to String. */

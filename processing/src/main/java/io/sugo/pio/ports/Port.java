@@ -15,11 +15,15 @@ public interface Port {
             | CLEAR_REAL_METADATA;
 
 
-    /** A human readable, unique (operator scope) name for the port. */
-    public String getName();
+    /**
+     * A human readable, unique (operator scope) name for the port.
+     */
+    String getName();
 
-    /** Returns true if connected to another Port. */
-    public boolean isConnected();
+    /**
+     * Returns true if connected to another Port.
+     */
+    boolean isConnected();
 
     /**
      * Returns the meta data currently assigned to this port.
@@ -27,53 +31,56 @@ public interface Port {
      * @deprecated use {@link #getMetaData(Class)} instead
      */
     @Deprecated
-    public MetaData getMetaData();
+    MetaData getMetaData();
 
     /**
      * Returns the meta data of the desired class or throws an UserError if available meta data
      * cannot be cast to the desired class. If no meta data is present at all, <code>null</code> is
      * returned.
-     *
      */
-    public <T extends MetaData> T getMetaData(Class<T> desiredClass);
+    <T extends MetaData> T getMetaData(Class<T> desiredClass);
 
     /**
      * This method returns the object of the desired class or throws an UserError if no object is
      * present or cannot be casted to the desiredClass. * @throws UserError if data is missing or of
      * wrong class.
      */
-    public <T extends IOObject> T getData(Class<T> desiredClass);
+    <T extends IOObject> T getData(Class<T> desiredClass);
 
     /**
      * Returns the last object delivered to the connected {@link InputPort} or received from the
      * connected {@link OutputPort}
      */
-    public <T extends IOObject> T getDataOrNull(Class<T> desiredClass);
+    <T extends IOObject> T getDataOrNull(Class<T> desiredClass);
 
     /**
      * Returns the last object delivered to the connected {@link InputPort} or received from the
      * connected {@link OutputPort}. Never throws an exception.
      */
-    public IOObject getAnyDataOrNull();
+    IOObject getAnyDataOrNull();
 
-    /** Returns the set of ports to which this port belongs. */
-    public Ports<? extends Port> getPorts();
+    /**
+     * Returns the set of ports to which this port belongs.
+     */
+    Ports<? extends Port> getPorts();
 
     /**
      * Locks the port so port extenders do not remove the port if disconnected. unlocks it.
      */
-    public void lock();
+    void lock();
 
     /**
      * @see #lock()
      */
-    public void unlock();
+    void unlock();
 
     /**
      * @see #lock()
      */
-    public boolean isLocked();
+    boolean isLocked();
 
-    /** Releases of any hard reference to IOObjects held by this class. */
+    /**
+     * Releases of any hard reference to IOObjects held by this class.
+     */
     void freeMemory();
 }

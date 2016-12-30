@@ -12,4 +12,6 @@ public interface MetadataStorageConnector {
     ) throws Exception;
 
     void createEngineTable();
+
+    void createProcessInstanceTable();
 }

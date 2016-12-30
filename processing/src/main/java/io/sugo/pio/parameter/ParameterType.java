@@ -100,6 +100,13 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
         return false;
     }
 
+    /**
+     * Returns true if the values of this parameter type are numerical, i.e. might be parsed by
+     * {@link Double#parseDouble(String)}. Otherwise false should be returned. This method might be
+     * used by parameter logging operators.
+     */
+    public abstract boolean isNumerical();
+
     /** Sets the key. */
     public void setKey(String key) {
         this.key = key;
@@ -119,6 +126,9 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
     public void setDescription(String description) {
         this.description = description;
     }
+
+    /** Returns a human readable description of the range. */
+    public abstract String getRange();
 
     /** Returns a string representation of this value. */
     public String toString(Object value) {

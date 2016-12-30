@@ -19,4 +19,16 @@ public class ParameterTypeString extends ParameterType {
     public void setDefaultValue(Object defaultValue) {
         this.defaultValue = (String)defaultValue;
     }
+
+    /** Returns false. */
+    @Override
+    public boolean isNumerical() {
+        return false;
+    }
+
+    @Override
+    public String getRange() {
+        return "string" + (defaultValue != null ? "; default: '" + defaultValue + "'" : "");
+    }
+
 }

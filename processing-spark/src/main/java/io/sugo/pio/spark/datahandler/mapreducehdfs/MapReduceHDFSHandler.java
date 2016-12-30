@@ -6,7 +6,7 @@ import io.sugo.pio.spark.HadoopTools;
 import io.sugo.pio.spark.connections.HadoopConnectionEntry;
 import io.sugo.pio.spark.datahandler.HadoopContext;
 import io.sugo.pio.spark.operator.spark.SparkTools.SparkFinalState;
-import io.sugo.pio.util.ParameterService;
+import io.sugo.pio.tools.ParameterService;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;

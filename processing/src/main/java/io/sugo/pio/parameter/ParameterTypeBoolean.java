@@ -19,4 +19,14 @@ public class ParameterTypeBoolean extends ParameterTypeSingle {
     public void setDefaultValue(Object defaultValue) {
         this.defaultValue = (Boolean)defaultValue;
     }
+
+    @Override
+    public boolean isNumerical() {
+        return false;
+    }
+
+    @Override
+    public String getRange() {
+        return "boolean; default: " + defaultValue;
+    }
 }

@@ -28,6 +28,7 @@ public class DataResultSetTranslationConfiguration {
 	public static final String PARAMETER_ANNOTATIONS = "annotations";
 	public static final String ANNOTATION_NAME = "Name";
 	public static final String PARAMETER_DATE_FORMAT = "date_format";
+	public static final String PARAMETER_TIME_ZONE = "time_zone";
 
 	private ColumnMetaData[] columnMetaData;
 

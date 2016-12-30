@@ -1,6 +1,7 @@
 package io.sugo.pio.tools;
 
 
+import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterWriter;
 
 import java.io.*;

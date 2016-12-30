@@ -14,8 +14,8 @@ import io.sugo.pio.spark.ports.SparkOutputPortImpl;
 public abstract class SparkOperator extends Operator implements KillableOperation {
     private SparkNest sparkNest = null;
 
-    public SparkOperator(OperatorDescription description) {
-        super(description);
+    public SparkOperator() {
+        super();
     }
 
     public SparkNest getRadoopNest() {

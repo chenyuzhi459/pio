@@ -18,8 +18,8 @@ public abstract class AbstractLearner extends SparkOperator {
     private final OutputPort weightsOutput = createOutputPort("weights", this.canCalculateWeights());
     private final OutputPort exampleSetOutput = createOutputPort("exampleSet");
 
-    public AbstractLearner(OperatorDescription description, SparkOperation sparkOperation) {
-        super(description);
+    public AbstractLearner(SparkOperation sparkOperation) {
+        super();
         this.sparkOperation = sparkOperation;
     }
 
@@ -34,4 +34,8 @@ public abstract class AbstractLearner extends SparkOperator {
     public abstract boolean canEstimatePerformance();
 
     public abstract boolean canCalculateWeights();
+
+    public static void main(String[] args) {
+        System.out.println();
+    }
 }

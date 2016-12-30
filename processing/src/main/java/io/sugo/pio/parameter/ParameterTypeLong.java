@@ -55,4 +55,39 @@ public class ParameterTypeLong extends ParameterTypeNumber {
         noDefault = false;
         this.defaultValue = (Long) defaultValue;
     }
+
+    @Override
+    public boolean isNumerical() {
+        return true;
+    }
+
+    @Override
+    public String getRange() {
+        String range = "Long; ";
+        if (min == -Long.MAX_VALUE) {
+            range += "-\u221E";
+        } else {
+            range += min;
+        }
+        range += "-";
+        if (max == Long.MAX_VALUE) {
+            range += "+\u221E";
+        } else {
+            range += max;
+        }
+        if (!noDefault) {
+            range += "; default: " + getStringRepresentation(defaultValue);
+        }
+        return range;
+    }
+
+    public String getStringRepresentation(long defaultValue2) {
+        String valueString = defaultValue2 + "";
+        if (defaultValue2 == Long.MAX_VALUE) {
+            valueString = "+\u221E";
+        } else if (defaultValue2 == Long.MIN_VALUE) {
+            valueString = "-\u221E";
+        }
+        return valueString;
+    }
 }

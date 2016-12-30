@@ -293,7 +293,11 @@ public class CSVResultSet implements DataResultSet {
 
 	@Override
 	public String getString(int columnIndex) {
-		return null;
+		if (columnIndex < current.length) {
+			return current[columnIndex];
+		} else {
+			return null;
+		}
 	}
 
 	@Override

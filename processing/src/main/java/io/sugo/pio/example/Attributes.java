@@ -13,11 +13,39 @@ public interface Attributes extends Iterable<Attribute>, Cloneable, Serializable
     /** Indicates all attributes. */
     public static final int ALL = 2;
 
+    /** The name of the confidence special attributes. */
+    public static final String CONFIDENCE_NAME = "confidence";
+
     /** The name of the special attribute label. */
     public static final String LABEL_NAME = "label";
 
+    /** The name of the special attribute id. */
+    public static final String ID_NAME = "id";
+
+    /** The name of the special attribute prediction. */
+    public static final String PREDICTION_NAME = "prediction";
+
     /** The name of regular attributes. */
     public static final String ATTRIBUTE_NAME = "attribute";
+
+    /** The name of the special attribute batch. */
+    public static final String BATCH_NAME = "batch";
+
+    /** The name of the special attribute outlier. */
+    public static final String OUTLIER_NAME = "outlier";
+
+    /** The name of the classification cost special attribute. */
+    public static final String CLASSIFICATION_COST = "cost";
+
+    /** The name of the classification cost special attribute. */
+    public static final String BASE_VALUE = "base_value";
+
+    /** The name of the special attribute cluster. */
+    public static final String CLUSTER_NAME = "cluster";
+
+    /** All known names of regular and special attribute types as an array. */
+    public static final String[] KNOWN_ATTRIBUTE_TYPES = new String[] { ATTRIBUTE_NAME, LABEL_NAME, ID_NAME,
+            BATCH_NAME, CLUSTER_NAME, PREDICTION_NAME, OUTLIER_NAME, CLASSIFICATION_COST, BASE_VALUE };
 
     /** Returns a clone of this attribute set. */
     public Object clone();

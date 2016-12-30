@@ -1,4 +1,4 @@
-package io.sugo.pio.resource;
+package io.sugo.pio.server.process;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

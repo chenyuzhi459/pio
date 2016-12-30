@@ -7,20 +7,19 @@ import io.sugo.pio.operator.execution.UnitExecutionFactory;
 import io.sugo.pio.operator.execution.UnitExecutor;
 import io.sugo.pio.ports.*;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Level;
 
 /**
  */
-public class ExecutionUnit {
+public class ExecutionUnit implements Serializable {
     private final PortOwner portOwner = new PortOwner() {
         @Override
         public Operator getOperator() {
             return getEnclosingOperator();
         }
     };
-
-    private String name;
 
     private OperatorChain enclosingOperator;
     private InputPorts innerInputPorts;
@@ -37,10 +36,8 @@ public class ExecutionUnit {
 
     @JsonCreator
     public ExecutionUnit(
-            @JsonProperty("operators") List<Operator> operators,
-            @JsonProperty("name") String name
+            @JsonProperty("operators") List<Operator> operators
     ) {
-        this.name = name;
         this.operators = operators;
     }
 
@@ -112,6 +109,7 @@ public class ExecutionUnit {
     /**
      * Returns an unmodifiable view of the operators contained in this process.
      */
+    @JsonProperty("operators")
     public List<Operator> getOperators() {
         return Collections.unmodifiableList(new ArrayList<>(operators));
     }

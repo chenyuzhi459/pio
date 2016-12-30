@@ -1,5 +1,6 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.ports.InputPorts;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.OutputPorts;
@@ -15,13 +16,18 @@ import java.util.List;
  */
 public abstract class OperatorChain extends Operator {
 
-    private ExecutionUnit[] execUnits;
+    private List<ExecutionUnit> execUnits;
 
-    public void setExecUnits(ExecutionUnit[] execUnits) {
+    public void setExecUnits(List<ExecutionUnit> execUnits) {
         this.execUnits = execUnits;
-        for (int i = 0; i < execUnits.length; i++) {
-            execUnits[i].setEnclosingOperator(this);
+        for (ExecutionUnit unit : execUnits) {
+            unit.setEnclosingOperator(this);
         }
+    }
+
+    @JsonProperty("execUnits")
+    public List<ExecutionUnit> getExecUnits() {
+        return execUnits;
     }
 
     /**
@@ -30,8 +36,7 @@ public abstract class OperatorChain extends Operator {
      * (dis)connection behavior, optionally by customized {@link InputPort} instances) by overriding
      * this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link InputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
@@ -45,8 +50,7 @@ public abstract class OperatorChain extends Operator {
      * (dis)connection behavior, optionally by customized {@link OutputPort} instances) by
      * overriding this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link OutputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
@@ -62,15 +66,17 @@ public abstract class OperatorChain extends Operator {
     }
 
     public ExecutionUnit getSubprocess(int index) {
-        return execUnits[index];
+        return execUnits.get(index);
     }
 
     public int getNumberOfSubprocesses() {
-        return execUnits.length;
+        return execUnits.size();
     }
 
-    /** Returns an immutable view of all subprocesses */
+    /**
+     * Returns an immutable view of all subprocesses
+     */
     public List<ExecutionUnit> getSubprocesses() {
-        return Arrays.asList(execUnits);
+        return execUnits;
     }
 }

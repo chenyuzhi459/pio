@@ -198,6 +198,9 @@ public class Tools {
         System.arraycopy(allTimeZoneNames, 0, availableTimeZoneNames, 1, allTimeZoneNames.length);
     }
 
+    public static String[] getAllTimeZones() {
+        return availableTimeZoneNames;
+    }
 
     public static TimeZone getTimeZone(int index) {
         if (index == SYSTEM_TIME_ZONE) {

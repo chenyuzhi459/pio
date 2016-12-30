@@ -59,4 +59,29 @@ public class ParameterTypeDouble extends ParameterTypeNumber {
     public void setDefaultValue(Object object) {
         this.defaultValue = (Double) object;
     }
+
+    @Override
+    public boolean isNumerical() {
+        return true;
+    }
+
+    @Override
+    public String getRange() {
+        String range = "real; ";
+        if (min == Double.NEGATIVE_INFINITY) {
+            range += "-\u221E";
+        } else {
+            range += min;
+        }
+        range += "-";
+        if (max == Double.POSITIVE_INFINITY) {
+            range += "+\u221E";
+        } else {
+            range += max;
+        }
+        if (!noDefault) {
+            range += "; default: " + defaultValue;
+        }
+        return range;
+    }
 }

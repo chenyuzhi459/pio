@@ -20,6 +20,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 
+import static io.sugo.pio.operator.io.DataResultSetTranslationConfiguration.ANNOTATION_NAME;
+
 
 /**
  * This class encapsulates the translation step from a {@link DataResultSetTranslator} to an
@@ -144,7 +146,7 @@ public class DataResultSetTranslator {
 				int attributeIndex = 0;
 				List<String> attributeNames = new ArrayList<>();
 				for (Attribute attribute : attributes) {
-//					if (AbstractDataResultSetReader.ANNOTATION_NAME.equals(currentAnnotation)) {
+					if (ANNOTATION_NAME.equals(currentAnnotation)) {
 						// resetting name
 
 						// going into here, setting the names, maybe add checks here
@@ -173,14 +175,14 @@ public class DataResultSetTranslator {
 							}
 
 						}
-//					} else {
-//						// setting annotation
-//						String annotationValue = getString(dataResultSet, exampleIndex, attributeColumns[attributeIndex],
-//								isFaultTolerant);
-//						if (annotationValue != null && !annotationValue.isEmpty()) {
+					} else {
+						// setting annotation
+						String annotationValue = getString(dataResultSet, exampleIndex, attributeColumns[attributeIndex],
+								isFaultTolerant);
+						if (annotationValue != null && !annotationValue.isEmpty()) {
 //							attribute.getAnnotations().put(currentAnnotation, annotationValue);
-//						}
-//					}
+						}
+					}
 					attributeNames.add(attribute.getName());
 					attributeIndex++;
 				}
@@ -404,6 +406,7 @@ public class DataResultSetTranslator {
 			if (cancelGuessingRequested) {
 				break;
 			}
+			dataResultSet.next();
 
 			// skip rows with annotations
 			if (currentRow > maxAnnotatedRow || configuration.getAnnotation(currentRow) == null) {

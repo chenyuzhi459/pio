@@ -26,6 +26,7 @@ import io.sugo.pio.operator.io.DataResultSetFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class CSVResultSetConfiguration implements DataResultSetFactory {
 	private int startingRow = 0;
 	private int headerRow = 0;
 
-	private Charset encoding = Charset.defaultCharset();
+	private Charset encoding = StandardCharsets.UTF_8;
 
 	/**
 	 * This will create a completely empty result set configuration

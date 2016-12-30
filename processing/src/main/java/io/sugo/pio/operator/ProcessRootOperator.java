@@ -6,22 +6,31 @@ import io.sugo.pio.Process;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.InputPorts;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  */
 public final class ProcessRootOperator extends OperatorChain {
+
+    public static final String TYPE = "root";
+
     /** The process which is connected to this process operator. */
     private Process process;
 
     @JsonCreator
     public ProcessRootOperator(
-            @JsonProperty("units") ExecutionUnit[] execUnits
+            @JsonProperty("execUnits") List<ExecutionUnit> execUnits
     ) {
-        rename("Root");
+        rename(TYPE);
         setExecUnits(execUnits);
     }
+
+//    @Override
+//    public String getType() {
+//        return TYPE;
+//    }
 
     /**
      * Convenience backport method to get the results of a process.

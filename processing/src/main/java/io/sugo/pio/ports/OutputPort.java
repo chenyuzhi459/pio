@@ -10,7 +10,7 @@ public interface OutputPort extends Port {
      *
      *             if already connected.
      */
-    public void connectTo(InputPort inputPort);
+    void connectTo(InputPort inputPort);
 
     /**
      * Disconnects the OutputPort from its InputPort. Note: As a side effect, disconnecting ports
@@ -18,19 +18,19 @@ public interface OutputPort extends Port {
      * {@link #lock()} port first.
      *
      */
-    public void disconnect();
+    void disconnect();
 
     /**
      * Delivers an object to the connected {@link InputPort} or ignores it if the output port is not
      * connected.
      */
-    public void deliver(IOObject object);
+    void deliver(IOObject object);
 
     /** Returns the destination input port. */
-    public InputPort getDestination();
+    InputPort getDestination();
 
     /**
      * Asks the owning operator
      */
-    public boolean shouldAutoConnect();
+    boolean shouldAutoConnect();
 }

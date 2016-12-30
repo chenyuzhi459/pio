@@ -140,4 +140,14 @@ public class ParameterTypeList extends CombinedParameterType {
 		}
 		return result;
 	}
+
+	@Override
+	public String getRange() {
+		return "list";
+	}
+
+	@Override
+	public boolean isNumerical() {
+		return false;
+	}
 }
