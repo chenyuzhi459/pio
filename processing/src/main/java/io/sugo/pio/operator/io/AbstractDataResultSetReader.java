@@ -15,6 +15,7 @@ import io.sugo.pio.operator.io.csv.CSVResultSetConfiguration;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -53,10 +54,14 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
 
     public static final String PARAMETER_ATTRIBUTES = "attributes";
 
-    private InputPort fileInputPort = getInputPorts().createPort("file");
+//    private InputPort fileInputPort = getInputPorts().createPort("file");
 
-    public InputPort getFileInputPort() {
-        return fileInputPort;
+//    public InputPort getFileInputPort() {
+//        return fileInputPort;
+//    }
+
+    public AbstractDataResultSetReader(String name, OutputPort outputPort){
+        super(name, outputPort);
     }
 
     @Override

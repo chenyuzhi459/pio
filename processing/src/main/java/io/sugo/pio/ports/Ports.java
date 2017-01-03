@@ -3,12 +3,13 @@ package io.sugo.pio.ports;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Observer;
 
 /**
  */
-public interface Ports<T> {
+public interface Ports<T> extends Serializable {
     /** Creates a new port and adds it to these Ports. */
     public T createPort(String name);
 

@@ -9,7 +9,10 @@ import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.tools.Pair;
+import scala.util.parsing.combinator.testing.Str;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,33 +40,34 @@ public class ProcessBuilder {
 
     private void initConnections() {
         Map<String, Operator> operatorMap = new HashMap<>();
-        Map<String, InputPort> inputMap = new HashMap<>();
-        Map<String, OutputPort> outputMap = new HashMap<>();
+        Map<Pair<String, String>, InputPort> inputMap = new HashMap<>();
+        Map<Pair<String, String>, OutputPort> outputMap = new HashMap<>();
         List<Operator> opts;
-        List<InputPort> inputs;
-        List<OutputPort> outputs;
+        Collection<InputPort> inputs;
+        Collection<OutputPort> outputs;
         for (ExecutionUnit unit : excUnits) {
             opts = unit.getOperators();
             Preconditions.checkArgument(opts != null && opts.size() > 0, "operators cannot be empty");
             for (Operator opt : opts) {
                 Preconditions.checkNotNull(opt.getName(), "Must specify operator name");
                 operatorMap.put(opt.getName(), opt);
-                inputs = opt.getInputPorts().getAllPorts();
+                inputs = opt.getInputPorts();
                 for (InputPort input : inputs) {
-                    inputMap.put(input.getName(), input);
+                    inputMap.put(new Pair<>(opt.getName(), input.getName()), input);
                 }
-                outputs = opt.getOutputPorts().getAllPorts();
+                outputs = opt.getOutputPorts();
                 for (OutputPort output : outputs) {
-                    outputMap.put(output.getName(), output);
+                    outputMap.put(new Pair<>(opt.getName(), output.getName()), output);
                 }
             }
         }
         InputPort input;
         OutputPort output;
         for (Connection conn : connections) {
-            input = inputMap.get(conn.getFromPort());
-            output = outputMap.get(conn.getToPort());
-            Preconditions.checkNotNull(output, "Cannot find outputPort:[%s]", conn.getToPort());
+            input = inputMap.get(new Pair<>(conn.getToOpt(), conn.getToPort()));
+            output = outputMap.get(new Pair<>(conn.getFromOpt(), conn.getFromPort()));
+
+            Preconditions.checkNotNull(output, "Cannot find outputPort:[%s-%s]", conn.getFromOpt(), conn.getFromPort());
             output.connectTo(input);
         }
     }

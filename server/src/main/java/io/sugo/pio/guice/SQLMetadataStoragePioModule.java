@@ -3,10 +3,7 @@ package io.sugo.pio.guice;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.Module;
-import io.sugo.pio.metadata.MetadataStorageProvider;
-import io.sugo.pio.metadata.MetadataStorageConnector;
-import io.sugo.pio.metadata.NoopMetadataStorageProvider;
-import io.sugo.pio.metadata.SQLMetadataConnector;
+import io.sugo.pio.metadata.*;
 
 /**
  */
@@ -14,8 +11,7 @@ public class SQLMetadataStoragePioModule implements Module {
     public static final String PROPERTY = "pio.metadata.storage.type";
     final String type;
 
-    public SQLMetadataStoragePioModule(String type)
-    {
+    public SQLMetadataStoragePioModule(String type) {
         this.type = type;
     }
 
@@ -23,8 +19,7 @@ public class SQLMetadataStoragePioModule implements Module {
      * This function only needs to be called by the default SQL metadata storage module
      * Other modules should default to calling super.configure(...) alone
      */
-    public void createBindingChoices(Binder binder, String defaultPropertyValue)
-    {
+    public void createBindingChoices(Binder binder, String defaultPropertyValue) {
         PolyBind.createChoiceWithDefault(
                 binder, PROPERTY, Key.get(MetadataStorageConnector.class), null, defaultPropertyValue
         );
@@ -38,10 +33,27 @@ public class SQLMetadataStoragePioModule implements Module {
         PolyBind.createChoiceWithDefault(
                 binder, PROPERTY, Key.get(SQLMetadataConnector.class), null, defaultPropertyValue
         );
+
+        PolyBind.createChoiceWithDefault(
+                binder,
+                PROPERTY,
+                Key.get(MetadataProcessInstanceManager.class),
+                Key.get(SQLMetadataProcessInstanceManager.class),
+                defaultPropertyValue
+        );
+
     }
 
     @Override
     public void configure(Binder binder) {
 
+//        PolyBind.optionBinder(binder, Key.get(MetadataProcessInstanceManager.class))
+//                .addBinding(type)
+//                .to(SQLMetadataProcessInstanceManager.class)
+//                .in(LazySingleton.class);
+        PolyBind.optionBinder(binder, Key.get(MetadataProcessInstanceManager.class))
+                .addBinding(type)
+                .to(SQLMetadataProcessInstanceManager.class)
+                .in(LazySingleton.class);
     }
 }

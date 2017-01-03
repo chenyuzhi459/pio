@@ -1,20 +1,29 @@
 package io.sugo.pio.ports.impl;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.PortOwner;
 import io.sugo.pio.ports.Ports;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  */
 public abstract class AbstractPorts<T extends Port> implements Ports<T> {
 
+    @JsonProperty
     private final List<T> portList = Collections.synchronizedList(new ArrayList<>());
     private final Map<String, T> portMap = new HashMap<>();
+
+//    @JsonProperty
     private final PortOwner owner;
+
+    public List<T> getPortList() {
+        return portList;
+    }
 
     public AbstractPorts(PortOwner owner) {
         this.owner = owner;
@@ -43,7 +52,7 @@ public abstract class AbstractPorts<T extends Port> implements Ports<T> {
         if (portMap.containsKey(port.getName())) {
             return;
         }
-        assert port.getPorts() == this;
+//        assert port.getPorts() == this;
         portList.add(port);
         portMap.put(port.getName(), port);
     }

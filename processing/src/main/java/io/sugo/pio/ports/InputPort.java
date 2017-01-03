@@ -1,10 +1,15 @@
 package io.sugo.pio.ports;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.ports.impl.InputPortImpl;
 import io.sugo.pio.ports.metadata.MetaData;
 
-/**
- */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "inputType", defaultImpl = InputPortImpl.class)
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = "default", value = InputPortImpl.class)
+})
 public interface InputPort extends Port {
     /**
      * Receives data from the output port.

@@ -1,6 +1,10 @@
 package io.sugo.pio.server.process;
 
-import com.google.common.cache.*;
+import com.google.common.base.Supplier;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import com.google.inject.Inject;
 import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
@@ -9,7 +13,6 @@ import io.sugo.pio.Process;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.metadata.MetadataProcessInstanceManager;
 
-import java.util.Random;
 import java.util.concurrent.*;
 
 /**
@@ -26,15 +29,15 @@ public class ProcessManager {
     private final int executeMaxThread;
     private final Cache<String, ProcessInstance> instances;
     private final MetadataProcessInstanceManager metadataProcessInstanceManager;
+    private final ProcessInstanceLoader loader;
 
     @Inject
-    public ProcessManager(final ProcessManagerConfig config, MetadataProcessInstanceManager metadataProcessInstanceManager) {
+    public ProcessManager(ProcessManagerConfig config, MetadataProcessInstanceManager metadataProcessInstanceManager) {
         this.config = config;
-        this.executeMaxThread = config.getExecuteMaxThread();
         this.metadataProcessInstanceManager = metadataProcessInstanceManager;
+        this.executeMaxThread = config.getExecuteMaxThread();
         queue = new ArrayBlockingQueue<>(config.getProcessQueueSize());
         this.runners = new ProcessRunner[config.getExecuteMaxThread()];
-
         CacheBuilder builder = CacheBuilder.newBuilder()
                 .recordStats()
                 .maximumSize(config.getMaxEntriesSize())
@@ -50,6 +53,7 @@ public class ProcessManager {
         for (int i = 0; i < executeMaxThread; i++) {
             this.runners[i] = new ProcessRunner(queue, i, instances);
         }
+        loader = new ProcessInstanceLoader(this.metadataProcessInstanceManager);
     }
 
     @LifecycleStart
@@ -94,23 +98,45 @@ public class ProcessManager {
 
     public void register(Process process) {
         try {
-            queue.offer(process, 10, TimeUnit.SECONDS);
             ProcessInstance processInstance = new ProcessInstance(process, metadataProcessInstanceManager);
             instances.put(process.getId(), processInstance);
             metadataProcessInstanceManager.insert(processInstance);
+            queue.offer(process, 10, TimeUnit.SECONDS);
             log.info("queue size:%d", queue.size());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void main(String[] args) {
-        ProcessManagerConfig cfg = new ProcessManagerConfig();
-        cfg.setExecuteMaxThread(10);
-        ProcessManager manager = new ProcessManager(cfg, null);
-        manager.start();
-        System.out.println("stop");
-        manager.stop();
-        System.out.println("finish");
+    public ProcessInstance get(String id) {
+        loader.setProcessIntanceId(id);
+        ProcessInstance pi = null;
+        try {
+            pi = instances.get(id, loader);
+        } catch (ExecutionException e) {
+            log.error(e, "get process instance %s error", id);
+            throw new RuntimeException(e);
+        }
+        return pi;
     }
+
+    class ProcessInstanceLoader implements Callable<ProcessInstance> {
+
+        private String processIntanceId;
+        private final MetadataProcessInstanceManager metadataProcessInstanceManager;
+        public ProcessInstanceLoader(MetadataProcessInstanceManager metadataProcessInstanceManager) {
+            this.metadataProcessInstanceManager = metadataProcessInstanceManager;
+        }
+
+        @Override
+        public ProcessInstance call() throws Exception {
+            ProcessInstance pi = metadataProcessInstanceManager.get(processIntanceId);
+            return pi;
+        }
+
+        public void setProcessIntanceId(String processIntanceId) {
+            this.processIntanceId = processIntanceId;
+        }
+    }
+
 }

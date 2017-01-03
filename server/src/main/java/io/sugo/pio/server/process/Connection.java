@@ -15,10 +15,6 @@ public class Connection implements Serializable{
     private String toOpt;
     private String toPort;
 
-    public Connection(){
-
-    }
-
     @JsonCreator
     public Connection(
             @JsonProperty("fromOpt") String fromOpt,
@@ -26,10 +22,10 @@ public class Connection implements Serializable{
             @JsonProperty("toOpt") String toOpt,
             @JsonProperty("toPort") String toPort
     ){
-        Preconditions.checkNotNull(this.fromOpt, "Must specify a fromOpt");
-        Preconditions.checkNotNull(this.fromPort, "Must specify a fromPort");
-        Preconditions.checkNotNull(this.toOpt, "Must specify a toOpt");
-        Preconditions.checkNotNull(this.toPort, "Must specify a toPort");
+        Preconditions.checkNotNull(fromOpt, "Must specify a fromOpt");
+        Preconditions.checkNotNull(fromPort, "Must specify a fromPort");
+        Preconditions.checkNotNull(toOpt, "Must specify a toOpt");
+        Preconditions.checkNotNull(toPort, "Must specify a toPort");
         this.fromOpt = fromOpt;
         this.fromPort = fromPort;
         this.toOpt = toOpt;

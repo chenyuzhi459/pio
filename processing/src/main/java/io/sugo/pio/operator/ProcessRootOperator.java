@@ -4,15 +4,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.Process;
 import io.sugo.pio.parameter.ParameterType;
-import io.sugo.pio.ports.InputPorts;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  */
-public final class ProcessRootOperator extends OperatorChain {
+public final class ProcessRootOperator extends OperatorChain implements Serializable {
 
     public static final String TYPE = "root";
 
@@ -23,14 +25,9 @@ public final class ProcessRootOperator extends OperatorChain {
     public ProcessRootOperator(
             @JsonProperty("execUnits") List<ExecutionUnit> execUnits
     ) {
-        rename(TYPE);
+        super("root", null, null);
         setExecUnits(execUnits);
     }
-
-//    @Override
-//    public String getType() {
-//        return TYPE;
-//    }
 
     /**
      * Convenience backport method to get the results of a process.
@@ -40,8 +37,25 @@ public final class ProcessRootOperator extends OperatorChain {
      *            <code>null</code> values for empty results instead of omitting them.
      */
     public IOContainer getResults(boolean omitNullResults) {
-        InputPorts innerSinks = getSubprocess(0).getInnerSinks();
-        return innerSinks.createIOContainer(false, omitNullResults);
+        List<InputPort> inputPorts = getSubprocess(0).getAllInputPorts();
+        return createIOContainer(false, omitNullResults, inputPorts);
+    }
+
+    public IOContainer createIOContainer(boolean onlyConnected, boolean omitEmptyResults, List<InputPort> inputPorts) {
+        Collection<IOObject> output = new LinkedList<>();
+        for (Port port : inputPorts) {
+            if (!onlyConnected || port.isConnected()) {
+                IOObject data = port.getAnyDataOrNull();
+                if (omitEmptyResults) {
+                    if (data != null) {
+                        output.add(data);
+                    }
+                } else {
+                    output.add(data);
+                }
+            }
+        }
+        return new IOContainer(output);
     }
 
     /** Sets the process. */

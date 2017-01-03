@@ -3,9 +3,11 @@ package io.sugo.pio.ports;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.ports.metadata.MetaData;
 
+import java.io.Serializable;
+
 /**
  */
-public interface Port {
+public interface Port extends Serializable{
     public static final int CLEAR_META_DATA_ERRORS = 1 << 0;
     public static final int CLEAR_METADATA = 1 << 1;
     public static final int CLEAR_DATA = 1 << 2;
@@ -59,11 +61,13 @@ public interface Port {
      */
     IOObject getAnyDataOrNull();
 
-    /**
-     * Returns the set of ports to which this port belongs.
-     */
-    Ports<? extends Port> getPorts();
+//    /**
+//     * Returns the set of ports to which this port belongs.
+//     */
+//    Ports<? extends Port> getPorts();
+    PortOwner getPortOwner();
 
+    void setPortOwner(PortOwner portOwner);
     /**
      * Locks the port so port extenders do not remove the port if disconnected. unlocks it.
      */

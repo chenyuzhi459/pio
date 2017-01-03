@@ -1,27 +1,31 @@
 package io.sugo.pio.ports.impl;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOObject;
-import io.sugo.pio.ports.Ports;
-import io.sugo.pio.ports.Port;
+import io.sugo.pio.ports.PortOwner;
 
 /**
  *
  */
 public class OutputPortImpl extends AbstractOutputPort {
-    protected OutputPortImpl(Ports<? extends Port> owner, String name) {
-        super(owner, name);
+    @JsonCreator
+    public OutputPortImpl(
+            @JsonProperty("name") String name
+    ) {
+        super(name);
     }
 
     @Override
     public void deliver(IOObject object) {
         // registering history of object
         if (object != null) {
-            object.appendOperatorToHistory(getPorts().getOwner().getOperator(), this);
+            object.appendOperatorToHistory(getPortOwner().getOperator(), this);
 
             // set source if not yet set
             if (object.getSource() == null) {
-                if (getPorts().getOwner().getOperator() != null) {
-                    object.setSource(getPorts().getOwner().getOperator().getName());
+                if (getPortOwner().getOperator() != null) {
+                    object.setSource(getPortOwner().getOperator().getName());
                 }
             }
         }

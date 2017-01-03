@@ -8,7 +8,13 @@ import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.io.AbstractDataResultSetReader;
 import io.sugo.pio.operator.io.DataResultSetFactory;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortOwner;
+import io.sugo.pio.ports.impl.InputPortImpl;
+import io.sugo.pio.ports.impl.OutputPortImpl;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 
@@ -23,7 +29,7 @@ import java.text.NumberFormat;
  * @author Ingo Mierswa, Tobias Malbrecht, Sebastian Loh, Sebastian Land, Simon Fischer
  */
 //@JsonTypeName("csv_reader")
-public class CSVExampleSource extends AbstractDataResultSetReader {
+public class CSVExampleSource extends AbstractDataResultSetReader implements Serializable {
 	public static final String TYPE = "csv_reader";
 
 	public static final String PARAMETER_CSV_FILE = "csv_file";
@@ -35,6 +41,9 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
 	public static final String PARAMETER_COLUMN_SEPARATORS = "column_separators";
 	public static final String PARAMETER_ESCAPE_CHARACTER = "escape_character";
 
+
+//	private InputPort inputPort = new InputPortImpl("file");
+
 	@JsonProperty
 	private String file = "/work/win7/druid.csv";
 
@@ -43,13 +52,20 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
 //		return TYPE;
 //	}
 
+//	@JsonProperty
+//	public String getInputPort() {
+//		return inputPort.getName();
+////	}
+
 	@JsonCreator
 	public CSVExampleSource(
 			@JsonProperty("file") String file,
-			@JsonProperty("name") String name
+			@JsonProperty("name") String name,
+			@JsonProperty("output") OutputPort outputPort,
+			@JsonProperty("config") CSVResultSetConfiguration config
 	) {
+		super(name, outputPort);
 		this.file = file;
-		setName(name);
 	}
 
 	@Override
@@ -60,7 +76,9 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
 	@Override
 	public ExampleSet read() {
 		try {
-			Thread.sleep(3000);
+			System.out.println("CSVExampleSource read");
+			Thread.sleep(13000);
+			System.out.println("CSVExampleSource read finished");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -90,11 +108,5 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
 	@Override
 	protected String getFileExtension() {
 		return "csv";
-	}
-
-	public static void main(String[] args) {
-		CSVExampleSource csvSource = new CSVExampleSource("/work/win7/druid.csv", TYPE);
-		csvSource.execute();
-		System.out.println("successfully");
 	}
 }

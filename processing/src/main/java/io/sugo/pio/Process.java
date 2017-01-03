@@ -58,7 +58,7 @@ public class Process {
         this.rootOperator = rootOperator;
         this.operatorNameMap.clear();
         this.rootOperator.setProcess(this);
-        this.rootOperator.rename(ProcessRootOperator.TYPE);
+//        this.rootOperator.rename(ProcessRootOperator.TYPE);
     }
 
     /**

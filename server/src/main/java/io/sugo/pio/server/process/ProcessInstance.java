@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.Process;
 import io.sugo.pio.metadata.MetadataProcessInstanceManager;
 import io.sugo.pio.operator.Status;
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -13,10 +14,20 @@ import java.util.UUID;
  */
 public class ProcessInstance implements Serializable {
     private final String id;
-    private final MetadataProcessInstanceManager metadataProcessInstanceManager;
+    private MetadataProcessInstanceManager metadataProcessInstanceManager;
     private Process process;
     private Status status = Status.QUEUE;
     private Status preStatus;
+    private DateTime createTime;
+    private DateTime updateTime;
+
+    public ProcessInstance(Process process, Status status, DateTime createTime, DateTime updateTime) {
+        this.process = process;
+        this.id = process.getId();
+        this.status = status;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
 
     public ProcessInstance(Process process, MetadataProcessInstanceManager metadataProcessInstanceManager) {
         this.process = process;
@@ -28,11 +39,11 @@ public class ProcessInstance implements Serializable {
         return id;
     }
 
-    @JsonProperty
     public String getProcessName() {
         return process.getName();
     }
 
+    @JsonProperty
     public Process getProcess() {
         return process;
     }

@@ -1,22 +1,22 @@
 package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.sugo.pio.ports.InputPorts;
-import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.OutputPorts;
-import io.sugo.pio.ports.PortOwner;
-import io.sugo.pio.ports.impl.InputPortsImpl;
-import io.sugo.pio.ports.impl.OutputPortsImpl;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
 
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 /**
  */
-public abstract class OperatorChain extends Operator {
+public abstract class OperatorChain extends Operator implements Serializable {
 
     private List<ExecutionUnit> execUnits;
+
+    public OperatorChain(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts){
+        super(name, inputPorts, outputPorts);
+    }
 
     public void setExecUnits(List<ExecutionUnit> execUnits) {
         this.execUnits = execUnits;
@@ -40,9 +40,9 @@ public abstract class OperatorChain extends Operator {
      * @return The {@link InputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
-    protected InputPorts createInnerSinks(PortOwner portOwner) {
-        return new InputPortsImpl(portOwner);
-    }
+//    protected InputPorts createInnerSinks(PortOwner portOwner) {
+//        return new InputPortsImpl(portOwner);
+//    }
 
     /**
      * This method returns an arbitrary implementation of {@link OutputPorts} for inner source port
@@ -54,9 +54,9 @@ public abstract class OperatorChain extends Operator {
      * @return The {@link OutputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
-    protected OutputPorts createInnerSources(PortOwner portOwner) {
-        return new OutputPortsImpl(portOwner);
-    }
+//    protected OutputPorts createInnerSources(PortOwner portOwner) {
+//        return new OutputPortsImpl(portOwner);
+//    }
 
     @Override
     public void doWork() {

@@ -9,6 +9,7 @@ import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.*;
+import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.tools.Ontology;
 
@@ -106,6 +107,10 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 	 * a list of errors which might occurred during the importing prozess.
 	 */
 	private List<OperatorException> importErrors = new LinkedList<OperatorException>();
+
+	public AbstractDataReader(String name, OutputPort outputPort) {
+		super(name, outputPort);
+	}
 
 	protected abstract DataSet getDataSet() throws OperatorException, IOException;
 

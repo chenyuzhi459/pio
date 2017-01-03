@@ -11,6 +11,7 @@ public interface MetadataProcessInstanceManager
 
   void stop();
 
+  ProcessInstance get(String id);
   void insert(ProcessInstance spec);
   boolean updateStatus(ProcessInstance pi);
 }
