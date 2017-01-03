@@ -1,14 +1,14 @@
 package io.sugo.pio.engine.template.engine;
 
+import io.sugo.pio.engine.template.data.TemplateTrainingData;
+import io.sugo.pio.spark.engine.DataSource;
+import io.sugo.pio.spark.engine.data.input.BatchEventHose;
+import io.sugo.pio.spark.engine.data.input.Event;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SQLContext;
-import io.sugo.pio.data.input.BatchEventHose;
-import io.sugo.pio.data.input.Event;
-import io.sugo.pio.engine.DataSource;
-import io.sugo.pio.engine.template.data.TemplateTrainingData;
 
 import java.io.Serializable;
 import java.util.Map;

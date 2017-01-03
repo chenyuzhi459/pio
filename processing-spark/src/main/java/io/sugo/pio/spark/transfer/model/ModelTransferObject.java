@@ -1,6 +1,6 @@
 package io.sugo.pio.spark.transfer.model;
 
-import io.sugo.pio.spark.transfer.TransferObject;
+import io.sugo.pio.spark.transfer.parameter.SparkParameter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  */
-public class ModelTransferObject extends TransferObject {
+public class ModelTransferObject extends SparkParameter {
     private Map<String, List<String>> nominalMapping = new HashMap();
 
     public ModelTransferObject(Map<String, List<String>> nominalMapping) {

@@ -1,8 +1,8 @@
 package io.sugo.pio.engine.template.engine;
 
+import io.sugo.pio.spark.engine.Model;
+import io.sugo.pio.spark.engine.data.output.Repository;
 import org.apache.spark.ml.recommendation.ALSModel;
-import io.sugo.pio.data.output.Repository;
-import io.sugo.pio.engine.Model;
 import io.sugo.pio.engine.template.data.TemplateModelData;
 
 import java.io.*;

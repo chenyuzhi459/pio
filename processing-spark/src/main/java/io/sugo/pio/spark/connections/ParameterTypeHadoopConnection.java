@@ -4,9 +4,8 @@ import io.sugo.pio.parameter.ParameterTypeSingle;
 
 /**
  */
-public class ParameterTypeRadoopConnection extends ParameterTypeSingle {
-
-    public ParameterTypeRadoopConnection(String key, String description) {
+public class ParameterTypeHadoopConnection extends ParameterTypeSingle {
+    public ParameterTypeHadoopConnection(String key, String description) {
         super(key, description);
     }
 

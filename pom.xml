@@ -12,6 +12,7 @@
         <module>common</module>
         <module>api</module>
         <module>processing</module>
+        <module>processing-spark-common</module>
         <module>processing-spark</module>
         <module>server</module>
         <module>service</module>

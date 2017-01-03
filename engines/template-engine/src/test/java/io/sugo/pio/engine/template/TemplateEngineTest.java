@@ -1,14 +1,13 @@
 package io.sugo.pio.engine.template;
 
-import io.sugo.pio.data.output.Repository;
-import io.sugo.pio.engine.Algorithm;
-import io.sugo.pio.engine.DataSource;
-import io.sugo.pio.engine.Model;
-import io.sugo.pio.engine.Preparator;
+import io.sugo.pio.spark.engine.Algorithm;
+import io.sugo.pio.spark.engine.DataSource;
+import io.sugo.pio.spark.engine.Model;
+import io.sugo.pio.spark.engine.Preparator;
+import io.sugo.pio.spark.engine.data.output.Repository;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.Test;
-import io.sugo.pio.engine.template.TemplateEngineFactory;
 import io.sugo.pio.engine.template.data.TemplateModelData;
 import io.sugo.pio.engine.template.data.TemplatePreparedData;
 import io.sugo.pio.engine.template.data.TemplateTrainingData;

@@ -1,12 +1,11 @@
 package io.sugo.pio.engine.template.data.input;
 
 import com.google.common.collect.Maps;
-import io.sugo.pio.data.input.BatchEventHose;
-import io.sugo.pio.data.input.Event;
+import io.sugo.pio.spark.engine.data.input.BatchEventHose;
+import io.sugo.pio.spark.engine.data.input.Event;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.joda.time.DateTime;
 
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class MovielenBatchEventHose implements BatchEventHose {
     }
 
     @Override
-    public JavaRDD<Event> find(JavaSparkContext sc, DateTime starttime, DateTime endTime) {
+    public JavaRDD<Event> find(JavaSparkContext sc, long starttime, long endTime) {
         return find(sc);
     }
 
@@ -46,7 +45,7 @@ public class MovielenBatchEventHose implements BatchEventHose {
             map.put("movieId", Integer.parseInt(res[1]));
             map.put("rating", Float.parseFloat(res[2]));
 
-            return new Event(DateTime.now(), map);
+            return new Event(System.currentTimeMillis(), map);
         }
     }
 }

@@ -1,10 +1,10 @@
 package io.sugo.pio.engine.template.engine;
 
+import io.sugo.pio.spark.engine.Algorithm;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.ml.recommendation.ALS;
 import org.apache.spark.ml.recommendation.ALSModel;
 import org.apache.spark.sql.Dataset;
-import io.sugo.pio.engine.Algorithm;
 import io.sugo.pio.engine.template.data.TemplateModelData;
 import io.sugo.pio.engine.template.data.TemplatePreparedData;
 

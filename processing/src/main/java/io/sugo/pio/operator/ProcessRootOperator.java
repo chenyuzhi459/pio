@@ -3,6 +3,7 @@ package io.sugo.pio.operator;
 import io.sugo.pio.Process;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.InputPorts;
+import io.sugo.pio.ports.metadata.SubprocessTransformRule;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,7 @@ public final class ProcessRootOperator extends OperatorChain {
 
     public ProcessRootOperator(OperatorDescription description, Process process) {
         super(description, "Main Process");
+        getTransformer().addRule(new SubprocessTransformRule(getSubprocess(0)));
         setProcess(process);
         rename("Root");
     }

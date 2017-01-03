@@ -29,12 +29,6 @@ public class ParameterTypeDouble extends ParameterTypeNumber {
         this.max = max;
     }
 
-    public ParameterTypeDouble(String key, String description, double min, double max, double defaultValue, boolean expert) {
-        super(key, description);
-        this.defaultValue = defaultValue;
-        this.min = min;
-        this.max = max;
-    }
 
     @Override
     public double getMinValue() {

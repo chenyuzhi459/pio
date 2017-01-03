@@ -194,20 +194,17 @@ public abstract class AbstractDLModelLearner extends OperatorChain {
         types.add(new ParameterTypeDouble(
                 PARAMETER_LEARNING_RATE,
                 "The learning rate determines by how much we change the weights at each step. May not be 0.",
-                Double.MIN_VALUE, 1.0d, 0.9,
-                false));
+                Double.MIN_VALUE, 1.0d, 0.9));
 
         types.add(new ParameterTypeDouble(
                 PARAMETER_DECAY,
                 "The rate that learning rate decreases",
-                0.0d, 1.0d, 0.99d,
-                false));
+                0.0d, 1.0d, 0.99d));
 
         types.add(new ParameterTypeDouble(
                 PARAMETER_MOMENTUM,
                 "The momentum simply adds a fraction of the previous weight update to the current one (prevent local maxima and smoothes optimization directions).",
-                0.0d, 1.0d, 0.2d,
-                false));
+                0.0d, 1.0d, 0.2d));
 
         types.add(new ParameterTypeCategory(
                 PARAMETER_OPTIMIZATION_ALGORITHM,

@@ -1,11 +1,9 @@
 package io.sugo.pio.spark;
 
-import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler;
-import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.spark.ports.SparkOutputPortImpl;
 
@@ -18,12 +16,48 @@ public abstract class SparkOperator extends Operator implements KillableOperatio
         super(description);
     }
 
-    public SparkNest getRadoopNest() {
+    public SparkNest getSparkNest() {
+        if(sparkNest == null) {
+            try {
+                sparkNest = checkRadoopNest(this);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
         return sparkNest;
     }
 
     public MapReduceHDFSHandler getMapReduceHDFSHandler() {
-        return getRadoopNest().getMapReduceHDFSHandler();
+        return getSparkNest().getMapReduceHDFSHandler();
+    }
+
+    private static SparkNest checkEnclosingRadoopNest(Operator operator)  {
+        if(operator instanceof SparkNest) {
+            return (SparkNest)operator;
+        } else {
+            OperatorChain parent = operator.getParent();
+            if(parent == null) {
+                return null;
+            } else {
+                while(true) {
+                    String parentName = parent.getClass().getName();
+                    if(parentName.compareTo(SparkNest.class.getName()) == 0) {
+                        return (SparkNest)parent;
+                    }
+
+                    if(parent instanceof ProcessRootOperator) {
+                        throw new RuntimeException("Nest not found");
+                    }
+
+                    parent = parent.getParent();
+                }
+            }
+        }
+    }
+
+    public static SparkNest checkRadoopNest(Operator operator) {
+        return checkEnclosingRadoopNest(operator);
     }
 
     public OutputPort createOutputPort(String portName) {

@@ -22,10 +22,13 @@ public abstract class AbstractInputPort extends AbstractPort implements InputPor
 
     private MetaData metaData;
 
-    private MetaData realMetaData;
-
     /** The port to which this port is connected. */
     private OutputPort sourceOutputPort;
+
+    @Override
+    public void receiveMD(MetaData metaData) {
+        this.metaData = metaData;
+    }
 
     @Override
     public OutputPort getSource() {
@@ -45,23 +48,15 @@ public abstract class AbstractInputPort extends AbstractPort implements InputPor
 
     @Override
     public MetaData getMetaData() {
-        if (realMetaData != null) {
-            return realMetaData;
-        } else {
             return metaData;
-        }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends MetaData> T getMetaData(Class<T> desiredClass) {
-        if (realMetaData != null) {
-            return (T) realMetaData;
-        } else {
-            if (metaData != null) {
-            }
-            return (T) metaData;
+        if (metaData != null) {
         }
+        return (T) metaData;
     }
 
     public void connect(OutputPort outputPort) {

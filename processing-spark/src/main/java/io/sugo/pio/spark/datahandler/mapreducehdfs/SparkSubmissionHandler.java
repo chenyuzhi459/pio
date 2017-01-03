@@ -39,32 +39,32 @@ public abstract class SparkSubmissionHandler {
         argumentMap.put(key, Joiner.on(",").join(valuesToJoin));
     }
 
-    public void initConf(boolean isWindows, String appName, String sparkClassName) {
+    public void initConf(String appName, String sparkClassName) {
         sparkConf.setAppName(appName);
         sparkConf.set("spark.submit.deployMode", "cluster");
         System.setProperty("SPARK_YARN_MODE", "true");
         addToArgList("--class", sparkClassName);
-        initConfSpecific(isWindows, appName, sparkClassName);
+        initConfSpecific(appName, sparkClassName);
     }
 
-    protected abstract void initConfSpecific(boolean isWindows, String appName, String sparkClassName);
+    protected abstract void initConfSpecific(String appName, String sparkClassName);
 
-    public abstract void setSparkLibsPath(String var1, boolean var2);
+    public abstract void setSparkLibsPath(String var1, boolean isDirectory);
 
     public void setUserJar(String sparkAppJar) {
         addToArgList("--jar", "hdfs://" + sparkAppJar);
     }
 
-    public abstract void setAdditionalFiles(List<String> var1);
+    public abstract void setAdditionalFiles(List<String> additionalJarsList);
 
     public void setAdditionalJars(List<String> jarDependencyPaths, String radoopCommonJar, String radoopSparkJar) {
         ArrayList additionalJarsList = new ArrayList();
         if(jarDependencyPaths != null && !jarDependencyPaths.isEmpty()) {
             LinkedHashSet jars = new LinkedHashSet();
-            Iterator var6 = jarDependencyPaths.iterator();
+            Iterator<String> iterator = jarDependencyPaths.iterator();
 
-            while(var6.hasNext()) {
-                String depPath = (String)var6.next();
+            while(iterator.hasNext()) {
+                String depPath = iterator.next();
                 jars.add(depPath.startsWith("hdfs://") ? depPath:"hdfs://" + depPath);
             }
 
@@ -79,35 +79,14 @@ public abstract class SparkSubmissionHandler {
         if(!additionalJarsList.isEmpty()) {
             setAdditionalJars(additionalJarsList);
         }
+
     }
 
     protected abstract void setAdditionalJars(List<String> additionalJarsList);
 
-    public void setUserArguments(String commonParams, String params, String argFilePath) {
+    public void setUserArguments(String commonParams, String params) {
         if(commonParams != null && !commonParams.isEmpty()) {
-            boolean addAsArgs = false;
-            if(Strings.isNullOrEmpty(argFilePath)) {
-                addAsArgs = true;
-            } else {
-                PrintWriter out = null;
-                try {
-                    File e = new File(argFilePath);
-                    out = new PrintWriter(e, "UTF-8");
-                    out.print(commonParams);
-                    setAdditionalFiles(Collections.singletonList(e.getAbsolutePath()));
-                    addToArgList("--arg_common", e.getName());
-                } catch (IOException e) {
-                    addAsArgs = true;
-                } finally {
-                    if(out != null) {
-                        out.close();
-                    }
-                }
-            }
-
-            if(addAsArgs) {
-                addToArgList("--arg_common", commonParams);
-            }
+            addToArgList("--arg_common", commonParams);
         }
 
         if(params != null && !params.isEmpty()) {
