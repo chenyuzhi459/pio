@@ -46,7 +46,7 @@ public class MTOConverter {
                         ((NominalMapping)var9).mapString((String)nominalValueMap.get(Integer.valueOf(0)));
                         ((NominalMapping)var9).mapString((String)nominalValueMap.get(Integer.valueOf(1)));
                     } else {
-                        nominalValueMap.values().remove((Object)null);
+                        nominalValueMap.values().remove(null);
                         var9 = new PolynominalMapping(nominalValueMap);
                     }
 

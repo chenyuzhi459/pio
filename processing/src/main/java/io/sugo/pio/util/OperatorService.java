@@ -61,7 +61,7 @@ public class OperatorService {
      *
      * <p>
      * It is, however, not possible to create some generic operators with this method (this mainly
-     * applies to the Weka operators). Please use the method {@link #createOperator(String)} for
+     * applies to the Weka operators). Please use the method {@link #createOperator(Class)} for
      * those generic operators.
      * </p>
      *

@@ -35,5 +35,7 @@ public class OutputPortImpl extends AbstractOutputPort {
         if (isConnected()) {
             getDestination().receive(object);
         }
+
+
     }
 }

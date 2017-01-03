@@ -1,6 +1,6 @@
 package io.sugo.pio.engine.template.data.output;
 
-import io.sugo.pio.data.output.Repository;
+import io.sugo.pio.spark.engine.data.output.Repository;
 
 import java.io.*;
 

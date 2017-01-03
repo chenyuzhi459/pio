@@ -16,6 +16,9 @@ public interface InputPort extends Port {
      */
     void receive(IOObject object);
 
+    /** Does the same as {@link #receive(IOObject)} but only with meta data. */
+    public void receiveMD(MetaData metaData);
+
     // /** Called by the OutputPort when it connects to this InputPort. */
     // public void connect(OutputPort outputPort);
 

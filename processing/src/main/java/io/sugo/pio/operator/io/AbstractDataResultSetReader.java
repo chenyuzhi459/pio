@@ -60,8 +60,8 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
 //        return fileInputPort;
 //    }
 
-    public AbstractDataResultSetReader(String name, OutputPort outputPort){
-        super(name, outputPort);
+    public AbstractDataResultSetReader(Class<? extends IOObject> generatedClass, String name, OutputPort outputPort){
+        super(generatedClass, name, outputPort);
     }
 
     @Override

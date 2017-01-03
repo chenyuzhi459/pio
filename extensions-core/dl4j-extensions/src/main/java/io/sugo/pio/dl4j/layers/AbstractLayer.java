@@ -5,17 +5,24 @@ import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.impl.InputPortImpl;
+import io.sugo.pio.ports.impl.OutputPortImpl;
 import org.deeplearning4j.nn.conf.layers.Layer;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  */
 public abstract class AbstractLayer extends Operator {
 
-    private final InputPort inPort = getInputPorts().createPort("through");
-    private final OutputPort outPort = getOutputPorts().createPort("through");
+    private final InputPort inPort = new InputPortImpl("through");
+    private final OutputPort outPort = new OutputPortImpl("through");
 
-    public AbstractLayer(OperatorDescription description) {
-        super(description);
+    public AbstractLayer(String name) {
+        super(name, null, null);
+        addInputPort(inPort);
+        addOutputPort(outPort);
     }
 
     public abstract Layer getLayer();

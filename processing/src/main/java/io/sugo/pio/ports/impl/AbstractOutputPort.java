@@ -14,7 +14,13 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
 
     private MetaData metaData;
 
-    private MetaData realMetaData;
+    @Override
+    public void deliverMD(MetaData md) {
+        this.metaData = md;
+        if (connectedTo != null) {
+            this.connectedTo.receiveMD(md);
+        }
+    }
 
     @Override
     public InputPort getDestination() {
@@ -33,23 +39,15 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
 
     @Override
     public MetaData getMetaData() {
-        if (realMetaData != null) {
-            return realMetaData;
-        } else {
-            return metaData;
-        }
+        return metaData;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends MetaData> T getMetaData(Class<T> desiredClass){
-        if (realMetaData != null) {
-            return (T) realMetaData;
-        } else {
-            if (metaData != null) {
-            }
-            return (T) metaData;
+        if (metaData != null) {
         }
+        return (T) metaData;
     }
 
     @Override

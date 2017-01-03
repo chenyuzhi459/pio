@@ -47,15 +47,13 @@ public abstract class Operator implements ParameterHandler {
         if (inputPorts != null && inputPorts.size() > 0) {
             for (InputPort in : inputPorts) {
                 Preconditions.checkArgument(!inputPortMap.containsKey(in.getName()), "Cannot contain InputPorts with same name " + in.getName());
-                inputPortMap.put(in.getName(), in);
-                in.setPortOwner(portOwner);
+                addInputPort(in);
             }
         }
         if (outputPorts != null && outputPorts.size() > 0) {
             for (OutputPort out : outputPorts) {
                 Preconditions.checkArgument(!outputPortMap.containsKey(out.getName()), "Cannot contain InputPorts with same name " + out.getName());
-                outputPortMap.put(out.getName(), out);
-                out.setPortOwner(portOwner);
+                addOutputPort(out);
             }
         }
     }
@@ -79,6 +77,16 @@ public abstract class Operator implements ParameterHandler {
         } else {
             this.status = Status.QUEUE;
         }
+    }
+
+    protected void addInputPort(InputPort inPort){
+        inputPortMap.put(inPort.getName(), inPort);
+        inPort.setPortOwner(portOwner);
+    }
+
+    protected void addOutputPort(OutputPort outPort){
+        outputPortMap.put(outPort.getName(), outPort);
+        outPort.setPortOwner(portOwner);
     }
 
     @JsonProperty

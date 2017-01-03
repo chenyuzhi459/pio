@@ -20,7 +20,7 @@ public class SparkSubmissionHandlerV2 extends SparkSubmissionHandler {
     }
 
     @Override
-    protected void initConfSpecific(boolean isWindows, String appName, String sparkClassName) {
+    protected void initConfSpecific(String appName, String sparkClassName) {
     }
 
     @Override

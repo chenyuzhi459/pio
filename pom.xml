@@ -12,12 +12,13 @@
         <module>common</module>
         <module>api</module>
         <module>processing</module>
-        <!--<module>processing-spark</module>-->
+        <module>processing-spark-common</module>
+        <module>processing-spark</module>
         <module>server</module>
         <module>service</module>
 
         <!--extensions-->
-        <!--<module>extensions-core/dl4j-extensions</module>-->
+        <module>extensions-core/dl4j-extensions</module>
         <module>extensions-core/druid-extensions</module>
         <module>extensions-core/hdfs-extensions</module>
         <module>extensions-core/mysql-metadata-storage</module>

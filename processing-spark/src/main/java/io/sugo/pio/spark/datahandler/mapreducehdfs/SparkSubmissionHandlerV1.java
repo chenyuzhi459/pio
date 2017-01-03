@@ -21,7 +21,9 @@ public class SparkSubmissionHandlerV1 extends SparkSubmissionHandler {
     }
 
     @Override
-    protected void initConfSpecific(boolean isWindows, String appName, String sparkClassName) {
+    protected void initConfSpecific(String appName, String sparkClassName) {
+        this.sparkConf.set("spark.shuffle.blockTransferService", "nio");
+        this.addToArgList("--name", appName);
     }
 
     @Override

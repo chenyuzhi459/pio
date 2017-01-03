@@ -42,6 +42,11 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.sugo</groupId>
+            <artifactId>pio-processing-spark</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.4.1</version>
@@ -76,8 +81,8 @@
                                 <argument>${project.parent.version}</argument>
                                 <argument>-l</argument>
                                 <argument>${settings.localRepository}</argument>
-                                <!--<argument>-c</argument>-->
-                                <!--<argument>io.sugo.pio.extensions:dl4j-extensions</argument>-->
+                                <argument>-c</argument>
+                                <argument>io.sugo.pio.extensions:dl4j-extensions</argument>
                                 <argument>-c</argument>
                                 <argument>io.sugo.pio.extensions:druid-extensions</argument>
                                 <argument>-c</argument>

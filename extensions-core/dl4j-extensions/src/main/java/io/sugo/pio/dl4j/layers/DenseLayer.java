@@ -1,8 +1,14 @@
 package io.sugo.pio.dl4j.layers;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.impl.InputPortImpl;
+import io.sugo.pio.ports.impl.OutputPortImpl;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -72,8 +78,12 @@ public class DenseLayer extends AbstractLayer {
 
     private int numNodes;
 
-    public DenseLayer(OperatorDescription description) {
-        super(description);
+
+    @JsonCreator
+    public DenseLayer(
+            @JsonProperty("name") String name
+    ) {
+        super(name);
     }
 
     public org.deeplearning4j.nn.conf.layers.DenseLayer.Builder generateBuilder() {

@@ -12,8 +12,11 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.impl.InputPortImpl;
+import io.sugo.pio.ports.impl.OutputPortImpl;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,12 +24,16 @@ import java.util.List;
  */
 public abstract class AbstractDLModelLearner extends OperatorChain {
 
-    protected InputPort trainPort = getInputPorts().createPort("training examples", ExampleSet.class);
-    protected OutputPort modelPort = getOutputPorts().createPort("model");
-    protected OutputPort examplePort = getOutputPorts().createPort("examples");
-
-    protected final OutputPort start = getSubprocess(0).getInnerSources().createPort("start");
-    protected final InputPort end = getSubprocess(0).getInnerSinks().createPort("end");
+//    protected InputPort trainPort = getInputPorts().createPort("training examples", ExampleSet.class);
+    protected InputPort trainPort = new InputPortImpl("training examples");
+//    protected OutputPort modelPort = getOutputPorts().createPort("model");
+    protected OutputPort modelPort = new OutputPortImpl("model");
+//    protected OutputPort examplePort = getOutputPorts().createPort("examples");
+    protected OutputPort examplePort = new OutputPortImpl("examples");
+//    protected final OutputPort start = getSubprocess(0).getInnerSources().createPort("start");
+    protected final OutputPort start = new OutputPortImpl("start");
+//    protected final InputPort end = getSubprocess(0).getInnerSinks().createPort("end");
+    protected final InputPort end = new InputPortImpl("end");
 
     protected List<AbstractLayer> structure = new LinkedList<AbstractLayer>();
 
@@ -113,14 +120,19 @@ public abstract class AbstractDLModelLearner extends OperatorChain {
     public static final String PARAMETER_LOCAL_RANDOM_SEED = "local_random_seed";
 
 
-    public AbstractDLModelLearner(OperatorDescription description) {
-        super(description, "Layer Structure");
+    public AbstractDLModelLearner() {
+        super("Layer Structure", null, null);
+        addInputPort(trainPort);
+        addOutputPort(modelPort);
+        addOutputPort(examplePort);
+        addOutputPort(start);
+        addInputPort(end);
     }
 
     @Override
     public void doWork() {
         start.deliver(new LayerSemaphore("0"));
-        List<Operator> list = getSubprocess(0).getEnabledOperators();
+        List<Operator> list = getSubprocess(0).getOperators();
         structure = convertStructure(getStructure(list));
 
         // validate the input examples
@@ -194,20 +206,17 @@ public abstract class AbstractDLModelLearner extends OperatorChain {
         types.add(new ParameterTypeDouble(
                 PARAMETER_LEARNING_RATE,
                 "The learning rate determines by how much we change the weights at each step. May not be 0.",
-                Double.MIN_VALUE, 1.0d, 0.9,
-                false));
+                Double.MIN_VALUE, 1.0d, 0.9));
 
         types.add(new ParameterTypeDouble(
                 PARAMETER_DECAY,
                 "The rate that learning rate decreases",
-                0.0d, 1.0d, 0.99d,
-                false));
+                0.0d, 1.0d, 0.99d));
 
         types.add(new ParameterTypeDouble(
                 PARAMETER_MOMENTUM,
                 "The momentum simply adds a fraction of the previous weight update to the current one (prevent local maxima and smoothes optimization directions).",
-                0.0d, 1.0d, 0.2d,
-                false));
+                0.0d, 1.0d, 0.2d));
 
         types.add(new ParameterTypeCategory(
                 PARAMETER_OPTIMIZATION_ALGORITHM,

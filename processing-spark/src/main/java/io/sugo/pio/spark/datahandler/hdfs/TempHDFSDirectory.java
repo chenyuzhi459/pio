@@ -10,11 +10,13 @@ import java.io.IOException;
 /**
  */
 public class TempHDFSDirectory implements Closeable {
+    private final String parentDir;
     private final String subDir;
     private final boolean cleaning;
 
     public TempHDFSDirectory(MapReduceHDFSHandler mapReduceHDFSHandler, boolean cleaning) {
         this.subDir = "tmp_" + HadoopTools.getRandomString() + "/";
+        this.parentDir = mapReduceHDFSHandler.getUserDirectory();
         this.cleaning = cleaning;
     }
 
@@ -24,6 +26,10 @@ public class TempHDFSDirectory implements Closeable {
 
     public String getSubDir() {
         return subDir;
+    }
+
+    public String getFullPath() {
+        return parentDir + subDir;
     }
 
     @Override

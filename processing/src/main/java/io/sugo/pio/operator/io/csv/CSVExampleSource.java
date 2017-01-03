@@ -3,16 +3,12 @@ package io.sugo.pio.operator.io.csv;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.example.set.SimpleExampleSet;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.io.AbstractDataResultSetReader;
 import io.sugo.pio.operator.io.DataResultSetFactory;
-import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortOwner;
-import io.sugo.pio.ports.impl.InputPortImpl;
-import io.sugo.pio.ports.impl.OutputPortImpl;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -61,10 +57,9 @@ public class CSVExampleSource extends AbstractDataResultSetReader implements Ser
 	public CSVExampleSource(
 			@JsonProperty("file") String file,
 			@JsonProperty("name") String name,
-			@JsonProperty("output") OutputPort outputPort,
-			@JsonProperty("config") CSVResultSetConfiguration config
+			@JsonProperty("output") OutputPort outputPort
 	) {
-		super(name, outputPort);
+		super(SimpleExampleSet.class, name, outputPort);
 		this.file = file;
 	}
 

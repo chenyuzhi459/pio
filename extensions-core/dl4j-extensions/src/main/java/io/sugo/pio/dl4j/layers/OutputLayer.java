@@ -1,8 +1,12 @@
 package io.sugo.pio.dl4j.layers;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -63,8 +67,11 @@ public class OutputLayer extends AbstractLayer {
 
     private int numNodes;
 
-    public OutputLayer(OperatorDescription description) {
-        super(description);
+    @JsonCreator
+    public OutputLayer(
+            @JsonProperty("name") String name
+    ) {
+        super(name);
     }
 
     @Override
