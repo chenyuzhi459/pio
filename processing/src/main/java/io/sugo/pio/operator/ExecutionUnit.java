@@ -2,14 +2,13 @@ package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.sugo.pio.Process;
 import io.sugo.pio.operator.execution.UnitExecutionFactory;
 import io.sugo.pio.operator.execution.UnitExecutor;
-import io.sugo.pio.ports.*;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  */
@@ -24,7 +23,7 @@ public class ExecutionUnit implements Serializable {
     ) {
         this.operators = operators;
         for(Operator opt : operators){
-            opt.setEnclosingProcess(this);
+            opt.setEnclosingExecutionUnit(this);
         }
     }
 

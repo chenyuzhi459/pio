@@ -1,20 +1,23 @@
 package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-/**
- */
-public abstract class OperatorChain extends Operator implements Serializable {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "chainType", defaultImpl = ProcessRootOperator.class)
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class)
+})
+public abstract class OperatorChain extends Operator {
 
     private List<ExecutionUnit> execUnits;
 
-    public OperatorChain(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts){
+    public OperatorChain(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts) {
         super(name, inputPorts, outputPorts);
     }
 
@@ -57,7 +60,6 @@ public abstract class OperatorChain extends Operator implements Serializable {
 //    protected OutputPorts createInnerSources(PortOwner portOwner) {
 //        return new OutputPortsImpl(portOwner);
 //    }
-
     @Override
     public void doWork() {
         for (ExecutionUnit subprocess : execUnits) {
