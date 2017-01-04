@@ -23,8 +23,6 @@ import java.util.*;
 public abstract class Operator implements ParameterHandler {
     private final String name;
 
-//    private boolean enabled = true;
-
     /**
      * Parameters for this Operator.
      */
@@ -56,6 +54,10 @@ public abstract class Operator implements ParameterHandler {
                 addOutputPort(out);
             }
         }
+    }
+
+    public Object getMetadata(){
+        return "operator";
     }
 
     @JsonProperty
@@ -443,13 +445,6 @@ public abstract class Operator implements ParameterHandler {
      * TODO: Remove in later versions
      */
     public boolean shouldAutoConnect(OutputPort outputPort) {
-        return true;
-    }
-
-    /**
-     * @see #shouldAutoConnect(OutputPort)
-     */
-    public boolean shouldAutoConnect(InputPort inputPort) {
         return true;
     }
 

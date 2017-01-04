@@ -14,16 +14,20 @@ public abstract class OperatorChain extends Operator implements Serializable {
 
     private List<ExecutionUnit> execUnits;
 
-    public OperatorChain(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts){
+    public OperatorChain(List<ExecutionUnit> execUnits, String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts){
         super(name, inputPorts, outputPorts);
-    }
-
-    public void setExecUnits(List<ExecutionUnit> execUnits) {
         this.execUnits = execUnits;
         for (ExecutionUnit unit : execUnits) {
             unit.setEnclosingOperator(this);
         }
     }
+
+//    public void setExecUnits(List<ExecutionUnit> execUnits) {
+//        this.execUnits = execUnits;
+//        for (ExecutionUnit unit : execUnits) {
+//            unit.setEnclosingOperator(this);
+//        }
+//    }
 
     @JsonProperty("execUnits")
     public List<ExecutionUnit> getExecUnits() {

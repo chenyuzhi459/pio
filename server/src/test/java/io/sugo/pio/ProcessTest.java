@@ -1,9 +1,13 @@
 package io.sugo.pio;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
+import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import io.sugo.pio.guice.ProcessPioModule;
 import io.sugo.pio.guice.ProcessingPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
@@ -20,8 +24,12 @@ import io.sugo.pio.server.process.ProcessBuilder;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * Created by root on 16-12-27.
@@ -31,28 +39,66 @@ public class ProcessTest {
 
     static {
         ProcessingPioModule module = new ProcessingPioModule();
-        for(Module m: module.getJacksonModules()) {
+        for (Module m : module.getJacksonModules()) {
             jsonMapper.registerModule(m);
         }
         ProcessPioModule processPioModule = new ProcessPioModule();
-        for(Module m: processPioModule.getJacksonModules()) {
+        for (Module m : processPioModule.getJacksonModules()) {
             jsonMapper.registerModule(m);
         }
-//        jsonMapper.setVisibility(JsonMethod.FIELD, Visibility.ANY);
-//        jsonMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
     }
 
     @Test
-    public void testOperatorMetadata(){
-        ObjectReader reader = jsonMapper.readerFor(Operator.class);
+    public void getSubtypeClasses() {
+        Class c = Operator.class;
+        MapperConfig config = jsonMapper.getDeserializationConfig();
+        AnnotationIntrospector ai = config.getAnnotationIntrospector();
+        AnnotatedClass ac = AnnotatedClass.constructWithoutSuperTypes(c, ai, config);
+        List<NamedType> subtypes = ai.findSubtypes(ac);
+
+        if (subtypes != null) {
+            for (NamedType subtype : subtypes) {
+                System.out.println("------");
+                System.out.println(subtype.getName());
+                System.out.println(subtype.getType());
+                Class<?> t = subtype.getType();
+                    Constructor[] cons = t.getDeclaredConstructors();
+                    if(cons.length > 0){
+                        Constructor con = cons[0];
+                        Operator opt = null;
+                        try {
+                            opt = (Operator) con.newInstance(new Object[con.getParameterCount()]);
+                            System.out.println("" + opt.getMetadata());
+                            Method method = t.getMethod("getMetadata");
+                            Object val = method.invoke(opt, null);
+                            System.out.println(val);
+                        }catch (Exception e){
+//                            System.out.println("" + opt.getMetadata());
+                            Method method = null;
+                            try {
+                                method = t.getMethod("getMetadata");
+                                Object val = method.invoke(opt, null);
+                                System.out.println(val);
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    }
+                    for (int i = 0; i < cons.length; i++) {
+                        Constructor con = cons[i];
+                    }
+
+//                System.out.println(subtype.getType());
+            }
+        }
     }
 
     @Test
-    public void testProcess(){
+    public void testProcess() {
         List<ExecutionUnit> units = new ArrayList<>();
         List<Operator> operators = new ArrayList<>();
 
-        Operator csvReader = new CSVExampleSource("/work/win7/druid.csv", "csv_reader", new OutputPortImpl("csv_reader_output"));
+        Operator csvReader = new CSVExampleSource("druid.csv", "csv_reader", new OutputPortImpl("csv_reader_output"));
         csvReader.getInputPorts();
         csvReader.getOutputPorts();
         operators.add(csvReader);
@@ -90,7 +136,7 @@ public class ProcessTest {
     }
 
     @Test
-    public void testProcessBuilder(){
+    public void testProcessBuilder() {
         List<Connection> connections = new ArrayList<>();
         Connection conn = new Connection("csv_reader", "csv_reader_output", "csv_writer", "csv_writer_input");
 //        conn.setFromOpt("csv_reader");
@@ -102,7 +148,7 @@ public class ProcessTest {
 
         List<ExecutionUnit> execUnits = new ArrayList<>();
         List<Operator> operators = new ArrayList<>();
-        operators.add(new CSVExampleSource("/work/win7/druid.csv", "csv_reader", new OutputPortImpl("csv_reader_output")));
+        operators.add(new CSVExampleSource("druid.csv", "csv_reader", new OutputPortImpl("csv_reader_output")));
         operators.add(new CSVWriter("csv_writer", new InputPortImpl("csv_writer_input")));
         ExecutionUnit execUnit = new ExecutionUnit(operators);
         execUnits.add(execUnit);
@@ -128,7 +174,7 @@ public class ProcessTest {
     }
 
     @Test
-    public void testCsvReaderDeSerialize(){
+    public void testCsvReaderDeSerialize() {
         CSVExampleSource csvReader = new CSVExampleSource("/work/win7/druid.csv", "csv_reader", new OutputPortImpl("csv_reader_output"));
         try {
             csvReader.setStatus(Status.RUNNING);
@@ -147,7 +193,7 @@ public class ProcessTest {
     }
 
     @Test
-    public void testProcessRootOperatorDeSerialize(){
+    public void testProcessRootOperatorDeSerialize() {
         List<ExecutionUnit> execUnits = new ArrayList<>();
         List<Operator> operators = new ArrayList<>();
         operators.add(new CSVWriter("csv_writer", new InputPortImpl("csv_writer_input")));

@@ -27,6 +27,9 @@ public class ExecutionUnit implements Serializable {
 
     public void setEnclosingOperator(OperatorChain enclosingOperator) {
         this.enclosingOperator = enclosingOperator;
+        for(Operator operator: operators){
+            operator.setEnclosingProcess(this);
+        }
     }
 
     public List<InputPort> getAllInputPorts(){
