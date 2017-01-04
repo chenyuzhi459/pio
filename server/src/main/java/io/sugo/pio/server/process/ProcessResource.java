@@ -80,4 +80,18 @@ public class ProcessResource {
             return Response.ok(pi).build();
         }
     }
+
+    @GET
+    @Path("/metadata")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOperatorMetadata(@PathParam("id") final String id) {
+        ProcessInstance pi = processManager.get(id);
+        if (pi == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(ImmutableMap.of("error", String.format("[%s] does not exist", id)))
+                    .build();
+        } else {
+            return Response.ok(pi).build();
+        }
+    }
 }
