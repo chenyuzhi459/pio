@@ -22,6 +22,11 @@ public class CSVWriter extends Operator {
         super(name, Arrays.asList(inputPort), null);
     }
 
+    @Override
+    public Object getMetadata(){
+        return "CSVWriter_metadata";
+    }
+
     public void doWork() {
         System.out.println("CSVWriter do work");
         try {
