@@ -24,8 +24,7 @@ public final class TestOperatorChain extends OperatorChain {
     public TestOperatorChain(
             @JsonProperty("execUnits") List<ExecutionUnit> execUnits
     ) {
-        super("root", null, null);
-        setExecUnits(execUnits);
+        super(null, execUnits, "root", null, null);
     }
 
     public IOContainer getResults(boolean omitNullResults) {

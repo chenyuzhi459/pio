@@ -34,7 +34,7 @@ public class SparkDecisionTreeTest {
         ExecutionUnit sparkNestUnit = new ExecutionUnit(operators);
         sparkNestExecUnits.add(sparkNestUnit);
 
-        SparkNest sparkNest = new SparkNest(sparkNestExecUnits);
+        SparkNest sparkNest = new SparkNest(null, sparkNestExecUnits);
 
         List<Operator> rootOperators = new ArrayList<>();
         rootOperators.add(sparkNest);
