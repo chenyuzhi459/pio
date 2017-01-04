@@ -197,15 +197,16 @@ public class Initialization {
         return loader;
     }
 
-    public static Injector makeInjectorWithModules(final Injector baseInjector, Iterable<? extends Module> modules)
-    {
+    public static Injector makeInjectorWithModules(final Injector baseInjector, Iterable<? extends Module> modules) {
         final ModuleList defaultModules = new ModuleList(baseInjector);
         defaultModules.addModules(
-            new LifecycleModule(),
-            new JettyServerModule(),
-            new MetadataConfigModule(),
-            new DerbyMetadataStoragePioModule(),
-            new SparkConfigModule()
+                new LifecycleModule(),
+                new JettyServerModule(),
+                new MetadataConfigModule(),
+                new DerbyMetadataStoragePioModule(),
+                new SparkConfigModule(),
+                new ProcessPioModule(),
+                new ProcessingPioModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);

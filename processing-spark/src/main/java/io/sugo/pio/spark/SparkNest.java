@@ -24,12 +24,12 @@ public class SparkNest extends OperatorChain {
         sparkConfig = injector.getInstance(SparkConfig.class);
     }
 
-    public SparkNest(OperatorDescription description) {
-        this(description, "Spark Nest");
+    public SparkNest() {
+        this("Spark Nest");
     }
 
-    protected SparkNest(OperatorDescription description, String subProcessName) {
-        super(description, new String[]{subProcessName});
+    protected SparkNest(String subProcessName) {
+        super(subProcessName, null, null);
         // init the yarn connection
         HadoopConnectionEntry hadoopConnection = HadoopConnectionService.getConnectionEntry(sparkConfig);
         mapReduceHDFSHandler = new MapReduceHDFSHandler(hadoopConnection, sparkConfig);

@@ -1,7 +1,8 @@
 package io.sugo.pio.spark.operator.spark;
 
-import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.learner.PredictionModel;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 import io.sugo.pio.spark.datahandler.hdfs.TempHDFSDirectory;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler;
@@ -19,8 +20,9 @@ import java.lang.reflect.ParameterizedType;
 /**
  */
 public abstract class AbstractSparkLearner<T extends ModelTransferObject, M extends PredictionModel> extends AbstractLearner {
-    public AbstractSparkLearner(OperatorDescription description, SparkOperation sparkOperation) {
-        super(description, sparkOperation);
+    public AbstractSparkLearner(SparkOperation sparkOperation, String name,
+                                InputPort exampleSetInput, OutputPort modelOutput) {
+        super(sparkOperation, name, exampleSetInput, modelOutput);
     }
 
     @Override

@@ -13,8 +13,8 @@ import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 /**
  */
 public class SimpleNeuralNetwork extends AbstractDLModelLearner {
-    public SimpleNeuralNetwork(OperatorDescription description) {
-        super(description);
+    public SimpleNeuralNetwork() {
+        super();
     }
 
     @Override

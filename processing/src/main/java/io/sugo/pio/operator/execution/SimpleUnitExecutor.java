@@ -4,6 +4,7 @@ import io.sugo.pio.operator.ExecutionUnit;
 import io.sugo.pio.operator.Operator;
 
 import java.util.Enumeration;
+import java.util.Iterator;
 
 /**
  * Executes an {@link ExecutionUnit} by invoking the operators in their (presorted) ordering.
@@ -13,14 +14,14 @@ import java.util.Enumeration;
 public class SimpleUnitExecutor implements UnitExecutor {
     @Override
     public void execute(ExecutionUnit unit) {
-        Enumeration<Operator> opEnum = unit.getOperatorEnumeration();
+        Iterator<Operator> opIter = unit.getOperatorIterator();
 
-        Operator operator = opEnum.hasMoreElements() ? opEnum.nextElement() : null;
+        Operator operator = opIter.hasNext() ? opIter.next() : null;
         while (operator != null) {
             operator.execute();
             operator.freeMemory();
 
-            operator = opEnum.hasMoreElements() ? opEnum.nextElement() : null;
+            operator = opIter.hasNext() ? opIter.next() : null;
         }
     }
 }

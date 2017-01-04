@@ -18,4 +18,14 @@ public class ParameterTypeHadoopConnection extends ParameterTypeSingle {
     public void setDefaultValue(Object defaultValue) {
 
     }
+
+    @Override
+    public boolean isNumerical() {
+        return false;
+    }
+
+    @Override
+    public String getRange() {
+        return null;
+    }
 }

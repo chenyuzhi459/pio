@@ -23,6 +23,14 @@ public class Main {
                         CliPio.class
                 );
 
+        builder.withGroup("tools")
+                .withDescription("Various tools for working with Druid")
+                .withDefaultCommand(Help.class)
+                .withCommands(
+                        PullDependencies.class,
+                        CreateTables.class
+                );
+
 
         final Injector injector = GuiceInjectors.makeStartupInjector();
 //        final ExtensionsConfig config = injector.getInstance(ExtensionsConfig.class);

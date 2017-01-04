@@ -32,4 +32,5 @@ public interface NominalMapping extends Cloneable, Serializable {
      * now.
      */
     public List<String> getValues();
+
 }

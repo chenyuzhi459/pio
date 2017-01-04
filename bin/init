@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+
+LOG_DIR=./
+
+mkdir log
+mkdir -p $LOG_DIR/tmp;
+mkdir -p $LOG_DIR/hadoop-tmp;
+mkdir -p $LOG_DIR/pids;

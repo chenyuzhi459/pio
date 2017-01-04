@@ -5,15 +5,16 @@ import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.spark.ports.SparkOutputPortImpl;
+
+import java.util.Collection;
 
 /**
  */
 public abstract class SparkOperator extends Operator implements KillableOperation {
     private SparkNest sparkNest = null;
 
-    public SparkOperator(OperatorDescription description) {
-        super(description);
+    public SparkOperator(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts) {
+        super(name, inputPorts, outputPorts);
     }
 
     public SparkNest getSparkNest() {
@@ -60,18 +61,18 @@ public abstract class SparkOperator extends Operator implements KillableOperatio
         return checkEnclosingRadoopNest(operator);
     }
 
-    public OutputPort createOutputPort(String portName) {
-        return createOutputPort(portName, true);
-    }
-
-    public OutputPort createOutputPort(String portName, boolean add) {
-        SparkOutputPortImpl out = new SparkOutputPortImpl(getOutputPorts(), portName);
-        if(add) {
-            getOutputPorts().addPort(out);
-        }
-
-        return out;
-    }
+//    public OutputPort createOutputPort(String portName) {
+//        return createOutputPort(portName, true);
+//    }
+//
+//    public OutputPort createOutputPort(String portName, boolean add) {
+//        SparkOutputPortImpl out = new SparkOutputPortImpl(getOutputPorts(), portName);
+//        if(add) {
+//            getOutputPorts().addPort(out);
+//        }
+//
+//        return out;
+//    }
 
     public HadoopExampleSet getHesFromInputPort(InputPort port) {
         IOObject exampleSet = port.getAnyDataOrNull();

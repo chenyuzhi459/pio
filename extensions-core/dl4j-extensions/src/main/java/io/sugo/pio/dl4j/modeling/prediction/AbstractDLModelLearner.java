@@ -12,8 +12,11 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.impl.InputPortImpl;
+import io.sugo.pio.ports.impl.OutputPortImpl;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,12 +24,16 @@ import java.util.List;
  */
 public abstract class AbstractDLModelLearner extends OperatorChain {
 
-    protected InputPort trainPort = getInputPorts().createPort("training examples", ExampleSet.class);
-    protected OutputPort modelPort = getOutputPorts().createPort("model");
-    protected OutputPort examplePort = getOutputPorts().createPort("examples");
-
-    protected final OutputPort start = getSubprocess(0).getInnerSources().createPort("start");
-    protected final InputPort end = getSubprocess(0).getInnerSinks().createPort("end");
+//    protected InputPort trainPort = getInputPorts().createPort("training examples", ExampleSet.class);
+    protected InputPort trainPort = new InputPortImpl("training examples");
+//    protected OutputPort modelPort = getOutputPorts().createPort("model");
+    protected OutputPort modelPort = new OutputPortImpl("model");
+//    protected OutputPort examplePort = getOutputPorts().createPort("examples");
+    protected OutputPort examplePort = new OutputPortImpl("examples");
+//    protected final OutputPort start = getSubprocess(0).getInnerSources().createPort("start");
+    protected final OutputPort start = new OutputPortImpl("start");
+//    protected final InputPort end = getSubprocess(0).getInnerSinks().createPort("end");
+    protected final InputPort end = new InputPortImpl("end");
 
     protected List<AbstractLayer> structure = new LinkedList<AbstractLayer>();
 
@@ -113,14 +120,19 @@ public abstract class AbstractDLModelLearner extends OperatorChain {
     public static final String PARAMETER_LOCAL_RANDOM_SEED = "local_random_seed";
 
 
-    public AbstractDLModelLearner(OperatorDescription description) {
-        super(description, "Layer Structure");
+    public AbstractDLModelLearner() {
+        super("Layer Structure", null, null);
+        addInputPort(trainPort);
+        addOutputPort(modelPort);
+        addOutputPort(examplePort);
+        addOutputPort(start);
+        addInputPort(end);
     }
 
     @Override
     public void doWork() {
         start.deliver(new LayerSemaphore("0"));
-        List<Operator> list = getSubprocess(0).getEnabledOperators();
+        List<Operator> list = getSubprocess(0).getOperators();
         structure = convertStructure(getStructure(list));
 
         // validate the input examples

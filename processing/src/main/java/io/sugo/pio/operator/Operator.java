@@ -1,61 +1,102 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.base.Preconditions;
 import io.sugo.pio.Process;
+import io.sugo.pio.operator.io.csv.CSVExampleSource;
+import io.sugo.pio.operator.io.csv.CSVWriter;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
-import io.sugo.pio.ports.impl.InputPortsImpl;
-import io.sugo.pio.ports.impl.OutputPortsImpl;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MDTransformer;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-/**
- */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "operatorType")
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class),
+        @JsonSubTypes.Type(name = CSVExampleSource.TYPE, value = CSVExampleSource.class),
+        @JsonSubTypes.Type(name = CSVWriter.TYPE, value = CSVWriter.class),
+})
 public abstract class Operator implements ParameterHandler {
-    private String name;
+    private final String name;
 
-    private OperatorDescription operatorDescription = null;
+//    private boolean enabled = true;
 
-    private boolean enabled = true;
-
-    /** Parameters for this Operator. */
+    /**
+     * Parameters for this Operator.
+     */
     private Parameters parameters = null;
 
-    // / SIMONS NEUERUNGEN
-    private final PortOwner portOwner = new PortOwner() {
-        @Override
-        public Operator getOperator() {
-            return Operator.this;
-        }
-    };
+    private Status status;
 
-    private final InputPorts inputPorts;
-    private final OutputPorts outputPorts;
+//    private final InputPorts inputPorts;
+//    private final OutputPorts outputPorts;
+
     private final MDTransformer transformer = new MDTransformer(this);
 
     private ExecutionUnit enclosingExecutionUnit;
+    private final Map<String, InputPort> inputPortMap = new HashMap<>();
+    private final Map<String, OutputPort> outputPortMap = new HashMap<>();
+    private final PortOwner portOwner = new PortOwner(this);
 
-    public Operator(OperatorDescription description) {
-        this.operatorDescription = description;
-        this.name = description.getKey();
-
-        this.inputPorts = createInputPorts(portOwner);
-        this.outputPorts = createOutputPorts(portOwner);
+    public Operator(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts) {
+        this.name = name;
+        if (inputPorts != null && inputPorts.size() > 0) {
+            for (InputPort in : inputPorts) {
+                Preconditions.checkArgument(!inputPortMap.containsKey(in.getName()), "Cannot contain InputPorts with same name " + in.getName());
+                addInputPort(in);
+            }
+        }
+        if (outputPorts != null && outputPorts.size() > 0) {
+            for (OutputPort out : outputPorts) {
+                Preconditions.checkArgument(!outputPortMap.containsKey(out.getName()), "Cannot contain InputPorts with same name " + out.getName());
+                addOutputPort(out);
+            }
+        }
     }
 
+    @JsonProperty
     public String getName() {
         return name;
     }
 
-    /**
-     * This method simply sets the name to the given one. Please note that it is not checked if the
-     * name was already used in the process. Please use the method {@link #rename(String)} for usual
-     * renaming.
-     */
-    private final void setName(String newName) {
-        this.name = newName;
+    @JsonProperty
+    public Status getStatus() {
+        if(status == null){
+            return Status.QUEUE;
+        }
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        if(status != null) {
+            this.status = status;
+        } else {
+            this.status = Status.QUEUE;
+        }
+    }
+
+    protected void addInputPort(InputPort inPort){
+        inputPortMap.put(inPort.getName(), inPort);
+        inPort.setPortOwner(portOwner);
+    }
+
+    protected void addOutputPort(OutputPort outPort){
+        outputPortMap.put(outPort.getName(), outPort);
+        outPort.setPortOwner(portOwner);
+    }
+
+    @JsonProperty
+    public Collection<InputPort> getInputPorts() {
+        return inputPortMap.values();
+    }
+
+    @JsonProperty
+    public Collection<OutputPort> getOutputPorts() {
+        return outputPortMap.values();
     }
 
     /**
@@ -64,24 +105,23 @@ public abstract class Operator implements ParameterHandler {
      * might be changed during registering in order to ensure that each operator name is unique in
      * its process. The new name will be returned.
      */
-    public final String rename(String newName) {
-        Process process = getProcess();
-        if (process != null) {
-            process.unregisterName(this.name);
-            this.name = process.registerName(newName, this);
-        } else {
-            this.name = newName;
-        }
-        return this.name;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+//    public final String rename(String newName) {
+//        Process process = getProcess();
+//        if (process != null) {
+//            process.unregisterName(this.name);
+//            this.name = process.registerName(newName, this);
+//        } else {
+//            this.name = newName;
+//        }
+//        return this.name;
+//    }
+//    public boolean isEnabled() {
+//        return enabled;
+//    }
+//
+//    public void setEnabled(boolean enabled) {
+//        this.enabled = enabled;
+//    }
 
     /**
      * Returns the process of this operator by asking the parent operator. If the operator itself
@@ -103,7 +143,7 @@ public abstract class Operator implements ParameterHandler {
      */
     protected void registerOperator(Process process) {
         if (process != null) {
-            setName(process.registerName(getName(), this));
+            process.registerName(getName(), this);
         }
     }
 
@@ -126,8 +166,13 @@ public abstract class Operator implements ParameterHandler {
     }
 
     public void execute() {
-        if (isEnabled()) {
+        try {
+            setStatus(Status.RUNNING);
             doWork();
+            setStatus(Status.SUCCESS);
+        } catch (OperatorException oe) {
+            setStatus(Status.FAILED);
+            throw oe;
         }
     }
 
@@ -148,7 +193,7 @@ public abstract class Operator implements ParameterHandler {
      * Returns a list of <tt>ParameterTypes</tt> describing the parameters of this operator. The
      * default implementation returns an empty list if no input objects can be retained and special
      * parameters for those input objects which can be prevented from being consumed.
-     *
+     * <p>
      * ATTENTION! This will create new parameterTypes. For calling already existing parameter types
      * use getParameters().getParameterTypes();
      */
@@ -175,7 +220,7 @@ public abstract class Operator implements ParameterHandler {
      * Returns a single parameter retrieved from the {@link Parameters} of this Operator.
      */
     @Override
-    public String getParameter(String key)  {
+    public String getParameter(String key) {
         try {
             return getParameters().getParameter(key);
         } catch (Exception e) {
@@ -183,13 +228,43 @@ public abstract class Operator implements ParameterHandler {
         }
     }
 
-    /** Returns a single named parameter and casts it to String. */
+    @Override
+    public void setParameters(Parameters parameters) {
+        this.parameters = parameters;
+    }
+
+    @Override
+    public void setParameter(String key, String value) {
+        getParameters().setParameter(key, value);
+    }
+
+    @Override
+    public void setListParameter(String key, List<String[]> list) {
+        getParameters().setParameter(key, ParameterTypeList.transformList2String(list));
+    }
+
+    /**
+     * Returns a single named parameter and casts it to List. The list returned by this method
+     * contains the user defined key-value pairs. Each element is a String array of length 2. The
+     * first element is the key, the second the parameter value. The caller have to perform the
+     * casts to the correct types himself.
+     */
+    @Override
+    public List<String[]> getParameterList(String key) throws UndefinedParameterError {
+        return ParameterTypeList.transformString2List(getParameter(key));
+    }
+
+    /**
+     * Returns a single named parameter and casts it to String.
+     */
     @Override
     public String getParameterAsString(String key) {
         return getParameter(key);
     }
 
-    /** Returns a single named parameter and casts it to char. */
+    /**
+     * Returns a single named parameter and casts it to char.
+     */
     @Override
     public char getParameterAsChar(String key) {
         String parameterValue = getParameter(key);
@@ -199,7 +274,9 @@ public abstract class Operator implements ParameterHandler {
         return 0;
     }
 
-    /** Returns a single named parameter and casts it to int. */
+    /**
+     * Returns a single named parameter and casts it to int.
+     */
     @Override
     public int getParameterAsInt(String key) {
         ParameterType type = this.getParameters().getParameterType(key);
@@ -222,7 +299,9 @@ public abstract class Operator implements ParameterHandler {
         }
     }
 
-    /** Returns a single named parameter and casts it to long. */
+    /**
+     * Returns a single named parameter and casts it to long.
+     */
     @Override
     public long getParameterAsLong(String key) {
         ParameterType type = this.getParameters().getParameterType(key);
@@ -245,7 +324,9 @@ public abstract class Operator implements ParameterHandler {
         }
     }
 
-    /** Returns a single named parameter and casts it to double. */
+    /**
+     * Returns a single named parameter and casts it to double.
+     */
     @Override
     public double getParameterAsDouble(String key) {
         String value = getParameter(key);
@@ -279,9 +360,9 @@ public abstract class Operator implements ParameterHandler {
      * {@link InputPort} for an operator using one of the {@link InputPorts#createPort(String)}
      * methods.
      */
-    public final InputPorts getInputPorts() {
-        return inputPorts;
-    }
+//    public final InputPorts getInputPorts() {
+//        return inputPorts;
+//    }
 
     /**
      * This method returns the {@link OutputPorts} object that gives access to all defined
@@ -289,9 +370,9 @@ public abstract class Operator implements ParameterHandler {
      * {@link OutputPort} for an operator using one of the {@link OutputPorts#createPort(String)}
      * methods.
      */
-    public final OutputPorts getOutputPorts() {
-        return outputPorts;
-    }
+//    public final OutputPorts getOutputPorts() {
+//        return outputPorts;
+//    }
 
 
     /**
@@ -304,23 +385,22 @@ public abstract class Operator implements ParameterHandler {
      * @return The {@link InputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
-    protected InputPorts createInputPorts(PortOwner portOwner) {
-        return new InputPortsImpl(portOwner);
-    }
+//    protected InputPorts createInputPorts(PortOwner portOwner) {
+//        return new InputPortsImpl(portOwner);
+//    }
 
     /**
      * This method returns an {@link OutputPorts} object for port initialization. Useful for adding
      * an arbitrary implementation (e.g. changing port creation & (dis)connection behavior,
      * optionally by customized {@link OutputPort} instances) by overriding this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link OutputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
-    protected OutputPorts createOutputPorts(PortOwner portOwner) {
-        return new OutputPortsImpl(portOwner);
-    }
+//    protected OutputPorts createOutputPorts(PortOwner portOwner) {
+//        return new OutputPortsImpl(portOwner);
+//    }
 
 
     /**
@@ -335,7 +415,9 @@ public abstract class Operator implements ParameterHandler {
         return transformer;
     }
 
-    /** Returns the ExecutionUnit that contains this operator. */
+    /**
+     * Returns the ExecutionUnit that contains this operator.
+     */
     public final ExecutionUnit getExecutionUnit() {
         return enclosingExecutionUnit;
     }
@@ -345,10 +427,10 @@ public abstract class Operator implements ParameterHandler {
      * the meta data on the input Ports to be already calculated.
      */
     public void transformMetaData() {
-        if (!isEnabled()) {
-            return;
-        }
-        getInputPorts().checkPreconditions();
+//        if (!isEnabled()) {
+//            return;
+//        }
+//        getInputPorts().checkPreconditions();
         getTransformer().transformMetaData();
     }
 
@@ -403,7 +485,11 @@ public abstract class Operator implements ParameterHandler {
      * removes all hard references to IOObjects stored at the ports.
      */
     public void freeMemory() {
-        getInputPorts().freeMemory();
-        getOutputPorts().freeMemory();
+        for (Port inputPort : getInputPorts()) {
+            inputPort.freeMemory();
+        }
+        for (Port inputPort : getOutputPorts()) {
+            inputPort.freeMemory();
+        }
     }
 }

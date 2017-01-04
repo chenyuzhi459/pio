@@ -1,14 +1,14 @@
 package io.sugo.pio.spark.operator.spark;
 
-import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.io.AbstractReader;
+import io.sugo.pio.ports.impl.OutputPortImpl;
 import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 
 /**
  */
 public class TestHadoopExampleSetReader extends AbstractReader<HadoopExampleSet> {
-    public TestHadoopExampleSetReader(OperatorDescription description) {
-        super(description, HadoopExampleSet.class);
+    public TestHadoopExampleSetReader() {
+        super(HadoopExampleSet.class, "TestHadoopExampleSetReader", new OutputPortImpl("hadoopOutput"));
     }
 
     @Override

@@ -1,28 +1,32 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.Process;
 import io.sugo.pio.parameter.ParameterType;
-import io.sugo.pio.ports.InputPorts;
-import io.sugo.pio.ports.metadata.SubprocessTransformRule;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  */
-public final class ProcessRootOperator extends OperatorChain {
+public final class ProcessRootOperator extends OperatorChain implements Serializable {
+
+    public static final String TYPE = "root";
+
     /** The process which is connected to this process operator. */
     private Process process;
 
-    public ProcessRootOperator(OperatorDescription description) {
-        this(description, null);
-    }
-
-    public ProcessRootOperator(OperatorDescription description, Process process) {
-        super(description, "Main Process");
-        getTransformer().addRule(new SubprocessTransformRule(getSubprocess(0)));
-        setProcess(process);
-        rename("Root");
+    @JsonCreator
+    public ProcessRootOperator(
+            @JsonProperty("execUnits") List<ExecutionUnit> execUnits
+    ) {
+        super("root", null, null);
+        setExecUnits(execUnits);
     }
 
     /**
@@ -33,8 +37,25 @@ public final class ProcessRootOperator extends OperatorChain {
      *            <code>null</code> values for empty results instead of omitting them.
      */
     public IOContainer getResults(boolean omitNullResults) {
-        InputPorts innerSinks = getSubprocess(0).getInnerSinks();
-        return innerSinks.createIOContainer(false, omitNullResults);
+        List<InputPort> inputPorts = getSubprocess(0).getAllInputPorts();
+        return createIOContainer(false, omitNullResults, inputPorts);
+    }
+
+    public IOContainer createIOContainer(boolean onlyConnected, boolean omitEmptyResults, List<InputPort> inputPorts) {
+        Collection<IOObject> output = new LinkedList<>();
+        for (Port port : inputPorts) {
+            if (!onlyConnected || port.isConnected()) {
+                IOObject data = port.getAnyDataOrNull();
+                if (omitEmptyResults) {
+                    if (data != null) {
+                        output.add(data);
+                    }
+                } else {
+                    output.add(data);
+                }
+            }
+        }
+        return new IOContainer(output);
     }
 
     /** Sets the process. */

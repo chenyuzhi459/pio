@@ -29,4 +29,14 @@ public class HadoopExampleSet extends AbstractExampleSet {
     public Attributes getAttributes() {
         return attributes;
     }
+
+    @Override
+    public int size() {
+        return exampleTable.size();
+    }
+
+    @Override
+    public ExampleTable getExampleTable() {
+        return exampleTable;
+    }
 }

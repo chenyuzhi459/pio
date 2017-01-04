@@ -4,7 +4,12 @@ import io.sugo.pio.operator.Operator;
 
 /**
  */
-public interface PortOwner {
-    /** Returns the operator to which these ports are attached. */
-    public Operator getOperator();
+public class PortOwner {
+    private final Operator operator;
+    public PortOwner(Operator operator){
+        this.operator = operator;
+    }
+    public Operator getOperator(){
+        return operator;
+    }
 }

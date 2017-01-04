@@ -49,4 +49,21 @@ public class ParameterTypeCategory extends ParameterTypeSingle {
             return -1;
         }
     }
+
+    @Override
+    public boolean isNumerical() {
+        return false;
+    }
+
+    @Override
+    public String getRange() {
+        StringBuffer values = new StringBuffer();
+        for (int i = 0; i < categories.length; i++) {
+            if (i > 0) {
+                values.append(", ");
+            }
+            values.append(categories[i]);
+        }
+        return values.toString() + "; default: " + categories[defaultValue];
+    }
 }

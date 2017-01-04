@@ -44,7 +44,7 @@ public class SQLMetadataEngineStorage implements EngineStorage {
 
     @LifecycleStart
     public void start() {
-        connector.createEngineTable();
+//        connector.createEngineTable();
     }
 
     @LifecycleStop

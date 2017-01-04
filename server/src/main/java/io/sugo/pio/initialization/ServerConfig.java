@@ -59,7 +59,7 @@ public class ServerConfig
   {
     return "ServerConfig{" +
         "port=" + port +
-        "numThreads=" + numThreads +
+        ", numThreads=" + numThreads +
         ", maxIdleTime=" + maxIdleTime +
         '}';
   }

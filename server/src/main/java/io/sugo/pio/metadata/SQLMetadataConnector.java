@@ -245,4 +245,33 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
             createEngineTable(tablesConfigSupplier.get().getEngineTable());
         }
     }
+
+    public void createProcessInstanceTable(final String tableName)
+    {
+        createTable(
+                tableName,
+                ImmutableList.of(
+                        String.format(
+                                "CREATE TABLE %1$s (\n"
+                                        + "  id VARCHAR(255) NOT NULL,\n"
+                                        + "  process_name VARCHAR(50) NOT NULL,\n"
+                                        + "  status VARCHAR(20) NOT NULL,\n"
+                                        + "  created_date VARCHAR(50) NOT NULL,\n"
+                                        + "  update_date VARCHAR(50) NOT NULL,\n"
+                                        + "  process %2$s NOT NULL,\n"
+                                        + "  PRIMARY KEY (id)\n"
+                                        + ")",
+                                tableName, getPayloadType()
+                        )
+                )
+        );
+    }
+
+    @Override
+    public void createProcessInstanceTable()
+    {
+        if (config.get().isCreateTables()) {
+            createProcessInstanceTable(tablesConfigSupplier.get().getProcessInstanceTable());
+        }
+    }
 }

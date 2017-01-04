@@ -6,6 +6,9 @@ import java.util.*;
  */
 public class Parameters implements Cloneable, Iterable<String> {
 
+    public static final char PAIR_SEPARATOR = '\u241D';
+    public static final char RECORD_SEPARATOR = '\u241E';
+
     /** Maps parameter keys (i.e. Strings) to their value (Objects). */
     private final Map<String, String> keyToValueMap = new LinkedHashMap<String, String>();
 
@@ -96,5 +99,19 @@ public class Parameters implements Cloneable, Iterable<String> {
                 return type.toString(defaultValue);
             }
         }
+    }
+
+    /**
+     * Sets the parameter for the given key after performing a range-check. This method returns true
+     * if the type was known and false if no parameter type was defined for this key.
+     */
+    public boolean setParameter(String key, String value) {
+        ParameterType parameterType = keyToTypeMap.get(key);
+        if (value == null) {
+            keyToValueMap.remove(key);
+        } else {
+            keyToValueMap.put(key, value);
+        }
+        return parameterType != null;
     }
 }

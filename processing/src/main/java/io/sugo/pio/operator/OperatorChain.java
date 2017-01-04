@@ -1,44 +1,34 @@
 package io.sugo.pio.operator;
 
-import io.sugo.pio.ports.InputPorts;
-import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.OutputPorts;
-import io.sugo.pio.ports.PortOwner;
-import io.sugo.pio.ports.impl.InputPortsImpl;
-import io.sugo.pio.ports.impl.OutputPortsImpl;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
 
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 /**
  */
-public abstract class OperatorChain extends Operator {
+public abstract class OperatorChain extends Operator implements Serializable {
 
-    private ExecutionUnit[] subprocesses;
+    private List<ExecutionUnit> execUnits;
 
-    public OperatorChain(OperatorDescription description, String... subprocessNames) {
-        super(description);
-        subprocesses = new ExecutionUnit[subprocessNames.length];
-        for (int i = 0; i < subprocesses.length; i++) {
-            subprocesses[i] = new ExecutionUnit(this, subprocessNames[i]);
+    public OperatorChain(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts){
+        super(name, inputPorts, outputPorts);
+    }
+
+    public void setExecUnits(List<ExecutionUnit> execUnits) {
+        this.execUnits = execUnits;
+        for (ExecutionUnit unit : execUnits) {
+            unit.setEnclosingOperator(this);
         }
     }
 
-    /**
-     * Adds the given operator at the given position. Please note that all operators (including the
-     * disabled operators) are used for position calculations.
-     */
-    public final int addOperator(Operator operator, int index) {
-        if (index < subprocesses.length) {
-            subprocesses[index].addOperator(operator);
-            return index;
-        } else {
-            throw new UnsupportedOperationException(
-                    "addOperator() is no longer supported. Try getSubprocess(int).addOperator()");
-        }
+    @JsonProperty("execUnits")
+    public List<ExecutionUnit> getExecUnits() {
+        return execUnits;
     }
-
 
     /**
      * This method returns an arbitrary implementation of {@link InputPorts} for inner sink port
@@ -46,14 +36,13 @@ public abstract class OperatorChain extends Operator {
      * (dis)connection behavior, optionally by customized {@link InputPort} instances) by overriding
      * this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link InputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
-    protected InputPorts createInnerSinks(PortOwner portOwner) {
-        return new InputPortsImpl(portOwner);
-    }
+//    protected InputPorts createInnerSinks(PortOwner portOwner) {
+//        return new InputPortsImpl(portOwner);
+//    }
 
     /**
      * This method returns an arbitrary implementation of {@link OutputPorts} for inner source port
@@ -61,32 +50,33 @@ public abstract class OperatorChain extends Operator {
      * (dis)connection behavior, optionally by customized {@link OutputPort} instances) by
      * overriding this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link OutputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
-    protected OutputPorts createInnerSources(PortOwner portOwner) {
-        return new OutputPortsImpl(portOwner);
-    }
+//    protected OutputPorts createInnerSources(PortOwner portOwner) {
+//        return new OutputPortsImpl(portOwner);
+//    }
 
     @Override
     public void doWork() {
-        for (ExecutionUnit subprocess : subprocesses) {
+        for (ExecutionUnit subprocess : execUnits) {
             subprocess.execute();
         }
     }
 
     public ExecutionUnit getSubprocess(int index) {
-        return subprocesses[index];
+        return execUnits.get(index);
     }
 
     public int getNumberOfSubprocesses() {
-        return subprocesses.length;
+        return execUnits.size();
     }
 
-    /** Returns an immutable view of all subprocesses */
+    /**
+     * Returns an immutable view of all subprocesses
+     */
     public List<ExecutionUnit> getSubprocesses() {
-        return Arrays.asList(subprocesses);
+        return execUnits;
     }
 }

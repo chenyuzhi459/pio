@@ -1,16 +1,13 @@
 package io.sugo.pio.ports.impl;
 
-import io.sugo.pio.ports.InputPort;
-import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.Port;
-import io.sugo.pio.ports.Ports;
+import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.metadata.MetaData;
 
 /**
  */
 public abstract class AbstractOutputPort extends AbstractPort implements OutputPort {
-    protected AbstractOutputPort(Ports<? extends Port> owner, String name) {
-        super(owner, name);
+    protected AbstractOutputPort(String name) {
+        super(name);
     }
 
     private InputPort connectedTo;
@@ -37,7 +34,7 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
 
     @Override
     public boolean shouldAutoConnect() {
-        return getPorts().getOwner().getOperator().shouldAutoConnect(this);
+        return getPortOwner().getOperator().shouldAutoConnect(this);
     }
 
     @Override
@@ -52,11 +49,6 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
         }
         return (T) metaData;
     }
-
-    /*
-	 * private void assertDisconnected() throws PortException { if (this.connectedTo != null) {
-	 * throw new PortException(this, "Already connected."); } }
-	 */
 
     @Override
     public void connectTo(InputPort inputPort) {

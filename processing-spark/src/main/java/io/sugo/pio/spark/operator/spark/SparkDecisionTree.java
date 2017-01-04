@@ -1,6 +1,10 @@
 package io.sugo.pio.spark.operator.spark;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.parameter.*;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler.SparkOperation;
 import io.sugo.pio.operator.OperatorDescription;
@@ -27,8 +31,13 @@ public class SparkDecisionTree extends AbstractSparkLearner {
     public static final String PARAMETER_IMPURITY = "criterion";
     public static final String[] IMPURITY = new String[]{"Gini", "Entropy"};
 
-    public SparkDecisionTree(OperatorDescription description) {
-        super(description, SparkOperation.DecisionTree);
+    @JsonCreator
+    public SparkDecisionTree(
+            @JsonProperty("name") String name,
+            @JsonProperty("inputPort") InputPort exampleSetInput,
+            @JsonProperty("outputPort") OutputPort modelOutput
+    ) {
+        super(SparkOperation.DecisionTree, name, exampleSetInput, modelOutput);
     }
 
     @Override
