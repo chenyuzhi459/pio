@@ -9,10 +9,9 @@ import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.http.TaskResource;
 import io.sugo.pio.metadata.SQLMetadataEngineStorage;
-import io.sugo.pio.server.EngineResource;
 import io.sugo.pio.server.EngineStorage;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
-import io.sugo.pio.server.process.ProcessResource;
+import io.sugo.pio.http.ProcessResource;
 import io.sugo.pio.services.ServerRunnable;
 import org.eclipse.jetty.server.Server;
 
@@ -31,15 +30,10 @@ public class CliPio extends ServerRunnable {
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        Jerseys.addResource(binder, EngineResource.class);
-                        Jerseys.addResource(binder, TaskResource.class);
                         Jerseys.addResource(binder, ProcessResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
-
-                        binder.bind(EngineStorage.class).to(SQLMetadataEngineStorage.class).in(LazySingleton.class);
-                        LifecycleModule.register(binder, SQLMetadataEngineStorage.class);
                     }
                 });
     }

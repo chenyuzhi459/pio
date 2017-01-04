@@ -1,17 +1,14 @@
-package io.sugo.pio.server.process;
+package io.sugo.pio.http;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.jaxrs.smile.SmileMediaTypes;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
-import io.sugo.pio.Process;
+import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.annotations.Json;
-import io.sugo.pio.metadata.MetadataProcessInstanceManager;
+import io.sugo.pio.server.process.ProcessManager;
+import io.sugo.pio.server.process.ResponseMsg;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -54,11 +51,9 @@ public class ProcessResource {
     ) {
         ResponseMsg msg = new ResponseMsg();
         try {
-            final ProcessBuilder handler = jsonMapper.readValue(in, ProcessBuilder.class);
-            Process process = handler.getProcess();
-            msg.put("id", process.getId());
+            final OperatorProcess process = jsonMapper.readValue(in, OperatorProcess.class);
+            msg.put("id", processManager.register(process));
             msg.status(Response.Status.ACCEPTED);
-            processManager.register(process);
         } catch (IOException e) {
             log.warn(e, "");
             msg.error(e.getMessage()).status(Response.Status.INTERNAL_SERVER_ERROR);
@@ -71,27 +66,20 @@ public class ProcessResource {
     @Path("/{id}/status")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStatus(@PathParam("id") final String id) {
-        ProcessInstance pi = processManager.get(id);
-        if (pi == null) {
+        OperatorProcess process = processManager.get(id);
+        if (process == null) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity(ImmutableMap.of("error", String.format("[%s] does not exist", id)))
                     .build();
         } else {
-            return Response.ok(pi).build();
+            return Response.ok(process).build();
         }
     }
 
     @GET
     @Path("/metadata")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOperatorMetadata(@PathParam("id") final String id) {
-        ProcessInstance pi = processManager.get(id);
-        if (pi == null) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(ImmutableMap.of("error", String.format("[%s] does not exist", id)))
-                    .build();
-        } else {
-            return Response.ok(pi).build();
-        }
+    public Response getOperatorMetadata() {
+        return Response.ok().build();
     }
 }

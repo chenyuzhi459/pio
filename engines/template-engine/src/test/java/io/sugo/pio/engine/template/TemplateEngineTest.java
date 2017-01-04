@@ -24,7 +24,7 @@ public class TemplateEngineTest {
         sparkConf.setAppName("template-engine");
 
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
-        MovielenBatchEventHose movielenBatchEventHose = new MovielenBatchEventHose("resources/movielen100k/sample_movielens_data.txt", "::");
+        MovielenBatchEventHose movielenBatchEventHose = new MovielenBatchEventHose(this.getClass().getClassLoader().getResource("movielen100k/sample_movielens_data.txt").getPath(), "::");
 
         TemplateEngineFactory factory = new TemplateEngineFactory();
         DataSource<TemplateTrainingData> datasource =  factory.createDatasource();
@@ -43,5 +43,11 @@ public class TemplateEngineTest {
         TemplateModelData model2 = model.read(repository);
 
         System.out.print("ok");
+    }
+
+    @Test
+    public void test1() {
+        Object o = this.getClass().getClassLoader().getResource("movielen100k/sample_movielens_data.txt");
+        System.out.println(o);
     }
 }

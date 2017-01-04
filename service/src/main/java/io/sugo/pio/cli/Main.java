@@ -5,6 +5,7 @@ import io.airlift.airline.Cli;
 import io.airlift.airline.Help;
 import io.airlift.airline.ParseException;
 import io.sugo.pio.guice.GuiceInjectors;
+import org.apache.derby.client.am.ClientMessageId;
 
 /**
  */
@@ -20,7 +21,10 @@ public class Main {
                 .withDescription("Run one of the Pio server types.")
                 .withDefaultCommand(Help.class)
                 .withCommands(
-                        CliPio.class
+                        CliPio.class,
+                        CliOverlord.class,
+                        CliMiddleManager.class,
+                        CliPeon.class
                 );
 
         builder.withGroup("tools")

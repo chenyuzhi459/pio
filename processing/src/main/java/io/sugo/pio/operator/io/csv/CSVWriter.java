@@ -3,6 +3,7 @@ package io.sugo.pio.operator.io.csv;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.ports.InputPort;
 
 import java.util.Arrays;
@@ -22,17 +23,12 @@ public class CSVWriter extends Operator {
         super(name, Arrays.asList(inputPort), null);
     }
 
-    @Override
-    public Object getMetadata(){
-        return "CSVWriter_metadata";
-    }
-
     public void doWork() {
         System.out.println("CSVWriter do work");
         try {
             Thread.sleep(20000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new OperatorException(TYPE + " error", e);
         }
         System.out.println("CSVWriter do work finished after 20 seconds");
     }

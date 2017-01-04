@@ -26,7 +26,7 @@ import java.text.NumberFormat;
  */
 //@JsonTypeName("csv_reader")
 public class CSVExampleSource extends AbstractDataResultSetReader implements Serializable {
-	public static final String TYPE = "csv_reader";
+	public static final String TYPE = "csv_example_source";
 
 	public static final String PARAMETER_CSV_FILE = "csv_file";
 	public static final String PARAMETER_TRIM_LINES = "trim_lines";
@@ -41,7 +41,7 @@ public class CSVExampleSource extends AbstractDataResultSetReader implements Ser
 //	private InputPort inputPort = new InputPortImpl("file");
 
 	@JsonProperty
-	private String file = "/work/win7/druid.csv";
+	private String file;
 
 //	@Override
 //	public String getType() {

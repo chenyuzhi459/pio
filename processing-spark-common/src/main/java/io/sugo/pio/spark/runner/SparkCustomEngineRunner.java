@@ -15,7 +15,7 @@ import java.util.ServiceLoader;
 /**
  */
 public class SparkCustomEngineRunner {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] encodedArgs) throws Exception {
         ServiceLoader<SparkModule> serviceLoader = ServiceLoader
                 .load(SparkModule.class);
         ObjectMapper mapper = new ObjectMapper();
@@ -26,12 +26,9 @@ public class SparkCustomEngineRunner {
         }
 
         SparkConf sparkConf = new SparkConf();
-        sparkConf.setMaster("local");
-        sparkConf.setAppName("template-engine");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
-        String str = "{\"engineFactory\":{\"type\":\"test\"},\"repository\":null,\"batchEventHose\":null}";
-        SparkCustomEngineParameter parameter = mapper.readValue(str, SparkCustomEngineParameter.class);
+        SparkCustomEngineParameter parameter = mapper.readValue(encodedArgs[0], SparkCustomEngineParameter.class);
 
         EngineFactory factory = parameter.getEngineFactory();
         DataSource datasource =  factory.createDatasource();

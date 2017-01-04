@@ -7,9 +7,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by root on 16-12-23.
- */
 public class ResponseMsg implements Serializable {
     private Boolean success = true;
     private Map<String, Object> data = new HashMap<>();

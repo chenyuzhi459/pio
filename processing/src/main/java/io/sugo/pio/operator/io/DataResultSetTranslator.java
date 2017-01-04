@@ -1,6 +1,5 @@
 package io.sugo.pio.operator.io;
 
-import io.sugo.pio.Process;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
@@ -13,12 +12,14 @@ import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorVersion;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.tools.Ontology;
-import io.sugo.pio.tools.ParameterService;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import static io.sugo.pio.operator.io.DataResultSetTranslationConfiguration.ANNOTATION_NAME;
 
@@ -121,7 +122,7 @@ public class DataResultSetTranslator {
 		// detect if this is executed in a process
 		boolean isRunningInProcess = false;
 		if (operator != null) {
-			Process process = operator.getProcess();
+//			Process process = operator.getProcess();
 //			if (process != null && process.getProcessState() == Process.PROCESS_STATE_RUNNING) {
 //				isRunningInProcess = true;
 //			}

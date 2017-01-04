@@ -2,30 +2,31 @@ package io.sugo.pio.server.process;
 
 import com.google.common.cache.Cache;
 import com.metamx.common.logger.Logger;
-import io.sugo.pio.Process;
-import io.sugo.pio.metadata.MetadataProcessInstanceManager;
+import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.metadata.MetadataProcessManager;
 import io.sugo.pio.operator.IOContainer;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class ProcessRunner implements Runnable {
     private static final Logger log = new Logger(ProcessRunner.class);
-    private final BlockingQueue<Process> queue;
+    private final BlockingQueue<OperatorProcess> queue;
     private volatile boolean running = false;
     private Thread t;
     private final CountDownLatch latch;
     public static final int WAIT_TIME = 2;
     private final String name;
-    private final Cache<String, ProcessInstance> instances;
+    private final Cache<String, OperatorProcess> processes;
+    private final MetadataProcessManager metadataProcessManager;
 
-    public ProcessRunner(final BlockingQueue<Process> queue, int index,
-                         Cache<String, ProcessInstance> instances
+    public ProcessRunner(final BlockingQueue<OperatorProcess> queue, int index,
+                         Cache<String, OperatorProcess> processes, MetadataProcessManager metadataProcessManager
     ) {
         this.queue = queue;
-        this.instances = instances;
+        this.processes = processes;
+        this.metadataProcessManager = metadataProcessManager;
         name = "PIO-Process-Runner-" + index;
         log.info("start Thread:%s", name);
         t = new Thread(this, name);
@@ -51,18 +52,19 @@ public class ProcessRunner implements Runnable {
     public void run() {
         while (running) {
             try {
-                Process process = queue.poll(WAIT_TIME, TimeUnit.SECONDS);
+                OperatorProcess process = queue.poll(WAIT_TIME, TimeUnit.SECONDS);
                 if (process != null) {
                     log.info("queue size:%d", queue.size());
-                    ProcessInstance processInstance = instances.getIfPresent(process.getId());
+                    process = processes.getIfPresent(process.getId());
                     try {
-                        processInstance.run();
+                        process.run();
+                        metadataProcessManager.updateStatus(process);
                     } catch (RuntimeException re) {
                         log.error(re, "Process %s run failed", process.getId());
-                        processInstance.failed();
+                        process.failed();
                     }
-                    IOContainer ret = process.getRootOperator().getResults(true);
-                    processInstance.success();
+                    IOContainer ret = process.getRootOperator().getResults();
+                    process.success();
                     log.info("IOContainer:%s", ret.toString());
 
                     log.info("Process:%s finished", process.getId());

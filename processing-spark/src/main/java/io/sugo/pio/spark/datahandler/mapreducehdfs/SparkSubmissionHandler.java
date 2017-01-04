@@ -47,6 +47,10 @@ public abstract class SparkSubmissionHandler {
         initConfSpecific(appName, sparkClassName);
     }
 
+    public void setYarnQueue(String yarnQueue) {
+        sparkConf.set("spark.yarn.queue", yarnQueue);
+    }
+
     protected abstract void initConfSpecific(String appName, String sparkClassName);
 
     public abstract void setSparkLibsPath(String var1, boolean isDirectory);

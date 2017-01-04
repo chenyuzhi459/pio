@@ -21,7 +21,7 @@ public class ConfigurationMapBuilder {
 
     public ConfigurationMapBuilder.ConfigurationMap readProperties(List<String> paths, String pattern) throws IOException {
         ConfigurationMapBuilder.ConfigurationMap conf = new ConfigurationMapBuilder.ConfigurationMap();
-        Collection<File> xmlFiles = listFiles(paths, pattern);
+        Collection<File> xmlFiles = listFiles(paths, ".xml");
         File xmlFile;
         Iterator<File> iterator = xmlFiles.iterator();
 

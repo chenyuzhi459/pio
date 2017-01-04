@@ -1,14 +1,16 @@
 package io.sugo.pio.spark.operator.spark;
 
-import io.sugo.pio.Process;
-import io.sugo.pio.operator.ExecutionUnit;
-import io.sugo.pio.operator.OperatorCreationException;
-import io.sugo.pio.operator.OperatorDescription;
-import io.sugo.pio.operator.ProcessRootOperator;
+import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.operator.*;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.impl.InputPortImpl;
+import io.sugo.pio.ports.impl.OutputPortImpl;
 import io.sugo.pio.spark.SparkNest;
 import io.sugo.pio.util.OperatorService;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,19 +18,30 @@ import java.util.List;
 public class SparkDecisionTreeTest {
     @Test
     public void test() throws OperatorCreationException {
-//        OperatorService.registerOperator(new OperatorDescription("root", ProcessRootOperator.class));
-//        List<ExecutionUnit> execUnits;
-//        Process process = new Process("name", new ProcessRootOperator(execUnits));
-//        TestHadoopExampleSetReader exampleSetReader = new TestHadoopExampleSetReader(new OperatorDescription("reader", TestHadoopExampleSetReader.class));
-//        SparkDecisionTree sparkDecisionTree = new SparkDecisionTree(new OperatorDescription("decisionTree", SparkDecisionTree.class));
-//
-//        SparkNest sparkNest = new SparkNest(new OperatorDescription("sparkNest", SparkNest.class));
-//        sparkNest.getSubprocess(0).addOperator(exampleSetReader);
-//        sparkNest.getSubprocess(0).addOperator(sparkDecisionTree);
-//        sparkNest.getSubprocess(0).autoWire(false, true);
-//
-//        process.getRootOperator().getSubprocess(0).addOperator(sparkNest);
-//        process.getRootOperator().getSubprocess(0).autoWire(false, true);
-//        process.run();
+        OperatorService.registerOperator(new OperatorDescription("root", ProcessRootOperator.class));
+
+        OutputPort outputPort = new OutputPortImpl("hadoopOutput");
+        InputPort inputPort = new InputPortImpl("hadoopInput");
+        OutputPort modelOutputPort = new OutputPortImpl("modelOutput");
+        outputPort.connectTo(inputPort);
+        TestHadoopExampleSetReader exampleSetReader = new TestHadoopExampleSetReader(outputPort);
+        SparkDecisionTree sparkDecisionTree = new SparkDecisionTree("tree", inputPort, modelOutputPort);
+
+        List<ExecutionUnit> sparkNestExecUnits = new ArrayList<>();
+        List<Operator> operators = new ArrayList<>();
+        operators.add(exampleSetReader);
+        operators.add(sparkDecisionTree);
+        ExecutionUnit sparkNestUnit = new ExecutionUnit(operators);
+        sparkNestExecUnits.add(sparkNestUnit);
+
+        SparkNest sparkNest = new SparkNest(null, sparkNestExecUnits);
+
+        List<Operator> rootOperators = new ArrayList<>();
+        rootOperators.add(sparkNest);
+        ExecutionUnit rootExecUnit = new ExecutionUnit(rootOperators);
+        List<ExecutionUnit> rootExecUnits = new ArrayList<>();
+        rootExecUnits.add(rootExecUnit);
+        OperatorProcess process = new OperatorProcess("name", new ProcessRootOperator(rootExecUnits));
+        process.run();
     }
 }

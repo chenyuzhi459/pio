@@ -4,24 +4,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.base.Preconditions;
-import io.sugo.pio.Process;
+import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.operator.io.csv.CSVExampleSource;
+import io.sugo.pio.operator.io.csv.CSVModifier;
+import io.sugo.pio.operator.io.csv.CSVReader;
 import io.sugo.pio.operator.io.csv.CSVWriter;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MDTransformer;
 
+import java.io.Serializable;
 import java.util.*;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "operatorType")
 @JsonSubTypes(value = {
         @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class),
         @JsonSubTypes.Type(name = CSVExampleSource.TYPE, value = CSVExampleSource.class),
-        @JsonSubTypes.Type(name = CSVWriter.TYPE, value = CSVWriter.class),
+        @JsonSubTypes.Type(name = CSVReader.TYPE, value = CSVReader.class),
+        @JsonSubTypes.Type(name = CSVModifier.TYPE, value = CSVModifier.class),
+        @JsonSubTypes.Type(name = CSVWriter.TYPE, value = CSVWriter.class)
 })
-public abstract class Operator implements ParameterHandler {
+public abstract class Operator implements ParameterHandler, Serializable {
     private final String name;
+
+//    private boolean enabled = true;
 
     /**
      * Parameters for this Operator.
@@ -54,10 +61,6 @@ public abstract class Operator implements ParameterHandler {
                 addOutputPort(out);
             }
         }
-    }
-
-    public Object getMetadata(){
-        return "operator";
     }
 
     @JsonProperty
@@ -130,7 +133,7 @@ public abstract class Operator implements ParameterHandler {
      * and all of its parents are not part of an process, this method will return null. Please note
      * that some operators (e.g. ProcessLog) must be part of an process in order to work properly.
      */
-    public Process getProcess() {
+    public OperatorProcess getProcess() {
         Operator parent = getParent();
         if (parent == null) {
             return null;
@@ -140,25 +143,14 @@ public abstract class Operator implements ParameterHandler {
     }
 
     /**
-     * Registers this operator in the given process. Please note that this might change the name of
-     * the operator.
-     */
-    protected void registerOperator(Process process) {
-        if (process != null) {
-            process.registerName(getName(), this);
-        }
-    }
-
-    /**
      * Implement this method in subclasses.
      *
      * @deprecated use doWork()
      */
-    @Deprecated
-    public IOObject[] apply() {
-        throw new UnsupportedOperationException("apply() is deprecated. Implement doWork().");
-    }
-
+//    @Deprecated
+//    public IOObject[] apply() {
+//        throw new UnsupportedOperationException("apply() is deprecated. Implement doWork().");
+//    }
 
     /**
      * Performs the actual work of the operator and must be implemented by subclasses. Replaces the
@@ -448,7 +440,14 @@ public abstract class Operator implements ParameterHandler {
         return true;
     }
 
-    final protected void setEnclosingProcess(ExecutionUnit parent) {
+    /**
+     * @see #shouldAutoConnect(OutputPort)
+     */
+    public boolean shouldAutoConnect(InputPort inputPort) {
+        return true;
+    }
+
+    final protected void setEnclosingExecutionUnit(ExecutionUnit parent) {
         if (parent != null && this.enclosingExecutionUnit != null) {
             throw new IllegalStateException("Parent already set.");
         }
