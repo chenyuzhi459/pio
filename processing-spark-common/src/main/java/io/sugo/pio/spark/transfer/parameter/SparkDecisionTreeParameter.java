@@ -13,6 +13,7 @@ public class SparkDecisionTreeParameter extends SparkParameter {
     private double subsamplingRate;
     private boolean useNodeIdCache;
     private boolean useBinominalMappings;
+    private boolean skipDiscover;
 
     public SparkDecisionTreeParameter() {
     }
@@ -87,5 +88,13 @@ public class SparkDecisionTreeParameter extends SparkParameter {
 
     public void setUseBinominalMappings(boolean useBinominalMappings) {
         this.useBinominalMappings = useBinominalMappings;
+    }
+
+    public boolean isSkipDiscover() {
+        return skipDiscover;
+    }
+
+    public void setSkipDiscover(boolean skipDiscover) {
+        this.skipDiscover = skipDiscover;
     }
 }

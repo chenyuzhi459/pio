@@ -8,6 +8,8 @@ import io.sugo.pio.spark.operator.spark.SparkTools.SparkFinalState;
 import io.sugo.pio.spark.transfer.parameter.SparkParameter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
+import org.apache.hadoop.yarn.api.records.ApplicationReport;
+import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.spark.deploy.yarn.Client;
 
 /**
@@ -37,8 +39,8 @@ public class MapReduceHDFSHandler {
                 sparkConfig.getSparkAssemblyJar(),
                 sparkOp.getSparkClassName(),
                 op.getName(),
-                commonParams.toJson(),
-                params.toJson());
+                commonParams == null? null: commonParams.toJson(),
+                params == null? null: params.toJson());
         return new MapReduceHDFSHandler.SparkJobResult(result);
     }
 
@@ -54,8 +56,24 @@ public class MapReduceHDFSHandler {
         ssh.setSparkLibsPath(sparkAssemblyJar, false);
         ssh.setUserArguments(commonParams, params);
         Client client = new Client(ssh.createClientArguments(), getHadoopConfiguration(), ssh.getSparkConf());
-        ApplicationId applicationId = client.submitApplication();
-        return null;
+        ApplicationId appId = client.submitApplication();
+        return new String[]{monitorSparkApplication(client, appId), appId.toString()};
+    }
+
+    private String monitorSparkApplication(Client c, ApplicationId appId) {
+        short interval = 5000;
+        YarnApplicationState state;
+        do {
+            try {
+                Thread.sleep((long)interval);
+            } catch (InterruptedException var9) {
+                ;
+            }
+
+            ApplicationReport report = c.getApplicationReport(appId);
+            state = report.getYarnApplicationState();
+        } while(state != YarnApplicationState.FINISHED && state != YarnApplicationState.FAILED && state != YarnApplicationState.KILLED);
+        return c.getApplicationReport(appId).getFinalApplicationStatus().name();
     }
 
     public static class SparkJobResult {
@@ -90,7 +108,8 @@ public class MapReduceHDFSHandler {
         SupportVectorMachine("io.sugo.pio.spark.runner.SparkSupportVectorMachineRunner"),
         SparkScript_Python("org.apache.spark.deploy.PythonRunner"),
         SparkScript_R("org.apache.spark.deploy.RRunner"),
-        GenerateData("io.sugo.pio.spark.runner.GenerateDataRunner");
+        GenerateData("io.sugo.pio.spark.runner.GenerateDataRunner"),
+        CustomEngine("io.sugo.pio.spark.runner.SparkCustomEngineRunner");
 
         private String sparkClassName;
 
