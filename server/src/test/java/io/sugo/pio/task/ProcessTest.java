@@ -3,6 +3,7 @@ package io.sugo.pio;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import io.sugo.pio.guice.ProcessPioModule;
 import io.sugo.pio.guice.ProcessingPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
@@ -40,6 +41,12 @@ public class ProcessTest {
 //        jsonMapper.setVisibility(JsonMethod.FIELD, Visibility.ANY);
 //        jsonMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
     }
+
+    @Test
+    public void testOperatorMetadata(){
+        ObjectReader reader = jsonMapper.readerFor(Operator.class);
+    }
+
     @Test
     public void testProcess(){
         List<ExecutionUnit> units = new ArrayList<>();
