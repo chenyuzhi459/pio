@@ -1,7 +1,10 @@
 package io.sugo.pio.spark;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.inject.Injector;
 import io.sugo.pio.guice.GuiceInjectors;
+import io.sugo.pio.operator.ExecutionUnit;
 import io.sugo.pio.operator.OperatorChain;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.metadata.SubprocessTransformRule;
@@ -15,7 +18,7 @@ import java.util.List;
 /**
  */
 public class SparkNest extends OperatorChain {
-    private MapReduceHDFSHandler mapReduceHDFSHandler;
+    private final MapReduceHDFSHandler mapReduceHDFSHandler;
     private static final SparkConfig sparkConfig;
 
     final static Injector injector = GuiceInjectors.makeStartupInjector();
@@ -24,12 +27,10 @@ public class SparkNest extends OperatorChain {
         sparkConfig = injector.getInstance(SparkConfig.class);
     }
 
-    public SparkNest() {
-        this("Spark Nest");
-    }
-
-    protected SparkNest(String subProcessName) {
-        super(subProcessName, null, null);
+    @JsonCreator
+    public SparkNest(@JsonProperty("execUnits") List<ExecutionUnit> execUnits) {
+        super("Spark Nest", null, null);
+        setExecUnits(execUnits);
         // init the yarn connection
         HadoopConnectionEntry hadoopConnection = HadoopConnectionService.getConnectionEntry(sparkConfig);
         mapReduceHDFSHandler = new MapReduceHDFSHandler(hadoopConnection, sparkConfig);

@@ -4,15 +4,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import io.airlift.airline.Command;
-import io.sugo.pio.guice.Jerseys;
-import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
-import io.sugo.pio.http.TaskResource;
-import io.sugo.pio.metadata.SQLMetadataEngineStorage;
-import io.sugo.pio.server.EngineStorage;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
-import io.sugo.pio.http.ProcessResource;
-import io.sugo.pio.services.ServerRunnable;
+import io.sugo.pio.services.GuiceRunnable;
 import org.eclipse.jetty.server.Server;
 
 import java.util.List;
@@ -20,22 +14,25 @@ import java.util.List;
 /**
  */
 @Command(
-        name = "pio",
-        description = "Runs a pio server"
+        name = "peon",
+        description = "Runs a Peon, this is an individual forked \"task\" used as part of the indexing service. "
+                + "This should rarely, if ever, be used directly."
 )
-public class CliPio extends ServerRunnable {
+public class CliPeon extends GuiceRunnable {
     @Override
     protected List<? extends Module> getModules() {
         return ImmutableList.<Module>of(
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        Jerseys.addResource(binder, ProcessResource.class);
-
-                        binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
+                        binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class);
                         LifecycleModule.register(binder, Server.class);
                     }
                 });
     }
 
+    @Override
+    public void run() {
+
+    }
 }

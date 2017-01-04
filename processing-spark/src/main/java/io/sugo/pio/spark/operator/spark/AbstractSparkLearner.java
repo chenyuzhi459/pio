@@ -15,9 +15,11 @@ import io.sugo.pio.spark.transfer.TransferObject;
 import io.sugo.pio.spark.transfer.model.ModelTransferObject;
 import io.sugo.pio.spark.transfer.parameter.CommonParameter;
 import io.sugo.pio.spark.transfer.parameter.SparkParameter;
+import scala.util.parsing.combinator.testing.Str;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+import java.util.Collections;
 
 /**
  */
@@ -32,7 +34,7 @@ public abstract class AbstractSparkLearner<T extends ModelTransferObject, M exte
         TempHDFSDirectory sparkOutputDirectory = new TempHDFSDirectory(getSparkNest());
         SparkParameter commonParams = setupCommonParams(inputHes, sparkOutputDirectory);
         SparkParameter params = setupAlgorithmParams(inputHes);
-        SparkJobResult result = getMapReduceHDFSHandler().runSpark(this, sparkOperation, commonParams, params);
+        SparkJobResult result = getMapReduceHDFSHandler().runSpark(this, sparkOperation, Collections.emptyList(), commonParams, params);
         SparkFinalState finalState  = result.getFinalState();
         M model;
         try {

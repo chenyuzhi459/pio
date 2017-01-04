@@ -1,17 +1,16 @@
-package io.sugo.pio.server.process;
+package io.sugo.pio.http;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.jaxrs.smile.SmileMediaTypes;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.Process;
 import io.sugo.pio.guice.annotations.Json;
-import io.sugo.pio.metadata.MetadataProcessInstanceManager;
+import io.sugo.pio.server.process.ProcessBuilder;
+import io.sugo.pio.server.process.ProcessInstance;
+import io.sugo.pio.server.process.ProcessManager;
+import io.sugo.pio.server.process.ResponseMsg;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;

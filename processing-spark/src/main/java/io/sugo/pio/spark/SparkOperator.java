@@ -20,7 +20,7 @@ public abstract class SparkOperator extends Operator implements KillableOperatio
     public SparkNest getSparkNest() {
         if(sparkNest == null) {
             try {
-                sparkNest = checkRadoopNest(this);
+                sparkNest = checkSparkNest(this);
             } catch (Exception e) {
                 return null;
             }
@@ -33,7 +33,7 @@ public abstract class SparkOperator extends Operator implements KillableOperatio
         return getSparkNest().getMapReduceHDFSHandler();
     }
 
-    private static SparkNest checkEnclosingRadoopNest(Operator operator)  {
+    private static SparkNest checkEnclosingSparkNest(Operator operator)  {
         if(operator instanceof SparkNest) {
             return (SparkNest)operator;
         } else {
@@ -57,22 +57,9 @@ public abstract class SparkOperator extends Operator implements KillableOperatio
         }
     }
 
-    public static SparkNest checkRadoopNest(Operator operator) {
-        return checkEnclosingRadoopNest(operator);
+    public static SparkNest checkSparkNest(Operator operator) {
+        return checkEnclosingSparkNest(operator);
     }
-
-//    public OutputPort createOutputPort(String portName) {
-//        return createOutputPort(portName, true);
-//    }
-//
-//    public OutputPort createOutputPort(String portName, boolean add) {
-//        SparkOutputPortImpl out = new SparkOutputPortImpl(getOutputPorts(), portName);
-//        if(add) {
-//            getOutputPorts().addPort(out);
-//        }
-//
-//        return out;
-//    }
 
     public HadoopExampleSet getHesFromInputPort(InputPort port) {
         IOObject exampleSet = port.getAnyDataOrNull();

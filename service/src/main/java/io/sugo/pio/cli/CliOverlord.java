@@ -8,10 +8,7 @@ import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.http.TaskResource;
-import io.sugo.pio.metadata.SQLMetadataEngineStorage;
-import io.sugo.pio.server.EngineStorage;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
-import io.sugo.pio.http.ProcessResource;
 import io.sugo.pio.services.ServerRunnable;
 import org.eclipse.jetty.server.Server;
 
@@ -20,22 +17,21 @@ import java.util.List;
 /**
  */
 @Command(
-        name = "pio",
-        description = "Runs a pio server"
+        name = "overlord",
+        description = "Runs an Overlord node, see http://druid.io/docs/latest/Indexing-Service.html for a description"
 )
-public class CliPio extends ServerRunnable {
+public class CliOverlord extends ServerRunnable {
     @Override
     protected List<? extends Module> getModules() {
         return ImmutableList.<Module>of(
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        Jerseys.addResource(binder, ProcessResource.class);
+                        Jerseys.addResource(binder, TaskResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
                     }
                 });
     }
-
 }

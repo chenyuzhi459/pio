@@ -8,34 +8,26 @@ import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.http.TaskResource;
-import io.sugo.pio.metadata.SQLMetadataEngineStorage;
-import io.sugo.pio.server.EngineStorage;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
-import io.sugo.pio.http.ProcessResource;
 import io.sugo.pio.services.ServerRunnable;
 import org.eclipse.jetty.server.Server;
 
 import java.util.List;
 
-/**
- */
 @Command(
-        name = "pio",
-        description = "Runs a pio server"
+        name = "middleManager",
+        description = "Runs a Middle Manager, this is a \"task\" node used as part of the remote indexing service."
 )
-public class CliPio extends ServerRunnable {
+public class CliMiddleManager extends ServerRunnable {
     @Override
     protected List<? extends Module> getModules() {
         return ImmutableList.<Module>of(
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        Jerseys.addResource(binder, ProcessResource.class);
-
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
                     }
                 });
     }
-
 }

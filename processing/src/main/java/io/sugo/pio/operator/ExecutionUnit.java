@@ -23,6 +23,9 @@ public class ExecutionUnit implements Serializable {
             @JsonProperty("operators") List<Operator> operators
     ) {
         this.operators = operators;
+        for(Operator opt : operators){
+            opt.setEnclosingProcess(this);
+        }
     }
 
     public void setEnclosingOperator(OperatorChain enclosingOperator) {

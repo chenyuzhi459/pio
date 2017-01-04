@@ -14,6 +14,7 @@ import io.sugo.pio.spark.transfer.parameter.CommonParameter;
 import io.sugo.pio.spark.transfer.parameter.SparkParameter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class SparkCustomEngineLearner<T extends ModelTransferObject, M extends P
         TempHDFSDirectory sparkOutputDirectory = new TempHDFSDirectory(getSparkNest());
         SparkParameter commonParams = setupCommonParams();
         SparkParameter params = setupAlgorithmParams(inputHes);
-        MapReduceHDFSHandler.SparkJobResult result = getMapReduceHDFSHandler().runSpark( this, sparkOperation, commonParams, params);
+        MapReduceHDFSHandler.SparkJobResult result = getMapReduceHDFSHandler().runSpark( this, sparkOperation, Collections.emptyList(), commonParams, params);
         SparkTools.SparkFinalState finalState = result.getFinalState();
         M model;
         try {
