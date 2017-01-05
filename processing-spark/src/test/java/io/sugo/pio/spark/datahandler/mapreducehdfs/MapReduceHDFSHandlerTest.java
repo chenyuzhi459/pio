@@ -29,8 +29,6 @@ public class MapReduceHDFSHandlerTest {
         hadoopConfigFiles.add(this.getClass().getClassLoader().getResource("conf/hadoop/yarn-site.xml").getPath());
 
         sparkConfig.setHadoopConfigFiles(hadoopConfigFiles);
-        sparkConfig.setCommonJarLocation("/home/yaotc/IdeaProjects/pio-sugo/processing-spark-common/target/pio-processing-spark-common-1.0-SNAPSHOT.jar");
-        sparkConfig.setWorkDirectory("hdfs://sugo/user/yaotc/");
         HadoopConnectionEntry hadoopConnection = HadoopConnectionService.getConnectionEntry(sparkConfig);
         handler = new MapReduceHDFSHandler(hadoopConnection, sparkConfig);
     }

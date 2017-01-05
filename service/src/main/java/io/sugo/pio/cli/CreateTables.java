@@ -11,6 +11,8 @@ import io.airlift.airline.Option;
 import io.sugo.pio.guice.JsonConfigProvider;
 import io.sugo.pio.metadata.MetadataStorageConnector;
 import io.sugo.pio.metadata.MetadataStorageConnectorConfig;
+import io.sugo.pio.metadata.MetadataStorageTablesConfig;
+import io.sugo.pio.services.GuiceRunnable;
 
 import java.util.List;
 
@@ -74,7 +76,7 @@ public class CreateTables extends GuiceRunnable
 //                binder, Key.get(MetadataStorageTablesConfig.class), MetadataStorageTablesConfig.fromBase(base)
 //            );
 //            JsonConfigProvider.bindInstance(
-//                binder, Key.get(PioNode.class, Self.class), new PioNode("tools", "localhost", -1)
+//                binder, Key.get(DruidNode.class, Self.class), new DruidNode("tools", "localhost", -1)
 //            );
           }
         }

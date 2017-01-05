@@ -1,7 +1,5 @@
 package io.sugo.pio.spark.operator.spark;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.learner.PredictionModel;
 import io.sugo.pio.parameter.*;
@@ -22,11 +20,9 @@ import java.util.List;
 /**
  */
 public class SparkCustomEngineLearner<T extends ModelTransferObject, M extends PredictionModel> extends AbstractLearner {
-    @JsonCreator
-    public SparkCustomEngineLearner(@JsonProperty("name") String name,
-                                    @JsonProperty("inputPort") InputPort exampleSetInput,
-                                    @JsonProperty("outputPort") OutputPort modelOutput) {
-        super(MapReduceHDFSHandler.SparkOperation.CustomEngine, name, exampleSetInput, modelOutput);
+    public SparkCustomEngineLearner(MapReduceHDFSHandler.SparkOperation sparkOperation, String name,
+                                    InputPort exampleSetInput, OutputPort modelOutput) {
+        super(sparkOperation, name, exampleSetInput, modelOutput);
     }
 
     @Override
