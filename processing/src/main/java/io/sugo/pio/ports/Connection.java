@@ -1,4 +1,4 @@
-package io.sugo.pio.server.process;
+package io.sugo.pio.ports;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,35 +6,32 @@ import com.google.common.base.Preconditions;
 
 import java.io.Serializable;
 
-/**
- * Created by root on 16-12-27.
- */
 public class Connection implements Serializable{
-    private String fromOpt;
+    private String fromOperator;
     private String fromPort;
-    private String toOpt;
+    private String toOperator;
     private String toPort;
 
     @JsonCreator
     public Connection(
-            @JsonProperty("fromOpt") String fromOpt,
+            @JsonProperty("fromOperator") String fromOperator,
             @JsonProperty("fromPort") String fromPort,
-            @JsonProperty("toOpt") String toOpt,
+            @JsonProperty("toOperator") String toOperator,
             @JsonProperty("toPort") String toPort
     ){
-        Preconditions.checkNotNull(fromOpt, "Must specify a fromOpt");
+        Preconditions.checkNotNull(fromOperator, "Must specify a fromOperator");
         Preconditions.checkNotNull(fromPort, "Must specify a fromPort");
-        Preconditions.checkNotNull(toOpt, "Must specify a toOpt");
+        Preconditions.checkNotNull(toOperator, "Must specify a toOperator");
         Preconditions.checkNotNull(toPort, "Must specify a toPort");
-        this.fromOpt = fromOpt;
+        this.fromOperator = fromOperator;
         this.fromPort = fromPort;
-        this.toOpt = toOpt;
+        this.toOperator = toOperator;
         this.toPort = toPort;
     }
 
-    @JsonProperty("fromOpt")
-    public String getFromOpt() {
-        return fromOpt;
+    @JsonProperty("fromOperator")
+    public String getFromOperator() {
+        return fromOperator;
     }
 
     @JsonProperty("fromPort")
@@ -42,9 +39,9 @@ public class Connection implements Serializable{
         return fromPort;
     }
 
-    @JsonProperty("toOpt")
-    public String getToOpt() {
-        return toOpt;
+    @JsonProperty("toOperator")
+    public String getToOperator() {
+        return toOperator;
     }
 
     @JsonProperty("toPort")
@@ -52,16 +49,16 @@ public class Connection implements Serializable{
         return toPort;
     }
 
-    public void setFromOpt(String fromOpt) {
-        this.fromOpt = fromOpt;
+    public void setFromOperator(String fromOperator) {
+        this.fromOperator = fromOperator;
     }
 
     public void setFromPort(String fromPort) {
         this.fromPort = fromPort;
     }
 
-    public void setToOpt(String toOpt) {
-        this.toOpt = toOpt;
+    public void setToOperator(String toOperator) {
+        this.toOperator = toOperator;
     }
 
     public void setToPort(String toPort) {
@@ -71,7 +68,7 @@ public class Connection implements Serializable{
     @Override
     public String toString() {
         return String.format("%s from %s:%s, to %s:%s", Connection.class.getSimpleName(),
-                this.fromOpt, this.fromPort, this.toOpt, this.toOpt);
+                this.fromOperator, this.fromPort, this.toOperator, this.toPort);
     }
 
     @Override
@@ -83,13 +80,13 @@ public class Connection implements Serializable{
             return false;
         }
         Connection o = (Connection) obj;
-        if (!this.fromOpt.equals(o.fromOpt)) {
+        if (!this.fromOperator.equals(o.fromOperator)) {
             return false;
         }
         if (!this.fromPort.equals(o.fromPort)) {
             return false;
         }
-        if (!this.toOpt.equals(o.toOpt)) {
+        if (!this.toOperator.equals(o.toOperator)) {
             return false;
         }
         if (!this.toPort.equals(o.toPort)) {
@@ -101,9 +98,9 @@ public class Connection implements Serializable{
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + fromOpt.hashCode();
+        result = 31 * result + fromOperator.hashCode();
         result = 31 * result + fromPort.hashCode();
-        result = 31 * result + toOpt.hashCode();
+        result = 31 * result + toOperator.hashCode();
         result = 31 * result + toPort.hashCode();
         return result;
     }

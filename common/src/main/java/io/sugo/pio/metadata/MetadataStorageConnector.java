@@ -13,5 +13,5 @@ public interface MetadataStorageConnector {
 
     void createEngineTable();
 
-    void createProcessInstanceTable();
+    void createOperatorProcessTable();
 }

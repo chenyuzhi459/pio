@@ -1,6 +1,5 @@
 package io.sugo.pio.server.process;
 
-import com.google.common.base.Supplier;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -9,51 +8,49 @@ import com.google.inject.Inject;
 import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
 import com.metamx.common.logger.Logger;
-import io.sugo.pio.Process;
+import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ManageLifecycle;
-import io.sugo.pio.metadata.MetadataProcessInstanceManager;
+import io.sugo.pio.metadata.MetadataProcessManager;
+import io.sugo.pio.operator.ProcessRootOperator;
 
 import java.util.concurrent.*;
 
-/**
- * Created by root on 16-12-28.
- */
 @ManageLifecycle
 public class ProcessManager {
 
     private static final Logger log = new Logger(ProcessManager.class);
 
-    private final BlockingQueue<Process> queue;
+    private final BlockingQueue<OperatorProcess> queue;
     private final ProcessRunner[] runners;
     private final ProcessManagerConfig config;
     private final int executeMaxThread;
-    private final Cache<String, ProcessInstance> instances;
-    private final MetadataProcessInstanceManager metadataProcessInstanceManager;
-    private final ProcessInstanceLoader loader;
+    private final Cache<String, OperatorProcess> instances;
+    private final MetadataProcessManager metadataProcessManager;
+    private final OperatorProcessLoader loader;
 
     @Inject
-    public ProcessManager(ProcessManagerConfig config, MetadataProcessInstanceManager metadataProcessInstanceManager) {
+    public ProcessManager(ProcessManagerConfig config, MetadataProcessManager metadataProcessManager) {
         this.config = config;
-        this.metadataProcessInstanceManager = metadataProcessInstanceManager;
+        this.metadataProcessManager = metadataProcessManager;
         this.executeMaxThread = config.getExecuteMaxThread();
         queue = new ArrayBlockingQueue<>(config.getProcessQueueSize());
         this.runners = new ProcessRunner[config.getExecuteMaxThread()];
         CacheBuilder builder = CacheBuilder.newBuilder()
                 .recordStats()
                 .maximumSize(config.getMaxEntriesSize())
-                .removalListener(new RemovalListener<String, ProcessInstance>() {
+                .removalListener(new RemovalListener<String, OperatorProcess>() {
                     @Override
-                    public void onRemoval(RemovalNotification<String, ProcessInstance> notification) {
-                        ProcessInstance instance = notification.getValue();
-                        log.info("delete ProcessInstance %s[%s] status:[%s] from cache", instance.getProcessName(), instance.getId(), instance.getStatus());
+                    public void onRemoval(RemovalNotification<String, OperatorProcess> notification) {
+                        OperatorProcess process = notification.getValue();
+                        log.info("delete Process %s[%s] status:[%s] from cache", process.getName(), process.getId(), process.getStatus());
                     }
                 });
         instances = builder.build();
 
         for (int i = 0; i < executeMaxThread; i++) {
-            this.runners[i] = new ProcessRunner(queue, i, instances);
+            this.runners[i] = new ProcessRunner(queue, i, instances, metadataProcessManager);
         }
-        loader = new ProcessInstanceLoader(this.metadataProcessInstanceManager);
+        loader = new OperatorProcessLoader(this.metadataProcessManager);
     }
 
     @LifecycleStart
@@ -96,46 +93,44 @@ public class ProcessManager {
         }
     }
 
-    public void register(Process process) {
+    public String register(OperatorProcess process) {
         try {
-            ProcessInstance processInstance = new ProcessInstance(process, metadataProcessInstanceManager);
-            instances.put(process.getId(), processInstance);
-            metadataProcessInstanceManager.insert(processInstance);
+            instances.put(process.getId(), process);
+            metadataProcessManager.insert(process);
             queue.offer(process, 10, TimeUnit.SECONDS);
             log.info("queue size:%d", queue.size());
+            return process.getId();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public ProcessInstance get(String id) {
-        loader.setProcessIntanceId(id);
-        ProcessInstance pi = null;
+    public OperatorProcess get(String id) {
+        loader.setProcessId(id);
         try {
-            pi = instances.get(id, loader);
+            return instances.get(id, loader);
         } catch (ExecutionException e) {
             log.error(e, "get process instance %s error", id);
             throw new RuntimeException(e);
         }
-        return pi;
     }
 
-    class ProcessInstanceLoader implements Callable<ProcessInstance> {
+    class OperatorProcessLoader implements Callable<OperatorProcess> {
 
-        private String processIntanceId;
-        private final MetadataProcessInstanceManager metadataProcessInstanceManager;
-        public ProcessInstanceLoader(MetadataProcessInstanceManager metadataProcessInstanceManager) {
-            this.metadataProcessInstanceManager = metadataProcessInstanceManager;
+        private String processId;
+        private final MetadataProcessManager metadataProcessManager;
+        public OperatorProcessLoader(MetadataProcessManager metadataProcessManager) {
+            this.metadataProcessManager = metadataProcessManager;
         }
 
         @Override
-        public ProcessInstance call() throws Exception {
-            ProcessInstance pi = metadataProcessInstanceManager.get(processIntanceId);
+        public OperatorProcess call() throws Exception {
+            OperatorProcess pi = metadataProcessManager.get(processId);
             return pi;
         }
 
-        public void setProcessIntanceId(String processIntanceId) {
-            this.processIntanceId = processIntanceId;
+        public void setProcessId(String processId) {
+            this.processId = processId;
         }
     }
 

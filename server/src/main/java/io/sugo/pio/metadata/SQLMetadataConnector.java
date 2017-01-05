@@ -246,7 +246,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         }
     }
 
-    public void createProcessInstanceTable(final String tableName)
+    public void createOperatorProcessTable(final String tableName)
     {
         createTable(
                 tableName,
@@ -254,11 +254,11 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                         String.format(
                                 "CREATE TABLE %1$s (\n"
                                         + "  id VARCHAR(255) NOT NULL,\n"
-                                        + "  process_name VARCHAR(50) NOT NULL,\n"
+                                        + "  name VARCHAR(50) NOT NULL,\n"
                                         + "  status VARCHAR(20) NOT NULL,\n"
                                         + "  created_date VARCHAR(50) NOT NULL,\n"
                                         + "  update_date VARCHAR(50) NOT NULL,\n"
-                                        + "  process %2$s NOT NULL,\n"
+                                        + "  operators %2$s NOT NULL,\n"
                                         + "  PRIMARY KEY (id)\n"
                                         + ")",
                                 tableName, getPayloadType()
@@ -268,10 +268,10 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     }
 
     @Override
-    public void createProcessInstanceTable()
+    public void createOperatorProcessTable()
     {
         if (config.get().isCreateTables()) {
-            createProcessInstanceTable(tablesConfigSupplier.get().getProcessInstanceTable());
+            createOperatorProcessTable(tablesConfigSupplier.get().getOperatorProcessTable());
         }
     }
 }

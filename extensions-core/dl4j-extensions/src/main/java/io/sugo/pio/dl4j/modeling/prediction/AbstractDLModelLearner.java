@@ -121,7 +121,7 @@ public abstract class AbstractDLModelLearner extends OperatorChain {
 
 
     public AbstractDLModelLearner() {
-        super("Layer Structure", null, null);
+        super(null, null, "Layer Structure", null, null);
         addInputPort(trainPort);
         addOutputPort(modelPort);
         addOutputPort(examplePort);

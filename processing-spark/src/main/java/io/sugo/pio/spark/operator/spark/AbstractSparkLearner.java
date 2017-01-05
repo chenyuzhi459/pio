@@ -10,12 +10,9 @@ import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler.SparkJob
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler.SparkOperation;
 import io.sugo.pio.spark.modeling.prediction.AbstractLearner;
 import io.sugo.pio.spark.operator.spark.SparkTools.SparkFinalState;
-import io.sugo.pio.spark.transfer.MTOConverter;
-import io.sugo.pio.spark.transfer.TransferObject;
 import io.sugo.pio.spark.transfer.model.ModelTransferObject;
 import io.sugo.pio.spark.transfer.parameter.CommonParameter;
 import io.sugo.pio.spark.transfer.parameter.SparkParameter;
-import scala.util.parsing.combinator.testing.Str;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;

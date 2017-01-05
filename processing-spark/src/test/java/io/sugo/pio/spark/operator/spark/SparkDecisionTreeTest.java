@@ -1,6 +1,6 @@
 package io.sugo.pio.spark.operator.spark;
 
-import io.sugo.pio.Process;
+import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.operator.*;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
@@ -34,14 +34,14 @@ public class SparkDecisionTreeTest {
         ExecutionUnit sparkNestUnit = new ExecutionUnit(operators);
         sparkNestExecUnits.add(sparkNestUnit);
 
-        SparkNest sparkNest = new SparkNest(sparkNestExecUnits);
+        SparkNest sparkNest = new SparkNest(null, sparkNestExecUnits);
 
         List<Operator> rootOperators = new ArrayList<>();
         rootOperators.add(sparkNest);
         ExecutionUnit rootExecUnit = new ExecutionUnit(rootOperators);
         List<ExecutionUnit> rootExecUnits = new ArrayList<>();
         rootExecUnits.add(rootExecUnit);
-        Process process = new Process("name", new ProcessRootOperator(rootExecUnits));
+        OperatorProcess process = new OperatorProcess("name", new ProcessRootOperator(rootExecUnits));
         process.run();
     }
 }
