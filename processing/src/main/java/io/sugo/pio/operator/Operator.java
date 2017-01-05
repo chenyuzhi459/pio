@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.base.Preconditions;
 import io.sugo.pio.OperatorProcess;
-import io.sugo.pio.operator.io.csv.CSVExampleSource;
-import io.sugo.pio.operator.io.csv.CSVModifier;
-import io.sugo.pio.operator.io.csv.CSVReader;
-import io.sugo.pio.operator.io.csv.CSVWriter;
+import io.sugo.pio.operator.io.csv.*;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
@@ -17,18 +14,18 @@ import io.sugo.pio.ports.metadata.MDTransformer;
 import java.io.Serializable;
 import java.util.*;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "operatorType")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = OperatorMeta.OPERATOR_TYPE)
 @JsonSubTypes(value = {
         @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class),
         @JsonSubTypes.Type(name = CSVExampleSource.TYPE, value = CSVExampleSource.class),
-        @JsonSubTypes.Type(name = CSVReader.TYPE, value = CSVReader.class),
-        @JsonSubTypes.Type(name = CSVModifier.TYPE, value = CSVModifier.class),
-        @JsonSubTypes.Type(name = CSVWriter.TYPE, value = CSVWriter.class)
+        @JsonSubTypes.Type(name = CSVReaderMeta.TYPE, value = CSVReader.class),
+        @JsonSubTypes.Type(name = CSVSpliterMeta.TYPE, value = CSVSpliter.class),
+        @JsonSubTypes.Type(name = CSVModifierMeta.TYPE, value = CSVModifier.class),
+        @JsonSubTypes.Type(name = CSVWriterMeta.TYPE, value = CSVWriter.class),
+        @JsonSubTypes.Type(name = CSVReaderTestMeta.TYPE, value = CSVReaderTest.class)
 })
 public abstract class Operator implements ParameterHandler, Serializable {
     private final String name;
-
-//    private boolean enabled = true;
 
     /**
      * Parameters for this Operator.
@@ -36,9 +33,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
     private Parameters parameters = null;
 
     private Status status;
-
-//    private final InputPorts inputPorts;
-//    private final OutputPorts outputPorts;
 
     private final MDTransformer transformer = new MDTransformer(this);
 
@@ -94,45 +88,14 @@ public abstract class Operator implements ParameterHandler, Serializable {
         outPort.setPortOwner(portOwner);
     }
 
-    @JsonProperty
     public Collection<InputPort> getInputPorts() {
         return inputPortMap.values();
     }
 
-    @JsonProperty
     public Collection<OutputPort> getOutputPorts() {
         return outputPortMap.values();
     }
 
-    /**
-     * This method unregisters the old name if this operator is already part of a {@link Process}.
-     * Afterwards, the new name is set and registered in the process. Please note that the name
-     * might be changed during registering in order to ensure that each operator name is unique in
-     * its process. The new name will be returned.
-     */
-//    public final String rename(String newName) {
-//        Process process = getProcess();
-//        if (process != null) {
-//            process.unregisterName(this.name);
-//            this.name = process.registerName(newName, this);
-//        } else {
-//            this.name = newName;
-//        }
-//        return this.name;
-//    }
-//    public boolean isEnabled() {
-//        return enabled;
-//    }
-//
-//    public void setEnabled(boolean enabled) {
-//        this.enabled = enabled;
-//    }
-
-    /**
-     * Returns the process of this operator by asking the parent operator. If the operator itself
-     * and all of its parents are not part of an process, this method will return null. Please note
-     * that some operators (e.g. ProcessLog) must be part of an process in order to work properly.
-     */
     public OperatorProcess getProcess() {
         Operator parent = getParent();
         if (parent == null) {
@@ -141,16 +104,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
             return parent.getProcess();
         }
     }
-
-    /**
-     * Implement this method in subclasses.
-     *
-     * @deprecated use doWork()
-     */
-//    @Deprecated
-//    public IOObject[] apply() {
-//        throw new UnsupportedOperationException("apply() is deprecated. Implement doWork().");
-//    }
 
     /**
      * Performs the actual work of the operator and must be implemented by subclasses. Replaces the
@@ -168,19 +121,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
             setStatus(Status.FAILED);
             throw oe;
         }
-    }
-
-
-    /**
-     * The default implementation returns an input description that consumes the input IOObject
-     * without a user parameter. Subclasses may override this method to allow other input handling
-     * behaviors.
-     *
-     * @deprecated
-     */
-    @Deprecated
-    protected InputDescription getInputDescription(Class<?> inputClass) {
-        return new InputDescription(inputClass);
     }
 
     /**
@@ -349,55 +289,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
 
     /**
-     * This method returns the {@link InputPorts} object that gives access to all defined
-     * {@link InputPort}s of this operator. This object can be used to create a new
-     * {@link InputPort} for an operator using one of the {@link InputPorts#createPort(String)}
-     * methods.
-     */
-//    public final InputPorts getInputPorts() {
-//        return inputPorts;
-//    }
-
-    /**
-     * This method returns the {@link OutputPorts} object that gives access to all defined
-     * {@link OutputPort}s of this operator. This object can be used to create a new
-     * {@link OutputPort} for an operator using one of the {@link OutputPorts#createPort(String)}
-     * methods.
-     */
-//    public final OutputPorts getOutputPorts() {
-//        return outputPorts;
-//    }
-
-
-    /**
-     * This method returns an {@link InputPorts} object for port initialization. Useful for adding
-     * an arbitrary implementation (e.g. changing port creation & (dis)connection behavior,
-     * optionally by customized {@link InputPort} instances) by overriding this method.
-     *
-     * @param portOwner
-     *            The owner of the ports.
-     * @return The {@link InputPorts} instance, never {@code null}.
-     * @since 7.3.0
-     */
-//    protected InputPorts createInputPorts(PortOwner portOwner) {
-//        return new InputPortsImpl(portOwner);
-//    }
-
-    /**
-     * This method returns an {@link OutputPorts} object for port initialization. Useful for adding
-     * an arbitrary implementation (e.g. changing port creation & (dis)connection behavior,
-     * optionally by customized {@link OutputPort} instances) by overriding this method.
-     *
-     * @param portOwner The owner of the ports.
-     * @return The {@link OutputPorts} instance, never {@code null}.
-     * @since 7.3.0
-     */
-//    protected OutputPorts createOutputPorts(PortOwner portOwner) {
-//        return new OutputPortsImpl(portOwner);
-//    }
-
-
-    /**
      * This method returns the {@link MDTransformer} object of this operator. This object will
      * process all meta data of all ports of this operator according to the rules registered to it.
      * This method can be used to get the transformer and register new Rules for
@@ -421,30 +312,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * the meta data on the input Ports to be already calculated.
      */
     public void transformMetaData() {
-//        if (!isEnabled()) {
-//            return;
-//        }
-//        getInputPorts().checkPreconditions();
         getTransformer().transformMetaData();
-    }
-
-    /**
-     * By default, all ports will be auto-connected by
-     * {@link ExecutionUnit#autoWire(boolean, boolean)}. Optional outputs were
-     * handled up to version 4.4 by parameters. From 5.0 on, optional outputs are computed iff the
-     * corresponding port is connected. For backward compatibility, operators can check if we should
-     * auto-connect a port by overriding this method (e.g. by checking a deprecated parameter).
-     * TODO: Remove in later versions
-     */
-    public boolean shouldAutoConnect(OutputPort outputPort) {
-        return true;
-    }
-
-    /**
-     * @see #shouldAutoConnect(OutputPort)
-     */
-    public boolean shouldAutoConnect(InputPort inputPort) {
-        return true;
     }
 
     final protected void setEnclosingExecutionUnit(ExecutionUnit parent) {
@@ -463,15 +331,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
         } else {
             return null;
         }
-    }
-
-    /**
-     * This method is called before auto-wiring an operator. Operators can reorder outputs in order
-     * to influence how subsequent operators are wired. This is only necessary for legacy operators
-     * like IOConsumer or IOSelector. Don't override this method for new operators.
-     */
-    protected LinkedList<OutputPort> preAutoWire(LinkedList<OutputPort> readyOutputs) {
-        return readyOutputs;
     }
 
     /**

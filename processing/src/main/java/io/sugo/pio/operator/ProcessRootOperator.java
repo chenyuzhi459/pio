@@ -18,7 +18,7 @@ public final class ProcessRootOperator extends OperatorChain {
     public static final String TYPE = "root_operator";
 
     public ProcessRootOperator(
-            @JsonProperty("excUnits") List<ExecutionUnit> execUnits
+            @JsonProperty("execUnits") List<ExecutionUnit> execUnits
     ) {
         super(null, execUnits, "root", null, null);
     }
@@ -26,7 +26,7 @@ public final class ProcessRootOperator extends OperatorChain {
     @JsonCreator
     public ProcessRootOperator(
             @JsonProperty("connections") List<Connection> connections,
-            @JsonProperty("excUnits") List<ExecutionUnit> execUnits
+            @JsonProperty("execUnits") List<ExecutionUnit> execUnits
     ) {
         super(connections, execUnits, "root", null, null);
     }
@@ -38,7 +38,7 @@ public final class ProcessRootOperator extends OperatorChain {
      *                        <code>null</code> values for empty results instead of omitting them.
      */
     public IOContainer getResults() {
-        List<InputPort> inputPorts = getSubprocess(0).getAllInputPorts();
+        List<InputPort> inputPorts = getExecutionUnit(0).getAllInputPorts();
         return createIOContainer(false, inputPorts);
     }
 

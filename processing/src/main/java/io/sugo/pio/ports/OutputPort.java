@@ -22,14 +22,6 @@ public interface OutputPort extends Port {
     void connectTo(InputPort inputPort);
 
     /**
-     * Disconnects the OutputPort from its InputPort. Note: As a side effect, disconnecting ports
-     * may trigger PortExtenders removing these ports. In order to avoid this behaviour,
-     * {@link #lock()} port first.
-     *
-     */
-    void disconnect();
-
-    /**
      * Delivers an object to the connected {@link InputPort} or ignores it if the output port is not
      * connected.
      */
@@ -44,8 +36,4 @@ public interface OutputPort extends Port {
     /** Returns the destination input port. */
     InputPort getDestination();
 
-    /**
-     * Asks the owning operator
-     */
-    boolean shouldAutoConnect();
 }

@@ -18,14 +18,16 @@ public class OperatorProcess {
     private DateTime updateTime;
     private ProcessRootOperator rootOperator;
 
-    public OperatorProcess() {
-    }
-
     @JsonCreator
-    public OperatorProcess(String name, ProcessRootOperator rootOperator) {
+    public OperatorProcess(
+            @JsonProperty("name") String name,
+            @JsonProperty("rootOperator") ProcessRootOperator rootOperator
+    ) {
         this.name = name;
         this.id = String.format("%s-%d", name, new DateTime().getMillis());
         setRootOperator(rootOperator);
+        this.createTime = new DateTime();
+        this.updateTime = this.createTime;
     }
 
     @JsonProperty
@@ -44,13 +46,13 @@ public class OperatorProcess {
     }
 
     @JsonProperty
-    public DateTime getCreateTime() {
-        return createTime;
+    public String getCreateTime() {
+        return createTime.toString();
     }
 
     @JsonProperty
-    public DateTime getUpdateTime() {
-        return updateTime;
+    public String getUpdateTime() {
+        return updateTime.toString();
     }
 
     public void setId(String id) {
@@ -63,6 +65,7 @@ public class OperatorProcess {
 
     public void setStatus(Status status) {
         this.status = status;
+        this.updateTime = new DateTime();
     }
 
     public void setCreateTime(DateTime createTime) {

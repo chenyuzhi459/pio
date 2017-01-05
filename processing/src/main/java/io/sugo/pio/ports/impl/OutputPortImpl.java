@@ -3,11 +3,7 @@ package io.sugo.pio.ports.impl;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOObject;
-import io.sugo.pio.ports.PortOwner;
 
-/**
- *
- */
 public class OutputPortImpl extends AbstractOutputPort {
     @JsonCreator
     public OutputPortImpl(
@@ -35,7 +31,6 @@ public class OutputPortImpl extends AbstractOutputPort {
         if (isConnected()) {
             getDestination().receive(object);
         }
-
-
+        System.out.println(String.format("deliver data from %s to %s", getName(), getDestination().getName()));
     }
 }
