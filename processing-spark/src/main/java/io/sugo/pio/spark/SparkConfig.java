@@ -23,6 +23,9 @@ public class SparkConfig {
     @JsonProperty
     private String commonJarLocation;
 
+    @JsonProperty
+    private String workDirectory = "hdfs://";
+
     public String getSparkVersion() {
         return sparkVersion;
     }
@@ -61,5 +64,13 @@ public class SparkConfig {
 
     public void setCommonJarLocation(String commonJarLocation) {
         this.commonJarLocation = commonJarLocation;
+    }
+
+    public String getWorkDirectory() {
+        return workDirectory;
+    }
+
+    public void setWorkDirectory(String workDirectory) {
+        this.workDirectory = workDirectory;
     }
 }
