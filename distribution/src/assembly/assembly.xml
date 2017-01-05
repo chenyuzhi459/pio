@@ -27,14 +27,22 @@
             <outputDirectory>hadoop-dependencies</outputDirectory>
         </fileSet>
 
-        <!--<fileSet>-->
-            <!--<directory>../examples/bin</directory>-->
-            <!--<includes>-->
-                <!--<include>*</include>-->
-            <!--</includes>-->
-            <!--<fileMode>744</fileMode>-->
-            <!--<outputDirectory>bin</outputDirectory>-->
-        <!--</fileSet>-->
+        <fileSet>
+            <directory>../bin</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>744</fileMode>
+            <outputDirectory>bin</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>../conf</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
 
     </fileSets>
     <dependencySets>

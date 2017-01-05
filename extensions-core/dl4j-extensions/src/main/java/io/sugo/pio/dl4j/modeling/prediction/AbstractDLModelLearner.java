@@ -132,7 +132,7 @@ public abstract class AbstractDLModelLearner extends OperatorChain {
     @Override
     public void doWork() {
         start.deliver(new LayerSemaphore("0"));
-        List<Operator> list = getSubprocess(0).getOperators();
+        List<Operator> list = getExecutionUnit(0).getOperators();
         structure = convertStructure(getStructure(list));
 
         // validate the input examples

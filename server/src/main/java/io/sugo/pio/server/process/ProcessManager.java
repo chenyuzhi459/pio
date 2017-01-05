@@ -11,7 +11,6 @@ import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.metadata.MetadataProcessManager;
-import io.sugo.pio.operator.ProcessRootOperator;
 
 import java.util.concurrent.*;
 
@@ -24,7 +23,7 @@ public class ProcessManager {
     private final ProcessRunner[] runners;
     private final ProcessManagerConfig config;
     private final int executeMaxThread;
-    private final Cache<String, OperatorProcess> instances;
+    private final Cache<String, OperatorProcess> processCache;
     private final MetadataProcessManager metadataProcessManager;
     private final OperatorProcessLoader loader;
 
@@ -45,10 +44,10 @@ public class ProcessManager {
                         log.info("delete Process %s[%s] status:[%s] from cache", process.getName(), process.getId(), process.getStatus());
                     }
                 });
-        instances = builder.build();
+        processCache = builder.build();
 
         for (int i = 0; i < executeMaxThread; i++) {
-            this.runners[i] = new ProcessRunner(queue, i, instances, metadataProcessManager);
+            this.runners[i] = new ProcessRunner(queue, i, processCache, metadataProcessManager);
         }
         loader = new OperatorProcessLoader(this.metadataProcessManager);
     }
@@ -76,7 +75,7 @@ public class ProcessManager {
                 log.error(e, "shutdown processRunner error");
             }
         }
-        instances.cleanUp();
+        processCache.cleanUp();
     }
 
     class ProcessRunnerShutdownHandler implements Callable<Boolean> {
@@ -95,7 +94,7 @@ public class ProcessManager {
 
     public String register(OperatorProcess process) {
         try {
-            instances.put(process.getId(), process);
+            processCache.put(process.getId(), process);
             metadataProcessManager.insert(process);
             queue.offer(process, 10, TimeUnit.SECONDS);
             log.info("queue size:%d", queue.size());
@@ -108,9 +107,9 @@ public class ProcessManager {
     public OperatorProcess get(String id) {
         loader.setProcessId(id);
         try {
-            return instances.get(id, loader);
+            return processCache.get(id, loader);
         } catch (ExecutionException e) {
-            log.error(e, "get process instance %s error", id);
+            log.error(e, "get process %s error", id);
             throw new RuntimeException(e);
         }
     }
@@ -119,14 +118,15 @@ public class ProcessManager {
 
         private String processId;
         private final MetadataProcessManager metadataProcessManager;
+
         public OperatorProcessLoader(MetadataProcessManager metadataProcessManager) {
             this.metadataProcessManager = metadataProcessManager;
         }
 
         @Override
         public OperatorProcess call() throws Exception {
-            OperatorProcess pi = metadataProcessManager.get(processId);
-            return pi;
+            OperatorProcess process = metadataProcessManager.get(processId);
+            return process;
         }
 
         public void setProcessId(String processId) {

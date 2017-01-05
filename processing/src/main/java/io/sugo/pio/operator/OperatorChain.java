@@ -37,14 +37,6 @@ public abstract class OperatorChain extends Operator {
         }
     }
 
-//    public void setExecUnits(List<ExecutionUnit> execUnits) {
-//        this.execUnits = execUnits;
-//        for (ExecutionUnit unit : execUnits) {
-//            unit.setEnclosingOperator(this);
-//        }
-//    }
-
-
     private void initConnections() {
         Map<String, Operator> operatorMap = new HashMap<>();
         Map<Pair<String, String>, InputPort> inputMap = new HashMap<>();
@@ -84,33 +76,11 @@ public abstract class OperatorChain extends Operator {
         return execUnits;
     }
 
-    /**
-     * This method returns an arbitrary implementation of {@link InputPorts} for inner sink port
-     * initialization. Useful for adding an arbitrary implementation (e.g. changing port creation &
-     * (dis)connection behavior, optionally by customized {@link InputPort} instances) by overriding
-     * this method.
-     *
-     * @param portOwner The owner of the ports.
-     * @return The {@link InputPorts} instance, never {@code null}.
-     * @since 7.3.0
-     */
-//    protected InputPorts createInnerSinks(PortOwner portOwner) {
-//        return new InputPortsImpl(portOwner);
-//    }
+    @JsonProperty("connections")
+    public List<Connection> getConnections() {
+        return connections;
+    }
 
-    /**
-     * This method returns an arbitrary implementation of {@link OutputPorts} for inner source port
-     * initialization. Useful for adding an arbitrary implementation (e.g. changing port creation &
-     * (dis)connection behavior, optionally by customized {@link OutputPort} instances) by
-     * overriding this method.
-     *
-     * @param portOwner The owner of the ports.
-     * @return The {@link OutputPorts} instance, never {@code null}.
-     * @since 7.3.0
-     */
-//    protected OutputPorts createInnerSources(PortOwner portOwner) {
-//        return new OutputPortsImpl(portOwner);
-//    }
     @Override
     public void doWork() {
         for (ExecutionUnit subprocess : execUnits) {
@@ -118,18 +88,15 @@ public abstract class OperatorChain extends Operator {
         }
     }
 
-    public ExecutionUnit getSubprocess(int index) {
+    public ExecutionUnit getExecutionUnit(int index) {
         return execUnits.get(index);
     }
 
-    public int getNumberOfSubprocesses() {
+    public int getNumberOfExecutionUnits() {
         return execUnits.size();
     }
 
-    /**
-     * Returns an immutable view of all subprocesses
-     */
-    public List<ExecutionUnit> getSubprocesses() {
+    public List<ExecutionUnit> getExecutionUnits() {
         return execUnits;
     }
 }

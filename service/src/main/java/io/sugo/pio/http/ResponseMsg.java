@@ -1,4 +1,4 @@
-package io.sugo.pio.server.process;
+package io.sugo.pio.http;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -20,14 +20,14 @@ public class ResponseMsg implements Serializable {
     public ResponseMsg() {
     }
 
-    public ResponseMsg ok(){
+    public ResponseMsg ok() {
         this.success = true;
         return this;
     }
 
-    public ResponseMsg error(String msg){
+    public ResponseMsg error(String msg) {
         this.success = false;
-        put("msg", msg);
+        put("err", msg);
         return this;
     }
 
