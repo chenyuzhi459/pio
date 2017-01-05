@@ -7,9 +7,8 @@ import io.airlift.airline.Command;
 import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
-import io.sugo.pio.http.TaskResource;
+import io.sugo.pio.overlord.http.OverlordResource;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
-import io.sugo.pio.services.ServerRunnable;
 import org.eclipse.jetty.server.Server;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class CliOverlord extends ServerRunnable {
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        Jerseys.addResource(binder, TaskResource.class);
+                        Jerseys.addResource(binder, OverlordResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
