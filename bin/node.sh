@@ -14,6 +14,10 @@ nodeType=$1
 shift
 
 startStop=$1
+pidDir=pids
+if [ ! -x "$pidDir" ]; then
+    mkdir "$pidDir"
+fi
 pid=pids/$nodeType.pid
 
 case $startStop in
