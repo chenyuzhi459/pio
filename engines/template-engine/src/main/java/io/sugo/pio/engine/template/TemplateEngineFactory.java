@@ -8,13 +8,20 @@ import io.sugo.pio.engine.template.data.TemplatePreparedData;
 import io.sugo.pio.engine.template.data.TemplateTrainingData;
 import io.sugo.pio.engine.template.engine.TemplateDatasource;
 import io.sugo.pio.spark.engine.*;
+import io.sugo.pio.spark.engine.data.input.BatchEventHose;
 
 /**
  */
-public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData, TemplatePreparedData, TemplateModelData> {
+public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData, TemplatePreparedData, TemplateModelData, TemplateModelData> {
+    private BatchEventHose eventHose;
+
+    public TemplateEngineFactory(BatchEventHose eventHose) {
+        this.eventHose = eventHose;
+    }
+
     @Override
     public DataSource<TemplateTrainingData> createDatasource() {
-        return new TemplateDatasource();
+        return new TemplateDatasource(eventHose);
     }
 
     @Override
@@ -28,7 +35,7 @@ public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData
     }
 
     @Override
-    public Model<TemplateModelData> createModel() {
+    public Model<TemplateModelData, TemplateModelData> createModel() {
         return new TemplateModel();
     }
 }

@@ -6,8 +6,8 @@ import io.sugo.pio.spark.engine.data.output.Repository;
 
 /**
  */
-public class SparkCustomEngineParameter<TD, PD, MD> extends SparkParameter {
-    private EngineFactory<TD, PD, MD> engineFactory;
+public class SparkCustomEngineParameter<TD, PD, MD, SD> extends SparkParameter {
+    private EngineFactory<TD, PD, MD, SD> engineFactory;
     private Repository repository;
     private BatchEventHose batchEventHose;
 

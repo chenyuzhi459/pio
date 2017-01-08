@@ -9,22 +9,23 @@ import java.io.*;
 
 /**
  */
-public class TemplateModel implements Model<TemplateModelData> {
+public class TemplateModel implements Model<TemplateModelData, TemplateModelData> {
+    private final String filename = "model";
+
     @Override
     public void save(TemplateModelData templateModelData, Repository repository) {
-            OutputStream outputStream = repository.openOutput();
+            OutputStream outputStream = repository.openOutput(filename);
         try {
             ObjectOutputStream objectWriter = new ObjectOutputStream(outputStream);
             objectWriter.writeObject(templateModelData.getModel());
         } catch (IOException e) {
 
         }
-
     }
 
     @Override
-    public TemplateModelData read(Repository repository) {
-        InputStream inputStream = repository.openInput();
+    public TemplateModelData load(Repository repository) {
+        InputStream inputStream = repository.openInput(filename);
         try {
             ObjectInputStream objectReader = new ObjectInputStream(inputStream);
             return new TemplateModelData((ALSModel) objectReader.readObject());

@@ -32,8 +32,7 @@ public class SparkCustomEngineRunner {
 
         EngineFactory factory = parameter.getEngineFactory();
         DataSource datasource =  factory.createDatasource();
-        BatchEventHose batchEventHose = parameter.getBatchEventHose();
-        Object trainingData = datasource.readTraining(sc, batchEventHose);
+        Object trainingData = datasource.readTraining(sc);
         Preparator preparator = factory.createPreparator();
         Object preparedData = preparator.prepare(sc, trainingData);
 

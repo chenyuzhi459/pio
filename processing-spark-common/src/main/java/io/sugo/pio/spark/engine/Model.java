@@ -4,8 +4,8 @@ import io.sugo.pio.spark.engine.data.output.Repository;
 
 /**
  */
-public interface Model<MD> {
+public interface Model<MD, SD> {
     void save(MD md, Repository repository);
 
-    MD read(Repository repository);
+    SD load(Repository repository);
 }
