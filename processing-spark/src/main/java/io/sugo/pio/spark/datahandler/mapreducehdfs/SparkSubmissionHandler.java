@@ -56,7 +56,7 @@ public abstract class SparkSubmissionHandler {
     public abstract void setSparkLibsPath(String var1, boolean isDirectory);
 
     public void setUserJar(String sparkAppJar) {
-        addToArgList("--jar", "hdfs://" + sparkAppJar);
+        addToArgList("--jar", sparkAppJar);
     }
 
     public abstract void setAdditionalFiles(List<String> additionalJarsList);

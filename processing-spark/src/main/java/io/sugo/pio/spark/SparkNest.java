@@ -36,7 +36,7 @@ public class SparkNest extends OperatorChain {
         HadoopConnectionEntry hadoopConnection = HadoopConnectionService.getConnectionEntry(sparkConfig);
         mapReduceHDFSHandler = new MapReduceHDFSHandler(hadoopConnection, sparkConfig);
 
-        getTransformer().addRule(new SubprocessTransformRule(getExecutionUnit(0)));
+        getTransformer().addRule(new SubprocessTransformRule(getSubprocess(0)));
     }
 
     public MapReduceHDFSHandler getMapReduceHDFSHandler() {

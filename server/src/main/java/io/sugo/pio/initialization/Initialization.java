@@ -12,6 +12,8 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import com.metamx.common.ISE;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.curator.CuratorModule;
+import io.sugo.pio.curator.discovery.DiscoveryModule;
 import io.sugo.pio.guice.*;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.metadata.storage.derby.DerbyMetadataStoragePioModule;
@@ -200,11 +202,13 @@ public class Initialization {
     public static Injector makeInjectorWithModules(final Injector baseInjector, Iterable<? extends Module> modules) {
         final ModuleList defaultModules = new ModuleList(baseInjector);
         defaultModules.addModules(
+                new CuratorModule(),
+                new ServerModule(),
+                new DiscoveryModule(),
                 new LifecycleModule(),
                 new JettyServerModule(),
                 new MetadataConfigModule(),
                 new DerbyMetadataStoragePioModule(),
-                new SparkConfigModule(),
                 new ProcessPioModule(),
                 new ProcessingPioModule()
         );
