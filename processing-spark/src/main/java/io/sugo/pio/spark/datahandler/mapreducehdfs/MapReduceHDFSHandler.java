@@ -16,7 +16,6 @@ import org.apache.spark.deploy.yarn.Client;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -64,9 +63,7 @@ public class MapReduceHDFSHandler {
         ssh.initConf(appName, sparkClassName);
         ssh.setYarnQueue(sparkConfig.getYarnQueue());
         ssh.setSparkLibsPath(sparkConfig.getSparkAssemblyJar(), false);
-        checkHadoopLibOnHDFS(sparkConfig.getCommonJarLocation(), sparkConfig.getWorkDirectory());
-
-        ssh.setUserJar(sparkConfig.getWorkDirectory()+new File(sparkConfig.getCommonJarLocation()).getName());
+        ssh.setUserJar(sparkConfig.getCommonJarLocation());
         ssh.setAdditionalJars(jarDependencyPaths);
         ssh.setUserArguments(commonParams, params);
         Client client = new Client(ssh.createClientArguments(), getHadoopConfiguration(), ssh.getSparkConf());
@@ -91,29 +88,14 @@ public class MapReduceHDFSHandler {
         return c.getApplicationReport(appId).getFinalApplicationStatus().name();
     }
 
-    public void checkHadoopLibOnHDFS(String localFilePath, String hdfsLocation) {
-
-        File source = new File(localFilePath);
-        if (!source.exists() || !source.isFile()) {
-            throw new RuntimeException();
-        }
-
-        String fileName = source.getName();
-        String hdfsFilePath = hdfsLocation + "/" + fileName;
-        try {
-            FileSystem fs = FileSystem.get(getHadoopConfiguration());
-            if(!checkHdfsFile(localFilePath, sparkConfig.getWorkDirectory(), source.getName(), fs)) {
-                uploadJar(source, new Path(hdfsFilePath), fs);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void checkHadoopLibOnHDFS(String localFilePath, String hdfsLocation, String hdfsFileName) {
     }
 
-    private boolean checkHdfsFile(String localFilePath, String hdfsLocation, String hdfsFileName, FileSystem fs) throws IOException {
+    private boolean checkHdfsFile(String localFilePath, String hdfsLocation, String hdfsFileName) throws IOException {
         String hdfsFilePath = hdfsLocation + "/" + hdfsFileName;
+        FileSystem hdfs = FileSystem.get(getHadoopConfiguration());
         Path f = new Path(hdfsFilePath);
-        Long hdfsFileSize = fs.exists(f) && fs.isFile(f) ? fs.getFileStatus(f).getLen() : null;
+        Long hdfsFileSize = hdfs.exists(f) && hdfs.isFile(f) ? Long.valueOf(hdfs.getFileStatus(f).getLen()) : null;
 
         if(hdfsFileSize == null) {
             return false;
@@ -124,6 +106,7 @@ public class MapReduceHDFSHandler {
             try {
                 localSize = Files.size(Paths.get(localFilePath, new String[0]));
             } catch (IOException e) {
+
             }
 
             if(localSize != hdfsFileSize.longValue()) {
@@ -134,12 +117,10 @@ public class MapReduceHDFSHandler {
         }
     }
 
-    private void uploadJar(File jarFile, Path path, FileSystem fs) throws IOException
+    private void uploadJar(File jarFile, Path path) throws IOException
     {
-        try (OutputStream outputStream = fs.create(path);){
-            com.google.common.io.Files.asByteSource(jarFile).copyTo(outputStream);
-        } catch (Exception e) {
-        }
+        FileSystem fs = FileSystem.get(getHadoopConfiguration());
+        com.google.common.io.Files.asByteSource(jarFile).copyTo(fs.create(path));
     }
 
     public static class SparkJobResult {

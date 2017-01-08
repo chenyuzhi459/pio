@@ -33,11 +33,6 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
     }
 
     @Override
-    public boolean shouldAutoConnect() {
-        return getPortOwner().getOperator().shouldAutoConnect(this);
-    }
-
-    @Override
     public MetaData getMetaData() {
         return metaData;
     }
@@ -59,12 +54,4 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
         this.connectedTo = inputPort;
         ((AbstractInputPort) inputPort).connect(this);
     }
-
-    @Override
-    public void disconnect() {
-        ((AbstractInputPort) this.connectedTo).connect(null);
-        this.connectedTo.receive(null);
-        this.connectedTo = null;
-    }
-
 }

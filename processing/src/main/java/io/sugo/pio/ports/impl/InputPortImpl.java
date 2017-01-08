@@ -17,6 +17,7 @@ public class InputPortImpl extends AbstractInputPort {
 
     @Override
     public void receive(IOObject object) {
+        System.out.println(String.format("receive data from %s to %s", getSource().getName(), getName()));
         setData(object);
     }
 }

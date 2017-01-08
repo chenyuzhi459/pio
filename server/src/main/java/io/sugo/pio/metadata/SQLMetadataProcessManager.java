@@ -79,13 +79,13 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     ProcessRootOperator root = jsonMapper.readValue(
                                             r.getBytes("operators"), new TypeReference<ProcessRootOperator>() {
                                             });
-                                    OperatorProcess process = new OperatorProcess();
+                                    OperatorProcess process = new OperatorProcess(name, root);
                                     process.setId(id);
-                                    process.setName(name);
+//                                    process.setName(name);
                                     process.setStatus(status);
                                     process.setCreateTime(createTime);
                                     process.setUpdateTime(updateTime);
-                                    process.setRootOperator(root);
+//                                    process.setRootOperator(root);
                                     return process;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
@@ -113,8 +113,8 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     .bind("id", process.getId())
                                     .bind("name", process.getName())
                                     .bind("status", process.getStatus().name())
-                                    .bind("created_date", new DateTime().toString())
-                                    .bind("update_date", new DateTime().toString())
+                                    .bind("created_date", process.getCreateTime())
+                                    .bind("update_date", process.getUpdateTime())
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
                                     .execute();
                             return null;
@@ -140,7 +140,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                             )
                                     .bind("id", process.getId())
                                     .bind("status", process.getStatus().name())
-                                    .bind("update_date", new DateTime().toString())
+                                    .bind("update_date", process.getUpdateTime().toString())
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
                                     .execute();
                             return null;
