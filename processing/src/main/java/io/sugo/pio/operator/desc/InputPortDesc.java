@@ -1,15 +1,30 @@
 package io.sugo.pio.operator.desc;
 
-public class InputPortDesc {
-    public static CustomParameterDesc create(String name) {
-        CustomParameterDesc desc = CustomParameterDesc.create(name, "InputPort");
-        desc.addParameterDesc(ParameterDesc.createString("name", ""));
-        return desc;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+
+public class InputPortDesc extends CustomParameterDesc {
+    @JsonProperty
+    private static String portType = "InputPort";
+
+    public InputPortDesc(String name, String description) {
+        super(name, description);
     }
 
-    public static CustomParameterDesc create(String name, String defaultValue) {
-        CustomParameterDesc desc = CustomParameterDesc.create(name, "InputPort");
-        desc.addParameterDesc(ParameterDesc.create("name", "", ParamType.STRING, defaultValue));
-        return desc;
+    public InputPortDesc(String name, String description, List<Description> params) {
+        super(name, description, params);
+    }
+
+    public String getPortType() {
+        return portType;
+    }
+
+    public static InputPortDesc create(String name) {
+        return new InputPortDesc(name, portType);
+    }
+
+    public static InputPortDesc create(String name, String description, List<Description> params) {
+        return new InputPortDesc(name, description, params);
     }
 }
