@@ -1,4 +1,4 @@
-package io.sugo.pio.http;
+package io.sugo.pio.server.process.http;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,7 +44,7 @@ public class ProcessResource {
         if (operatorMetaMap == null) {
             operatorMetaMap = OperatorMetadataHelper.getAllOperatorMetadata(jsonMapper);
             try {
-                operatorMetaJson = jsonMapper.writeValueAsString(operatorMetaMap.values());
+                operatorMetaJson = jsonWriter.writeValueAsString(operatorMetaMap.values());
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class InputPortDesc extends CustomParameterDesc {
+    private final static String PORT_TYPE = "InputPort";
     @JsonProperty
-    private static String portType = "InputPort";
+    private final String portType = PORT_TYPE;
 
-    public InputPortDesc(String name, String description) {
-        super(name, description);
+    public InputPortDesc(String name) {
+        super(name, PORT_TYPE);
     }
 
     public InputPortDesc(String name, String description, List<Description> params) {
@@ -21,7 +22,7 @@ public class InputPortDesc extends CustomParameterDesc {
     }
 
     public static InputPortDesc create(String name) {
-        return new InputPortDesc(name, portType);
+        return new InputPortDesc(name);
     }
 
     public static InputPortDesc create(String name, String description, List<Description> params) {
