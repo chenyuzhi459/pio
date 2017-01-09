@@ -14,6 +14,8 @@ public class CustomParameterDesc implements Description {
     @JsonProperty
     private String description;
     @JsonProperty
+    private CustomType portType;
+    @JsonProperty
     private List<Description> params;
 
     public CustomParameterDesc(String name, String description) {
@@ -44,6 +46,14 @@ public class CustomParameterDesc implements Description {
         this.description = description;
     }
 
+    public CustomType getPortType() {
+        return portType;
+    }
+
+    void setPortType(CustomType portType) {
+        this.portType = portType;
+    }
+
     public CustomParameterDesc addParameterDesc(Description desc) {
         params.add(desc);
         return this;
@@ -55,5 +65,9 @@ public class CustomParameterDesc implements Description {
 
     public static CustomParameterDesc create(String name, String description, List<Description> params) {
         return new CustomParameterDesc(name, description, params);
+    }
+
+    static enum CustomType {
+        InputPort, OutputPort, Custom
     }
 }
