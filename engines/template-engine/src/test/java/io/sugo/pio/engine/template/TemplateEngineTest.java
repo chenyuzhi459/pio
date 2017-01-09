@@ -12,7 +12,7 @@ import io.sugo.pio.engine.template.data.TemplateModelData;
 import io.sugo.pio.engine.template.data.TemplatePreparedData;
 import io.sugo.pio.engine.template.data.TemplateTrainingData;
 import io.sugo.pio.engine.template.data.input.MovielenBatchEventHose;
-import io.sugo.pio.engine.template.data.output.LocalFileRepository;
+import io.sugo.pio.spark.engine.data.output.LocalFileRepository;
 
 /**
  */
@@ -26,9 +26,9 @@ public class TemplateEngineTest {
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         MovielenBatchEventHose movielenBatchEventHose = new MovielenBatchEventHose(this.getClass().getClassLoader().getResource("movielen100k/sample_movielens_data.txt").getPath(), "::");
 
-        TemplateEngineFactory factory = new TemplateEngineFactory();
+        TemplateEngineFactory factory = new TemplateEngineFactory(movielenBatchEventHose);
         DataSource<TemplateTrainingData> datasource =  factory.createDatasource();
-        TemplateTrainingData trainingData = datasource.readTraining(sc, movielenBatchEventHose);
+        TemplateTrainingData trainingData = datasource.readTraining(sc);
 
         Preparator<TemplateTrainingData, TemplatePreparedData> preparator = factory.createPreparator();
         TemplatePreparedData preparedData = preparator.prepare(sc, trainingData);
@@ -36,11 +36,11 @@ public class TemplateEngineTest {
         Algorithm<TemplatePreparedData, TemplateModelData> modelDataAlgorithm = factory.createAlgorithm();
         TemplateModelData modelData = modelDataAlgorithm.train(sc, preparedData);
 
-        Model<TemplateModelData> model = factory.createModel();
+        Model<TemplateModelData, TemplateModelData> model = factory.createModel();
         Repository repository = new LocalFileRepository("/tmp/modelfile");
 
         model.save(modelData, repository);
-        TemplateModelData model2 = model.read(repository);
+        TemplateModelData model2 = model.load(repository);
 
         System.out.print("ok");
     }

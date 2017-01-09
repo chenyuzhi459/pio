@@ -19,13 +19,18 @@
         </dependency>
         <dependency>
             <groupId>io.sugo</groupId>
-            <artifactId>pio-server</artifactId>
+            <artifactId>pio-task-service</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.airlift</groupId>
-            <artifactId>airline</artifactId>
+            <groupId>io.sugo</groupId>
+            <artifactId>pio-server</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>io.airlift</groupId>-->
+            <!--<artifactId>airline</artifactId>-->
+        <!--</dependency>-->
 
         <!-- Tests -->
         <dependency>

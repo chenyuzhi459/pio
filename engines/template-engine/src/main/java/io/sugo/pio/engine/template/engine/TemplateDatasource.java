@@ -16,12 +16,18 @@ import java.util.Map;
 /**
  */
 public class TemplateDatasource implements DataSource<TemplateTrainingData> {
+    private BatchEventHose eventHose;
+
+    public TemplateDatasource(BatchEventHose eventHose) {
+        this.eventHose = eventHose;
+    }
+
     @Override
-    public TemplateTrainingData readTraining(JavaSparkContext sc, BatchEventHose eventHose) {
+    public TemplateTrainingData readTraining(JavaSparkContext sc) {
         JavaRDD<Event> events = eventHose.find(sc);
         SQLContext sqlContext = new SQLContext(sc);
 
-        Dataset ratingEvents =sqlContext.createDataFrame(events.map(new EventToRatingFunc()), Rating.class);
+        Dataset ratingEvents = sqlContext.createDataFrame(events.map(new EventToRatingFunc()), Rating.class);
         Dataset[] splits = ratingEvents.randomSplit(new double[]{0.8, 0.2});
         Dataset training = splits[0];
         Dataset test = splits[1];

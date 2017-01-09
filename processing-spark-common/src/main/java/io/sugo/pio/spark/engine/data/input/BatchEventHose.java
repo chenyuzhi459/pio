@@ -12,3 +12,4 @@ public interface BatchEventHose {
 
     JavaRDD<Event> find(JavaSparkContext sc, long starttime, long endTime);
 }
+
