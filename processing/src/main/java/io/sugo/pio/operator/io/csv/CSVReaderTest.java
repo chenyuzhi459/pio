@@ -10,9 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by root on 17-1-2.
- */
 public class CSVReaderTest extends Operator {
     private final OutputPort outputPort;
     private final int readTime;

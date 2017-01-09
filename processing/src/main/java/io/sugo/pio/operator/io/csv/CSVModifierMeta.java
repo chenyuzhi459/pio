@@ -6,9 +6,6 @@ import io.sugo.pio.operator.desc.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by root on 17-1-5.
- */
 public class CSVModifierMeta extends OperatorMeta {
     public static final String TYPE = "csv_modifier";
     @Override
