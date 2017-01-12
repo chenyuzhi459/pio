@@ -15,7 +15,7 @@ shift
 
 startStop=$1
 pidDir=pids
-if [ ! -x "$pidDir" ]; then
+if [ ! -d "$pidDir" ]; then
     mkdir "$pidDir"
 fi
 pid=pids/$nodeType.pid

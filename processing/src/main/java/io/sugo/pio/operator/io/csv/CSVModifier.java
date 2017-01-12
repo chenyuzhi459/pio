@@ -10,9 +10,6 @@ import io.sugo.pio.ports.OutputPort;
 
 import java.util.Arrays;
 
-/**
- * Created by root on 17-1-2.
- */
 public class CSVModifier extends Operator {
     private final InputPort inputPort;
     private final OutputPort outputPort;
