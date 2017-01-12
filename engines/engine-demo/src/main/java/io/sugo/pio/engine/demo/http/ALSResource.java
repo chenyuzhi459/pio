@@ -1,11 +1,11 @@
 package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.sugo.pio.engine.als.Constants;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.demo.ItemUtil;
 import io.sugo.pio.engine.popular.LucenceConstants;
-import io.sugo.pio.engine.ur.detail.Constants;
-import io.sugo.pio.engine.ur.detail.URDetailQuery;
+import io.sugo.pio.engine.als.AlsQuery;
 import io.sugo.pio.spark.engine.data.output.LocalFileRepository;
 import io.sugo.pio.spark.engine.data.output.Repository;
 import org.apache.lucene.search.SortField;
@@ -28,6 +28,7 @@ import java.util.Map;
 public class ALSResource {
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final QueryableModelData modelData;
+    private static final String ITEM_NAME = "item_name";
 
     public static final String REPOSITORY_PATH = "src/main/resources/index/als";
 
@@ -45,15 +46,11 @@ public class ALSResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            URDetailQuery query = jsonMapper.readValue(in, URDetailQuery.class);
+            AlsQuery query = jsonMapper.readValue(in, AlsQuery.class);
             Map<String, Object> map = new LinkedHashMap<>();
 
             if (query.getUserId() != null) {
                 map.put(Constants.USER_ID(), query.getUserId());
-            }
-
-            if (query.getDetailCategory() != null) {
-                map.put(Constants.DETAIL_CATEGORY(), query.getDetailCategory());
             }
 
             int queryNum = 10;
@@ -72,7 +69,7 @@ public class ALSResource {
                 for (String id: filmIds) {
                     filmNames.add(ItemUtil.getTitle(id));
                 }
-                res.put(Constants.ITEM_ID(), filmNames);
+                res.put(ITEM_NAME, filmNames);
                 str = jsonMapper.writeValueAsString(res);
             } else {
                 str = "items not found";

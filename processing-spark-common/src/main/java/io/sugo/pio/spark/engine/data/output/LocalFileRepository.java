@@ -51,12 +51,26 @@ public class LocalFileRepository implements Repository {
     }
 
     @Override
-    public void delete(String name) {
+    public void create(String name) {
         try {
-            Files.deleteIfExists(Paths.get(path, name));
+            Files.createFile(Paths.get(path, name));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean delete(String name) {
+        try {
+            return Files.deleteIfExists(Paths.get(path, name));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean exists(String name) {
+        return Files.exists(Paths.get(path, name));
     }
 
     @Override
@@ -98,6 +112,12 @@ public class LocalFileRepository implements Repository {
             }
             return value;
 
+        }
+
+        @Override
+        public void close() throws IOException {
+            fis.close();
+            super.close();
         }
     }
 }

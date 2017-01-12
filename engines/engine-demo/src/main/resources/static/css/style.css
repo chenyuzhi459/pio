@@ -731,7 +731,7 @@ body {
 	padding:8px 0;
 }
 .movie_desc p span{
-	text-decoration:line-through;
+	/*text-decoration:line-through;*/
 	color:#888;
 }
 .movie_desc span a{

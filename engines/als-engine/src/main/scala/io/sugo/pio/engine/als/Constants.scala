@@ -1,4 +1,4 @@
-package io.sugo.pio.engine.ur.detail
+package io.sugo.pio.engine.als
 
 object Constants {
   val USER_ID: String = "user_id"

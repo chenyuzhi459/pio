@@ -30,7 +30,7 @@
         <module>engines/engine-demo</module>
         <module>engines/template-engine</module>
         <module>engines/popular-recommend-engine</module>
-        <!--<module>engines/frequent-mining-engine</module>-->
+        <module>engines/detail-engine</module>
         <module>engines/als-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>

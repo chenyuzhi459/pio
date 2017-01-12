@@ -24,9 +24,7 @@ public class ItemUtil {
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(SEPERATOR);
                 String title = tokens[1];
-                if (title.contains(",")) {
-                    title = title.split(",")[0].trim();
-                } else if (title.indexOf("(") > 0) {
+                if (title.indexOf("(") > 0) {
                     int index = title.indexOf("(");
                     title = title.substring(0, index).trim();
                 }

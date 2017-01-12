@@ -15,7 +15,7 @@ public class RepositoryDirectory extends BaseDirectory {
     private Repository repository;
 
     public RepositoryDirectory(Repository repository) {
-        super(new SingleInstanceLockFactory());
+        super(RepositoryLockFactory.INSTANCE);
         this.repository = repository;
     }
 
@@ -51,6 +51,10 @@ public class RepositoryDirectory extends BaseDirectory {
     @Override
     public IndexInput openInput(String name, IOContext context) throws IOException {
         return new RepositoryInput(name, repository);
+    }
+
+    public Repository getRepository() {
+        return repository;
     }
 
     @Override
