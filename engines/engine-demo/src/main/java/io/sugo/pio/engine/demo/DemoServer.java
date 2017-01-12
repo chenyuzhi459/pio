@@ -20,15 +20,15 @@ import java.io.IOException;
  */
 public class DemoServer {
     public static void main(String[] args) throws Exception {
-        train();
-//        startServer();
+//        train();
+        startServer();
     }
 
     private static void train() throws IOException {
-//        PopularTraining popularTraining = new PopularTraining();
-//        popularTraining.train();
-//        ALSTraining alsTraining = new ALSTraining();
-//        alsTraining.train();
+        PopularTraining popularTraining = new PopularTraining();
+        popularTraining.train();
+        ALSTraining alsTraining = new ALSTraining();
+        alsTraining.train();
         DetailTraining detailTraining = new DetailTraining();
         detailTraining.train();
     }

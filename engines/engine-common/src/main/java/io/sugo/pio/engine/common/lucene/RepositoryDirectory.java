@@ -74,6 +74,13 @@ public class RepositoryDirectory extends BaseDirectory {
         }
 
         @Override
+        public IndexInput clone() {
+            RepositoryInput clone = (RepositoryInput) super.clone();
+            clone.clone = true;
+            return clone;
+        }
+
+        @Override
         protected void closeInternal() throws IOException {
             if (!clone) {
                 inputStream.close();

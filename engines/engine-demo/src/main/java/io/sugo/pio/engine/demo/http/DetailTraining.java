@@ -26,7 +26,7 @@ import java.io.IOException;
 public class DetailTraining extends AbstractTraining {
     @Override
     protected JavaSparkContext init() {
-        SparkConf sparkConf = new SparkConf().setMaster("local[2]").setAppName("test");
+        SparkConf sparkConf = new SparkConf().setMaster("local[1]").setAppName("test");
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         sparkConf.set("spark.kryo.registrator", "org.apache.mahout.sparkbindings.io.MahoutKryoRegistrator");
         sparkConf.set("spark.kryo.referenceTracking", "false");
