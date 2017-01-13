@@ -1,6 +1,6 @@
-package io.sugo.pio.engine.ur.detail.engine
+package io.sugo.pio.engine.als.engine
 
-import io.sugo.pio.engine.ur.detail.data.{ALSPreparedData, ALSTrainingData}
+import io.sugo.pio.engine.als.data.{ALSPreparedData, ALSTrainingData}
 import io.sugo.pio.spark.engine.Preparator
 import org.apache.spark.api.java.JavaSparkContext
 

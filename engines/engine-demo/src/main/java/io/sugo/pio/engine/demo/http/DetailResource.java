@@ -3,9 +3,10 @@ package io.sugo.pio.engine.demo.http;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.demo.ItemUtil;
-import io.sugo.pio.engine.popular.Constants;
 import io.sugo.pio.engine.popular.LucenceConstants;
-import io.sugo.pio.engine.popular.query.PopQuery;
+import io.sugo.pio.engine.ur.detail.Constants;
+import io.sugo.pio.engine.als.AlsQuery;
+import io.sugo.pio.engine.ur.detail.URDetailQuery;
 import io.sugo.pio.spark.engine.data.output.LocalFileRepository;
 import io.sugo.pio.spark.engine.data.output.Repository;
 import org.apache.lucene.search.SortField;
@@ -24,15 +25,15 @@ import java.util.Map;
 
 /**
  */
-@Path("query/itempop")
-public class PopluarResource {
+@Path("query/detail")
+public class DetailResource {
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final QueryableModelData modelData;
-    private static final String ITEM_NAME = "item_name";
+    private static final String RELATED_ITEM_NAME = "related_item_name";
 
-    public static final String REPOSITORY_PATH = "src/main/resources/index/pop";
+    public static final String REPOSITORY_PATH = "src/main/resources/index/detail";
 
-    public PopluarResource() throws IOException {
+    public DetailResource() throws IOException {
         Repository repository = new LocalFileRepository(REPOSITORY_PATH);
         modelData = new QueryableModelData(repository);
     }
@@ -46,11 +47,11 @@ public class PopluarResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            PopQuery query = jsonMapper.readValue(in, PopQuery.class);
+            URDetailQuery query = jsonMapper.readValue(in, URDetailQuery.class);
             Map<String, Object> map = new LinkedHashMap<>();
 
-            if (query.getDetailCategory() != null) {
-                map.put(Constants.DETAIL_CATEGORY(), query.getDetailCategory());
+            if (query.getItemId() != null) {
+                map.put(Constants.ITEM_ID(), query.getItemId());
             }
 
             int queryNum = 10;
@@ -60,16 +61,16 @@ public class PopluarResource {
             }
 
             List<String> resultFields = new ArrayList<>();
-            resultFields.add(Constants.ITEM_ID());
-            Map<String, List<String>> res = modelData.predict(map, resultFields, new SortField(LucenceConstants.SCORE(), SortField.Type.INT, true), queryNum);
+            resultFields.add(Constants.RELATED_ITEM_ID());
+            Map<String, List<String>> res = modelData.predict(map, resultFields, null, queryNum);
             String str;
             if (!res.isEmpty()) {
-                List<String> filmIds = res.get(Constants.ITEM_ID());
+                List<String> filmIds = res.get(Constants.RELATED_ITEM_ID());
                 List<String> filmNames = new ArrayList<>(filmIds.size());
                 for (String id: filmIds) {
                     filmNames.add(ItemUtil.getTitle(id));
                 }
-                res.put(ITEM_NAME, filmNames);
+                res.put(RELATED_ITEM_NAME, filmNames);
                 str = jsonMapper.writeValueAsString(res);
             } else {
                 str = "items not found";
@@ -80,6 +81,4 @@ public class PopluarResource {
         }
         return Response.status(Response.Status.ACCEPTED).entity("items not found").build();
     }
-
-
 }

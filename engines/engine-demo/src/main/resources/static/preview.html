@@ -9,23 +9,20 @@
 <script type="text/javascript" src="js/easing.js"></script>
 </head>
 <body>
+	<div id="app">
 	<div class="header">
 		 <div class="headertop_desc">
 			<div class="wrap">
 				<div class="nav_list">
 					<ul>
 						<li><a href="index.html">Home</a></li>
-						<li><a href="contact.html">Sitemap</a></li>
-						<li><a href="contact.html">Contact</a></li>
 					</ul>
 				</div>
 					<div class="account_desc">
 						<ul>
-							<li><a href="contact.html">Register</a></li>
-							<li><a href="contact.html">Login</a></li>
-							<li><a href="preview.html">Delivery</a></li>
-							<li><a href="#">Checkout</a></li>
-							<li><a href="#">My Account</a></li>
+							<li v-if="userId"><a href="#">{{userId}}</a></li>
+							<li v-else><a href="contact.html">Login</a></li>
+							<li><a href="index.html" v-on:click="checkOut">Checkout</a></li>
 						</ul>
 					</div>
 				<div class="clear"></div>
@@ -36,20 +33,20 @@
 					<div class="logo">
 						<a href="index.html"><img src="images/logo.png" alt="" /></a>
 					</div>
-						<div class="header_top_right">
-						  <div class="cart">
-						  	   <p><span>Cart</span><div id="dd" class="wrapper-dropdown-2"> (empty)
-						  	   	<ul class="dropdown">
-										<li>you have no items in your Shopping cart</li>
-								</ul></div></p>
-						  </div>
-							  <div class="search_box">
-					     		<form>
-					     			<input type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}"><input type="submit" value="">
-					     		</form>
-					     	</div>
-						 <div class="clear"></div>
-					</div>
+						<!--<div class="header_top_right">-->
+						  <!--<div class="cart">-->
+						  	   <!--<p><span>Cart</span><div id="dd" class="wrapper-dropdown-2"> (empty)-->
+						  	   	<!--<ul class="dropdown">-->
+										<!--<li>you have no items in your Shopping cart</li>-->
+								<!--</ul></div></p>-->
+						  <!--</div>-->
+							  <!--<div class="search_box">-->
+					     		<!--<form>-->
+					     			<!--<input type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}"><input type="submit" value="">-->
+					     		<!--</form>-->
+					     	<!--</div>-->
+						 <!--<div class="clear"></div>-->
+					<!--</div>-->
 						  <script type="text/javascript">
 								function DropDown(el) {
 									this.dd = el;
@@ -93,168 +90,144 @@
 				<div class="cont-desc span_1_of_2">
 				  <div class="product-details">				
 					<div class="grid images_3_of_2">
-						<img src="images/preview.jpg" alt="" />
+						<img :src="filmData.Poster" alt="" />
 				  </div>
 				<div class="desc span_3_of_2">
-					<h2>Wrath of the Titans </h2>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>					
-					<div class="price">
-						<p>Price: <span>$500</span></p>
+					<h2>{{filmData.Title}}</h2>
+					<div>
+						<p>Director: <span>{{filmData.Director}}</span></p>
 					</div>
 					<div class="available">
 						<ul>
-						  <li><span>Model:</span> &nbsp; Model 1</li>
-						  <li><span>Shipping Weight:</span>&nbsp; 5lbs</li>
-						  <li><span>Units in Stock:</span>&nbsp; 566</li>
+						  <li><span>Genre:</span> &nbsp; {{filmData.Genre}}</li>
+						  <li><span>Writer:</span> &nbsp; {{filmData.Writer}}</li>
+						  <li><span>Stars:</span>&nbsp; {{filmData.Actors}}</li>
+						  <!--<li><span>Units in Stock:</span>&nbsp; 566</li>-->
 					    </ul>
 					</div>
-				<div class="share-desc">
-					<div class="share">
-						<p>Number of units :</p><input class="text_box" type="text">				
-					</div>
-					<div class="button"><span><a href="#">Add to Cart</a></span></div>					
-					<div class="clear"></div>
-				</div>
-				 <div class="wish-list">
-				 	<ul>
-				 		<li class="wish"><a href="#">Add to Wishlist</a></li>
-				 	    <li class="compare"><a href="#">Add to Compare</a></li>
-				 	</ul>
-				 </div>
+				<!--<div class="share-desc">-->
+					<!--<div class="share">-->
+						<!--<p>Number of units :</p><input class="text_box" type="text">				-->
+					<!--</div>-->
+					<!--<div class="button"><span><a href="#">Add to Cart</a></span></div>					-->
+					<!--<div class="clear"></div>-->
+				<!--</div>-->
+				 <!--<div class="wish-list">-->
+				 	<!--<ul>-->
+				 		<!--<li class="wish"><a href="#">Add to Wishlist</a></li>-->
+				 	    <!--<li class="compare"><a href="#">Add to Compare</a></li>-->
+				 	<!--</ul>-->
+				 <!--</div>-->
 			</div>
 			<div class="clear"></div>
 		  </div>
 		<div class="product_desc">	
 			 <h2>Details :</h2>
-			   <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
-	           <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+			   <p>{{filmData.Plot}}</p>
 	   </div>
    </div>
 				<div class="rightsidebar span_3_of_1 sidebar">
 					<h2>Specials</h2>
-					 	<div class="special_movies">
+					 	<div class="special_movies" v-for="(item, index) in relatedFilms">
 					 	   <div class="movie_poster">
-					 		  <a href="preview.html"><img src="images/end-game.jpg" alt="" /></a>
+					 		  <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title"><img :src="item.Poster" alt="" /></a>
 					 		 </div>
 					 		   <div class="movie_desc">
-							    <h3><a href="preview.html">End Game</a></h3>
-								   <p><span>$620.87</span> &nbsp; $500.35</p>
-								     <span><a href="#">Add to Cart</a></span>
+							    <h3><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h3>
+								   <p><span>Genre:</span> &nbsp; {{item.Genre}}</p>
+								   <p><span>Rating:</span> &nbsp; {{item.imdbRating}}</p>
+								     <span><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">View</a></span>
 								 </div>
 								<div class="clear"></div>
 					 		</div>	
-					 		<div class="special_movies">
-					 	   <div class="movie_poster">
-					 		  <a href="preview.html"><img src="images/Coraline.jpg" alt="" /></a>
-					 		 </div>
-					 		   <div class="movie_desc">
-							    <h3><a href="preview.html">Coraline</a></h3>
-								   <p><span>$620.87</span> &nbsp; $500.35</p>
-								     <span><a href="#">Add to Cart</a></span>
-								 </div>
-								<div class="clear"></div>
-					 		</div>	
-					 		<div class="special_movies">
-					 	   <div class="movie_poster">
-					 		  <a href="preview.html"><img src="images/Eclipse.jpg" alt="" /></a>
-					 		 </div>
-					 		   <div class="movie_desc">
-							    <h3><a href="preview.html">Eclipse</a></h3>
-								   <p><span>$620.87</span> &nbsp; $500.35</p>
-								     <span><a href="#">Add to Cart</a></span>
-								 </div>
-								<div class="clear"></div>
-					 		</div>	
-					 		<div class="special_movies">
-					 	   <div class="movie_poster">
-					 		  <a href="preview.html"><img src="images/Priest.jpg" alt="" /></a>
-					 		 </div>
-					 		   <div class="movie_desc">
-							    <h3><a href="preview.html">Priest 3D</a></h3>
-								   <p><span>$620.87</span> &nbsp; $500.35</p>
-								     <span><a href="#">Add to Cart</a></span>
-								 </div>
-								<div class="clear"></div>
-					 		</div>	
-					 		<div class="special_movies">
-					 	    <div class="movie_poster">
-					 		  <a href="preview.html"><img src="images/Sorority_Wars.jpg" alt="" /></a>
-					 		 </div>
-					 		   <div class="movie_desc">
-							    <h3><a href="preview.html">Sorority Wars</a></h3>
-								   <p><span>$620.87</span> &nbsp; $500.35</p>
-								     <span><a href="#">Add to Cart</a></span>
-								 </div>
-								<div class="clear"></div>
-					 		</div>			 
  					   </div>
  		 		 </div>
    	 		</div>
         </div>
    <div class="footer">
    	  <div class="wrap">	
-	     <div class="section group">
-				<div class="col_1_of_4 span_1_of_4">
-						<h4>Information</h4>
-						<ul>
-						<li><a href="#">About Us</a></li>
-						<li><a href="#">Customer Service</a></li>
-						<li><a href="#">Advanced Search</a></li>
-						<li><a href="#">Orders and Returns</a></li>
-						<li><a href="contact.html">Contact Us</a></li>
-						</ul>
-					</div>
-				<div class="col_1_of_4 span_1_of_4">
-					<h4>Why buy from us</h4>
-						<ul>
-						<li><a href="#">About Us</a></li>
-						<li><a href="#">Customer Service</a></li>
-						<li><a href="#">Privacy Policy</a></li>
-						<li><a href="contact.html">Site Map</a></li>
-						<li><a href="#">Search Terms</a></li>
-						</ul>
-				</div>
-				<div class="col_1_of_4 span_1_of_4">
-					<h4>My account</h4>
-						<ul>
-							<li><a href="contact.html">Sign In</a></li>
-							<li><a href="index.html">View Cart</a></li>
-							<li><a href="#">My Wishlist</a></li>
-							<li><a href="#">Track My Order</a></li>
-							<li><a href="contact.html">Help</a></li>
-						</ul>
-				</div>
-				<div class="col_1_of_4 span_1_of_4">
-					<h4>Contact</h4>
-						<ul>
-							<li><span>+91-123-456789</span></li>
-							<li><span>+00-123-000000</span></li>
-						</ul>
-						<div class="social-icons">
-							<h4>Follow Us</h4>
-					   		  <ul>
-							      <li><a href="#" target="_blank"><img src="images/facebook.png" alt="" /></a></li>
-							      <li><a href="#" target="_blank"><img src="images/twitter.png" alt="" /></a></li>
-							      <li><a href="#" target="_blank"><img src="images/skype.png" alt="" /> </a></li>
-							      <li><a href="#" target="_blank"> <img src="images/linkedin.png" alt="" /></a></li>
-							      <div class="clear"></div>
-						     </ul>
-   	 					</div>
-				</div>
-			</div>
 			 <div class="copy_right">
-				<p>Copyright &copy; 2014.Company name All rights reserved.<a target="_blank" href="http://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a></p>
+				 <p>Copyright &copy; 2016.Sugo All rights reserved.</p>
 		   </div>			
         </div>
     </div>
+	<script type="text/javascript" src="js/vue.min.js"></script>
    <script type="text/javascript">
 		$(document).ready(function() {			
 			$().UItoTop({ easingType: 'easeOutQuart' });
-			
+
+            function qs(key) {
+                key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&") // escape RegEx meta chars
+                var match = location.search.match(new RegExp("[?&]" + key + "=([^&]+)(&|$)"))
+                return match && decodeURIComponent(match[1].replace(/\+/g, " "))
+            }
+
+            var detailUR = new Vue({
+                el: '#app',
+                data: {
+                    userId: window.localStorage.getItem("userId") || '',
+                    filmData: {},
+					relatedFilms: []
+                },
+                methods: {
+                    checkOut: function() {
+                        window.localStorage.setItem("userId", "")
+                    },
+
+					queryRelated: function(id) {
+                        var that = this
+                        $.ajax({
+                            url: '/pio/query/detail',
+                            beforeSend(req) {
+                                req.setRequestHeader('Content-Type', 'application/json')
+                            },
+                            data: JSON.stringify({
+                                'itemId': id, 'num': 5
+                            }),
+                            dataType: 'json',
+                            type: 'post',
+                            success(data) {
+                                var temp = []
+                                for (let m = 0; m < data.related_item_id.length; m++) {
+                                    that.queryOmdbByTitle(data.related_item_id[m], data.related_item_name[m], temp)
+                                }
+                                that.relatedFilms = temp
+                            }
+                        })
+					},
+
+                    queryOmdbById: function (imdbId) {
+                        var that = this
+                        $.ajax({
+                            url: 'http://www.omdbapi.com/?i=' + imdbId,
+                            dataType: 'json',
+                            type: 'get',
+                            success(data) {
+                                that.filmData = data
+                            }
+                        })
+                    },
+
+                    queryOmdbByTitle: function (id, title, temp) {
+                        $.ajax({
+                            url: 'http://www.omdbapi.com/?t=' + escape(title),
+                            dataType: 'json',
+                            type: 'get',
+                            success(data) {
+                                data.id = id
+                                temp.push(data)
+                            }
+                        })
+                    }
+                }
+            })
+			detailUR.queryOmdbById(qs("imdbId"))
+            detailUR.queryRelated(qs("id"))
 		});
 	</script>
     <a href="#" id="toTop"><span id="toTopHover"> </span></a>
 <div style="display:none"><script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script></div>
+</div>
 </body>
 </html>
 

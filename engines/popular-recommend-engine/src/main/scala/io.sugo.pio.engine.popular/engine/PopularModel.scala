@@ -13,7 +13,7 @@ import org.apache.lucene.document._
 class PopularModel extends Model[PopularModelData, QueryableModelData] {
   override def save(md: PopularModelData, repository: Repository): Unit = {
     val resItem = md.itemPopular
-    resItem.foreachPartition(iter => {
+    resItem.coalesce(1).foreachPartition(iter => {
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository))
       iter.foreach(re => {
           val doc = new Document

@@ -17,7 +17,11 @@ public interface Repository extends Serializable {
 
     void rename(String source, String dest);
 
-    void delete(String name);
+    void create(String name);
+
+    boolean delete(String name);
+
+    boolean exists(String name);
 
     FSInputStream openInput(String name);
 }

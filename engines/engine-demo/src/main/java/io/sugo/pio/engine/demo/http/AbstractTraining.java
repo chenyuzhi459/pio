@@ -8,25 +8,19 @@ import java.io.IOException;
 /**
  */
 public abstract class AbstractTraining {
-    private JavaSparkContext sc;
-
     public AbstractTraining() {
     }
 
-    protected void init() {
+    protected JavaSparkContext init() {
         SparkConf sparkConf = new SparkConf().setMaster("local").setAppName("test");
-        sc = new JavaSparkContext(sparkConf);
+        return new JavaSparkContext(sparkConf);
     }
 
     public void train() throws IOException {
-        init();
+        JavaSparkContext sc = init();
         doTrain(sc);
-        close();
+        sc.close();
     }
 
     protected abstract void doTrain(JavaSparkContext sc) throws IOException;
-
-    protected void close() {
-        sc.close();
-    }
 }

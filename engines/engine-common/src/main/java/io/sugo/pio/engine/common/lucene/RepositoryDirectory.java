@@ -15,7 +15,7 @@ public class RepositoryDirectory extends BaseDirectory {
     private Repository repository;
 
     public RepositoryDirectory(Repository repository) {
-        super(new SingleInstanceLockFactory());
+        super(RepositoryLockFactory.INSTANCE);
         this.repository = repository;
     }
 
@@ -53,6 +53,10 @@ public class RepositoryDirectory extends BaseDirectory {
         return new RepositoryInput(name, repository);
     }
 
+    public Repository getRepository() {
+        return repository;
+    }
+
     @Override
     public void close() throws IOException {
         this.isOpen = false;
@@ -67,6 +71,13 @@ public class RepositoryDirectory extends BaseDirectory {
             super(name);
             this.inputStream = repository.openInput(name);
             this.length = repository.getSize(name);
+        }
+
+        @Override
+        public IndexInput clone() {
+            RepositoryInput clone = (RepositoryInput) super.clone();
+            clone.clone = true;
+            return clone;
         }
 
         @Override
