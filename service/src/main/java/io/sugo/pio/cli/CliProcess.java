@@ -9,7 +9,6 @@ import io.airlift.airline.Command;
 import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
-import io.sugo.pio.server.process.http.ProcessResource;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import org.eclipse.jetty.server.Server;
 
@@ -40,8 +39,6 @@ public class CliProcess extends ServerRunnable {
                                 .to("pio/process");
                         binder.bindConstant().annotatedWith(Names.named("servicePort")).to(8080);
 
-
-                        Jerseys.addResource(binder, ProcessResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);

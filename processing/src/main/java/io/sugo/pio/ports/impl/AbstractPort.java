@@ -1,18 +1,15 @@
 package io.sugo.pio.ports.impl;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.ports.Port;
-import io.sugo.pio.ports.PortOwner;
+import io.sugo.pio.ports.Ports;
 import io.sugo.pio.util.ReferenceCache;
-
 
 /**
  */
 public abstract class AbstractPort implements Port {
-    private PortOwner portOwner;
+    private final Ports<? extends Port> ports;
 
-    @JsonProperty
     private String name;
 
     private static final ReferenceCache<IOObject> IOO_REFERENCE_CACHE = new ReferenceCache<>(20);
@@ -22,23 +19,14 @@ public abstract class AbstractPort implements Port {
 
     private boolean locked = false;
 
-    public AbstractPort(String name) {
+    public AbstractPort(Ports<? extends Port> owner, String name) {
         this.name = name;
+        this.ports = owner;
     }
 
     protected final void setData(IOObject object) {
         this.weakDataReference = IOO_REFERENCE_CACHE.newReference(object);
         this.hardDataReference = object;
-    }
-
-    @Override
-    public PortOwner getPortOwner() {
-        return portOwner;
-    }
-
-    @Override
-    public void setPortOwner(PortOwner portOwner) {
-        this.portOwner = portOwner;
     }
 
     @Override
@@ -84,10 +72,10 @@ public abstract class AbstractPort implements Port {
         return name;
     }
 
-//    @Override
-//    public Ports<? extends Port> getPorts() {
-//        return ports;
-//    }
+    @Override
+    public Ports<? extends Port> getPorts() {
+        return ports;
+    }
 
     @Override
     public boolean isLocked() {

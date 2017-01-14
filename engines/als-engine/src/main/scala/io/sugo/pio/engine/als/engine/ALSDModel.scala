@@ -1,6 +1,5 @@
 package io.sugo.pio.engine.als.engine
 
-import io.sugo.pio.engine.common.data.QueryableModelData
 import io.sugo.pio.engine.common.lucene.RepositoryDirectory
 import io.sugo.pio.engine.common.utils.LuceneUtils
 import org.apache.lucene.document._
@@ -10,7 +9,6 @@ import io.sugo.pio.engine.als.{Constants, LucenceConstants}
 import io.sugo.pio.engine.als.data.ALSModelData
 import io.sugo.pio.engine.data.output.Repository
 import io.sugo.pio.engine.training.Model
-import io.sugo.pio.spark.engine.training.Model
 
 class ALSDModel extends Model[ALSModelData] with Serializable {
 

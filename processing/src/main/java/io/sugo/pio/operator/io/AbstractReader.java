@@ -20,7 +20,7 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
     private final OutputPort outputPort;
 
     public AbstractReader(Class<? extends IOObject> generatedClass, String name, OutputPort outputPort) {
-        super(name, null, Arrays.asList(outputPort));
+        super(name);
         this.outputPort = outputPort;
         this.generatedClass = generatedClass;
     }

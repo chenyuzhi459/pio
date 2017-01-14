@@ -25,7 +25,7 @@ public abstract class AbstractLearner extends SparkOperator {
 
     public AbstractLearner(SparkOperation sparkOperation, String name,
                            InputPort exampleSetInput, OutputPort modelOutput) {
-        super(name, Arrays.asList(exampleSetInput), Arrays.asList(modelOutput));
+        super(name);
         this.exampleSetInput = exampleSetInput;
         this.modelOutput = modelOutput;
         this.sparkOperation = sparkOperation;

@@ -13,8 +13,8 @@ import java.util.Collection;
 public abstract class SparkOperator extends Operator implements KillableOperation {
     private SparkNest sparkNest = null;
 
-    public SparkOperator(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts) {
-        super(name, inputPorts, outputPorts);
+    public SparkOperator(String name) {
+        super(name);
     }
 
     public SparkNest getSparkNest() {

@@ -1,23 +1,18 @@
 package io.sugo.pio.ports.impl;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.ports.Ports;
+import io.sugo.pio.ports.Port;
 
 /**
  */
 public class InputPortImpl extends AbstractInputPort {
-
-    @JsonCreator
-    public InputPortImpl(
-            @JsonProperty("name") String name
-    ) {
-        super(name);
+    protected InputPortImpl(Ports<? extends Port> owner, String name) {
+        super(owner, name);
     }
 
     @Override
     public void receive(IOObject object) {
-        System.out.println(String.format("receive data from %s to %s", getSource().getName(), getName()));
         setData(object);
     }
 }

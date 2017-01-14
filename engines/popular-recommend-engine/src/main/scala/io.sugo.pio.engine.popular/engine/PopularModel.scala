@@ -1,13 +1,11 @@
 package io.sugo.pio.engine.popular.engine
 
-import io.sugo.pio.engine.common.data.QueryableModelData
 import io.sugo.pio.engine.common.lucene.RepositoryDirectory
 import io.sugo.pio.engine.common.utils.LuceneUtils
 import io.sugo.pio.engine.data.output.Repository
 import io.sugo.pio.engine.popular.data.PopularModelData
 import io.sugo.pio.engine.popular.{Constants, LucenceConstants}
 import io.sugo.pio.engine.training.Model
-import io.sugo.pio.spark.engine.training.Model
 import org.apache.lucene.document._
 
 

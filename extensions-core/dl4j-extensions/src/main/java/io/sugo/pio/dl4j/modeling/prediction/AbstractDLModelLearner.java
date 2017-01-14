@@ -24,16 +24,11 @@ import java.util.List;
  */
 public abstract class AbstractDLModelLearner extends OperatorChain {
 
-//    protected InputPort trainPort = getInputPorts().createPort("training examples", ExampleSet.class);
-    protected InputPort trainPort = new InputPortImpl("training examples");
-//    protected OutputPort modelPort = getOutputPorts().createPort("model");
-    protected OutputPort modelPort = new OutputPortImpl("model");
-//    protected OutputPort examplePort = getOutputPorts().createPort("examples");
-    protected OutputPort examplePort = new OutputPortImpl("examples");
-//    protected final OutputPort start = getSubprocess(0).getInnerSources().createPort("start");
-    protected final OutputPort start = new OutputPortImpl("start");
-//    protected final InputPort end = getSubprocess(0).getInnerSinks().createPort("end");
-    protected final InputPort end = new InputPortImpl("end");
+    protected InputPort trainPort = getInputPorts().createPort("training examples", ExampleSet.class);
+    protected OutputPort modelPort = getOutputPorts().createPort("model");
+    protected OutputPort examplePort = getOutputPorts().createPort("examples");
+    protected final OutputPort start = getExecutionUnit(0).getInnerSources().createPort("start");
+    protected final InputPort end = getExecutionUnit(0).getInnerSinks().createPort("end");
 
     protected List<AbstractLayer> structure = new LinkedList<AbstractLayer>();
 
@@ -122,11 +117,6 @@ public abstract class AbstractDLModelLearner extends OperatorChain {
 
     public AbstractDLModelLearner() {
         super(null, null, "Layer Structure", null, null);
-        addInputPort(trainPort);
-        addOutputPort(modelPort);
-        addOutputPort(examplePort);
-        addOutputPort(start);
-        addInputPort(end);
     }
 
     @Override

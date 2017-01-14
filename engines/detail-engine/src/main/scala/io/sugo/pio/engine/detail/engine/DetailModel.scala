@@ -1,8 +1,5 @@
 package io.sugo.pio.engine.detail.engine
 
-import java.lang.{Float => jFloat}
-
-import io.sugo.pio.engine.common.data.QueryableModelData
 import io.sugo.pio.engine.common.lucene.RepositoryDirectory
 import io.sugo.pio.engine.common.utils.LuceneUtils
 import io.sugo.pio.engine.data.output.Repository
@@ -11,7 +8,7 @@ import io.sugo.pio.engine.detail.data.DetailModelData
 import io.sugo.pio.engine.training.Model
 import org.apache.lucene.document._
 
-class DetailModel extends Model[DetailModelData, QueryableModelData] with Serializable {
+class DetailModel extends Model[DetailModelData] with Serializable {
 
   override def save(md: DetailModelData, repository: Repository): Unit = {
     val modelData = md.model

@@ -61,13 +61,11 @@ public interface Port extends Serializable{
      */
     IOObject getAnyDataOrNull();
 
-//    /**
-//     * Returns the set of ports to which this port belongs.
-//     */
-//    Ports<? extends Port> getPorts();
-    PortOwner getPortOwner();
+    /**
+     * Returns the set of ports to which this port belongs.
+     */
+    Ports<? extends Port> getPorts();
 
-    void setPortOwner(PortOwner portOwner);
     /**
      * Locks the port so port extenders do not remove the port if disconnected. unlocks it.
      */
