@@ -3,15 +3,16 @@ package io.sugo.pio.engine.als.engine
 import io.sugo.pio.engine.common.data.QueryableModelData
 import io.sugo.pio.engine.common.lucene.RepositoryDirectory
 import io.sugo.pio.engine.common.utils.LuceneUtils
-import io.sugo.pio.spark.engine.Model
-import io.sugo.pio.spark.engine.data.output.Repository
 import org.apache.lucene.document._
 import java.lang.{Float => jFloat}
 
 import io.sugo.pio.engine.als.{Constants, LucenceConstants}
 import io.sugo.pio.engine.als.data.ALSModelData
+import io.sugo.pio.engine.data.output.Repository
+import io.sugo.pio.engine.training.Model
+import io.sugo.pio.spark.engine.training.Model
 
-class ALSDModel extends Model[ALSModelData, QueryableModelData] with Serializable {
+class ALSDModel extends Model[ALSModelData] with Serializable {
 
   override def save(md: ALSModelData, repository: Repository): Unit = {
     val modelData = md.model
@@ -30,9 +31,5 @@ class ALSDModel extends Model[ALSModelData, QueryableModelData] with Serializabl
       })
       indexWriter.close()
     })
-  }
-
-  override def load(repository: Repository): QueryableModelData = {
-   new QueryableModelData(repository)
   }
 }

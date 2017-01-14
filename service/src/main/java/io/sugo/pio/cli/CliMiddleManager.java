@@ -5,6 +5,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
+import com.metamx.common.logger.Logger;
 import io.airlift.airline.Command;
 import io.sugo.pio.common.config.TaskConfig;
 import io.sugo.pio.guice.*;
@@ -26,6 +27,14 @@ import java.util.List;
         description = "Runs a Middle Manager, this is a \"task\" node used as part of the remote indexing service."
 )
 public class CliMiddleManager extends ServerRunnable {
+    private static final Logger log = new Logger(CliMiddleManager.class);
+
+    public CliMiddleManager()
+    {
+        super(log);
+    }
+
+
     @Override
     protected List<? extends Module> getModules() {
         return ImmutableList.<Module>of(
@@ -47,7 +56,7 @@ public class CliMiddleManager extends ServerRunnable {
                         binder.bind(WorkerCuratorCoordinator.class).in(ManageLifecycle.class);
 
                         LifecycleModule.register(binder, WorkerTaskMonitor.class);
-                        binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
+                        binder.bind(JettyServerInitializer.class).to(MiddleManagerJettyServerInitializer.class).in(LazySingleton.class);
                         Jerseys.addResource(binder, WorkerResource.class);
 
                         LifecycleModule.register(binder, Server.class);

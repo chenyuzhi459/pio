@@ -1,6 +1,6 @@
 package io.sugo.pio.engine.common.lucene;
 
-import io.sugo.pio.spark.engine.data.output.LocalFileRepository;
+import io.sugo.pio.engine.data.output.LocalFileRepository;
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;

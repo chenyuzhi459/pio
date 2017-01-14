@@ -13,6 +13,7 @@
         <module>api</module>
         <module>processing</module>
         <module>processing-spark-common</module>
+        <module>processing-engine-common</module>
         <module>processing-spark</module>
         <module>server</module>
         <module>service</module>
@@ -50,6 +51,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.metamx</groupId>
+                <artifactId>http-client</artifactId>
+                <version>1.0.4</version>
+            </dependency>
             <dependency>
                 <groupId>com.metamx</groupId>
                 <artifactId>java-util</artifactId>

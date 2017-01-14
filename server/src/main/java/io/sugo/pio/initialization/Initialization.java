@@ -16,6 +16,7 @@ import io.sugo.pio.curator.CuratorModule;
 import io.sugo.pio.curator.discovery.DiscoveryModule;
 import io.sugo.pio.guice.*;
 import io.sugo.pio.guice.annotations.Json;
+import io.sugo.pio.guice.http.HttpClientModule;
 import io.sugo.pio.metadata.storage.derby.DerbyMetadataStoragePioModule;
 import io.sugo.pio.server.initialization.jetty.JettyServerModule;
 import org.apache.commons.io.FileUtils;
@@ -202,15 +203,17 @@ public class Initialization {
     public static Injector makeInjectorWithModules(final Injector baseInjector, Iterable<? extends Module> modules) {
         final ModuleList defaultModules = new ModuleList(baseInjector);
         defaultModules.addModules(
+                new LifecycleModule(),
+                HttpClientModule.global(),
                 new CuratorModule(),
                 new ServerModule(),
                 new DiscoveryModule(),
-                new LifecycleModule(),
                 new JettyServerModule(),
                 new MetadataConfigModule(),
                 new DerbyMetadataStoragePioModule(),
                 new ProcessPioModule(),
-                new ProcessingPioModule()
+                new ProcessingPioModule(),
+                new JacksonConfigManagerModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);

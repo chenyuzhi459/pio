@@ -30,9 +30,6 @@ import javax.validation.constraints.NotNull;
 public class ServerConfig
 {
   @JsonProperty
-  private int port = 8080;
-
-  @JsonProperty
   @Min(1)
   private int numThreads = Math.max(10, (Runtime.getRuntime().availableProcessors() * 17) / 16 + 2) + 30;
 
@@ -50,15 +47,10 @@ public class ServerConfig
     return maxIdleTime;
   }
 
-  public int getPort() {
-    return port;
-  }
-
   @Override
   public String toString()
   {
     return "ServerConfig{" +
-        "port=" + port +
         ", numThreads=" + numThreads +
         ", maxIdleTime=" + maxIdleTime +
         '}';

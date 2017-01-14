@@ -5,9 +5,9 @@ import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.demo.ItemUtil;
 import io.sugo.pio.engine.popular.Constants;
 import io.sugo.pio.engine.popular.LucenceConstants;
-import io.sugo.pio.engine.popular.query.PopQuery;
-import io.sugo.pio.spark.engine.data.output.LocalFileRepository;
-import io.sugo.pio.spark.engine.data.output.Repository;
+import io.sugo.pio.engine.popular.PopQuery;
+import io.sugo.pio.engine.data.output.LocalFileRepository;
+import io.sugo.pio.engine.data.output.Repository;
 import org.apache.lucene.search.SortField;
 
 import javax.servlet.http.HttpServletRequest;

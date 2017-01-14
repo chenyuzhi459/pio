@@ -1,6 +1,6 @@
 package io.sugo.pio.engine.common.lucene;
 
-import io.sugo.pio.spark.engine.data.output.Repository;
+import io.sugo.pio.engine.data.output.Repository;
 import org.apache.lucene.store.*;
 
 import java.io.IOException;

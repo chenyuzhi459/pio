@@ -5,27 +5,36 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.sun.jersey.spi.container.ResourceFilters;
+import io.sugo.pio.common.config.JacksonConfigManager;
 import io.sugo.pio.common.task.Task;
 import io.sugo.pio.metadata.EntryExistsException;
 import io.sugo.pio.overlord.TaskMaster;
 import io.sugo.pio.overlord.TaskQueue;
+import io.sugo.pio.overlord.setup.WorkerBehaviorConfig;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  */
 @Path("/pio/overlord/")
 public class OverlordResource {
     private final TaskMaster taskMaster;
+    private final JacksonConfigManager configManager;
+
+    private AtomicReference<WorkerBehaviorConfig> workerConfigRef = null;
 
     @Inject
     public OverlordResource(
-        TaskMaster taskMaster){
+        TaskMaster taskMaster,
+        JacksonConfigManager configManager){
         this.taskMaster = taskMaster;
+        this.configManager = configManager;
     }
 
     @GET
@@ -63,6 +72,18 @@ public class OverlordResource {
                     }
                 }
         );
+    }
+
+    @GET
+    @Path("/worker")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getWorkerConfig()
+    {
+        if (workerConfigRef == null) {
+            workerConfigRef = configManager.watch(WorkerBehaviorConfig.CONFIG_KEY, WorkerBehaviorConfig.class);
+        }
+
+        return Response.ok(workerConfigRef.get()).build();
     }
 
     private <T> Response asLeaderWith(Optional<T> x, Function<T, Response> f)

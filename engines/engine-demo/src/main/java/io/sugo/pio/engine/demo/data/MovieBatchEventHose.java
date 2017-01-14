@@ -1,9 +1,8 @@
 package io.sugo.pio.engine.demo.data;
 
 import com.google.common.collect.Maps;
-import io.sugo.pio.engine.demo.ItemUtil;
-import io.sugo.pio.spark.engine.data.input.BatchEventHose;
-import io.sugo.pio.spark.engine.data.input.Event;
+import io.sugo.pio.engine.data.input.BatchEventHose;
+import io.sugo.pio.engine.data.input.Event;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;

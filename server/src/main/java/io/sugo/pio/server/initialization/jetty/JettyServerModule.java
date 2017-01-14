@@ -13,7 +13,9 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.sun.jersey.spi.container.servlet.WebConfig;
+import io.sugo.pio.guice.Self;
 import io.sugo.pio.guice.annotations.JSR311Resource;
+import io.sugo.pio.server.PioNode;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -85,10 +87,10 @@ public class JettyServerModule extends JerseyServletModule
     @Provides
     @LazySingleton
     public Server getServer(
-            final Injector injector, final Lifecycle lifecycle, final ServerConfig config
+            final Injector injector, final Lifecycle lifecycle, @Self final PioNode node, final ServerConfig config
     )
     {
-        final Server server = makeJettyServer(config);
+        final Server server = makeJettyServer(node, config);
         initializeServer(injector, lifecycle, server);
         return server;
     }
@@ -102,7 +104,7 @@ public class JettyServerModule extends JerseyServletModule
         return provider;
     }
 
-    static Server makeJettyServer(ServerConfig config)
+    static Server makeJettyServer(PioNode node, ServerConfig config)
     {
         final QueuedThreadPool threadPool = new QueuedThreadPool();
         threadPool.setMinThreads(config.getNumThreads());
@@ -116,7 +118,7 @@ public class JettyServerModule extends JerseyServletModule
         server.addBean(new ScheduledExecutorScheduler("JettyScheduler", true), true);
 
         ServerConnector connector = new ServerConnector(server);
-        connector.setPort(config.getPort());
+        connector.setPort(node.getPort());
         connector.setIdleTimeout(Ints.checkedCast(config.getMaxIdleTime().toStandardDuration().getMillis()));
         // workaround suggested in -
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=435322#c66 for jetty half open connection issues during failovers

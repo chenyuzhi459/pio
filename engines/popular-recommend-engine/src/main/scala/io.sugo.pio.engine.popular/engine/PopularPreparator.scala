@@ -1,7 +1,7 @@
 package io.sugo.pio.engine.popular.engine
 
 import io.sugo.pio.engine.popular.data.{PopularPreparaData, PopularTrainingData}
-import io.sugo.pio.spark.engine.Preparator
+import io.sugo.pio.engine.training.Preparator
 import org.apache.spark.api.java.JavaSparkContext
 
 /**
