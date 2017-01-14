@@ -9,6 +9,18 @@ import java.io.Serializable;
  */
 public interface Attribute extends Cloneable, Serializable {
 
+    /** Used to identify that this attribute is not part of any example table. */
+    public static final int UNDEFINED_ATTRIBUTE_INDEX = -1;
+
+    /** Used to identify view attributes */
+    public static final int VIEW_ATTRIBUTE_INDEX = -2;
+
+    /**
+     * Indicates a missing value for nominal values. For the internal values and numerical values,
+     * Double.NaN is used which can be checked via {@link Double#isNaN(double)}.
+     */
+    public static final String MISSING_NOMINAL_VALUE = "?";
+
     /**
      * Clones this attribute.
      */
@@ -96,7 +108,7 @@ public interface Attribute extends Cloneable, Serializable {
     /**
      * Returns the value type of this attribute.
      *
-     * @see com.rapidminer.tools.Ontology#ATTRIBUTE_VALUE_TYPE
+     * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_VALUE_TYPE
      */
     int getValueType();
 }

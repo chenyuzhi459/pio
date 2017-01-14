@@ -39,4 +39,9 @@ public class HadoopExampleSet extends AbstractExampleSet {
     public ExampleTable getExampleTable() {
         return exampleTable;
     }
+
+    @Override
+    public Example getExample(int index) {
+        return null;
+    }
 }

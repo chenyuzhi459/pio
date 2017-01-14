@@ -33,9 +33,6 @@ public final class ProcessRootOperator extends OperatorChain {
 
     /**
      * Convenience backport method to get the results of a process.
-     *
-     * @param omitNullResults if set to <code>false</code> the returned {@link IOContainer} will contain
-     *                        <code>null</code> values for empty results instead of omitting them.
      */
     public IOContainer getResults() {
         List<InputPort> inputPorts = getExecutionUnit(0).getAllInputPorts();

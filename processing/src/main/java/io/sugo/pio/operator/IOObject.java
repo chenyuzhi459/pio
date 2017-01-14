@@ -44,6 +44,8 @@ public interface IOObject extends Serializable {
 	/** Writes the object data into a stream. */
 	public void write(OutputStream out) throws IOException;
 
+	public Annotations getAnnotations();
+
 	/**
 	 * Returns user specified data attached to the IOObject. The key has to be a fully qualified
 	 * name
