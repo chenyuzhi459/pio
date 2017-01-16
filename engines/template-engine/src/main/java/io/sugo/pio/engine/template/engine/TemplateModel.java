@@ -1,15 +1,14 @@
 package io.sugo.pio.engine.template.engine;
 
-import io.sugo.pio.spark.engine.Model;
-import io.sugo.pio.spark.engine.data.output.Repository;
-import org.apache.spark.ml.recommendation.ALSModel;
+import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.template.data.TemplateModelData;
+import io.sugo.pio.engine.training.Model;
 
 import java.io.*;
 
 /**
  */
-public class TemplateModel implements Model<TemplateModelData, TemplateModelData> {
+public class TemplateModel implements Model<TemplateModelData> {
     private final String filename = "model";
 
     @Override
@@ -23,14 +22,4 @@ public class TemplateModel implements Model<TemplateModelData, TemplateModelData
         }
     }
 
-    @Override
-    public TemplateModelData load(Repository repository) {
-        InputStream inputStream = repository.openInput(filename);
-        try {
-            ObjectInputStream objectReader = new ObjectInputStream(inputStream);
-            return new TemplateModelData((ALSModel) objectReader.readObject());
-        } catch (IOException | ClassNotFoundException e) {
-            return null;
-        }
-    }
 }

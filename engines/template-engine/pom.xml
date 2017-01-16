@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>io.sugo</groupId>
-            <artifactId>pio-processing-spark-common</artifactId>
+            <artifactId>pio-processing-engine-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

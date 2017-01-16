@@ -41,6 +41,11 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     private ExecutionUnit enclosingExecutionUnit;
 
+    /**
+     * The {@link OperatorProgress} used to track progress during the execution of the operator.
+     */
+    private final OperatorProgress operatorProgress = new OperatorProgress(this);
+
     public Operator(String name) {
         this.name = name;
 
@@ -341,6 +346,19 @@ public abstract class Operator implements ParameterHandler, Serializable {
         getTransformer().transformMetaData();
     }
 
+    /**
+     */
+    public boolean shouldAutoConnect(OutputPort outputPort) {
+        return true;
+    }
+
+    /**
+     * @see #shouldAutoConnect(OutputPort)
+     */
+    public boolean shouldAutoConnect(InputPort inputPort) {
+        return true;
+    }
+
     final protected void setEnclosingExecutionUnit(ExecutionUnit parent) {
         if (parent != null && this.enclosingExecutionUnit != null) {
             throw new IllegalStateException("Parent already set.");
@@ -366,5 +384,19 @@ public abstract class Operator implements ParameterHandler, Serializable {
     public void freeMemory() {
         getInputPorts().freeMemory();
         getOutputPorts().freeMemory();
+    }
+
+    /**
+     * The {@link OperatorProgress} should be initialized when starting the operator execution by
+     * setting the total amount of progress (which is {@link OperatorProgress#NO_PROGRESS} by
+     * default) by calling {@link OperatorProgress#setTotal(int)}. Afterwards the progress can be
+     * reported by calling {@link OperatorProgress#setCompleted(int)}. The progress will be reset
+     * before the operator is being executed.
+     *
+     * @return the {@link OperatorProgress} to report progress during operator execution.
+     * @since 7.0.0
+     */
+    public final OperatorProgress getProgress() {
+        return operatorProgress;
     }
 }

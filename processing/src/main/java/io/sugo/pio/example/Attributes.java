@@ -59,6 +59,9 @@ public interface Attributes extends Iterable<Attribute>, Cloneable, Serializable
     /** Returns an iterator over all attribute roles, including the special attribute roles. */
     public Iterator<AttributeRole> allAttributeRoles();
 
+    /** Returns true if this attribute set contains the given attribute. */
+    public boolean contains(Attribute attribute);
+
     /** Returns the number of regular attributes. */
     public int size();
 

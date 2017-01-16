@@ -8,7 +8,7 @@ import io.sugo.pio.operator.performance.PerformanceVector;
 
 /**
  */
-public interface Learner {
+public interface Learner extends CapabilityProvider {
     /**
      * Trains a model. This method should be called by apply() and is implemented by subclasses.
      */

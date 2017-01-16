@@ -19,7 +19,7 @@ public class SimpleNeuralNetwork extends AbstractDLModelLearner {
 
     @Override
     public Model learn(ExampleSet exampleSet) {
-        MultiLayerNetModel model = new MultiLayerNetModel();
+        MultiLayerNetModel model = new MultiLayerNetModel(exampleSet);
 
         // retrieve information
         // for the whole model

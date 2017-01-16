@@ -19,6 +19,11 @@ public abstract class AbstractAttributes implements Attributes {
     }
 
     @Override
+    public boolean contains(Attribute attribute) {
+        return findAttributeRole(attribute.getName()) != null;
+    }
+
+    @Override
     public int allSize() {
         return calculateSize(allAttributes());
     }

@@ -2,6 +2,7 @@ package io.sugo.pio.ports;
 
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.ports.metadata.MetaData;
+import io.sugo.pio.ports.metadata.MetaDataError;
 
 import java.io.Serializable;
 
@@ -26,6 +27,9 @@ public interface Port extends Serializable{
      * Returns true if connected to another Port.
      */
     boolean isConnected();
+
+    /** Report an error in the current process setup. */
+    public void addError(MetaDataError metaDataError);
 
     /**
      * Returns the meta data currently assigned to this port.
@@ -65,6 +69,9 @@ public interface Port extends Serializable{
      * Returns the set of ports to which this port belongs.
      */
     Ports<? extends Port> getPorts();
+
+    /** Returns the string "OperatorName.PortName". */
+    public String getSpec();
 
     /**
      * Locks the port so port extenders do not remove the port if disconnected. unlocks it.

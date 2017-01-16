@@ -1,9 +1,10 @@
 package io.sugo.pio.engine.template.engine;
 
+
+import io.sugo.pio.engine.data.input.BatchEventHose;
+import io.sugo.pio.engine.data.input.Event;
 import io.sugo.pio.engine.template.data.TemplateTrainingData;
-import io.sugo.pio.spark.engine.DataSource;
-import io.sugo.pio.spark.engine.data.input.BatchEventHose;
-import io.sugo.pio.spark.engine.data.input.Event;
+import io.sugo.pio.engine.training.DataSource;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;

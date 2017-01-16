@@ -54,7 +54,7 @@ import java.util.zip.ZipFile;
 
 
 /**
- * Tools for RapidMiner.
+ * ExampleTools for RapidMiner.
  *
  * @author Simon Fischer, Ingo Mierswa, Marco Boeck
  */

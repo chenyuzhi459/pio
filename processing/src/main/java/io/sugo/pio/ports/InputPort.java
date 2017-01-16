@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.ports.impl.InputPortImpl;
+import io.sugo.pio.ports.metadata.CompatibilityLevel;
 import io.sugo.pio.ports.metadata.MetaData;
+import io.sugo.pio.ports.metadata.Precondition;
+
+import java.util.Collection;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "inputType", defaultImpl = InputPortImpl.class)
 @JsonSubTypes(value = {
@@ -27,13 +31,15 @@ public interface InputPort extends Port {
      */
     OutputPort getSource();
 
-    /**
-     * Checks all registered preconditions.
-     */
-    void checkPreconditions();
+    /** Adds a precondition to this input port. */
+    public void addPrecondition(Precondition precondition);
 
-    /**
-     * Returns true if the given input is compatible with the preconditions.
-     */
-    boolean isInputCompatible(MetaData input);
+    /** Returns a collection (view) of all preconditions assigned to this InputPort. */
+    public Collection<Precondition> getAllPreconditions();
+
+    /** Checks all registered preconditions. */
+    public void checkPreconditions();
+
+    /** Returns true if the given input is compatible with the preconditions. */
+    public boolean isInputCompatible(MetaData input, CompatibilityLevel level);
 }

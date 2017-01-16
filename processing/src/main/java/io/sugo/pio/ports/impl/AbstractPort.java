@@ -3,11 +3,17 @@ package io.sugo.pio.ports.impl;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.Ports;
+import io.sugo.pio.ports.metadata.MetaDataError;
 import io.sugo.pio.util.ReferenceCache;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
 public abstract class AbstractPort implements Port {
+
+    private final List<MetaDataError> errorList = new LinkedList<>();
     private final Ports<? extends Port> ports;
 
     private String name;
@@ -73,8 +79,22 @@ public abstract class AbstractPort implements Port {
     }
 
     @Override
+    public void addError(MetaDataError metaDataError) {
+        errorList.add(metaDataError);
+    }
+
+    @Override
     public Ports<? extends Port> getPorts() {
         return ports;
+    }
+
+    @Override
+    public String getSpec() {
+        if (getPorts() != null) {
+            return getPorts().getOwner().getOperator().getName() + "." + getName();
+        } else {
+            return "DUMMY." + getName();
+        }
     }
 
     @Override
