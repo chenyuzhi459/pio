@@ -53,7 +53,41 @@ public abstract class AbstractAttributes implements Attributes {
     }
 
     @Override
+    public AttributeRole findRoleByName(String name) {
+        return findRoleByName(name, true);
+    }
+
+    @Override
     public Attribute getLabel() {
         return getSpecial(LABEL_NAME);
+    }
+
+    @Override
+    public boolean remove(Attribute attribute) {
+        AttributeRole role = getRole(attribute);
+        if (role != null) {
+            return remove(role);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public AttributeRole getRole(Attribute attribute) {
+        return getRole(attribute.getName());
+    }
+
+    @Override
+    public AttributeRole getRole(String name) {
+        return findAttributeRole(name);
+    }
+
+    private AttributeRole findAttributeRole(String name) {
+        AttributeRole role = findRoleByName(name);
+        if (role != null) {
+            return role;
+        } else {
+            return findRoleBySpecialName(name);
+        }
     }
 }

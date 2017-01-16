@@ -71,6 +71,11 @@ public class SimpleAttributes extends AbstractAttributes {
         register(attributeRole, false);
     }
 
+    @Override
+    public boolean remove(AttributeRole attributeRole) {
+        return unregister(attributeRole, false);
+    }
+
     /**
      * @param onlyMaps
      *            add only to maps, not to list.
@@ -126,6 +131,21 @@ public class SimpleAttributes extends AbstractAttributes {
         } else {
             String lowerSearchTerm = specialName.toLowerCase();
             for (Map.Entry<String, AttributeRole> entry : specialNameToAttributeRoleMap.entrySet()) {
+                if (lowerSearchTerm.equals(entry.getKey().toLowerCase())) {
+                    return entry.getValue();
+                }
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public AttributeRole findRoleByName(String name, boolean caseSensitive) {
+        if (caseSensitive) {
+            return nameToAttributeRoleMap.get(name);
+        } else {
+            String lowerSearchTerm = name.toLowerCase();
+            for (Map.Entry<String, AttributeRole> entry : nameToAttributeRoleMap.entrySet()) {
                 if (lowerSearchTerm.equals(entry.getKey().toLowerCase())) {
                     return entry.getValue();
                 }

@@ -2,7 +2,6 @@ package io.sugo.pio.operator.io;
 
 
 import io.sugo.pio.tools.Ontology;
-import sun.net.ProgressListener;
 
 import java.util.Date;
 

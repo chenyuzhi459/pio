@@ -3,6 +3,7 @@ package io.sugo.pio.operator.io;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.example.table.DataRowFactory;
+import io.sugo.pio.operator.io.*;
 import io.sugo.pio.parameter.ParameterTypeList;
 import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.tools.Ontology;
@@ -19,7 +20,6 @@ import java.util.Map.Entry;
  * holds information about the final name, the value type, role and if the column is selected at
  * all.
  *
- * @author Sebastian Land, Simon Fischer
  */
 public class DataResultSetTranslationConfiguration {
 
@@ -51,7 +51,7 @@ public class DataResultSetTranslationConfiguration {
 	 * @param readerOperator
 	 * @throws OperatorException
 	 */
-	public DataResultSetTranslationConfiguration(AbstractDataResultSetReader readerOperator) {
+	public DataResultSetTranslationConfiguration(io.sugo.pio.operator.io.AbstractDataResultSetReader readerOperator) {
 		this(readerOperator, null);
 	}
 
@@ -83,12 +83,12 @@ public class DataResultSetTranslationConfiguration {
 	 *
 	 * @throws OperatorException
 	 */
-	private DataResultSetTranslationConfiguration(AbstractDataResultSetReader readerOperator, DataResultSet dataResultSet) {
+	private DataResultSetTranslationConfiguration(io.sugo.pio.operator.io.AbstractDataResultSetReader readerOperator, DataResultSet dataResultSet) {
 		reconfigure(dataResultSet);
 		reconfigure(readerOperator);
 	}
 
-	public void reconfigure(AbstractDataResultSetReader readerOperator) {
+	public void reconfigure(io.sugo.pio.operator.io.AbstractDataResultSetReader readerOperator) {
 		// reading parameter settings
 		if (readerOperator != null) {
 			dataManagementType = readerOperator.getParameterAsInt(PARAMETER_DATAMANAGEMENT);
@@ -124,7 +124,7 @@ public class DataResultSetTranslationConfiguration {
 	}
 
 	/** Sets the parameters in the given operator to describe this configuration. */
-	public void setParameters(AbstractDataResultSetReader operator) {
+	public void setParameters(io.sugo.pio.operator.io.AbstractDataResultSetReader operator) {
 		operator.getParameters().setParameter(PARAMETER_DATE_FORMAT, getDatePattern());
 		// meta data
 		List<String[]> metaDataList = new LinkedList<>();

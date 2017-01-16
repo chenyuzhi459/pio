@@ -19,4 +19,8 @@ public class Example {
         this.data = data;
         this.parentExampleSet = parentExampleSet;
     }
+
+    public double getValue(Attribute a) {
+        return data.get(a);
+    }
 }

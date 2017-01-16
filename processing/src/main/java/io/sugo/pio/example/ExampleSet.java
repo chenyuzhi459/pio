@@ -24,4 +24,7 @@ public interface ExampleSet extends ResultObject, Cloneable, Iterable<Example> {
      * manipulate example to change table data instead of using the table directly.
      */
     ExampleTable getExampleTable();
+
+    /** Clones the example set. */
+    public Object clone();
 }
