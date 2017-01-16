@@ -1,6 +1,8 @@
 package io.sugo.pio.ports.metadata;
 
 import io.sugo.pio.operator.Operator;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
 
 import java.util.LinkedList;
 
@@ -27,4 +29,10 @@ public class MDTransformer {
     public void addRule(MDTransformationRule rule) {
         transformationRules.add(rule);
     }
+
+    /** Convenience method to generate a {@link PassThroughRule}. */
+    public void addPassThroughRule(InputPort input, OutputPort output) {
+        addRule(new PassThroughRule(input, output, false));
+    }
+
 }

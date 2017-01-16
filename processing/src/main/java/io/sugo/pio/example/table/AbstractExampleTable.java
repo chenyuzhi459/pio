@@ -104,7 +104,7 @@ public abstract class AbstractExampleTable implements ExampleTable {
 	 * Adds all {@link Attribute}s in <code>newAttributes</code> to the end of the list of
 	 * attributes, creating new data columns if necessary.
 	 */
-//	@Override
+	@Override
 	public void addAttributes(Collection<Attribute> newAttributes) {
 		Iterator<Attribute> i = newAttributes.iterator();
 		while (i.hasNext()) {
@@ -116,7 +116,7 @@ public abstract class AbstractExampleTable implements ExampleTable {
 	 * Adds the attribute to the list of attributes assigning it a free column index. If the name is
 	 * already in use, the attribute will be renamed.
 	 */
-//	@Override
+	@Override
 	public int addAttribute(Attribute a) {
 
 		if (a == null) {
@@ -152,9 +152,9 @@ public abstract class AbstractExampleTable implements ExampleTable {
 	/**
 	 * Equivalent to calling <code>removeAttribute(attribute.getTableIndex())</code>.
 	 */
-//	@Override
+	@Override
 	public void removeAttribute(Attribute attribute) {
-//		removeAttribute(attribute.getTableIndex());
+		removeAttribute(attribute.getTableIndex());
 	}
 
 	/**
@@ -164,7 +164,7 @@ public abstract class AbstractExampleTable implements ExampleTable {
 	 * intermediate attributes, like a validation chain or a feature generator. If the attribute
 	 * already was removed, this method returns silently.
 	 */
-//	@Override
+	@Override
 	public synchronized void removeAttribute(int index) {
 		Attribute a = attributes.get(index);
 		if (a == null) {

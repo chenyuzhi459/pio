@@ -72,6 +72,11 @@ public class SimpleAttributes extends AbstractAttributes {
     }
 
     @Override
+    public void addRegular(Attribute attribute) {
+        add(new AttributeRole(attribute));
+    }
+
+    @Override
     public boolean remove(AttributeRole attributeRole) {
         return unregister(attributeRole, false);
     }

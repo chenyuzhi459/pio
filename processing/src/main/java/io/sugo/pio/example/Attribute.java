@@ -2,8 +2,10 @@ package io.sugo.pio.example;
 
 import io.sugo.pio.example.table.DataRow;
 import io.sugo.pio.example.table.NominalMapping;
+import io.sugo.pio.operator.Annotations;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 /**
  */
@@ -65,6 +67,20 @@ public interface Attribute extends Cloneable, Serializable {
      */
     void setValue(DataRow row, double value);
 
+    public void addTransformation(AttributeTransformation transformation);
+
+    /** Clear all transformations. */
+    public void clearTransformations();
+
+    /**
+     * Returns an iterator over all statistics objects available for this type of attribute.
+     * Additional statistics can be registered via {@link #registerStatistics(Statistics)}.
+     */
+    public Iterator<Statistics> getAllStatistics();
+
+    /** Registers the attribute statistics. */
+    public void registerStatistics(Statistics statistics);
+
     /**
      * Sets the construction description.
      */
@@ -111,4 +127,7 @@ public interface Attribute extends Cloneable, Serializable {
      * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_VALUE_TYPE
      */
     int getValueType();
+
+    /** Returns a set of annotations for this attribute. */
+    public Annotations getAnnotations();
 }

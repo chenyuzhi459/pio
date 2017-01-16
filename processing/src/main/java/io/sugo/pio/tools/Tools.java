@@ -21,6 +21,7 @@ package io.sugo.pio.tools;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.UserError;
+import io.sugo.pio.tools.plugin.Plugin;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -987,6 +988,28 @@ public class Tools {
             } catch (Throwable t) {
             }
         }
+    }
+
+    /** TODO: Looks like this can be replaced by {@link Plugin#getMajorClassLoader()} */
+    public static Class<?> classForName(String className) throws ClassNotFoundException {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+        }
+        try {
+            return ClassLoader.getSystemClassLoader().loadClass(className);
+        } catch (ClassNotFoundException e) {
+        }
+        Iterator<Plugin> i = Plugin.getAllPlugins().iterator();
+        while (i.hasNext()) {
+            Plugin p = i.next();
+            try {
+                return p.getClassLoader().loadClass(className);
+            } catch (ClassNotFoundException e) {
+                // this wasn't it, so continue
+            }
+        }
+        throw new ClassNotFoundException(className);
     }
 
     /**

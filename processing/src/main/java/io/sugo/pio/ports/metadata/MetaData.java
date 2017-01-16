@@ -2,13 +2,12 @@ package io.sugo.pio.ports.metadata;
 
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -72,6 +71,41 @@ public class MetaData implements Serializable {
             clone.annotations.putAll(annotations);
         }
         return clone;
+    }
+
+    /**
+     * Returns true if isData is compatible with this meta data, where <code>this</code> represents
+     * desired meta data and isData represents meta data that was actually delivered.
+     */
+    public boolean isCompatible(MetaData isData, CompatibilityLevel level) {
+        return getErrorsForInput(null, isData, level).isEmpty();
+    }
+
+    /**
+     * Returns a (possibly empty) list of errors specifying in what regard <code>isData</code>
+     * differs from <code>this</code> meta data specification.
+     *
+     * @param inputPort
+     *            required for generating errors
+     * @param isData
+     *            the data received by the port
+     */
+    public Collection<MetaDataError> getErrorsForInput(InputPort inputPort, MetaData isData, CompatibilityLevel level) {
+        if (!this.dataClass.isAssignableFrom(isData.dataClass)) {
+            return Collections.<MetaDataError> singletonList(new InputMissingMetaDataError(inputPort, this.getObjectClass(),
+                    isData.getObjectClass()));
+        }
+        Collection<MetaDataError> errors = new LinkedList<MetaDataError>();
+        if (level == CompatibilityLevel.VERSION_5) {
+            for (Map.Entry<String, Object> entry : this.keyValueMap.entrySet()) {
+                Object isValue = isData.keyValueMap.get(entry.getKey());
+                if (!entry.getValue().equals(isValue)) {
+                    errors.add(new SimpleMetaDataError(Severity.ERROR, inputPort, "general_property_mismatch", new Object[] {
+                            entry.getKey(), entry.getValue() }));
+                }
+            }
+        }
+        return errors;
     }
 
     public String getDescription() {

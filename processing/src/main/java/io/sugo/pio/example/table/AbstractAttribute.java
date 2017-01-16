@@ -1,11 +1,16 @@
 package io.sugo.pio.example.table;
 
 import io.sugo.pio.example.Attribute;
+import io.sugo.pio.example.AttributeTransformation;
 import io.sugo.pio.example.Attributes;
+import io.sugo.pio.example.Statistics;
+import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.tools.Ontology;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,8 +27,15 @@ public abstract class AbstractAttribute implements Attribute {
 
 	private transient List<Attributes> owners = new LinkedList<Attributes>();
 
+	private final List<AttributeTransformation> transformations = new ArrayList<AttributeTransformation>();
+
+	/** Contains all attribute statistics calculation algorithms. */
+	private List<Statistics> statistics = new LinkedList<Statistics>();
+
 	/** The current attribute construction description object. */
 	private String constructionDescription = null;
+
+	private Annotations annotations = new Annotations();
 
 	private int tableIndex;
 
@@ -36,8 +48,28 @@ public abstract class AbstractAttribute implements Attribute {
 	 * cloned, the other transformations are cloned by reference.
 	 */
 	protected AbstractAttribute(AbstractAttribute attribute) {
+		// copy statistics
+		this.statistics = new LinkedList<Statistics>();
+		for (Statistics statistics : attribute.statistics) {
+			this.statistics.add((Statistics) statistics.clone());
+		}
+
+		// copy transformations if necessary (only the transformation on top of the view stack!)
+		int counter = 0;
+		for (AttributeTransformation transformation : attribute.transformations) {
+			if (counter < attribute.transformations.size() - 1) {
+				addTransformation(transformation);
+			} else {
+				addTransformation((AttributeTransformation) transformation.clone());
+			}
+			counter++;
+		}
+
 		// copy construction description
 		this.constructionDescription = attribute.constructionDescription;
+
+		// copy annotations
+		annotations.putAll(attribute.getAnnotations());
 	}
 
 	/**
@@ -128,6 +160,16 @@ public abstract class AbstractAttribute implements Attribute {
 		row.set(0, newValue, 0);
 	}
 
+	@Override
+	public void addTransformation(AttributeTransformation transformation) {
+		transformations.add(transformation);
+	}
+
+	@Override
+	public void clearTransformations() {
+		this.transformations.clear();
+	}
+
 	/**
 	 * Returns the value type of this attribute.
 	 *
@@ -136,5 +178,21 @@ public abstract class AbstractAttribute implements Attribute {
 	@Override
 	public int getValueType() {
 		return 0;
+	}
+
+	/** Returns the attribute statistics. */
+	@Override
+	public Iterator<Statistics> getAllStatistics() {
+		return statistics.iterator();
+	}
+
+	@Override
+	public void registerStatistics(Statistics statistics) {
+		this.statistics.add(statistics);
+	}
+
+	@Override
+	public Annotations getAnnotations() {
+		return annotations;
 	}
 }

@@ -1,6 +1,7 @@
 package io.sugo.pio.parameter;
 
 import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.error.ParameterError;
 
 /**
  * This exception will be thrown if a non-optional parameter has no default value and was not

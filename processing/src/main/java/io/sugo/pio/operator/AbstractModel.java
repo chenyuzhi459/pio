@@ -49,6 +49,16 @@ public abstract class AbstractModel extends ResultObjectAdapter implements Model
     }
 
     /**
+     * Throws a UserError since most models should not allow additional parameters during
+     * application. However, subclasses may overwrite this method.
+     */
+    @Override
+    public void setParameter(String key, Object value) throws OperatorException {
+        throw new UnsupportedApplicationParameterError(null, getName(), key);
+    }
+
+
+    /**
      * delivers the set Operator or null if no Operator was set.
      */
     public Operator getOperator() {

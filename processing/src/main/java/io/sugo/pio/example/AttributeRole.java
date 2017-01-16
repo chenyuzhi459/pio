@@ -77,4 +77,8 @@ public class AttributeRole implements Serializable {
         }
     }
 
+    public void changeToRegular() {
+        setSpecial(null);
+    }
+
 }

@@ -3,7 +3,7 @@ package io.sugo.pio.example.table.column;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.table.*;
-import io.sugo.pio.operator.io.ExampleSets;
+import io.sugo.pio.example.util.ExampleSets;
 import io.sugo.pio.tools.Ontology;
 
 import java.util.Arrays;

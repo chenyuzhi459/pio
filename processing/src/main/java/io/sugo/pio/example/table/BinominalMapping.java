@@ -36,6 +36,11 @@ public class BinominalMapping implements NominalMapping {
     }
 
     @Override
+    public Object clone() {
+        return new BinominalMapping(this);
+    }
+
+    @Override
     public int mapString(String str) {
         if (str == null) {
             return -1;
