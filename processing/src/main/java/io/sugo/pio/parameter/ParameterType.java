@@ -101,6 +101,21 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
     }
 
     /**
+     * This returns whether this parameter is deprecated.
+     */
+    public boolean isDeprecated() {
+        return this.isDeprecated;
+    }
+
+    /**
+     * This method indicates that this parameter is deprecated and isn't used anymore beside from
+     * loading old process files.
+     */
+    public void setDeprecated() {
+        this.isDeprecated = true;
+    }
+
+    /**
      * Returns true if the values of this parameter type are numerical, i.e. might be parsed by
      * {@link Double#parseDouble(String)}. Otherwise false should be returned. This method might be
      * used by parameter logging operators.

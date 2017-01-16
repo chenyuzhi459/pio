@@ -22,6 +22,9 @@ public class ModelMetaData extends MetaData {
 
 	private ExampleSetMetaData trainingSetMetaData;
 
+	/** Clone constructor */
+	protected ModelMetaData() {}
+
 	public ModelMetaData(ExampleSetMetaData trainingSetMetaData) {
 		this(Model.class, trainingSetMetaData);
 	}
@@ -29,6 +32,12 @@ public class ModelMetaData extends MetaData {
 	public ModelMetaData(Class<? extends Model> mclass, ExampleSetMetaData trainingSetMetaData) {
 		super(mclass);
 		this.trainingSetMetaData = trainingSetMetaData;
+	}
+
+
+	@Override
+	public String getDescription() {
+		return super.getDescription();
 	}
 
 	/**

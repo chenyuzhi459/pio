@@ -4,10 +4,12 @@ import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.Ports;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.Port;
+import io.sugo.pio.ports.metadata.CompatibilityLevel;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.Precondition;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.logging.Level;
 
@@ -65,9 +67,9 @@ public abstract class AbstractInputPort extends AbstractPort implements InputPor
 
 
     @Override
-    public boolean isInputCompatible(MetaData input) {
+    public boolean isInputCompatible(MetaData input, CompatibilityLevel level) {
         for (Precondition precondition : preconditions) {
-            if (!precondition.isCompatible(input)) {
+            if (!precondition.isCompatible(input, level)) {
                 return false;
             }
         }
@@ -78,4 +80,16 @@ public abstract class AbstractInputPort extends AbstractPort implements InputPor
     public boolean isConnected() {
         return sourceOutputPort != null;
     }
+
+    @Override
+    public void addPrecondition(Precondition precondition) {
+        preconditions.add(precondition);
+
+    }
+
+    @Override
+    public Collection<Precondition> getAllPreconditions() {
+        return Collections.unmodifiableCollection(preconditions);
+    }
+
 }

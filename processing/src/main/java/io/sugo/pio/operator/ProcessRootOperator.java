@@ -1,22 +1,21 @@
 package io.sugo.pio.operator;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.parameter.ParameterType;
-import io.sugo.pio.ports.Connection;
-import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.parameter.ParameterTypeInt;
 import io.sugo.pio.ports.InputPorts;
-import io.sugo.pio.ports.Port;
+import io.sugo.pio.tools.ParameterService;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  */
 public final class ProcessRootOperator extends OperatorChain {
-
     public static final String TYPE = "root_operator";
+
+    /** The property name for &quot;The default random seed (-1: random random seed).&quot; */
+    public static final String PROPERTY_RAPIDMINER_GENERAL_RANDOMSEED = "rapidminer.general.randomseed";
+
+    public static final String PARAMETER_RANDOM_SEED = "random_seed";
 
     public ProcessRootOperator(
     ) {
@@ -34,6 +33,17 @@ public final class ProcessRootOperator extends OperatorChain {
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
+        int seed = 2001;
+        String seedProperty = ParameterService.getParameterValue(PROPERTY_RAPIDMINER_GENERAL_RANDOMSEED);
+        try {
+            if (seedProperty != null) {
+                seed = Integer.parseInt(seedProperty);
+            }
+        } catch (NumberFormatException e) {
+        }
+        types.add(new ParameterTypeInt(PARAMETER_RANDOM_SEED,
+                "Global random seed for random generators (-1 for initialization by system time).", Integer.MIN_VALUE,
+                Integer.MAX_VALUE, seed));
         return types;
     }
 }

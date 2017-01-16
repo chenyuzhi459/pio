@@ -30,10 +30,10 @@ public class ModelApplier extends Operator {
     /** Indicates if preprocessing models should create a view instead of changing the data. */
     private static final String PARAMETER_CREATE_VIEW = "create_view";
 
-//    private final InputPort modelInput = getInputPorts().createPort("model");
-//    private final InputPort exampleSetInput = getInputPorts().createPort("unlabelled data");
-//    private final OutputPort exampleSetOutput = getOutputPorts().createPort("labelled data");
-//    private final OutputPort modelOutput = getOutputPorts().createPort("model");
+    private final InputPort modelInput = getInputPorts().createPort("model");
+    private final InputPort exampleSetInput = getInputPorts().createPort("unlabelled data");
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort("labelled data");
+    private final OutputPort modelOutput = getOutputPorts().createPort("model");
 
     public ModelApplier() {
         super("modelApplier");

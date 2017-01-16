@@ -1,10 +1,21 @@
 package io.sugo.pio.dl4j.model;
 
+import io.sugo.pio.dl4j.DL4JConvert;
+import io.sugo.pio.example.Attribute;
+import io.sugo.pio.example.Attributes;
+import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.example.set.ExampleSetUtilities;
+import io.sugo.pio.example.table.NominalMapping;
+import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.learner.PredictionModel;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.DataSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A multilayer network model.
@@ -39,10 +50,40 @@ public class MultiLayerNetModel extends PredictionModel {
      */
     private MultiLayerNetwork model;
 
+
+    /**
+     * The list stores feature names.
+     */
+    List<String> featureNames;
+
+    /**
+     * The means of features of the training data, typically used for normalization.
+     */
+    private INDArray columnMeans = null;
+
+    /**
+     * The standard deviation of features of the training data, typically used for normalization.
+     */
+    private INDArray columnStds = null;
+
     /**
      * The configuration information of the mutilayer network model.
      */
     private MultiLayerConfiguration configuration;
+
+    public MultiLayerNetModel(ExampleSet exampleSet) {
+        super(exampleSet,ExampleSetUtilities.SetsCompareOption.ALLOW_SUPERSET, ExampleSetUtilities.TypesCompareOption.ALLOW_SAME_PARENTS);
+
+        // record the attributes
+        Attributes attributes = exampleSet.getAttributes();
+        featureNames = new ArrayList<String>();
+        for (Attribute attribute : attributes){
+            featureNames.add(attribute.getName());
+        }
+
+        model = null;
+        configuration = null;
+    }
 
     /**
      * Train the data.
@@ -63,5 +104,75 @@ public class MultiLayerNetModel extends PredictionModel {
 
     public MultiLayerNetModel clone(){
         return null;
+    }
+
+    /**
+     * Retrieve the nominal mapping that maps the label names to numerics.
+     * @return the nominal mapping
+     */
+    public NominalMapping getLabelMapping(){
+        return getLabel().getMapping();
+    }
+
+    /**
+     * Retrieve the names of labels, i.e. the possible values of the label attributes.
+     * @return a list of the label names
+     */
+    public List<String> getLabelName(){
+        return getLabelMapping().getValues();
+    }
+
+    @Override
+    public ExampleSet performPrediction(ExampleSet exampleSet, Attribute predictedLabel) throws OperatorException {
+        if (exampleSet.getAttributes().getPredictedLabel() != predictedLabel){
+            exampleSet.getAttributes().setPredictedLabel(predictedLabel);
+        }
+
+        // construct the table of features
+        int feature_num = featureNames.size();
+        int row_num = exampleSet.size();
+        double[][] featuresMatrix = new double[row_num][feature_num];
+
+        int counter = 0;
+        for (Example e : exampleSet){
+            for (int i=0; i<feature_num; i++){
+                double d = e.getValue(exampleSet.getAttributes().get(featureNames.get(i)));
+                featuresMatrix[counter][i] = d;
+            }
+            counter++;
+        }
+
+        // build the 2d-array of the features
+        INDArray features = org.nd4j.linalg.factory.Nd4j.create(featuresMatrix);
+
+        // normalize features in the same way that the training data is normalized.
+        if (columnMeans != null && columnStds != null){
+            features = features.subiRowVector(columnMeans);
+            features = features.diviRowVector(columnStds);
+        }
+
+        // make prediction
+        INDArray output = model.output(features);
+
+		/*
+		 * convert the output 2d-array to the specified attribute in the exampleset,
+		 * together with the confidences on each label
+		 */
+        int[] indices = DL4JConvert.getMax(output);
+        NominalMapping mapping = getLabelMapping();
+        int numLabel = mapping.getValues().size();
+
+        counter = 0;
+        for (Example e : exampleSet){
+
+            e.setPredictedLabel(indices[counter]);
+
+            for (int i=0; i<numLabel; i++){
+                e.setConfidence(mapping.mapIndex(i), output.getRow(counter).getDouble(i));
+            }
+            counter++;
+        }
+
+        return exampleSet;
     }
 }

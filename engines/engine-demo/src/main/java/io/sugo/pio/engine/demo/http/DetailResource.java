@@ -3,8 +3,8 @@ package io.sugo.pio.engine.demo.http;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.demo.ItemUtil;
-import io.sugo.pio.engine.ur.detail.Constants;
-import io.sugo.pio.engine.ur.detail.URDetailQuery;
+import io.sugo.pio.engine.detail.Constants;
+import io.sugo.pio.engine.detail.DetailQuery;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 
@@ -44,7 +44,7 @@ public class DetailResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            URDetailQuery query = jsonMapper.readValue(in, URDetailQuery.class);
+            DetailQuery query = jsonMapper.readValue(in, DetailQuery.class);
             Map<String, Object> map = new LinkedHashMap<>();
 
             if (query.getItemId() != null) {

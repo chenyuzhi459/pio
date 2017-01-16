@@ -1,9 +1,6 @@
 package io.sugo.pio.example.table;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -77,8 +74,68 @@ public class PolynominalMapping implements NominalMapping {
         return indexToSymbolMap.get(index);
     }
 
+    /**
+     * Returns the index of the first value if this attribute is a classification attribute, i.e. if
+     * it is binominal.
+     */
+    @Override
+    public int getNegativeIndex() {
+        ensureClassification();
+        if (mapIndex(0) == null) {
+            throw new AttributeTypeException("Attribute: Cannot use FIRST_CLASS_INDEX for negative class!");
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the index of the second value if this attribute is a classification attribute. Works
+     * for all binominal attributes.
+     */
+    @Override
+    public int getPositiveIndex() {
+        ensureClassification();
+        if (mapIndex(0) == null) {
+            throw new AttributeTypeException("Attribute: Cannot use FIRST_CLASS_INDEX for negative class!");
+        }
+        Iterator<Integer> i = symbolToIndexMap.values().iterator();
+        while (i.hasNext()) {
+            int index = i.next();
+            if (index != 0) {
+                return index;
+            }
+        }
+        throw new AttributeTypeException("Attribute: No other class than FIRST_CLASS_INDEX found!");
+    }
+
+    @Override
+    public String getNegativeString() {
+        return mapIndex(getNegativeIndex());
+    }
+
+    @Override
+    public String getPositiveString() {
+        return mapIndex(getPositiveIndex());
+    }
+
     @Override
     public List<String> getValues() {
         return null;
     }
+
+    /** Returns the number of different nominal values. */
+    @Override
+    public int size() {
+        return indexToSymbolMap.size();
+    }
+
+
+    /**
+     * Throws a runtime exception if this attribute is not a classification attribute.
+     */
+    private void ensureClassification() {
+        if (size() != 2) {
+            throw new AttributeTypeException("Attribute " + this.toString() + " is not a classification attribute!");
+        }
+    }
+
 }
