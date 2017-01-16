@@ -6,8 +6,8 @@ import io.sugo.pio.ports.metadata.MetaData;
 /**
  */
 public abstract class AbstractOutputPort extends AbstractPort implements OutputPort {
-    protected AbstractOutputPort(String name) {
-        super(name);
+    protected AbstractOutputPort(Ports<? extends Port> owner, String name) {
+        super(owner, name);
     }
 
     private InputPort connectedTo;
@@ -53,5 +53,12 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
 
         this.connectedTo = inputPort;
         ((AbstractInputPort) inputPort).connect(this);
+    }
+
+    @Override
+    public void disconnect() {
+        ((AbstractInputPort) this.connectedTo).connect(null);
+        this.connectedTo.receive(null);
+        this.connectedTo = null;
     }
 }

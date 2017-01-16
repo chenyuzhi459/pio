@@ -3,7 +3,7 @@ package io.sugo.pio.engine.common.data;
 import io.sugo.pio.engine.common.lucene.RepositoryDirectory;
 import io.sugo.pio.engine.common.lucene.SearchResult;
 import io.sugo.pio.engine.common.utils.LuceneUtils;
-import io.sugo.pio.spark.engine.data.output.Repository;
+import io.sugo.pio.engine.data.output.Repository;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;

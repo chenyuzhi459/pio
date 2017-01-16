@@ -174,8 +174,7 @@ public class MapReduceHDFSHandler {
         SupportVectorMachine("io.sugo.pio.spark.runner.SparkSupportVectorMachineRunner"),
         SparkScript_Python("org.apache.spark.deploy.PythonRunner"),
         SparkScript_R("org.apache.spark.deploy.RRunner"),
-        GenerateData("io.sugo.pio.spark.runner.GenerateDataRunner"),
-        CustomEngine("io.sugo.pio.spark.runner.SparkCustomEngineRunner");
+        GenerateData("io.sugo.pio.spark.runner.GenerateDataRunner");
 
         private String sparkClassName;
 

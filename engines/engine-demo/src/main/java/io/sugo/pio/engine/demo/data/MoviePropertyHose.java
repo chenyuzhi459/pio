@@ -1,7 +1,7 @@
 package io.sugo.pio.engine.demo.data;
 
 import com.google.common.collect.Maps;
-import io.sugo.pio.spark.engine.data.input.PropertyHose;
+import io.sugo.pio.engine.data.input.PropertyHose;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;

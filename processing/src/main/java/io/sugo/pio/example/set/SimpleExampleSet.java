@@ -47,54 +47,24 @@ public class SimpleExampleSet extends AbstractExampleSet {
 	private Attributes attributes = new SimpleAttributes();
 
 	/**
-	 * Constructs a new SimpleExampleSet backed by the given example table. The example set
-	 * initially does not have any special attributes but all attributes from the given table will
-	 * be used as regular attributes.
-	 *
-	 * If you are constructing the example set from a {@link MemoryExampleTable}, you should use the
-	 * method {@link MemoryExampleTable#createExampleSet()} instead unless you are absolutely sure
-	 * what you are doing.
 	 */
 	public SimpleExampleSet(ExampleTable exampleTable) {
 		this(exampleTable, null, null);
 	}
 
 	/**
-	 * Constructs a new SimpleExampleSet backed by the given example table. The example set
-	 * initially does not have any special attributes but all attributes from the given table will
-	 * be used as regular attributes.
-	 *
-	 * If you are constructing the example set from a {@link MemoryExampleTable}, you should use the
-	 * method {@link MemoryExampleTable#createExampleSet()} instead unless you are absolutely sure
-	 * what you are doing.
 	 */
 	public SimpleExampleSet(ExampleTable exampleTable, List<Attribute> regularAttributes) {
 		this(exampleTable, regularAttributes, null);
 	}
 
 	/**
-	 * Constructs a new SimpleExampleSet backed by the given example table. All attributes in the
-	 * table apart from the special attributes become normal (regular) attributes. The special
-	 * attributes are specified by the given map. The ordering of the attributes is defined by the
-	 * iteration order of the map.
-	 *
-	 * If you are constructing the example set from a {@link MemoryExampleTable}, you should use the
-	 * method {@link MemoryExampleTable#createExampleSet(Map)} instead unless you are absolutely
-	 * sure what you are doing.
 	 */
 	public SimpleExampleSet(ExampleTable exampleTable, Map<Attribute, String> specialAttributes) {
 		this(exampleTable, null, specialAttributes);
 	}
 
 	/**
-	 * Constructs a new SimpleExampleSet backed by the given example table. All attributes in the
-	 * table defined in the regular attribute list apart from those (also) defined the special
-	 * attributes become normal (regular) attributes. The special attributes are specified by the
-	 * given map. The ordering of the attributes is defined by the iteration order of the map.
-	 *
-	 * If you are constructing the example set from a {@link MemoryExampleTable}, you should use the
-	 * method {@link MemoryExampleTable#createExampleSet(Map)} instead unless you are absolutely
-	 * sure what you are doing.
 	 */
 	public SimpleExampleSet(ExampleTable exampleTable, List<Attribute> regularAttributes,
 							Map<Attribute, String> specialAttributes) {
@@ -140,6 +110,16 @@ public class SimpleExampleSet extends AbstractExampleSet {
 	@Override
 	public ExampleTable getExampleTable() {
 		return exampleTable;
+	}
+
+	@Override
+	public Example getExample(int index) {
+		DataRow dataRow = getExampleTable().getDataRow(index);
+		if (dataRow == null) {
+			return null;
+		} else {
+			return new Example(dataRow, this);
+		}
 	}
 
 	@Override

@@ -5,9 +5,9 @@ import io.sugo.pio.engine.als.Constants;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.demo.ItemUtil;
 import io.sugo.pio.engine.popular.LucenceConstants;
-import io.sugo.pio.engine.als.AlsQuery;
-import io.sugo.pio.spark.engine.data.output.LocalFileRepository;
-import io.sugo.pio.spark.engine.data.output.Repository;
+import io.sugo.pio.engine.als.ALSQuery;
+import io.sugo.pio.engine.data.output.LocalFileRepository;
+import io.sugo.pio.engine.data.output.Repository;
 import org.apache.lucene.search.SortField;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +46,7 @@ public class ALSResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            AlsQuery query = jsonMapper.readValue(in, AlsQuery.class);
+            ALSQuery query = jsonMapper.readValue(in, ALSQuery.class);
             Map<String, Object> map = new LinkedHashMap<>();
 
             if (query.getUserId() != null) {

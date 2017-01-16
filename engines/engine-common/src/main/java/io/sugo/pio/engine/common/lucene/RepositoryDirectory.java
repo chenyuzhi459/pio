@@ -1,12 +1,10 @@
 package io.sugo.pio.engine.common.lucene;
 
-import io.sugo.pio.spark.engine.data.output.FSInputStream;
-import io.sugo.pio.spark.engine.data.output.Repository;
-import org.apache.hadoop.fs.FSDataInputStream;
+import io.sugo.pio.engine.data.output.FSInputStream;
+import io.sugo.pio.engine.data.output.Repository;
 import org.apache.lucene.store.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 
 /**

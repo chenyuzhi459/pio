@@ -16,13 +16,11 @@ import java.util.Collection;
  */
 public abstract class AbstractLayer extends Operator {
 
-    private final InputPort inPort = new InputPortImpl("through");
-    private final OutputPort outPort = new OutputPortImpl("through");
+    private final InputPort inPort = getInputPorts().createPort("through");
+    private final OutputPort outPort = getOutputPorts().createPort("through");
 
     public AbstractLayer(String name) {
-        super(name, null, null);
-        addInputPort(inPort);
-        addOutputPort(outPort);
+        super(name);
     }
 
     public abstract Layer getLayer();

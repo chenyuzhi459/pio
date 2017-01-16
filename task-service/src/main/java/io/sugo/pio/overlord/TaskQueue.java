@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import io.sugo.pio.common.TaskStatus;
 import io.sugo.pio.common.task.Task;
@@ -12,6 +13,9 @@ import io.sugo.pio.overlord.config.TaskQueueConfig;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -25,6 +29,17 @@ public class TaskQueue {
     private final ReentrantLock giant = new ReentrantLock(true);
 
     private volatile boolean active = false;
+
+    private final ExecutorService managerExec = Executors.newSingleThreadExecutor(
+            new ThreadFactoryBuilder()
+                    .setDaemon(false)
+                    .setNameFormat("TaskQueue-Manager").build()
+    );
+    private final ScheduledExecutorService storageSyncExec = Executors.newSingleThreadScheduledExecutor(
+            new ThreadFactoryBuilder()
+                    .setDaemon(false)
+                    .setNameFormat("TaskQueue-StorageSync").build()
+    );
 
     @Inject
     public TaskQueue(

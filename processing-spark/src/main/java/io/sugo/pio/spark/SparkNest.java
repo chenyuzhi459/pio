@@ -29,9 +29,8 @@ public class SparkNest extends OperatorChain {
     }
 
     @JsonCreator
-    public SparkNest(@JsonProperty("connections") List<Connection> connections,
-                     @JsonProperty("execUnits") List<ExecutionUnit> execUnits) {
-        super(connections, execUnits, "Spark Nest", null, null);
+    public SparkNest() {
+        super("Spark Nest");
         // init the yarn connection
         HadoopConnectionEntry hadoopConnection = HadoopConnectionService.getConnectionEntry(sparkConfig);
         mapReduceHDFSHandler = new MapReduceHDFSHandler(hadoopConnection, sparkConfig);

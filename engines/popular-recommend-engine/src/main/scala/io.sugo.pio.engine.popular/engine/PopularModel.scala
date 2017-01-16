@@ -1,16 +1,15 @@
 package io.sugo.pio.engine.popular.engine
 
-import io.sugo.pio.engine.common.data.QueryableModelData
 import io.sugo.pio.engine.common.lucene.RepositoryDirectory
 import io.sugo.pio.engine.common.utils.LuceneUtils
+import io.sugo.pio.engine.data.output.Repository
 import io.sugo.pio.engine.popular.data.PopularModelData
 import io.sugo.pio.engine.popular.{Constants, LucenceConstants}
-import io.sugo.pio.spark.engine.Model
-import io.sugo.pio.spark.engine.data.output.Repository
+import io.sugo.pio.engine.training.Model
 import org.apache.lucene.document._
 
 
-class PopularModel extends Model[PopularModelData, QueryableModelData] {
+class PopularModel extends Model[PopularModelData] {
   override def save(md: PopularModelData, repository: Repository): Unit = {
     val resItem = md.itemPopular
     resItem.coalesce(1).foreachPartition(iter => {
@@ -28,9 +27,5 @@ class PopularModel extends Model[PopularModelData, QueryableModelData] {
       })
       indexWriter.close()
     })
-  }
-
-  override def load(repository: Repository): QueryableModelData = {
-    new QueryableModelData(repository)
   }
 }

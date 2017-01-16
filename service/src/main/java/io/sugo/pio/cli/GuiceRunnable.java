@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.metamx.common.lifecycle.Lifecycle;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.initialization.Initialization;
 
 import java.util.List;
@@ -12,10 +13,13 @@ import java.util.List;
 /**
  */
 public abstract class GuiceRunnable implements Runnable {
+    private final Logger log;
+
     private Injector baseInjector;
 
-    public GuiceRunnable()
+    public GuiceRunnable(Logger log)
     {
+        this.log = log;
     }
 
     @Inject
@@ -31,11 +35,17 @@ public abstract class GuiceRunnable implements Runnable {
         try {
             final Lifecycle lifecycle = injector.getInstance(Lifecycle.class);
 
+            log.info(
+                    "Starting up with processors[%,d], memory[%,d].",
+                    Runtime.getRuntime().availableProcessors(),
+                    Runtime.getRuntime().totalMemory()
+            );
+
             try {
                 lifecycle.start();
             }
             catch (Throwable t) {
-                t.printStackTrace();
+                log.error(t, "Error when starting up.  Failing.");
                 System.exit(1);
             }
 

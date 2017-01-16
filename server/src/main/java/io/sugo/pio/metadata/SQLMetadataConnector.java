@@ -4,6 +4,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
+import com.metamx.common.ISE;
 import com.metamx.common.RetryUtils;
 import com.metamx.common.logger.Logger;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -12,11 +13,13 @@ import org.skife.jdbi.v2.exceptions.DBIException;
 import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
 import org.skife.jdbi.v2.exceptions.UnableToObtainConnectionException;
 import org.skife.jdbi.v2.tweak.HandleCallback;
+import org.skife.jdbi.v2.util.ByteArrayMapper;
 import org.skife.jdbi.v2.util.IntegerMapper;
 
 import java.sql.SQLException;
 import java.sql.SQLRecoverableException;
 import java.sql.SQLTransientException;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -25,7 +28,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     private static final Logger log = new Logger(SQLMetadataConnector.class);
     private static final String PAYLOAD_TYPE = "BLOB";
 
-    public static final int DEFAULT_MAX_TRIES = 10;
+    public static final int DEFAULT_MAX_TRIES = 0;
 
     private final Supplier<MetadataStorageConnectorConfig> config;
     private final Supplier<MetadataStorageTablesConfig> tablesConfigSupplier;
@@ -153,6 +156,24 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         }
     }
 
+
+    public void createConfigTable(final String tableName)
+    {
+        createTable(
+                tableName,
+                ImmutableList.of(
+                        String.format(
+                                "CREATE TABLE %1$s (\n"
+                                        + "  name VARCHAR(255) NOT NULL,\n"
+                                        + "  payload %2$s NOT NULL,\n"
+                                        + "  PRIMARY KEY(name)\n"
+                                        + ")",
+                                tableName, getPayloadType()
+                        )
+                )
+        );
+    }
+
     @Override
     public Void insertOrUpdate(
             final String tableName,
@@ -222,30 +243,6 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         return dataSource;
     }
 
-    public void createEngineTable(final String tableName)
-    {
-        createTable(
-                tableName,
-                ImmutableList.of(
-                        String.format(
-                                "CREATE TABLE %1$s (\n"
-                                        + "  id VARCHAR(255) NOT NULL,\n"
-                                        + "  payload %2$s NOT NULL,\n"
-                                        + "  PRIMARY KEY (id)\n"
-                                        + ")",
-                                tableName, getPayloadType()
-                        )
-                )
-        );
-    }
-
-    @Override
-    public void createEngineTable() {
-        if (config.get().isCreateTables()) {
-            createEngineTable(tablesConfigSupplier.get().getEngineTable());
-        }
-    }
-
     public void createOperatorProcessTable(final String tableName)
     {
         createTable(
@@ -274,4 +271,62 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
             createOperatorProcessTable(tablesConfigSupplier.get().getOperatorProcessTable());
         }
     }
+
+    @Override
+    public void createConfigTable()
+    {
+        if (config.get().isCreateTables()) {
+            createConfigTable(tablesConfigSupplier.get().getConfigTable());
+        }
+    }
+
+    @Override
+    public byte[] lookup(
+            final String tableName,
+            final String keyColumn,
+            final String valueColumn,
+            final String key
+    )
+    {
+        return getDBI().withHandle(
+                new HandleCallback<byte[]>()
+                {
+                    @Override
+                    public byte[] withHandle(Handle handle) throws Exception
+                    {
+                        return lookupWithHandle(handle, tableName, keyColumn, valueColumn, key);
+                    }
+                }
+        );
+    }
+
+    public byte[] lookupWithHandle(
+            final Handle handle,
+            final String tableName,
+            final String keyColumn,
+            final String valueColumn,
+            final String key
+    )
+    {
+        final String selectStatement = String.format(
+                "SELECT %s FROM %s WHERE %s = :key", valueColumn,
+                tableName, keyColumn
+        );
+
+        List<byte[]> matched = handle.createQuery(selectStatement)
+                .bind("key", key)
+                .map(ByteArrayMapper.FIRST)
+                .list();
+
+        if (matched.isEmpty()) {
+            return null;
+        }
+
+        if (matched.size() > 1) {
+            throw new ISE("Error! More than one matching entry[%d] found for [%s]?!", matched.size(), key);
+        }
+
+        return matched.get(0);
+    }
+
 }

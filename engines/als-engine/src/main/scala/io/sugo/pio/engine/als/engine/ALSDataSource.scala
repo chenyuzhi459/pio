@@ -1,15 +1,13 @@
 package io.sugo.pio.engine.als.engine
 
 import io.sugo.pio.engine.als.data.ALSTrainingData
-import io.sugo.pio.spark.engine.DataSource
-import io.sugo.pio.spark.engine.data.input.{BatchEventHose, PropertyHose}
+import io.sugo.pio.engine.data.input.BatchEventHose
+import io.sugo.pio.engine.training.DataSource
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.sql.SQLContext
 
-import scala.collection.JavaConverters._
-
-class ALSDataSource(propertyHose: PropertyHose, batchEventHose: BatchEventHose) extends DataSource[ALSTrainingData] with Serializable {
+class ALSDataSource(batchEventHose: BatchEventHose) extends DataSource[ALSTrainingData] with Serializable {
   override def readTraining(javaSparkContext: JavaSparkContext): ALSTrainingData = {
     val sc = javaSparkContext.sc
     val events = batchEventHose.find(sc).rdd
@@ -19,7 +17,6 @@ class ALSDataSource(propertyHose: PropertyHose, batchEventHose: BatchEventHose) 
         e.getProperties.get("movieId").asInstanceOf[Int],
         e.getProperties.get("rating").asInstanceOf[Float])
     })
-    val itemRdd = propertyHose.find(sc).rdd.map(s => s.asScala.toMap)
-    ALSTrainingData(trainingData, itemRdd)
+    ALSTrainingData(trainingData)
   }
 }

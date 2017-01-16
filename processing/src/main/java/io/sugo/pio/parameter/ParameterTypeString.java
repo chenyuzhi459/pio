@@ -10,6 +10,16 @@ public class ParameterTypeString extends ParameterType {
         this.defaultValue = defaultValue;
     }
 
+    public ParameterTypeString(String key, String description, boolean optional) {
+        super(key, description);
+        this.defaultValue = null;
+        setOptional(optional);
+    }
+
+    public ParameterTypeString(String key, String description) {
+        this(key, description, true);
+    }
+
     @Override
     public Object getDefaultValue() {
         return defaultValue;

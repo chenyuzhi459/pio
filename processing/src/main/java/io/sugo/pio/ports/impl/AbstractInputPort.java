@@ -1,19 +1,21 @@
 package io.sugo.pio.ports.impl;
 
-import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortOwner;
+import io.sugo.pio.ports.Ports;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.Precondition;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.logging.Level;
 
 /**
  */
 public abstract class AbstractInputPort extends AbstractPort implements InputPort {
-    protected AbstractInputPort(String name) {
-        super(name);
+    protected AbstractInputPort(Ports<? extends Port> owner, String name) {
+        super(owner, name);
     }
 
     private final Collection<Precondition> preconditions = new LinkedList<>();
@@ -46,7 +48,7 @@ public abstract class AbstractInputPort extends AbstractPort implements InputPor
 
     @Override
     public MetaData getMetaData() {
-            return metaData;
+        return metaData;
     }
 
     @SuppressWarnings("unchecked")

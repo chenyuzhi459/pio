@@ -1,13 +1,9 @@
 package io.sugo.pio.engine.demo;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.demo.http.ALSTraining;
 import io.sugo.pio.engine.demo.http.DetailTraining;
 import io.sugo.pio.engine.demo.http.PopularTraining;
-import io.sugo.pio.spark.engine.data.input.PropertyHose;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;

@@ -36,7 +36,7 @@ public class CreateTables extends GuiceRunnable
 
   public CreateTables()
   {
-    super();
+    super(log);
   }
 
   @Override
@@ -86,7 +86,6 @@ public class CreateTables extends GuiceRunnable
   {
     final Injector injector = makeInjector();
     MetadataStorageConnector dbConnector = injector.getInstance(MetadataStorageConnector.class);
-    dbConnector.createEngineTable();
     dbConnector.createOperatorProcessTable();
 //    dbConnector.createDataSourceTable();
 //    dbConnector.createPendingSegmentsTable();

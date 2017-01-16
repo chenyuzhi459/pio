@@ -2,10 +2,10 @@ package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.operator.execution.UnitExecutionFactory;
 import io.sugo.pio.operator.execution.UnitExecutor;
-import io.sugo.pio.ports.InputPort;
-import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.*;
 
 import java.io.Serializable;
 import java.util.*;
@@ -13,30 +13,93 @@ import java.util.*;
 /**
  */
 public class ExecutionUnit implements Serializable {
+    private final PortOwner portOwner = new PortOwner() {
+        @Override
+        public Operator getOperator() {
+            return getEnclosingOperator();
+        }
+    };
+
+    private String name;
 
     private OperatorChain enclosingOperator;
-    private List<Operator> operators;
+    private final InputPorts innerInputPorts;
+    private final OutputPorts innerOutputPorts;
+    private List<Operator> operators = new ArrayList<>();
 
     @JsonCreator
     public ExecutionUnit(
-            @JsonProperty("operators") List<Operator> operators
+            OperatorChain enclosingOperator, String name
     ) {
-        this.operators = operators;
-        for(Operator opt : operators){
-            opt.setEnclosingExecutionUnit(this);
+        this.name = name;
+
+        this.enclosingOperator = enclosingOperator;
+        innerInputPorts = enclosingOperator.createInnerSinks(portOwner);
+        innerOutputPorts = enclosingOperator.createInnerSources(portOwner);
+    }
+
+    public InputPorts getInnerSinks() {
+        return innerInputPorts;
+    }
+
+    public OutputPorts getInnerSources() {
+        return innerOutputPorts;
+    }
+
+    /**
+     * Same as {@link #addOperator(Operator, boolean)}.
+     */
+    public int addOperator(Operator operator) {
+        return addOperator(operator, true);
+    }
+
+    /**
+     * Adds the operator to this execution unit.
+     *
+     * @param registerWithProcess
+     *            Typically true. If false, the operator will not be registered with its parent
+     *            process.
+     * @return the new index of the operator.
+     */
+    public int addOperator(Operator operator, boolean registerWithProcess) {
+        if (operator == null) {
+            throw new NullPointerException("operator cannot be null!");
+        }
+        if (operator instanceof ProcessRootOperator) {
+            throw new IllegalArgumentException(
+                    "'Process' operator cannot be added. It must always be the top-level operator!");
+        }
+        operators.add(operator);
+        registerOperator(operator, registerWithProcess);
+        return operators.size() - 1;
+    }
+
+    /**
+     * Adds the operator to this execution unit. The operator at this index and all subsequent
+     * operators are shifted to the right. The operator is registered automatically.
+     */
+    public void addOperator(Operator operator, int index) {
+        if (operator == null) {
+            throw new NullPointerException("operator cannot be null!");
+        }
+        if (operator instanceof ProcessRootOperator) {
+            throw new IllegalArgumentException(
+                    "'Process' operator cannot be added. It must always be the top-level operator!");
+        }
+        operators.add(index, operator);
+        registerOperator(operator, true);
+    }
+
+    private void registerOperator(Operator operator, boolean registerWithProcess) {
+        operator.setEnclosingExecutionUnit(this);
+        OperatorProcess process = getEnclosingOperator().getProcess();
+        if (process != null && registerWithProcess) {
+            operator.registerOperator(process);
         }
     }
 
     public void setEnclosingOperator(OperatorChain enclosingOperator) {
         this.enclosingOperator = enclosingOperator;
-    }
-
-    public List<InputPort> getAllInputPorts(){
-        List<InputPort> inputPorts = new ArrayList<>();
-        for(Operator opt : operators){
-            inputPorts.addAll(opt.getInputPorts());
-        }
-        return inputPorts;
     }
 
     /** Helper class to count the number of dependencies of an operator. */
@@ -95,10 +158,10 @@ public class ExecutionUnit implements Serializable {
         }
         EdgeCounter counter = new EdgeCounter(operators);
         for (Operator child : getOperators()) {
-            for (OutputPort out : child.getOutputPorts()) {
+            for (OutputPort out : child.getOutputPorts().getAllPorts()) {
                 InputPort dest = out.getDestination();
                 if (dest != null) {
-                    counter.incNumEdges(dest.getPortOwner().getOperator());
+                    counter.incNumEdges(dest.getPorts().getOwner().getOperator());
                 }
             }
         }
@@ -115,10 +178,10 @@ public class ExecutionUnit implements Serializable {
         while (!independentOperators.isEmpty()) {
             Operator first = independentOperators.poll();
             sorted.add(first);
-            for (OutputPort out : first.getOutputPorts()) {
+            for (OutputPort out : first.getOutputPorts().getAllPorts()) {
                 InputPort dest = out.getDestination();
                 if (dest != null) {
-                    Operator destOp = dest.getPortOwner().getOperator();
+                    Operator destOp = dest.getPorts().getOwner().getOperator();
                     if (counter.decNumEdges(destOp) == 0) {
                         // independentOperators.addFirst(destOp);
                         independentOperators.add(destOp);

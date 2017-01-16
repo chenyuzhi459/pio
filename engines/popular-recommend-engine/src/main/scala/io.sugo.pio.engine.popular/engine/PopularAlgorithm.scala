@@ -1,10 +1,12 @@
 package io.sugo.pio.engine.popular.engine
 
 import java.util.{List => jList}
+
 import io.sugo.pio.engine.popular.data.{PopularModelData, PopularPreparaData}
-import io.sugo.pio.spark.engine.Algorithm
+import io.sugo.pio.engine.training.Algorithm
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.rdd.RDD
+
 import scala.collection.JavaConverters._
 
 class PopularAlgorithm() extends Algorithm[PopularPreparaData, PopularModelData]{

@@ -1,7 +1,7 @@
 package io.sugo.pio.engine.als.engine
 
 import io.sugo.pio.engine.als.data.{ALSModelData, ALSPreparedData}
-import io.sugo.pio.spark.engine.Algorithm
+import io.sugo.pio.engine.training.Algorithm
 import org.apache.log4j.Logger
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.mllib.recommendation.ALS

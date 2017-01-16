@@ -2,27 +2,20 @@ package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.common.base.Preconditions;
 import io.sugo.pio.OperatorProcess;
-import io.sugo.pio.operator.io.csv.*;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
+import io.sugo.pio.ports.impl.InputPortsImpl;
+import io.sugo.pio.ports.impl.OutputPortsImpl;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MDTransformer;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = OperatorMeta.OPERATOR_TYPE)
 @JsonSubTypes(value = {
         @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class),
-        @JsonSubTypes.Type(name = CSVExampleSource.TYPE, value = CSVExampleSource.class),
-        @JsonSubTypes.Type(name = CSVReaderMeta.TYPE, value = CSVReader.class),
-        @JsonSubTypes.Type(name = CSVSpliterMeta.TYPE, value = CSVSpliter.class),
-        @JsonSubTypes.Type(name = CSVModifierMeta.TYPE, value = CSVModifier.class),
-        @JsonSubTypes.Type(name = CSVWriterMeta.TYPE, value = CSVWriter.class),
-        @JsonSubTypes.Type(name = CSVReaderTestMeta.TYPE, value = CSVReaderTest.class)
 })
 public abstract class Operator implements ParameterHandler, Serializable {
     private final String name;
@@ -34,27 +27,26 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     private Status status;
 
+    // / SIMONS NEUERUNGEN
+    private final PortOwner portOwner = new PortOwner() {
+        @Override
+        public Operator getOperator() {
+            return Operator.this;
+        }
+    };
+
+    private final InputPorts inputPorts;
+    private final OutputPorts outputPorts;
     private final MDTransformer transformer = new MDTransformer(this);
 
     private ExecutionUnit enclosingExecutionUnit;
-    private final Map<String, InputPort> inputPortMap = new HashMap<>();
-    private final Map<String, OutputPort> outputPortMap = new HashMap<>();
-    private final PortOwner portOwner = new PortOwner(this);
 
-    public Operator(String name, Collection<InputPort> inputPorts, Collection<OutputPort> outputPorts) {
+    public Operator(String name) {
         this.name = name;
-        if (inputPorts != null && inputPorts.size() > 0) {
-            for (InputPort in : inputPorts) {
-                Preconditions.checkArgument(!inputPortMap.containsKey(in.getName()), "Cannot contain InputPorts with same name " + in.getName());
-                addInputPort(in);
-            }
-        }
-        if (outputPorts != null && outputPorts.size() > 0) {
-            for (OutputPort out : outputPorts) {
-                Preconditions.checkArgument(!outputPortMap.containsKey(out.getName()), "Cannot contain InputPorts with same name " + out.getName());
-                addOutputPort(out);
-            }
-        }
+
+
+        this.inputPorts = createInputPorts(portOwner);
+        this.outputPorts = createOutputPorts(portOwner);
     }
 
     @JsonProperty
@@ -78,23 +70,42 @@ public abstract class Operator implements ParameterHandler, Serializable {
         }
     }
 
-    protected void addInputPort(InputPort inPort){
-        inputPortMap.put(inPort.getName(), inPort);
-        inPort.setPortOwner(portOwner);
+    public InputPorts getInputPorts() {
+        return inputPorts;
     }
 
-    protected void addOutputPort(OutputPort outPort){
-        outputPortMap.put(outPort.getName(), outPort);
-        outPort.setPortOwner(portOwner);
+    public OutputPorts getOutputPorts() {
+        return outputPorts;
     }
 
-    public Collection<InputPort> getInputPorts() {
-        return inputPortMap.values();
+    /**
+     * This method returns an {@link InputPorts} object for port initialization. Useful for adding
+     * an arbitrary implementation (e.g. changing port creation & (dis)connection behavior,
+     * optionally by customized {@link InputPort} instances) by overriding this method.
+     *
+     * @param portOwner
+     *            The owner of the ports.
+     * @return The {@link InputPorts} instance, never {@code null}.
+     * @since 7.3.0
+     */
+    protected InputPorts createInputPorts(PortOwner portOwner) {
+        return new InputPortsImpl(portOwner);
     }
 
-    public Collection<OutputPort> getOutputPorts() {
-        return outputPortMap.values();
+    /**
+     * This method returns an {@link OutputPorts} object for port initialization. Useful for adding
+     * an arbitrary implementation (e.g. changing port creation & (dis)connection behavior,
+     * optionally by customized {@link OutputPort} instances) by overriding this method.
+     *
+     * @param portOwner
+     *            The owner of the ports.
+     * @return The {@link OutputPorts} instance, never {@code null}.
+     * @since 7.3.0
+     */
+    protected OutputPorts createOutputPorts(PortOwner portOwner) {
+        return new OutputPortsImpl(portOwner);
     }
+
 
     public OperatorProcess getProcess() {
         Operator parent = getParent();
@@ -103,6 +114,21 @@ public abstract class Operator implements ParameterHandler, Serializable {
         } else {
             return parent.getProcess();
         }
+    }
+
+    /**
+     * Registers this operator in the given process. Please note that this might change the name of
+     * the operator.
+     */
+    protected void registerOperator(OperatorProcess process) {
+        if (process != null) {
+            process.registerName(getName(), this);
+        }
+    }
+
+    /** Deletes this operator removing it from the name map of the process. */
+    protected void unregisterOperator(OperatorProcess process) {
+        process.unregisterName(name);
     }
 
     /**
@@ -338,11 +364,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * removes all hard references to IOObjects stored at the ports.
      */
     public void freeMemory() {
-        for (Port inputPort : getInputPorts()) {
-            inputPort.freeMemory();
-        }
-        for (Port inputPort : getOutputPorts()) {
-            inputPort.freeMemory();
-        }
+        getInputPorts().freeMemory();
+        getOutputPorts().freeMemory();
     }
 }

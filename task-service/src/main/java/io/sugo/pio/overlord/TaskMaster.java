@@ -41,7 +41,8 @@ public class TaskMaster {
         final TaskZkConfig zkPaths,
         final TaskRunnerFactory runnerFactory,
         final CuratorFramework curator,
-        final ServiceAnnouncer serviceAnnouncer) {
+        final ServiceAnnouncer serviceAnnouncer
+    ) {
         this.leaderSelector = new LeaderSelector(
                 curator,
                 zkPaths.getLeaderLatchPath(),

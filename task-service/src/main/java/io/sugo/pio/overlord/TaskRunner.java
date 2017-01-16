@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.sugo.pio.common.TaskStatus;
 import io.sugo.pio.common.task.Task;
 
+import java.util.Collection;
 import java.util.concurrent.Executor;
 
 /**
@@ -39,4 +40,15 @@ public interface TaskRunner {
      * stopping, "run" will not accept further tasks.
      */
     void stop();
+
+    Collection<? extends TaskRunnerWorkItem> getRunningTasks();
+
+    Collection<? extends TaskRunnerWorkItem> getPendingTasks();
+
+    Collection<? extends TaskRunnerWorkItem> getKnownTasks();
+
+    /**
+     * Start the state of the runner
+     */
+    void start();
 }
