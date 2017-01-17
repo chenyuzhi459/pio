@@ -4,10 +4,7 @@ import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.AttributeWeights;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
-import io.sugo.pio.operator.OperatorCapability;
-import io.sugo.pio.operator.OperatorCreationException;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.UserError;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.preprocessing.discretization.BinDiscretization;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeInt;
@@ -27,7 +24,27 @@ public class ChiSquaredWeighting extends AbstractWeighting {
 	private static final int PROGRESS_UPDATE_STEPS = 1_000_000;
 
 	public ChiSquaredWeighting() {
-		super("chiSquaredWeighting", true);
+		super(true);
+	}
+
+	@Override
+	public String getName() {
+		return "chiSquaredWeighting";
+	}
+
+	@Override
+	public String getFullName() {
+		return "chiSquaredWeighting";
+	}
+
+	@Override
+	public String getDescription() {
+		return "chiSquaredWeighting";
+	}
+
+	@Override
+	public OperatorGroup getGroup() {
+		return OperatorGroup.algorithmModel;
 	}
 
 	@Override

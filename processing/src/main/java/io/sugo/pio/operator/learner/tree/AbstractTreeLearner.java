@@ -53,10 +53,6 @@ public abstract class AbstractTreeLearner extends AbstractLearner {
 
 	public static final int CRITERION_ACCURACY = 3;
 
-	public AbstractTreeLearner(String name) {
-		super(name);
-	}
-
 	@Override
 	public Class<? extends PredictionModel> getModelClass() {
 		return TreeModel.class;

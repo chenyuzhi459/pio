@@ -8,7 +8,6 @@ import io.sugo.pio.example.table.AttributeTypeException;
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
@@ -109,8 +108,8 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 	 */
 	private List<OperatorException> importErrors = new LinkedList<OperatorException>();
 
-	public AbstractDataReader(Class<? extends IOObject> generatedClass, String name, OutputPort outputPort) {
-		super(generatedClass, name, outputPort);
+	public AbstractDataReader(Class<? extends IOObject> generatedClass, OutputPort outputPort) {
+		super(generatedClass, outputPort);
 	}
 
 	protected abstract DataSet getDataSet() throws OperatorException, IOException;

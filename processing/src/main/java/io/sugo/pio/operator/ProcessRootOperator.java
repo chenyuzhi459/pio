@@ -12,14 +12,31 @@ import java.util.List;
 public final class ProcessRootOperator extends OperatorChain {
     public static final String TYPE = "root_operator";
 
-    /** The property name for &quot;The default random seed (-1: random random seed).&quot; */
+    /**
+     * The property name for &quot;The default random seed (-1: random random seed).&quot;
+     */
     public static final String PROPERTY_RAPIDMINER_GENERAL_RANDOMSEED = "rapidminer.general.randomseed";
 
     public static final String PARAMETER_RANDOM_SEED = "random_seed";
 
-    public ProcessRootOperator(
-    ) {
-        super("Main Process");
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public String getFullName() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
+    public OperatorGroup getGroup() {
+        return null;
     }
 
     /**

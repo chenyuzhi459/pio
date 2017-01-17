@@ -3,6 +3,7 @@ package io.sugo.pio.operator.learner.tree;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.OperatorCapability;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;
 import io.sugo.pio.parameter.ParameterTypeDouble;
@@ -46,12 +47,24 @@ public class DecisionTreeLearner extends AbstractTreeLearner {
 
 	public static final String PARAMETER_NUMBER_OF_PREPRUNING_ALTERNATIVES = "number_of_prepruning_alternatives";
 
-	public DecisionTreeLearner() {
-		this("DecisionTree");
+	@Override
+	public String getName() {
+		return "DecisionTree";
 	}
 
-	protected DecisionTreeLearner(String name) {
-		super(name);
+	@Override
+	public String getFullName() {
+		return "DecisionTree";
+	}
+
+	@Override
+	public String getDescription() {
+		return "DecisionTree";
+	}
+
+	@Override
+	public OperatorGroup getGroup() {
+		return OperatorGroup.algorithmModel;
 	}
 
 	@Override

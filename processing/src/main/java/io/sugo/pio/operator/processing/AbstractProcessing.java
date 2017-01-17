@@ -7,8 +7,6 @@ import io.sugo.pio.example.table.MemoryExampleTable;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.impl.InputPortImpl;
-import io.sugo.pio.ports.impl.OutputPortImpl;
 
 /**
  * Created by root on 17-1-13.
@@ -17,10 +15,6 @@ public abstract class AbstractProcessing extends Operator {
     private final InputPort exampleSetInput = getInputPorts().createPort("example set input");
     private final OutputPort exampleSetOutput = getOutputPorts().createPort("example set output");
     private final OutputPort originalOutput = getOutputPorts().createPort("original");
-
-    public AbstractProcessing(String name) {
-        super(name);
-    }
 
     protected final InputPort getInputPort() {
         return exampleSetInput;

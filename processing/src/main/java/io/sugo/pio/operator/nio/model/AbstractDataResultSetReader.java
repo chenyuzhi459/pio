@@ -8,10 +8,6 @@ import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.io.AbstractDataReader;
 import io.sugo.pio.operator.io.AbstractReader;
-import io.sugo.pio.operator.nio.model.DataResultSet;
-import io.sugo.pio.operator.nio.model.DataResultSetFactory;
-import io.sugo.pio.operator.nio.model.DataResultSetTranslationConfiguration;
-import io.sugo.pio.operator.nio.model.DataResultSetTranslator;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.OutputPort;
@@ -56,8 +52,8 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
 //        return fileInputPort;
 //    }
 
-    public AbstractDataResultSetReader(Class<? extends IOObject> generatedClass, String name, OutputPort outputPort){
-        super(generatedClass, name, outputPort);
+    public AbstractDataResultSetReader(Class<? extends IOObject> generatedClass, OutputPort outputPort){
+        super(generatedClass, outputPort);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package io.sugo.pio.server.process;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -10,8 +12,10 @@ import com.metamx.common.lifecycle.LifecycleStop;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ManageLifecycle;
+import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.metadata.MetadataProcessManager;
 
+import java.util.Map;
 import java.util.concurrent.*;
 
 @ManageLifecycle
@@ -27,8 +31,11 @@ public class ProcessManager {
     private final MetadataProcessManager metadataProcessManager;
     private final OperatorProcessLoader loader;
 
+    private static String operatorMetaJson;
+    private static Map<String, OperatorMeta> operatorMetaMap;
+
     @Inject
-    public ProcessManager(ProcessManagerConfig config, MetadataProcessManager metadataProcessManager) {
+    public ProcessManager(@Json ObjectMapper jsonMapper, ProcessManagerConfig config, MetadataProcessManager metadataProcessManager) {
         this.config = config;
         this.metadataProcessManager = metadataProcessManager;
         this.executeMaxThread = config.getExecuteMaxThread();
@@ -50,6 +57,14 @@ public class ProcessManager {
             this.runners[i] = new ProcessRunner(queue, i, processCache, metadataProcessManager);
         }
         loader = new OperatorProcessLoader(this.metadataProcessManager);
+        if (operatorMetaMap == null) {
+            operatorMetaMap = OperatorMapHelper.getAllOperatorMetas(jsonMapper);
+            try {
+                operatorMetaJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(operatorMetaMap.values());
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @LifecycleStart

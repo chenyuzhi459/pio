@@ -90,8 +90,24 @@ public class LogisticRegression extends AbstractLearner {
 
 	private PerformanceVector estimatedPerformance;
 
-	public LogisticRegression() {
-		super("logisticRegression");
+	@Override
+	public String getName() {
+		return "logisticRegression";
+	}
+
+	@Override
+	public String getFullName() {
+		return "logisticRegression";
+	}
+
+	@Override
+	public String getDescription() {
+		return "logisticRegression";
+	}
+
+	@Override
+	public OperatorGroup getGroup() {
+		return OperatorGroup.algorithmModel;
 	}
 
 	@Override

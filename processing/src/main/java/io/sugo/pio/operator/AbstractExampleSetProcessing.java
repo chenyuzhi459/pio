@@ -27,8 +27,7 @@ public abstract class AbstractExampleSetProcessing extends Operator {
 	private final OutputPort exampleSetOutput = getOutputPorts().createPort("example set output");
 	private final OutputPort originalOutput = getOutputPorts().createPort("original");
 
-	public AbstractExampleSetProcessing(String name) {
-		super(name);
+	public AbstractExampleSetProcessing() {
 		exampleSetInput.addPrecondition(new SimplePrecondition(exampleSetInput, getRequiredMetaData()));
 		getTransformer().addRule(new PassThroughRule(exampleSetInput, exampleSetOutput, false) {
 

@@ -4,6 +4,7 @@ package io.sugo.pio.operator.learner.tree;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.OperatorCapability;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.OperatorGroup;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,8 +21,24 @@ import java.util.List;
 @Deprecated
 public class ID3NumericalLearner extends AbstractTreeLearner {
 
-	public ID3NumericalLearner() {
-		super("ID3NumericalLearner");
+	@Override
+	public String getName() {
+		return "ID3NumericalLearner";
+	}
+
+	@Override
+	public String getFullName() {
+		return "ID3NumericalLearner";
+	}
+
+	@Override
+	public String getDescription() {
+		return "ID3NumericalLearner";
+	}
+
+	@Override
+	public OperatorGroup getGroup() {
+		return OperatorGroup.algorithmModel;
 	}
 
 	@Override

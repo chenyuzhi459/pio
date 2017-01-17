@@ -1,12 +1,11 @@
 package io.sugo.pio.operator.processing;
 
 import io.sugo.pio.example.*;
-import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.processing.filter.*;
 import io.sugo.pio.parameter.ParameterHandler;
 import io.sugo.pio.parameter.UndefinedParameterError;
-import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.tools.Ontology;
 
 import java.util.*;
@@ -27,13 +26,33 @@ public class ColumnSelector extends AbstractProcessing {
 
     private int[] valueTypes;
 
-    public ColumnSelector(String name, int... valueTypes) {
-        super(name);
+    public ColumnSelector(int... valueTypes) {
         if (valueTypes.length == 0) {
             this.valueTypes = new int[]{Ontology.ATTRIBUTE_VALUE};
         } else {
             this.valueTypes = valueTypes;
         }
+    }
+
+
+    @Override
+    public String getName() {
+        return "ColumnSelector";
+    }
+
+    @Override
+    public String getFullName() {
+        return "ColumnSelector";
+    }
+
+    @Override
+    public String getDescription() {
+        return "ColumnSelector";
+    }
+
+    @Override
+    public OperatorGroup getGroup() {
+        return OperatorGroup.algorithmModel;
     }
 
     @Override

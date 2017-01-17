@@ -45,8 +45,7 @@ public abstract class PreprocessingOperator extends AbstractDataProcessing {
 	 */
 	public static final String PARAMETER_CREATE_VIEW = "create_view";
 
-	public PreprocessingOperator(String name) {
-		super(name);
+	public PreprocessingOperator() {
 		getTransformer().addRule(
 				new GenerateModelTransformationRule(getExampleSetInputPort(), modelOutput, getPreprocessingModelClass()));
 		getExampleSetInputPort().addPrecondition(attributeSelector.makePrecondition());

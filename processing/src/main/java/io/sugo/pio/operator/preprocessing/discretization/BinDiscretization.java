@@ -3,8 +3,8 @@ package io.sugo.pio.operator.preprocessing.discretization;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.Statistics;
-import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.OperatorVersion;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.preprocessing.PreprocessingModel;
@@ -15,7 +15,6 @@ import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.SetRelation;
 import io.sugo.pio.tools.Ontology;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.util.*;
 
@@ -56,8 +55,24 @@ public class BinDiscretization extends AbstractDiscretizationOperator {
      */
     private static final OperatorVersion VERSION_MAY_WRITE_INTO_DATA = new OperatorVersion(7, 1, 1);
 
-    public BinDiscretization(String name) {
-        super(name);
+    @Override
+    public String getName() {
+        return "BinDiscretization";
+    }
+
+    @Override
+    public String getFullName() {
+        return "BinDiscretization";
+    }
+
+    @Override
+    public String getDescription() {
+        return "BinDiscretization";
+    }
+
+    @Override
+    public OperatorGroup getGroup() {
+        return OperatorGroup.algorithmModel;
     }
 
     @Override

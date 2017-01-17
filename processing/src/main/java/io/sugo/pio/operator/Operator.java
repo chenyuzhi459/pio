@@ -19,8 +19,9 @@ import java.util.List;
         @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class),
 })
 public abstract class Operator implements ParameterHandler, Serializable {
-    private final String name;
-
+    private String name;
+    private int xPos;
+    private int yPos;
     /**
      * Parameters for this Operator.
      */
@@ -53,10 +54,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      */
     private final OperatorProgress operatorProgress = new OperatorProgress(this);
 
-    public Operator(String name) {
-        this.name = name;
-
-
+    public Operator() {
         this.inputPorts = createInputPorts(portOwner);
         this.outputPorts = createOutputPorts(portOwner);
     }
@@ -67,15 +65,42 @@ public abstract class Operator implements ParameterHandler, Serializable {
     }
 
     @JsonProperty
+    public abstract String getFullName();
+
+    @JsonProperty
+    public abstract OperatorGroup getGroup();
+
+    @JsonProperty
+    public abstract String getDescription();
+
+    @JsonProperty
+    public int getxPos() {
+        return xPos;
+    }
+
+    public void setxPos(int xPos) {
+        this.xPos = xPos;
+    }
+
+    @JsonProperty
+    public int getyPos() {
+        return yPos;
+    }
+
+    public void setyPos(int yPos) {
+        this.yPos = yPos;
+    }
+
+    @JsonProperty
     public Status getStatus() {
-        if(status == null){
+        if (status == null) {
             return Status.QUEUE;
         }
         return status;
     }
 
     public void setStatus(Status status) {
-        if(status != null) {
+        if (status != null) {
             this.status = status;
         } else {
             this.status = Status.QUEUE;
@@ -95,8 +120,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * an arbitrary implementation (e.g. changing port creation & (dis)connection behavior,
      * optionally by customized {@link InputPort} instances) by overriding this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link InputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
@@ -109,8 +133,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * an arbitrary implementation (e.g. changing port creation & (dis)connection behavior,
      * optionally by customized {@link OutputPort} instances) by overriding this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link OutputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
@@ -138,7 +161,9 @@ public abstract class Operator implements ParameterHandler, Serializable {
         }
     }
 
-    /** Deletes this operator removing it from the name map of the process. */
+    /**
+     * Deletes this operator removing it from the name map of the process.
+     */
     protected void unregisterOperator(OperatorProcess process) {
         process.unregisterName(name);
     }

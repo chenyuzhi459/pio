@@ -16,4 +16,6 @@ public @interface OperatorType {
     Class<Operator> value();
 
     String description();
+
+    String group() default "default";
 }

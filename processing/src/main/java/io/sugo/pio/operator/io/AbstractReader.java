@@ -5,8 +5,6 @@ import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.OutputPort;
 
-import java.util.Arrays;
-
 
 /**
  * Superclass of all operators that have no input and generate a single output. This class is mainly
@@ -19,8 +17,7 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
     private final Class<? extends IOObject> generatedClass;
     private final OutputPort outputPort;
 
-    public AbstractReader(Class<? extends IOObject> generatedClass, String name, OutputPort outputPort) {
-        super(name);
+    public AbstractReader(Class<? extends IOObject> generatedClass, OutputPort outputPort) {
         this.outputPort = outputPort;
         this.generatedClass = generatedClass;
     }

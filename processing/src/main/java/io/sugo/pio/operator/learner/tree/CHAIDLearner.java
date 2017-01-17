@@ -25,6 +25,7 @@ import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.OperatorCapability;
 import io.sugo.pio.operator.OperatorCreationException;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.features.weighting.ChiSquaredWeighting;
 import io.sugo.pio.operator.learner.tree.criterions.Criterion;
 import io.sugo.pio.parameter.ParameterType;
@@ -42,8 +43,24 @@ import java.util.List;
  */
 public class CHAIDLearner extends DecisionTreeLearner {
 
-	public CHAIDLearner() {
-		super("CHAIDLearner");
+	@Override
+	public String getName() {
+		return "CHAIDLearner";
+	}
+
+	@Override
+	public String getFullName() {
+		return "CHAIDLearner";
+	}
+
+	@Override
+	public String getDescription() {
+		return "CHAIDLearner";
+	}
+
+	@Override
+	public OperatorGroup getGroup() {
+		return OperatorGroup.algorithmModel;
 	}
 
 	@Override

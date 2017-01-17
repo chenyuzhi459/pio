@@ -28,8 +28,7 @@ public abstract class AbstractLearner extends Operator implements Learner {
     private final OutputPort exampleSetOutput = getOutputPorts().createPort("exampleSet");
 
     /** Creates a new abstract */
-    public AbstractLearner(String name) {
-        super(name);
+    public AbstractLearner() {
         exampleSetInput.addPrecondition(new LearnerPrecondition(this, exampleSetInput));
         getTransformer().addRule(
                 new GeneratePredictionModelTransformationRule(exampleSetInput, modelOutput, getModelClass()));

@@ -1,18 +1,10 @@
 package io.sugo.pio.operator;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.common.base.Preconditions;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
-import io.sugo.pio.tools.Pair;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "chainType", defaultImpl = ProcessRootOperator.class)
 @JsonSubTypes(value = {
@@ -22,8 +14,7 @@ public abstract class OperatorChain extends Operator {
 
     private ExecutionUnit[] execUnits;
 
-    public OperatorChain(String name, String... executionUnitNames) {
-        super(name);
+    public OperatorChain(String... executionUnitNames) {
         execUnits = new ExecutionUnit[executionUnitNames.length];
         for (int i = 0; i < execUnits.length; i++) {
             execUnits[i] = new ExecutionUnit(this, executionUnitNames[i]);

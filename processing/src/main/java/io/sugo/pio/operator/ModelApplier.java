@@ -10,16 +10,15 @@ import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.*;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  */
 public class ModelApplier extends Operator {
-    public ModelApplier(String name) {
-        super(name);
-    }
+//    public ModelApplier(String name) {
+//
+//    }
 
     /** The parameter name for &quot;key&quot; */
     public static final String PARAMETER_KEY = "key";
@@ -39,12 +38,32 @@ public class ModelApplier extends Operator {
     private final OutputPort modelOutput = getOutputPorts().createPort("model");
 
     public ModelApplier() {
-        super("modelApplier");
+//        super("modelApplier");
         modelInput.addPrecondition(
                 new SimplePrecondition(modelInput, new ModelMetaData(Model.class, new ExampleSetMetaData())));
         exampleSetInput.addPrecondition(new SimplePrecondition(exampleSetInput, new ExampleSetMetaData()));
         getTransformer().addRule(new ModelApplicationRule(exampleSetInput, exampleSetOutput, modelInput, false));
         getTransformer().addRule(new PassThroughRule(modelInput, modelOutput, false));
+    }
+
+    @Override
+    public String getName() {
+        return "modelApplier";
+    }
+
+    @Override
+    public String getFullName() {
+        return "modelApplier";
+    }
+
+    @Override
+    public String getDescription() {
+        return "modelApplier";
+    }
+
+    @Override
+    public OperatorGroup getGroup() {
+        return OperatorGroup.algorithmModel;
     }
 
     /**

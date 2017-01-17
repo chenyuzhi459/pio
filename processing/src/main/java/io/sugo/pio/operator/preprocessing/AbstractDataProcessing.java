@@ -9,12 +9,7 @@ import io.sugo.pio.operator.AbstractExampleSetProcessing;
  * 
  * TODO: Clarify relation to features.*
  * 
- * @author Simon Fischer
  */
 public abstract class AbstractDataProcessing extends AbstractExampleSetProcessing {
-
-	public AbstractDataProcessing(String name) {
-		super(name);
-	}
 
 }
