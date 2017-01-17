@@ -21,6 +21,7 @@ package io.sugo.pio.example.set;
 import io.sugo.pio.example.*;
 import io.sugo.pio.example.table.DataRow;
 import io.sugo.pio.example.table.ExampleTable;
+import io.sugo.pio.example.table.column.ColumnarExampleTable;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -131,5 +132,13 @@ public class SimpleExampleSet extends AbstractExampleSet {
 	@Override
 	public Iterator<Example> iterator() {
 		return new SimpleExampleReader(getExampleTable().getDataRowReader(), this);
+	}
+
+	@Override
+	public void cleanup() {
+		if (exampleTable instanceof ColumnarExampleTable) {
+			ColumnarExampleTable table = (ColumnarExampleTable) exampleTable;
+			this.exampleTable = table.columnCleanupClone(attributes);
+		}
 	}
 }

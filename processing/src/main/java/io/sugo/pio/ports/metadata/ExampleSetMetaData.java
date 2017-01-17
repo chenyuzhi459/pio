@@ -194,20 +194,20 @@ public class ExampleSetMetaData extends MetaData {
 		addAllAttributes(attributes);
 	}
 
-//	@Override
-//	public ExampleSetMetaData clone() {
-//		ExampleSetMetaData clone = (ExampleSetMetaData) super.clone();
-//		clone.attributesRelation = this.attributesRelation;
-//		clone.numberOfExamples = this.numberOfExamples.copy();
-//		if (this.attributeMetaData != null) {
-//			clone.attributeMetaData = new LinkedHashMap<String, AttributeMetaData>();
-//			for (AttributeMetaData attribute : this.attributeMetaData.values()) {
-//				clone.addAttribute(attribute.clone());
-//			}
-//		}
-//		clone.nominalDataWasShrinked = this.nominalDataWasShrinked;
-//		return clone;
-//	}
+	@Override
+	public ExampleSetMetaData clone() {
+		ExampleSetMetaData clone = (ExampleSetMetaData) super.clone();
+		clone.attributesRelation = this.attributesRelation;
+		clone.numberOfExamples = this.numberOfExamples.copy();
+		if (this.attributeMetaData != null) {
+			clone.attributeMetaData = new LinkedHashMap<String, AttributeMetaData>();
+			for (AttributeMetaData attribute : this.attributeMetaData.values()) {
+				clone.addAttribute(attribute.clone());
+			}
+		}
+		clone.nominalDataWasShrinked = this.nominalDataWasShrinked;
+		return clone;
+	}
 
 	public MetaDataInfo containsAttributesWithValueType(int type, boolean includeSpecials) {
 		if (attributeMetaData != null) {

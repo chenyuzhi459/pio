@@ -31,6 +31,9 @@ public interface  ParameterHandler {
      */
     void setListParameter(String key, List<String[]> list);
 
+    /** Returns true iff the parameter with the given name is set. */
+    public boolean isParameterSet(String key) throws UndefinedParameterError;
+
     /** Returns a single named parameter and casts it to String. */
     String getParameterAsString(String key);
 

@@ -1,6 +1,8 @@
 package io.sugo.pio.example;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -16,6 +18,16 @@ public abstract class AbstractAttributes implements Attributes {
     @Override
     public Iterator<Attribute> allAttributes() {
         return new AttributeIterator(allAttributeRoles(), ALL);
+    }
+
+    @Override
+    public Iterator<AttributeRole> specialAttributes() {
+        return new AttributeRoleIterator(allAttributeRoles(), SPECIAL);
+    }
+
+    @Override
+    public Iterator<AttributeRole> regularAttributes() {
+        return new AttributeRoleIterator(allAttributeRoles(), REGULAR);
     }
 
     @Override
@@ -49,6 +61,22 @@ public abstract class AbstractAttributes implements Attributes {
             return remove(role);
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public void clearRegular() {
+        List<AttributeRole> toRemove = new LinkedList<AttributeRole>();
+        Iterator<AttributeRole> i = allAttributeRoles();
+        while (i.hasNext()) {
+            AttributeRole role = i.next();
+            if (!role.isSpecial()) {
+                toRemove.add(role);
+            }
+        }
+
+        for (AttributeRole role : toRemove) {
+            remove(role);
         }
     }
 

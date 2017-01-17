@@ -5,6 +5,8 @@ import java.util.*;
 /**
  */
 public class PolynominalMapping implements NominalMapping {
+
+
     /** The map between symbolic values and their indices. */
     private final Map<String, Integer> symbolToIndexMap = new LinkedHashMap<>();
 
@@ -26,6 +28,24 @@ public class PolynominalMapping implements NominalMapping {
             this.indexToSymbolMap.set(index, value);
         }
     }
+
+    /* pp */ PolynominalMapping(NominalMapping mapping) {
+        this.symbolToIndexMap.clear();
+        this.indexToSymbolMap.clear();
+        for (int i = 0; i < mapping.size(); i++) {
+            int index = i;
+            String value = mapping.mapIndex(index);
+            this.symbolToIndexMap.put(value, index);
+            this.indexToSymbolMap.add(value);
+        }
+    }
+
+
+    @Override
+    public Object clone() {
+        return new PolynominalMapping(this);
+    }
+
     /**
      * Returns the index for the nominal attribute value <code>str</code>. If the string is unknown,
      * a new index value is assigned. Returns -1, if str is null.

@@ -2,7 +2,7 @@ package io.sugo.pio.example.table;
 
 
 import io.sugo.pio.example.Attribute;
-import io.sugo.pio.operator.io.ExampleSets;
+import io.sugo.pio.example.util.ExampleSets;
 
 import java.util.*;
 

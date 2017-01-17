@@ -6,6 +6,9 @@ import java.util.List;
 /**
  */
 public interface NominalMapping extends Cloneable, Serializable {
+    /** Should return a deep clone of this nominal mapping. */
+    public Object clone();
+
     /**
      * Returns the index of a positive class (if available). Returns -1 otherwise.
      */

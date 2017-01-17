@@ -11,6 +11,7 @@ import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MDTransformer;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +27,12 @@ public abstract class Operator implements ParameterHandler, Serializable {
     private Parameters parameters = null;
 
     private Status status;
+
+    /**
+     * The list which stores the errors of this operator (parameter not set, wrong children number,
+     * wrong IO).
+     */
+    private List<ProcessSetupError> errorList = Collections.synchronizedList(new LinkedList<ProcessSetupError>());
 
     // / SIMONS NEUERUNGEN
     private final PortOwner portOwner = new PortOwner() {
@@ -228,6 +235,16 @@ public abstract class Operator implements ParameterHandler, Serializable {
     }
 
     /**
+     * Returns true iff the parameter with the given name is set. If no parameters object has been
+     * created yet, false is returned. This can be used to break initialization loops.
+     */
+    @Override
+    public boolean isParameterSet(String key) {
+        return getParameters().isSet(key);
+    }
+
+
+    /**
      * Returns a single named parameter and casts it to char.
      */
     @Override
@@ -318,6 +335,9 @@ public abstract class Operator implements ParameterHandler, Serializable {
         return false; // cannot happen
     }
 
+    public void addError(ProcessSetupError error) {
+        errorList.add(error);
+    }
 
     /**
      * This method returns the {@link MDTransformer} object of this operator. This object will

@@ -67,6 +67,13 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
         return isDeprecated || isHidden || !conditionsMet;
     }
 
+    /**
+     * Sets if this parameter is hidden (value true) and will not be shown in the GUI.
+     */
+    public void setHidden(boolean hidden) {
+        this.isHidden = hidden;
+    }
+
     /** Registers the given dependency condition. */
     public void registerDependencyCondition(ParameterCondition condition) {
         this.conditions.add(condition);

@@ -114,4 +114,30 @@ public class Parameters implements Cloneable, Iterable<String> {
         }
         return parameterType != null;
     }
+
+    /**
+     * Returns true if the parameter is set or has a default value.
+     *
+     * @see Parameters#isSpecified(String)
+     */
+    public boolean isSet(String parameterKey) {
+        if (keyToValueMap.containsKey(parameterKey)) {
+            return true;
+        } else {
+            // check for default if we have a type registered for this key
+            ParameterType type = keyToTypeMap.get(parameterKey);
+            if (type == null) {
+                return false;
+            }
+            return type.getDefaultValue() != null;
+        }
+    }
+
+    /**
+     * Returns true iff the parameter value was explicitly set (as opposed to {@link #isSet(String)}
+     * which also takes into account a possible default value.
+     */
+    public boolean isSpecified(String key) {
+        return keyToValueMap.containsKey(key);
+    }
 }

@@ -59,6 +59,12 @@ public interface Attributes extends Iterable<Attribute>, Cloneable, Serializable
     /** Returns an iterator over all attribute roles, including the special attribute roles. */
     public Iterator<AttributeRole> allAttributeRoles();
 
+    /** Returns an iterator over the attribute roles of the special attributes. */
+    public Iterator<AttributeRole> specialAttributes();
+
+    /** Returns an iterator over the attribute roles of the regular attributes. */
+    public Iterator<AttributeRole> regularAttributes();
+
     /** Returns true if this attribute set contains the given attribute. */
     public boolean contains(Attribute attribute);
 
@@ -71,11 +77,17 @@ public interface Attributes extends Iterable<Attribute>, Cloneable, Serializable
     /** Adds a new attribute role. */
     public void add(AttributeRole attributeRole);
 
-    /** Removes the given attribute. */
-    public boolean remove(Attribute attribute);
+    /** Adds the given attribute as regular attribute. */
+    public void addRegular(Attribute attribute);
 
     /** Removes the given attribute role. */
     public boolean remove(AttributeRole attributeRole);
+
+    /** Removes the given attribute. */
+    public boolean remove(Attribute attribute);
+
+    /** Removes all regular attributes. */
+    public void clearRegular();
 
     /** Returns the attribute for the given name. The search is case sensitive. */
     public Attribute get(String name);

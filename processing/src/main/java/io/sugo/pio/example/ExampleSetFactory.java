@@ -20,8 +20,8 @@ package io.sugo.pio.example;
 
 import io.sugo.pio.example.table.ExampleTable;
 import io.sugo.pio.example.table.AttributeFactory;
-import io.sugo.pio.operator.io.ExampleSetBuilder;
-import io.sugo.pio.operator.io.ExampleSets;
+import io.sugo.pio.example.util.ExampleSetBuilder;
+import io.sugo.pio.example.util.ExampleSets;
 import io.sugo.pio.tools.Ontology;
 
 import java.util.ArrayList;

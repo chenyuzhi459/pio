@@ -3,6 +3,7 @@ package io.sugo.pio.example.table;
 import io.sugo.pio.example.Attribute;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  */
@@ -32,6 +33,32 @@ public interface ExampleTable extends Serializable {
 
     /** Returns a new array containing all {@link Attribute}s. */
     public Attribute[] getAttributes();
+
+    /**
+     * Adds all {@link Attribute}s in <code>newAttributes</code> to the end of the list of
+     * attributes, creating new data columns if necessary.
+     */
+    public void addAttributes(Collection<Attribute> newAttributes);
+
+    /**
+     * Adds a clone of the attribute <code>a</code> to the list of attributes assigning it a free
+     * column index. The column index is also set on <code>a</code>.
+     */
+    public int addAttribute(Attribute a);
+
+    /**
+     * Equivalent to calling <code>removeAttribute(attribute.getTableIndex())</code>.
+     */
+    public void removeAttribute(Attribute attribute);
+
+    /**
+     * Sets the attribute with the given index to null. Afterwards, this column can be reused.
+     * Callers must make sure, that no other example set contains a reference to this column.
+     * Otherwise its data will be messed up. Usually this is only possible if an operator generates
+     * intermediate attributes, like a validation chain or a feature generator. If the attribute
+     * already was removed, this method returns silently.
+     */
+    public void removeAttribute(int index);
 
     /**
      * Returns the number of attributes. Attention: Callers that use a for-loop and retrieving
