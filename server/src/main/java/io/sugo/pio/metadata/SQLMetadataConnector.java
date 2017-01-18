@@ -28,7 +28,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     private static final Logger log = new Logger(SQLMetadataConnector.class);
     private static final String PAYLOAD_TYPE = "BLOB";
 
-    public static final int DEFAULT_MAX_TRIES = 0;
+    public static final int DEFAULT_MAX_TRIES = 3;
 
     private final Supplier<MetadataStorageConnectorConfig> config;
     private final Supplier<MetadataStorageTablesConfig> tablesConfigSupplier;
@@ -252,6 +252,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                                 "CREATE TABLE %1$s (\n"
                                         + "  id VARCHAR(255) NOT NULL,\n"
                                         + "  name VARCHAR(50) NOT NULL,\n"
+                                        + "  description VARCHAR(250) NOT NULL,\n"
                                         + "  status VARCHAR(20) NOT NULL,\n"
                                         + "  created_date VARCHAR(50) NOT NULL,\n"
                                         + "  update_date VARCHAR(50) NOT NULL,\n"

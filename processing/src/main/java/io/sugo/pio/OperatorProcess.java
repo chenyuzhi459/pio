@@ -1,6 +1,5 @@
 package io.sugo.pio;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
@@ -10,6 +9,7 @@ import org.joda.time.DateTime;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  */
@@ -17,6 +17,7 @@ public class OperatorProcess {
 
     private String id;
     private String name;
+    private String description;
     private Status status = Status.QUEUE;
     private DateTime createTime;
     private DateTime updateTime;
@@ -28,13 +29,14 @@ public class OperatorProcess {
      */
     private Map<String, Operator> operatorNameMap = new HashMap<>();
 
-    @JsonCreator
-    public OperatorProcess(
-            @JsonProperty("name") String name,
-            @JsonProperty("rootOperator") ProcessRootOperator rootOperator
-    ) {
+    public OperatorProcess(String name) {
+        this(name, new ProcessRootOperator());
+    }
+
+    public OperatorProcess(String name, ProcessRootOperator rootOperator) {
         this.name = name;
-        this.id = String.format("%s-%d", name, new DateTime().getMillis());
+//        this.id = String.format("%s-%d", name, new DateTime().getMillis());
+        this.id = UUID.randomUUID().toString();
         setRootOperator(rootOperator);
         this.createTime = new DateTime();
         this.updateTime = this.createTime;
@@ -48,6 +50,11 @@ public class OperatorProcess {
     @JsonProperty
     public String getName() {
         return name;
+    }
+
+    @JsonProperty
+    public String getDescription() {
+        return description;
     }
 
     @JsonProperty
@@ -73,6 +80,10 @@ public class OperatorProcess {
         this.name = name;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
         this.updateTime = new DateTime();
@@ -93,6 +104,7 @@ public class OperatorProcess {
 
     public void setRootOperator(ProcessRootOperator rootOperator) {
         this.rootOperator = rootOperator;
+        this.rootOperator.setProcess(this);
     }
 
     public final IOContainer run() {
@@ -126,7 +138,9 @@ public class OperatorProcess {
         }
     }
 
-    /** This method is used for unregistering a name from the operator name map. */
+    /**
+     * This method is used for unregistering a name from the operator name map.
+     */
     public void unregisterName(final String name) {
         operatorNameMap.remove(name);
     }

@@ -10,6 +10,7 @@ import com.metamx.common.lifecycle.Lifecycle;
 import com.metamx.common.logger.Logger;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.sun.jersey.spi.container.servlet.WebConfig;
@@ -80,7 +81,9 @@ public class JettyServerModule extends JerseyServletModule
                 Map<String, Object> props, WebConfig webConfig
         ) throws ServletException
         {
-            return new DefaultResourceConfig(resources);
+            ResourceConfig resourceConfig = new DefaultResourceConfig(resources);
+            resourceConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+            return resourceConfig;
         }
     }
 

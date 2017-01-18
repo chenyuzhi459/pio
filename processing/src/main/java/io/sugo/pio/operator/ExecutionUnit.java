@@ -25,6 +25,7 @@ public class ExecutionUnit implements Serializable {
     private OperatorChain enclosingOperator;
     private final InputPorts innerInputPorts;
     private final OutputPorts innerOutputPorts;
+    @JsonProperty("operators")
     private List<Operator> operators = new ArrayList<>();
 
     @JsonCreator
@@ -32,7 +33,6 @@ public class ExecutionUnit implements Serializable {
             OperatorChain enclosingOperator, String name
     ) {
         this.name = name;
-
         this.enclosingOperator = enclosingOperator;
         innerInputPorts = enclosingOperator.createInnerSinks(portOwner);
         innerOutputPorts = enclosingOperator.createInnerSources(portOwner);
@@ -56,9 +56,8 @@ public class ExecutionUnit implements Serializable {
     /**
      * Adds the operator to this execution unit.
      *
-     * @param registerWithProcess
-     *            Typically true. If false, the operator will not be registered with its parent
-     *            process.
+     * @param registerWithProcess Typically true. If false, the operator will not be registered with its parent
+     *                            process.
      * @return the new index of the operator.
      */
     public int addOperator(Operator operator, boolean registerWithProcess) {
@@ -102,7 +101,9 @@ public class ExecutionUnit implements Serializable {
         this.enclosingOperator = enclosingOperator;
     }
 
-    /** Helper class to count the number of dependencies of an operator. */
+    /**
+     * Helper class to count the number of dependencies of an operator.
+     */
     private static class EdgeCounter {
 
         private final Map<Operator, Integer> numIncomingEdges = new LinkedHashMap<Operator, Integer>();
@@ -200,10 +201,15 @@ public class ExecutionUnit implements Serializable {
     }
 
 
-    /** Returns an unmodifiable view of the operators contained in this process. */
-    @JsonProperty("operators")
+    /**
+     * Returns an unmodifiable view of the operators contained in this process.
+     */
     public List<Operator> getOperators() {
         return Collections.unmodifiableList(new ArrayList<>(operators));
+    }
+
+    public void setOperators(List<Operator> operators) {
+        this.operators = operators;
     }
 
     /**

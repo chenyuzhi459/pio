@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
@@ -14,15 +15,16 @@ import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.operator.Status;
 import org.joda.time.DateTime;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.IDBI;
-import org.skife.jdbi.v2.StatementContext;
+import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @ManageLifecycle
 public class SQLMetadataProcessManager implements MetadataProcessManager {
@@ -57,22 +59,39 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
 
     @Override
     public OperatorProcess get(String id) {
+        return get(id, false);
+    }
+
+    @Override
+    public OperatorProcess get(String id, boolean active) {
         return dbi.withHandle(
                 new HandleCallback<OperatorProcess>() {
                     @Override
                     public OperatorProcess withHandle(Handle handle) throws Exception {
 
-                        return handle.createQuery(String.format(
-                                "SELECT id, name, status, created_date, update_date, operators FROM %1$s where id = :id ORDER BY id DESC LIMIT 1 OFFSET 0",
-                                getOperatorProcessTable()
+                        StringBuilder builder = new StringBuilder();
+                        builder.append("SELECT id, name, description, status, created_date, update_date, operators ")
+                                .append(" FROM %1$s ")
+                                .append(" WHERE id = :id ");
+//                        if (active) {
+//                            builder.append(" AND status != :status");
+//                        }
+                        builder.append(" ORDER BY id DESC LIMIT 1 OFFSET 0");
+                        Query<Map<String, Object>> query = handle.createQuery(
+                                String.format(builder.toString(), getOperatorProcessTable())
+                        ).bind("id", id);
+//                        if (active) {
+//                            query.bind("status", Status.DELETED);
+//                        }
 
-                        )).bind("id", id).map(new ResultSetMapper<OperatorProcess>() {
+                        return query.map(new ResultSetMapper<OperatorProcess>() {
 
                             @Override
                             public OperatorProcess map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                                 try {
                                     String id = r.getString("id");
                                     String name = r.getString("name");
+                                    String description = r.getString("description");
                                     Status status = Status.valueOf(r.getString("status"));
                                     DateTime createTime = new DateTime(r.getString("created_date"));
                                     DateTime updateTime = new DateTime(r.getString("update_date"));
@@ -81,17 +100,73 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                             });
                                     OperatorProcess process = new OperatorProcess(name, root);
                                     process.setId(id);
-//                                    process.setName(name);
+                                    process.setDescription(description);
                                     process.setStatus(status);
                                     process.setCreateTime(createTime);
                                     process.setUpdateTime(updateTime);
-//                                    process.setRootOperator(root);
                                     return process;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
                                 }
                             }
                         }).first();
+                    }
+                });
+    }
+
+    @Override
+    public List<OperatorProcess> getAll() {
+        return dbi.withHandle(
+                new HandleCallback<List<OperatorProcess>>() {
+                    @Override
+                    public List<OperatorProcess> withHandle(Handle handle) throws Exception {
+
+                        return handle.createQuery(String.format(
+                                "SELECT id, name, description, status, created_date, update_date, operators " +
+                                        " FROM %1$s " +
+                                        " ORDER BY created_date DESC",
+                                getOperatorProcessTable()
+                        )).map(new ResultSetMapper<OperatorProcess>() {
+                            @Override
+                            public OperatorProcess map(int index, ResultSet r, StatementContext ctx) throws SQLException {
+                                try {
+                                    String id = r.getString("id");
+                                    String name = r.getString("name");
+                                    String description = r.getString("description");
+                                    Status status = Status.valueOf(r.getString("status"));
+                                    DateTime createTime = new DateTime(r.getString("created_date"));
+                                    DateTime updateTime = new DateTime(r.getString("update_date"));
+                                    ProcessRootOperator root = jsonMapper.readValue(
+                                            r.getBytes("operators"), new TypeReference<ProcessRootOperator>() {
+                                            });
+                                    OperatorProcess process = new OperatorProcess(name, root);
+                                    process.setId(id);
+                                    process.setDescription(description);
+                                    process.setStatus(status);
+                                    process.setCreateTime(createTime);
+                                    process.setUpdateTime(updateTime);
+                                    return process;
+                                } catch (IOException e) {
+                                    throw Throwables.propagate(e);
+                                }
+                            }
+                        }).fold(Lists.newArrayList(), new Folder3<ArrayList<OperatorProcess>, OperatorProcess>() {
+                            @Override
+                            public ArrayList<OperatorProcess> fold(
+                                    ArrayList<OperatorProcess> retVal,
+                                    OperatorProcess rs,
+                                    FoldController control,
+                                    StatementContext ctx
+                            ) throws SQLException {
+                                try {
+                                    retVal.add(rs);
+                                    return retVal;
+                                } catch (Exception e) {
+                                    throw Throwables.propagate(e);
+                                }
+                            }
+                        });
+
                     }
                 });
     }
@@ -105,13 +180,14 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(
                                     String.format(
-                                            "INSERT INTO %s (id, name, status, created_date, update_date, operators) " +
-                                                    " VALUES (:id, :name, :status, :created_date, :update_date, :operators)",
+                                            "INSERT INTO %s (id, name, description, status, created_date, update_date, operators) " +
+                                                    " VALUES (:id, :name, :description, :status, :created_date, :update_date, :operators)",
                                             getOperatorProcessTable()
                                     )
                             )
                                     .bind("id", process.getId())
                                     .bind("name", process.getName())
+                                    .bind("description", process.getDescription())
                                     .bind("status", process.getStatus().name())
                                     .bind("created_date", process.getCreateTime())
                                     .bind("update_date", process.getUpdateTime())
@@ -128,17 +204,19 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
     }
 
     @Override
-    public boolean updateStatus(final OperatorProcess process) {
+    public boolean update(final OperatorProcess process) {
         try {
             dbi.withHandle(
                     new HandleCallback<Void>() {
                         @Override
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(
-                                    String.format("UPDATE %s SET status = :status, update_date = :update_date, operators = :operators WHERE id = :id",
+                                    String.format("UPDATE %s SET name=:name, description=:description, status=:status, update_date=:update_date, operators = :operators WHERE id = :id",
                                             getOperatorProcessTable())
                             )
                                     .bind("id", process.getId())
+                                    .bind("name", process.getName())
+                                    .bind("description", process.getDescription())
                                     .bind("status", process.getStatus().name())
                                     .bind("update_date", process.getUpdateTime().toString())
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))

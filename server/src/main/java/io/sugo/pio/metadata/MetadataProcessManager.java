@@ -2,6 +2,8 @@ package io.sugo.pio.metadata;
 
 import io.sugo.pio.OperatorProcess;
 
+import java.util.List;
+
 /**
  */
 
@@ -12,6 +14,9 @@ public interface MetadataProcessManager
   void stop();
 
   OperatorProcess get(String id);
+  OperatorProcess get(String id, boolean active);
   void insert(OperatorProcess spec);
-  boolean updateStatus(OperatorProcess pi);
+  boolean update(OperatorProcess pi);
+
+  List<OperatorProcess> getAll();
 }

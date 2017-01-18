@@ -7,5 +7,6 @@ public enum Status {
     QUEUE,
     RUNNING,
     SUCCESS,
-    FAILED;
+    FAILED,
+    DELETED;
 }

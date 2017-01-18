@@ -2,6 +2,7 @@ package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
@@ -15,8 +16,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "operatorType")
 @JsonSubTypes(value = {
-        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class),
+        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class)
 })
 public abstract class Operator implements ParameterHandler, Serializable {
     private String name;
@@ -62,6 +64,10 @@ public abstract class Operator implements ParameterHandler, Serializable {
     @JsonProperty
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @JsonProperty

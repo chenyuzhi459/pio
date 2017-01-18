@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.ProcessRootOperator;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class OperatorMapHelper {
@@ -20,23 +22,28 @@ public class OperatorMapHelper {
             MapperConfig config = jsonMapper.getDeserializationConfig();
             AnnotationIntrospector ai = config.getAnnotationIntrospector();
             AnnotatedClass ac = AnnotatedClass.constructWithoutSuperTypes(Operator.class, ai, config);
-            List<NamedType> subTypes = ai.findSubtypes(ac);
+            Collection<NamedType> subTypes = jsonMapper.getSubtypeResolver().collectAndResolveSubtypesByClass(config, ac);
 
             if (subTypes != null) {
                 for (NamedType subType : subTypes) {
-                    Object o = subType.getType().newInstance();
-                    if (o instanceof Operator) {
-                        Operator op = (Operator) o;
-                        if (!operatorMap.containsKey(subType.getName())) {
-                            OperatorMeta meta = OperatorMeta.create(subType.getName())
-                                    .setFullName(op.getFullName())
-                                    .setDescription(op.getDescription())
-                                    .setType(subType)
-                                    .setGroup(op.getGroup());
-                            operatorMap.put(subType.getName(), meta);
-                        } else {
-                            throw new RuntimeException(String.format("OperatorMeta %s has been registered",
-                                    subType.getName()));
+
+                    Class<?> clazz = Class.forName(subType.getType().getName());
+                    boolean isAbstract = Modifier.isAbstract(clazz.getModifiers());
+                    if (!isAbstract) {
+                        Object o = subType.getType().newInstance();
+                        if (o instanceof Operator && !(o instanceof ProcessRootOperator)) {
+                            Operator op = (Operator) o;
+                            if (!operatorMap.containsKey(subType.getName())) {
+                                OperatorMeta meta = OperatorMeta.create(subType.getName())
+                                        .setFullName(op.getFullName())
+                                        .setDescription(op.getDescription())
+                                        .setType(subType)
+                                        .setGroup(op.getGroup());
+                                operatorMap.put(subType.getName(), meta);
+                            } else {
+                                throw new RuntimeException(String.format("OperatorMeta %s has been registered",
+                                        subType.getName()));
+                            }
                         }
                     }
                 }
