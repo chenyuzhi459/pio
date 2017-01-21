@@ -19,7 +19,7 @@ class PopularModel extends Model[PopularModelData] {
           val score = re._2._1
           doc.add(new StringField(Constants.ITEM_ID, re._1.toString, Field.Store.YES))
           for(tag <- re._2._2)
-            doc.add(new StringField(Constants.DETAIL_CATEGORY, tag, Field.Store.YES))
+            doc.add(new StringField(Constants.CATEGORY, tag, Field.Store.YES))
           doc.add(new IntField(LucenceConstants.SCORE, score, Field.Store.YES))
           doc.add(new NumericDocValuesField(LucenceConstants.SCORE, score));
 
