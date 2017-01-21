@@ -3,8 +3,9 @@ package io.sugo.pio.engine.als;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.engine.prediction.PredictionQueryObject;
 
-public class ALSQuery {
+public class ALSQuery implements PredictionQueryObject {
     private String userId;
     private String num;
 
@@ -22,5 +23,10 @@ public class ALSQuery {
 
     public String getNum() {
         return num;
+    }
+
+    @Override
+    public String getType() {
+        return "als";
     }
 }

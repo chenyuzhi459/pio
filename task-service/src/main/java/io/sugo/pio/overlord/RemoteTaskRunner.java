@@ -6,13 +6,18 @@ import com.google.common.collect.*;
 import com.google.common.util.concurrent.*;
 import com.metamx.common.ISE;
 import com.metamx.common.Pair;
+import com.metamx.common.RE;
+import com.metamx.common.logger.Logger;
 import com.metamx.http.client.HttpClient;
-import io.sugo.pio.cache.PathChildrenCacheFactory;
+import com.metamx.http.client.Request;
+import com.metamx.http.client.response.StatusResponseHandler;
+import com.metamx.http.client.response.StatusResponseHolder;
 import io.sugo.pio.common.TaskLocation;
 import io.sugo.pio.common.TaskStatus;
 import io.sugo.pio.common.task.Task;
 import io.sugo.pio.concurrent.Execs;
 import io.sugo.pio.curator.CuratorUtils;
+import io.sugo.pio.curator.cache.PathChildrenCacheFactory;
 import io.sugo.pio.initialization.TaskZkConfig;
 import io.sugo.pio.overlord.config.RemoteTaskRunnerConfig;
 import io.sugo.pio.overlord.setup.WorkerBehaviorConfig;
@@ -27,8 +32,13 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -37,10 +47,13 @@ import java.util.concurrent.*;
 /**
  */
 public class RemoteTaskRunner implements WorkerTaskRunner {
+    private static final Logger log = new Logger(RemoteTaskRunner.class);
+    private static final StatusResponseHandler RESPONSE_HANDLER = new StatusResponseHandler(Charsets.UTF_8);
     private static final Joiner JOINER = Joiner.on("/");
 
     private final ObjectMapper jsonMapper;
     private final RemoteTaskRunnerConfig config;
+    private final Duration shutdownTimeout;
     private final TaskZkConfig taskZkConfig;
     private final CuratorFramework cf;
     private final PathChildrenCacheFactory pathChildrenCacheFactory;
@@ -94,6 +107,7 @@ public class RemoteTaskRunner implements WorkerTaskRunner {
         this.taskZkConfig = taskZkConfig;
         this.cf = cf;
         this.config = config;
+        this.shutdownTimeout = config.getTaskShutdownLinkTimeout().toStandardDuration(); // Fail fast
         this.pathChildrenCacheFactory = pathChildrenCacheFactory;
         this.workerPathCache = pathChildrenCacheFactory.make(cf, taskZkConfig.getAnnouncementsPath());
         this.httpClient = httpClient;
@@ -103,6 +117,11 @@ public class RemoteTaskRunner implements WorkerTaskRunner {
                 config.getPendingTasksRunnerNumThreads(),
                 "rtr-pending-tasks-runner-%d"
         );
+    }
+
+    @Override
+    public List<Pair<Task, ListenableFuture<TaskStatus>>> restore() {
+        return ImmutableList.of();
     }
 
     @Override
@@ -175,6 +194,94 @@ public class RemoteTaskRunner implements WorkerTaskRunner {
             return completeTask.getResult();
         } else {
             return addPendingTask(task).getResult();
+        }
+    }
+
+    @Override
+    public void shutdown(String taskId) {
+        if (!started) {
+            log.info("This TaskRunner is stopped. Ignoring shutdown command for task: %s", taskId);
+        } else if (pendingTasks.remove(taskId) != null) {
+            pendingTaskPayloads.remove(taskId);
+            log.info("Removed task from pending queue: %s", taskId);
+        } else if (completeTasks.containsKey(taskId)) {
+            cleanup(taskId);
+        } else {
+            final ZkWorker zkWorker = findWorkerRunningTask(taskId);
+
+            if (zkWorker == null) {
+                log.info("Can't shutdown! No worker running task %s", taskId);
+                return;
+            }
+            URL url = null;
+            try {
+                url = makeWorkerURL(zkWorker.getWorker(), String.format("/task/%s/shutdown", taskId));
+                final StatusResponseHolder response = httpClient.go(
+                        new Request(HttpMethod.POST, url),
+                        RESPONSE_HANDLER,
+                        shutdownTimeout
+                ).get();
+
+                log.info(
+                        "Sent shutdown message to worker: %s, status %s, response: %s",
+                        zkWorker.getWorker().getHost(),
+                        response.getStatus(),
+                        response.getContent()
+                );
+
+                if (!HttpResponseStatus.OK.equals(response.getStatus())) {
+                    log.error("Shutdown failed for %s! Are you sure the task was running?", taskId);
+                }
+            }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RE(e, "Interrupted posting shutdown to [%s] for task [%s]", url, taskId);
+            }
+            catch (Exception e) {
+                throw new RE(e, "Error in handling post to [%s] for task [%s]", zkWorker.getWorker().getHost(), taskId);
+            }
+        }
+    }
+
+    private URL makeWorkerURL(Worker worker, String path)
+    {
+        Preconditions.checkArgument(path.startsWith("/"), "path must start with '/': %s", path);
+
+        try {
+            return new URL(String.format("http://%s/pio/worker/v1%s", worker.getHost(), path));
+        }
+        catch (MalformedURLException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    /**
+     * Removes a task from the complete queue and clears out the ZK status path of the task.
+     *
+     * @param taskId - the task to cleanup
+     */
+    private void cleanup(final String taskId)
+    {
+        if (!started) {
+            return;
+        }
+        final RemoteTaskRunnerWorkItem removed = completeTasks.remove(taskId);
+        final Worker worker = removed.getWorker();
+        if (removed == null || worker == null) {
+            log.warn("WTF?! Asked to cleanup nonexistent task");
+        } else {
+            final String workerId = worker.getHost();
+            log.info("Cleaning up task[%s] on worker[%s]", taskId, workerId);
+            final String statusPath = JOINER.join(taskZkConfig.getStatusPath(), workerId, taskId);
+            try {
+                cf.delete().guaranteed().forPath(statusPath);
+            }
+            catch (KeeperException.NoNodeException e) {
+                log.info("Tried to delete status path[%s] that didn't exist! Must've gone away already?", statusPath);
+            }
+            catch (Exception e) {
+                throw Throwables.propagate(e);
+            }
         }
     }
 

@@ -11,13 +11,13 @@ import com.metamx.common.lifecycle.Lifecycle;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
+import io.airlift.airline.Option;
+import io.sugo.pio.common.TaskToolboxFactory;
 import io.sugo.pio.common.config.TaskConfig;
-import io.sugo.pio.guice.Jerseys;
-import io.sugo.pio.guice.JsonConfigProvider;
-import io.sugo.pio.guice.LifecycleModule;
-import io.sugo.pio.guice.ManageLifecycle;
+import io.sugo.pio.guice.*;
 import io.sugo.pio.overlord.TaskRunner;
 import io.sugo.pio.overlord.ThreadPoolTaskRunner;
+import io.sugo.pio.query.QueryWalker;
 import io.sugo.pio.server.QueryResource;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import io.sugo.pio.worker.executor.ExecutorLifecycle;
@@ -40,6 +40,10 @@ public class CliPeon extends GuiceRunnable {
     @Arguments(description = "task.json status.json", required = true)
     public List<String> taskAndStatusFile;
 
+    @Option(name = "--nodeType", title = "nodeType", description = "Set the node type to expose on ZK")
+    public String nodeType = "executor";
+
+
     private static final Logger log = new Logger(CliPeon.class);
 
     @Inject
@@ -59,6 +63,8 @@ public class CliPeon extends GuiceRunnable {
                         binder.bindConstant().annotatedWith(Names.named("serviceName")).to("pio/peon");
                         binder.bindConstant().annotatedWith(Names.named("servicePort")).to(-1);
 
+                        binder.bind(TaskToolboxFactory.class).in(LazySingleton.class);
+
                         JsonConfigProvider.bind(binder, "pio.task", TaskConfig.class);
 
                         binder.bind(ExecutorLifecycle.class).in(ManageLifecycle.class);
@@ -70,11 +76,13 @@ public class CliPeon extends GuiceRunnable {
                         );
 
                         binder.bind(TaskRunner.class).to(ThreadPoolTaskRunner.class);
+                        binder.bind(QueryWalker.class).to(ThreadPoolTaskRunner.class);
                         binder.bind(ThreadPoolTaskRunner.class).in(ManageLifecycle.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class);
                         Jerseys.addResource(binder, QueryResource.class);
                         LifecycleModule.register(binder, QueryResource.class);
+                        binder.bind(NodeTypeConfig.class).toInstance(new NodeTypeConfig(nodeType));
                         LifecycleModule.register(binder, Server.class);
                     }
                 });
@@ -98,14 +106,6 @@ public class CliPeon extends GuiceRunnable {
                 );
                 Runtime.getRuntime().addShutdownHook(hook);
                 injector.getInstance(ExecutorLifecycle.class).join();
-
-                // Sanity check to help debug unexpected non-daemon threads
-                final Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-                for (Thread thread : threadSet) {
-                    if (!thread.isDaemon() && thread != Thread.currentThread()) {
-                    }
-                }
-
                 // Explicitly call lifecycle stop, dont rely on shutdown hook.
                 lifecycle.stop();
                 Runtime.getRuntime().removeShutdownHook(hook);

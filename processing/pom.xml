@@ -22,6 +22,14 @@
             <artifactId>jackson-jaxrs-smile-provider</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
             <groupId>gov.nist.math</groupId>
             <artifactId>jama</artifactId>
         </dependency>

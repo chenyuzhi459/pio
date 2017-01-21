@@ -37,6 +37,7 @@ public class TaskMaster {
     @Inject
     public TaskMaster(
         final TaskQueueConfig taskQueueConfig,
+        final TaskStorage taskStorage,
         @Self final PioNode node,
         final TaskZkConfig zkPaths,
         final TaskRunnerFactory runnerFactory,
@@ -61,12 +62,11 @@ public class TaskMaster {
 //                            taskLockbox.syncFromStorage();
                             taskRunner = runnerFactory.build();
                             taskQueue = new TaskQueue(
-                                    taskQueueConfig
-//                                    taskStorage,
-//                                    taskRunner,
+                                    taskQueueConfig,
+                                    taskStorage,
+                                    taskRunner
 //                                    taskActionClientFactory,
 //                                    taskLockbox,
-//                                    emitter
                             );
 
                             // Sensible order to start stuff:

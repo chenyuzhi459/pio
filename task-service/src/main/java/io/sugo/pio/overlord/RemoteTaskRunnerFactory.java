@@ -5,7 +5,7 @@ import com.google.common.base.Supplier;
 import com.google.inject.Inject;
 import com.metamx.common.concurrent.ScheduledExecutorFactory;
 import com.metamx.http.client.HttpClient;
-import io.sugo.pio.cache.SimplePathChildrenCacheFactory;
+import io.sugo.pio.curator.cache.SimplePathChildrenCacheFactory;
 import io.sugo.pio.guice.annotations.Global;
 import io.sugo.pio.initialization.TaskZkConfig;
 import io.sugo.pio.overlord.config.RemoteTaskRunnerConfig;

@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>io.sugo</groupId>
-            <artifactId>pio-api</artifactId>
+            <artifactId>pio-processing-engine-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

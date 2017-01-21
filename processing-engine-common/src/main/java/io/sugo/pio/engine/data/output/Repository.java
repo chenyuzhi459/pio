@@ -1,5 +1,6 @@
 package io.sugo.pio.engine.data.output;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.io.OutputStream;
@@ -7,7 +8,10 @@ import java.io.Serializable;
 
 /**
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "repositoryType")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = "local", value = LocalFileRepository.class)
+})
 public interface Repository extends Serializable {
     OutputStream openOutput(String name);
 
@@ -24,4 +28,6 @@ public interface Repository extends Serializable {
     boolean exists(String name);
 
     FSInputStream openInput(String name);
+
+    boolean isDistributed();
 }

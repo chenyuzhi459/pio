@@ -14,6 +14,7 @@ import io.sugo.pio.metadata.SQLMetadataConnector;
  */
 public class DerbyConnector extends SQLMetadataConnector {
     private static final Logger log = new Logger(DerbyConnector.class);
+    private static final String SERIAL_TYPE = "BIGINT GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)";
     private final DBI dbi;
 
     @Inject
@@ -28,6 +29,12 @@ public class DerbyConnector extends SQLMetadataConnector {
         this.dbi = new DBI(datasource);
 
         log.info("Configured Derby as metadata storage");
+    }
+
+    @Override
+    protected String getSerialType()
+    {
+        return SERIAL_TYPE;
     }
 
     @Override

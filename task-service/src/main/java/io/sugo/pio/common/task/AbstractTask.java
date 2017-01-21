@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  */
-public abstract class AbstractTask implements Task {
+public abstract class AbstractTask<Q> implements Task<Q> {
     @JsonIgnore
     private final String id;
 
@@ -49,7 +49,7 @@ public abstract class AbstractTask implements Task {
     }
 
     @Override
-    public <Q, R> QueryRunner<Q, R> getQueryRunner()
+    public <R> QueryRunner<Q, R> getQueryRunner()
     {
         return null;
     }

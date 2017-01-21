@@ -6,9 +6,9 @@ import io.sugo.pio.engine.prediction.PredictionModel;
 
 /**
  */
-public class PopularModelFactory implements ModelFactory<PopQuery, PopResult> {
+public class PopularModelFactory implements ModelFactory<PopResult> {
     @Override
-    public PredictionModel<PopQuery, PopResult> loadModel(Repository repository) {
+    public PredictionModel<PopResult> loadModel(Repository repository) {
         return null;
     }
 }

@@ -1,10 +1,11 @@
 package io.sugo.pio.engine.template;
 
-import io.sugo.pio.spark.engine.Algorithm;
-import io.sugo.pio.spark.engine.DataSource;
-import io.sugo.pio.spark.engine.Model;
-import io.sugo.pio.spark.engine.Preparator;
-import io.sugo.pio.spark.engine.data.output.Repository;
+import io.sugo.pio.engine.data.output.LocalFileRepository;
+import io.sugo.pio.engine.data.output.Repository;
+import io.sugo.pio.engine.training.Algorithm;
+import io.sugo.pio.engine.training.DataSource;
+import io.sugo.pio.engine.training.Model;
+import io.sugo.pio.engine.training.Preparator;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.Test;
@@ -12,7 +13,6 @@ import io.sugo.pio.engine.template.data.TemplateModelData;
 import io.sugo.pio.engine.template.data.TemplatePreparedData;
 import io.sugo.pio.engine.template.data.TemplateTrainingData;
 import io.sugo.pio.engine.template.data.input.MovielenBatchEventHose;
-import io.sugo.pio.spark.engine.data.output.LocalFileRepository;
 
 /**
  */
@@ -36,12 +36,10 @@ public class TemplateEngineTest {
         Algorithm<TemplatePreparedData, TemplateModelData> modelDataAlgorithm = factory.createAlgorithm();
         TemplateModelData modelData = modelDataAlgorithm.train(sc, preparedData);
 
-        Model<TemplateModelData, TemplateModelData> model = factory.createModel();
+        Model<TemplateModelData> model = factory.createModel();
         Repository repository = new LocalFileRepository("/tmp/modelfile");
 
         model.save(modelData, repository);
-        TemplateModelData model2 = model.load(repository);
-
         System.out.print("ok");
     }
 

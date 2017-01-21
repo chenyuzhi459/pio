@@ -21,6 +21,7 @@ public class PostgreSQLConnector extends SQLMetadataConnector
 {
     private static final Logger log = new Logger(PostgreSQLConnector.class);
     private static final String PAYLOAD_TYPE = "BYTEA";
+    private static final String SERIAL_TYPE = "BIGSERIAL";
 
     private final DBI dbi;
 
@@ -45,6 +46,12 @@ public class PostgreSQLConnector extends SQLMetadataConnector
     @Override
     protected String getPayloadType() {
         return PAYLOAD_TYPE;
+    }
+
+    @Override
+    protected String getSerialType()
+    {
+        return SERIAL_TYPE;
     }
 
     protected boolean canUpsert(Handle handle) throws SQLException

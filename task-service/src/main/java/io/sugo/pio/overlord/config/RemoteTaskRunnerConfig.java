@@ -19,6 +19,9 @@ public class RemoteTaskRunnerConfig extends WorkerTaskRunnerConfig {
     private Period taskCleanupTimeout = new Period("PT15M");
 
     @JsonProperty
+    private Period taskShutdownLinkTimeout = new Period("PT1M");
+
+    @JsonProperty
     @Min(1)
     private int pendingTasksRunnerNumThreads = 1;
 
@@ -34,6 +37,11 @@ public class RemoteTaskRunnerConfig extends WorkerTaskRunnerConfig {
     @JsonProperty
     public Period getTaskCleanupTimeout(){
         return taskCleanupTimeout;
+    }
+
+    public Period getTaskShutdownLinkTimeout()
+    {
+        return taskShutdownLinkTimeout;
     }
 
 

@@ -10,8 +10,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +18,7 @@ import java.util.Map;
 
 /**
  */
-public class DruidInputFormat extends InputFormat<DateTime, Map> implements Configurable {
+public class DruidInputFormat extends InputFormat<Long, Map> implements Configurable {
     public static final String DRUID_DATASOURCE = "druid.datasource";
     public static final String DRUID_COORDINATOR_URL = "druid.coordinator.url";
     public static final String DRUID_STARTTIME = "druid.starttime";
@@ -32,7 +30,8 @@ public class DruidInputFormat extends InputFormat<DateTime, Map> implements Conf
     private Configuration conf;
     private String datasource;
     private String coordinatorUrl;
-    private Interval interval;
+    private String startTime;
+    private String untilTime;
 
     public DruidInputFormat() {
         httpclient = new DefaultHttpClient();
@@ -65,12 +64,12 @@ public class DruidInputFormat extends InputFormat<DateTime, Map> implements Conf
         return String.format("http://%s/druid/coordinator/v1/datasources/%s/intervals/%s/serverview?partial=true",
                 coordinatorUrl,
                 datasource,
-                interval.toString().replace("/", "_")
+                startTime + "_" + untilTime
             );
     }
 
     @Override
-    public RecordReader<DateTime, Map> createRecordReader(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
+    public RecordReader<Long, Map> createRecordReader(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
         DruidInputSplit druidSplit = (DruidInputSplit)split;
         Configuration conf = new Configuration();
         return new DruidRecordReader(FileSystem.get(conf), druidSplit.getPath());
@@ -80,11 +79,10 @@ public class DruidInputFormat extends InputFormat<DateTime, Map> implements Conf
     public void setConf(Configuration conf) {
         this.conf = conf;
 
-        this.datasource = conf.get(DRUID_DATASOURCE);
-        this.coordinatorUrl = conf.get(DRUID_COORDINATOR_URL);
-        DateTime startTime = new DateTime(conf.get(DRUID_STARTTIME));
-        DateTime untilTime = new DateTime(conf.get(DRUID_ENDTIME));
-        interval = new Interval(startTime, untilTime);
+        datasource = conf.get(DRUID_DATASOURCE);
+        coordinatorUrl = conf.get(DRUID_COORDINATOR_URL);
+        startTime = conf.get(DRUID_STARTTIME);
+        untilTime = conf.get(DRUID_ENDTIME);
     }
 
     @Override

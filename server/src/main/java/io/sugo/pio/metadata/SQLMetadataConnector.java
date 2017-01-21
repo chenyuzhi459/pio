@@ -28,7 +28,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     private static final Logger log = new Logger(SQLMetadataConnector.class);
     private static final String PAYLOAD_TYPE = "BLOB";
 
-    public static final int DEFAULT_MAX_TRIES = 0;
+    public static final int DEFAULT_MAX_TRIES = 3;
 
     private final Supplier<MetadataStorageConnectorConfig> config;
     private final Supplier<MetadataStorageTablesConfig> tablesConfigSupplier;
@@ -62,6 +62,17 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     {
         return PAYLOAD_TYPE;
     }
+
+    /**
+     * Auto-incrementing SQL type to use for IDs
+     * Must be an integer type, which values will be automatically set by the database
+     * <p/>
+     * The resulting string will be interpolated into the table creation statement, e.g.
+     * <code>CREATE TABLE druid_table ( id <type> NOT NULL, ... )</code>
+     *
+     * @return String representing the SQL type and auto-increment statement
+     */
+    protected abstract String getSerialType();
 
     public abstract boolean tableExists(Handle handle, final String tableName);
 
@@ -174,6 +185,66 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         );
     }
 
+    public void createEntryTable(final String tableName)
+    {
+        createTable(
+                tableName,
+                ImmutableList.of(
+                        String.format(
+                                "CREATE TABLE %1$s (\n"
+                                        + "  id VARCHAR(255) NOT NULL,\n"
+                                        + "  created_date VARCHAR(255) NOT NULL,\n"
+                                        + "  datasource VARCHAR(255) NOT NULL,\n"
+                                        + "  payload %2$s NOT NULL,\n"
+                                        + "  status_payload %2$s NOT NULL,\n"
+                                        + "  active BOOLEAN NOT NULL DEFAULT FALSE,\n"
+                                        + "  PRIMARY KEY (id)\n"
+                                        + ")",
+                                tableName, getPayloadType()
+                        ),
+                        String.format("CREATE INDEX idx_%1$s_active_created_date ON %1$s(active, created_date)", tableName)
+                )
+        );
+    }
+
+    public void createLogTable(final String tableName, final String entryTypeName)
+    {
+        createTable(
+                tableName,
+                ImmutableList.of(
+                        String.format(
+                                "CREATE TABLE %1$s (\n"
+                                        + "  id %2$s NOT NULL,\n"
+                                        + "  %4$s_id VARCHAR(255) DEFAULT NULL,\n"
+                                        + "  log_payload %3$s,\n"
+                                        + "  PRIMARY KEY (id)\n"
+                                        + ")",
+                                tableName, getSerialType(), getPayloadType(), entryTypeName
+                        ),
+                        String.format("CREATE INDEX idx_%1$s_%2$s_id ON %1$s(%2$s_id)", tableName, entryTypeName)
+                )
+        );
+    }
+
+    public void createLockTable(final String tableName, final String entryTypeName)
+    {
+        createTable(
+                tableName,
+                ImmutableList.of(
+                        String.format(
+                                "CREATE TABLE %1$s (\n"
+                                        + "  id %2$s NOT NULL,\n"
+                                        + "  %4$s_id VARCHAR(255) DEFAULT NULL,\n"
+                                        + "  lock_payload %3$s,\n"
+                                        + "  PRIMARY KEY (id)\n"
+                                        + ")",
+                                tableName, getSerialType(), getPayloadType(), entryTypeName
+                        ),
+                        String.format("CREATE INDEX idx_%1$s_%2$s_id ON %1$s(%2$s_id)", tableName, entryTypeName)
+                )
+        );
+    }
+
     @Override
     public Void insertOrUpdate(
             final String tableName,
@@ -269,6 +340,18 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     {
         if (config.get().isCreateTables()) {
             createOperatorProcessTable(tablesConfigSupplier.get().getOperatorProcessTable());
+        }
+    }
+
+    @Override
+    public void createTaskTables()
+    {
+        if (config.get().isCreateTables()) {
+            final MetadataStorageTablesConfig tablesConfig = tablesConfigSupplier.get();
+            final String entryType = tablesConfig.getTaskEntryType();
+            createEntryTable(tablesConfig.getEntryTable(entryType));
+            createLogTable(tablesConfig.getLogTable(entryType), entryType);
+            createLockTable(tablesConfig.getLockTable(entryType), entryType);
         }
     }
 

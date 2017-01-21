@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.common.TaskStatus;
+import io.sugo.pio.common.TaskToolbox;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.UUID;
 /**
  */
 public class NoopTask extends AbstractTask {
-    private static final int defaultRunTime = 2500;
+    private static final int defaultRunTime = 2500000;
 
     @JsonIgnore
     private final long runTime;
@@ -35,7 +36,7 @@ public class NoopTask extends AbstractTask {
     }
 
     @Override
-    public TaskStatus run() throws Exception {
+    public TaskStatus run(TaskToolbox toolbox) throws Exception {
         Thread.sleep(runTime);
 
         return TaskStatus.success(getId());

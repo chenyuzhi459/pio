@@ -20,5 +20,7 @@ public interface MetadataStorageConnector {
 
     void createOperatorProcessTable();
 
+    void createTaskTables();
+
     void createConfigTable();
 }

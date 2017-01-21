@@ -6,9 +6,9 @@ import io.sugo.pio.engine.prediction.PredictionModel;
 
 /**
  */
-public class ALSModelFactory implements ModelFactory<ALSQuery, ALSResult> {
+public class ALSModelFactory implements ModelFactory<ALSResult> {
     @Override
-    public PredictionModel<ALSQuery, ALSResult> loadModel(Repository repository) {
+    public PredictionModel<ALSResult> loadModel(Repository repository) {
         return null;
     }
 }
