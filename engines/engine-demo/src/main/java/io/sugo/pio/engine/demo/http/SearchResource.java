@@ -1,14 +1,13 @@
 package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sugo.pio.engine.als.Constants;
 import io.sugo.pio.engine.common.data.QueryableModelData;
-import io.sugo.pio.engine.demo.ItemUtil;
-import io.sugo.pio.engine.popular.LucenceConstants;
-import io.sugo.pio.engine.als.ALSQuery;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
-import org.apache.lucene.search.SortField;
+import io.sugo.pio.engine.search.Constants;
+import io.sugo.pio.engine.search.SearchQuery;
+import org.ansj.lucene5.AnsjAnalyzer;
+import org.apache.lucene.analysis.Analyzer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -17,22 +16,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
-@Path("query/als")
-public class ALSResource {
+@Path("query/itemSearch")
+public class SearchResource {
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final QueryableModelData modelData;
-    private static final String ITEM_NAME = "item_name";
 
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/als";
+    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/search";
 
-    public ALSResource() throws IOException {
+    public SearchResource() throws IOException {
         Repository repository = new LocalFileRepository(REPOSITORY_PATH);
         modelData = new QueryableModelData(repository);
     }
@@ -46,13 +41,13 @@ public class ALSResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            ALSQuery query = jsonMapper.readValue(in, ALSQuery.class);
+            SearchQuery query = jsonMapper.readValue(in, SearchQuery.class);
             Map<String, Object> map = new LinkedHashMap<>();
+            Map<String, Object> mapSyn = new LinkedHashMap<>();
 
-            if (query.getUser_id() != null) {
-                map.put(Constants.USER_ID(), query.getUser_id());
+            if (query.getItem_name() != null) {
+                map.put(Constants.ITEM_NAME(), query.getItem_name());
             }
-
             int queryNum = 10;
             if (query.getNum() != null) {
                 String Num = query.getNum();
@@ -60,16 +55,12 @@ public class ALSResource {
             }
 
             List<String> resultFields = new ArrayList<>();
+            resultFields.add(Constants.ITEM_NAME());
             resultFields.add(Constants.ITEM_ID());
-            Map<String, List<String>> res = modelData.predict(map, resultFields, new SortField(LucenceConstants.SCORE(), SortField.Type.FLOAT, true), queryNum, null);
+            Analyzer analyzer = new AnsjAnalyzer(AnsjAnalyzer.TYPE.index_ansj);
+            Map<String, List<String>> res = modelData.predict(map, resultFields, null, queryNum, analyzer);
             String str;
             if (!res.isEmpty()) {
-                List<String> filmIds = res.get(Constants.ITEM_ID());
-                List<String> filmNames = new ArrayList<>(filmIds.size());
-                for (String id: filmIds) {
-                    filmNames.add(ItemUtil.getTitle(id));
-                }
-                res.put(ITEM_NAME, filmNames);
                 str = jsonMapper.writeValueAsString(res);
             } else {
                 str = "items not found";

@@ -12,11 +12,11 @@ import java.util.Map;
 
 /**
  */
-public class MovieBatchEventHose implements BatchEventHose {
+public class HtcBatchEventHose implements BatchEventHose {
     private final String filepath;
     private final String seperator;
 
-    public MovieBatchEventHose(String filepath, String seperator) {
+    public HtcBatchEventHose(String filepath, String seperator) {
         this.filepath = filepath;
         this.seperator = seperator;
     }
@@ -37,10 +37,10 @@ public class MovieBatchEventHose implements BatchEventHose {
         public Event call(String str) throws Exception {
             String[] res = str.split(seperator);
             Map<String, Object> map = Maps.newHashMap();
-            map.put(Constants.USER_ID, Integer.parseInt(res[0]));
-            map.put(Constants.ITEM_ID, Integer.parseInt(res[1]));
-            map.put(Constants.GRADE, Float.parseFloat(res[2]));
-            map.put(Constants.TIMENUM, Long.parseLong(res[3]));
+            if (res.length >= 10) {
+                map.put(Constants.ITEM_ID, res[1]);
+                map.put(Constants.ITEM_NAME, res[5]);
+            }
             return new Event(System.currentTimeMillis(), map);
         }
     }

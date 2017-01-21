@@ -30,7 +30,7 @@ public class PopluarResource {
     private final QueryableModelData modelData;
     private static final String ITEM_NAME = "item_name";
 
-    public static final String REPOSITORY_PATH = "src/main/resources/index/pop";
+    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/pop";
 
     public PopluarResource() throws IOException {
         Repository repository = new LocalFileRepository(REPOSITORY_PATH);
@@ -49,8 +49,8 @@ public class PopluarResource {
             PopQuery query = jsonMapper.readValue(in, PopQuery.class);
             Map<String, Object> map = new LinkedHashMap<>();
 
-            if (query.getDetailCategory() != null) {
-                map.put(Constants.DETAIL_CATEGORY(), query.getDetailCategory());
+            if (query.getTags() != null) {
+                map.put(Constants.CATEGORY(), query.getTags());
             }
 
             int queryNum = 10;
@@ -61,7 +61,7 @@ public class PopluarResource {
 
             List<String> resultFields = new ArrayList<>();
             resultFields.add(Constants.ITEM_ID());
-            Map<String, List<String>> res = modelData.predict(map, resultFields, new SortField(LucenceConstants.SCORE(), SortField.Type.INT, true), queryNum);
+            Map<String, List<String>> res = modelData.predict(map, resultFields, new SortField(LucenceConstants.SCORE(), SortField.Type.INT, true), queryNum, null);
             String str;
             if (!res.isEmpty()) {
                 List<String> filmIds = res.get(Constants.ITEM_ID());

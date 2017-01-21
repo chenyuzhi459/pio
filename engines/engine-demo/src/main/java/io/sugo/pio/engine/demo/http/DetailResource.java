@@ -7,6 +7,8 @@ import io.sugo.pio.engine.detail.Constants;
 import io.sugo.pio.engine.detail.DetailQuery;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
+import io.sugo.pio.engine.detail.LucenceConstants;
+import org.apache.lucene.search.SortField;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -28,7 +30,7 @@ public class DetailResource {
     private final QueryableModelData modelData;
     private static final String RELATED_ITEM_NAME = "related_item_name";
 
-    public static final String REPOSITORY_PATH = "src/main/resources/index/detail";
+    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/detail";
 
     public DetailResource() throws IOException {
         Repository repository = new LocalFileRepository(REPOSITORY_PATH);
@@ -47,8 +49,8 @@ public class DetailResource {
             DetailQuery query = jsonMapper.readValue(in, DetailQuery.class);
             Map<String, Object> map = new LinkedHashMap<>();
 
-            if (query.getItemId() != null) {
-                map.put(Constants.ITEM_ID(), query.getItemId());
+            if (query.getItem_id() != null) {
+                map.put(Constants.ITEM_ID(), query.getItem_id());
             }
 
             int queryNum = 10;
@@ -59,7 +61,7 @@ public class DetailResource {
 
             List<String> resultFields = new ArrayList<>();
             resultFields.add(Constants.RELATED_ITEM_ID());
-            Map<String, List<String>> res = modelData.predict(map, resultFields, null, queryNum);
+            Map<String, List<String>> res = modelData.predict(map, resultFields, new SortField(LucenceConstants.SCORE(), SortField.Type.FLOAT, true), queryNum, null);
             String str;
             if (!res.isEmpty()) {
                 List<String> filmIds = res.get(Constants.RELATED_ITEM_ID());

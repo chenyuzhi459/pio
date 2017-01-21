@@ -125,7 +125,7 @@
 			 <h2>Details :</h2>
 			   <p>{{filmData.Plot}}</p>
 	   </div>
-   </div>
+           </div>
 				<div class="rightsidebar span_3_of_1 sidebar">
 					<h2>Specials</h2>
 					 	<div class="special_movies" v-for="(item, index) in relatedFilms">
@@ -144,6 +144,37 @@
  		 		 </div>
    	 		</div>
         </div>
+
+		<!------------End Header ------------>
+		<div class="main">
+			<div class="wrap">
+				<div class="content">
+					<div class="content_bottom">
+						<div class="heading">
+							<h3>frequent Products</h3>
+						</div>
+					</div>
+					<div class="section group">
+						<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in fpFilms">
+							<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
+							<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
+							<div class="price-details">
+								<div class="price-number">
+									<p><span>Genre:</span> &nbsp; {{item.Genre}}</p>
+									<p><span>Rating:</span> &nbsp; {{item.imdbRating}}</p>
+								</div>
+								<div class="add-cart">
+									<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
+								</div>
+								<div class="clear"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
    <div class="footer">
    	  <div class="wrap">	
 			 <div class="copy_right">
@@ -167,7 +198,8 @@
                 data: {
                     userId: window.localStorage.getItem("userId") || '',
                     filmData: {},
-					relatedFilms: []
+					relatedFilms: [],
+					fpFilms: []
                 },
                 methods: {
                     checkOut: function() {
@@ -182,7 +214,7 @@
                                 req.setRequestHeader('Content-Type', 'application/json')
                             },
                             data: JSON.stringify({
-                                'itemId': id, 'num': 5
+                                'item_id': id, 'num': 5
                             }),
                             dataType: 'json',
                             type: 'post',
@@ -192,6 +224,28 @@
                                     that.queryOmdbByTitle(data.related_item_id[m], data.related_item_name[m], temp)
                                 }
                                 that.relatedFilms = temp
+                            }
+                        })
+					},
+
+					queryFp: function(id) {
+						var that = this
+						$.ajax({
+                            url: '/pio/query/itemfp',
+                            beforeSend(req) {
+                                req.setRequestHeader('Content-Type', 'application/json')
+                            },
+                            data: JSON.stringify({
+                                'item_id': id, 'num': 8
+                            }),
+                            dataType: 'json',
+                            type: 'post',
+                            success(data) {
+                                var temp = []
+                                for (let m = 0; m < data.item_id.length; m++) {
+                                    that.queryOmdbByTitle(data.item_id[m], data.item_name[m], temp)
+                                }
+                                that.fpFilms = temp
                             }
                         })
 					},
@@ -223,6 +277,7 @@
             })
 			detailUR.queryOmdbById(qs("imdbId"))
             detailUR.queryRelated(qs("id"))
+            detailUR.queryFp(qs("id"))
 		});
 	</script>
     <a href="#" id="toTop"><span id="toTopHover"> </span></a>

@@ -11,4 +11,16 @@ public class Constants {
 
     public static final String ITEM_GENS = "unknown|Action|Adventure|Animation|Children's|Comedy|Crime|Documentary|Drama|Fantasy|Film-Noir|Horror|Musical|Mystery|Romance|Sci-Fi|Thriller|War|Western|";
     public static final String ITEM_SEPERATOR = "\\|";
+
+    //HTC
+    public static final String HTCDATA_PATH = Constants.class.getClassLoader().getResource("htc/htcData.txt").getPath();
+    public static final String HTC_SEPERATOR = "::";
+
+    //
+    public static final String USER_ID = "user_id";
+    public static final String ITEM_ID = "item_id";
+    public static final String ITEM_NAME = "item_name";
+    public static final String GRADE = "grade";
+    public static final String CATEGORY = "category";
+    public static final String TIMENUM = "timenum";
 }
