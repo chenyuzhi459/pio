@@ -3,7 +3,6 @@ package io.sugo.pio.cli;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -11,7 +10,6 @@ import com.metamx.common.lifecycle.Lifecycle;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
-import io.airlift.airline.Option;
 import io.sugo.pio.common.TaskToolboxFactory;
 import io.sugo.pio.common.config.TaskConfig;
 import io.sugo.pio.guice.*;
@@ -26,8 +24,6 @@ import org.eclipse.jetty.server.Server;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  */
@@ -40,14 +36,7 @@ public class CliPeon extends GuiceRunnable {
     @Arguments(description = "task.json status.json", required = true)
     public List<String> taskAndStatusFile;
 
-    @Option(name = "--nodeType", title = "nodeType", description = "Set the node type to expose on ZK")
-    public String nodeType = "executor";
-
-
     private static final Logger log = new Logger(CliPeon.class);
-
-    @Inject
-    private Properties properties;
 
     public CliPeon()
     {

@@ -194,7 +194,6 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                                 "CREATE TABLE %1$s (\n"
                                         + "  id VARCHAR(255) NOT NULL,\n"
                                         + "  created_date VARCHAR(255) NOT NULL,\n"
-                                        + "  datasource VARCHAR(255) NOT NULL,\n"
                                         + "  payload %2$s NOT NULL,\n"
                                         + "  status_payload %2$s NOT NULL,\n"
                                         + "  active BOOLEAN NOT NULL DEFAULT FALSE,\n"
@@ -203,44 +202,6 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                                 tableName, getPayloadType()
                         ),
                         String.format("CREATE INDEX idx_%1$s_active_created_date ON %1$s(active, created_date)", tableName)
-                )
-        );
-    }
-
-    public void createLogTable(final String tableName, final String entryTypeName)
-    {
-        createTable(
-                tableName,
-                ImmutableList.of(
-                        String.format(
-                                "CREATE TABLE %1$s (\n"
-                                        + "  id %2$s NOT NULL,\n"
-                                        + "  %4$s_id VARCHAR(255) DEFAULT NULL,\n"
-                                        + "  log_payload %3$s,\n"
-                                        + "  PRIMARY KEY (id)\n"
-                                        + ")",
-                                tableName, getSerialType(), getPayloadType(), entryTypeName
-                        ),
-                        String.format("CREATE INDEX idx_%1$s_%2$s_id ON %1$s(%2$s_id)", tableName, entryTypeName)
-                )
-        );
-    }
-
-    public void createLockTable(final String tableName, final String entryTypeName)
-    {
-        createTable(
-                tableName,
-                ImmutableList.of(
-                        String.format(
-                                "CREATE TABLE %1$s (\n"
-                                        + "  id %2$s NOT NULL,\n"
-                                        + "  %4$s_id VARCHAR(255) DEFAULT NULL,\n"
-                                        + "  lock_payload %3$s,\n"
-                                        + "  PRIMARY KEY (id)\n"
-                                        + ")",
-                                tableName, getSerialType(), getPayloadType(), entryTypeName
-                        ),
-                        String.format("CREATE INDEX idx_%1$s_%2$s_id ON %1$s(%2$s_id)", tableName, entryTypeName)
                 )
         );
     }
@@ -350,8 +311,6 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
             final MetadataStorageTablesConfig tablesConfig = tablesConfigSupplier.get();
             final String entryType = tablesConfig.getTaskEntryType();
             createEntryTable(tablesConfig.getEntryTable(entryType));
-            createLogTable(tablesConfig.getLogTable(entryType), entryType);
-            createLockTable(tablesConfig.getLockTable(entryType), entryType);
         }
     }
 

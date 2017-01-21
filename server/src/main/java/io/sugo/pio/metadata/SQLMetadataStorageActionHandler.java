@@ -52,17 +52,13 @@ public class SQLMetadataStorageActionHandler<EntryType, StatusType>
 
   private final String entryTypeName;
   private final String entryTable;
-  private final String logTable;
-  private final String lockTable;
 
   public SQLMetadataStorageActionHandler(
       final SQLMetadataConnector connector,
       final ObjectMapper jsonMapper,
       final MetadataStorageActionHandlerTypes<EntryType, StatusType> types,
       final String entryTypeName,
-      final String entryTable,
-      final String logTable,
-      final String lockTable
+      final String entryTable
   )
   {
     this.connector = connector;
@@ -71,14 +67,11 @@ public class SQLMetadataStorageActionHandler<EntryType, StatusType>
     this.statusType = types.getStatusType();
     this.entryTypeName = entryTypeName;
     this.entryTable = entryTable;
-    this.logTable = logTable;
-    this.lockTable = lockTable;
   }
 
   public void insert(
       final String id,
       final DateTime timestamp,
-      final String dataSource,
       final EntryType entry,
       final boolean active,
       final StatusType status
@@ -93,13 +86,12 @@ public class SQLMetadataStorageActionHandler<EntryType, StatusType>
             {
               handle.createStatement(
                   String.format(
-                      "INSERT INTO %s (id, created_date, datasource, payload, active, status_payload) VALUES (:id, :created_date, :datasource, :payload, :active, :status_payload)",
+                      "INSERT INTO %s (id, created_date, payload, active, status_payload) VALUES (:id, :created_date, :payload, :active, :status_payload)",
                       entryTable
                   )
               )
                     .bind("id", id)
                     .bind("created_date", timestamp.toString())
-                    .bind("datasource", dataSource)
                     .bind("payload", jsonMapper.writeValueAsBytes(entry))
                     .bind("active", active)
                     .bind("status_payload", jsonMapper.writeValueAsBytes(status))
