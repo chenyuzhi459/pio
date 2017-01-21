@@ -8,9 +8,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Click {
     private String userId;
     private String itemId;
+    private long timestamp;
 
     @JsonCreator
-    public Click(@JsonProperty("userId") String userId, @JsonProperty("itemId")String itemId) {
+    public Click(@JsonProperty("userId") String userId, @JsonProperty("itemId")String itemId, @JsonProperty("timestamp")long timestamp) {
         this.userId = userId;
         this.itemId = itemId;
     }
@@ -23,5 +24,10 @@ public class Click {
     @JsonProperty
     public String getItemId() {
         return itemId;
+    }
+
+    @JsonProperty
+    public long getTimestamp() {
+        return timestamp;
     }
 }

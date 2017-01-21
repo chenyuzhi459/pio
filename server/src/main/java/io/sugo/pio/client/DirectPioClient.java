@@ -82,7 +82,7 @@ public class DirectPioClient<Q, R> implements QueryRunner<Q, R> {
                 {
                     responseStartTime = System.currentTimeMillis();
                     try {
-                        final String responseContext = response.headers().get("X-Druid-Response-Context");
+                        final String responseContext = response.headers().get("X-Pio-Response-Context");
                         // context may be null in case of error or query timeout
                         if (responseContext != null) {
                             context.putAll(
