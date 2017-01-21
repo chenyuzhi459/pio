@@ -24,7 +24,7 @@ class DetailAlgorithm extends Algorithm[DetailPreparedData, DetailModelData] {
 
     val modelData = cooccurrenceIDSs(0)
       .toStringMapRDD()
-      .asInstanceOf[RDD[(String, Seq[String])]]
+      .asInstanceOf[RDD[(String, Seq[(String,Double)])]]
     new DetailModelData(modelData)
   }
 }
