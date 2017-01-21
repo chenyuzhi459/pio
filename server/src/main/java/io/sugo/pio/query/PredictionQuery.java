@@ -20,7 +20,7 @@ public class PredictionQuery implements Query {
     }
 
     @Override
-    public Object getQueryObject() {
+    public PredictionQueryObject getQueryObject() {
         return predictionQueryObject;
     }
 }

@@ -6,9 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.prediction.PredictionQueryObject;
 
 public class PopQuery implements PredictionQueryObject {
+    @JsonProperty
     private String detailCategory;
-    private String num;
 
+    @JsonProperty
+    private String num;
 
     @JsonCreator
     public PopQuery(

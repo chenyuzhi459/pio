@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.client.PioDataServer;
+import io.sugo.pio.client.PioServer;
 import io.sugo.pio.curator.announcement.Announcer;
 import io.sugo.pio.server.initialization.ZkPathsConfig;
 import org.apache.curator.utils.ZKPaths;
@@ -19,7 +21,7 @@ public class BatchDataServerAnnouncer implements DataServerAnnouncer
 
   private final Announcer announcer;
   private final ObjectMapper jsonMapper;
-  private final PioServerMetadata server;
+  private final PioServer server;
   private final ZkPathsConfig config;
 
   private final Object lock = new Object();
@@ -28,7 +30,7 @@ public class BatchDataServerAnnouncer implements DataServerAnnouncer
 
   @Inject
   public BatchDataServerAnnouncer(
-      PioServerMetadata server,
+      PioServer server,
       ZkPathsConfig config,
       Announcer announcer,
       ObjectMapper jsonMapper
@@ -41,7 +43,7 @@ public class BatchDataServerAnnouncer implements DataServerAnnouncer
   }
 
   @Override
-  public void announce() throws IOException
+  public void announce(String id) throws IOException
   {
     synchronized (lock) {
       if (announced) {
@@ -51,7 +53,8 @@ public class BatchDataServerAnnouncer implements DataServerAnnouncer
       try {
         final String path = makeAnnouncementPath();
         log.info("Announcing self[%s] at [%s]", server, path);
-        announcer.announce(path, jsonMapper.writeValueAsBytes(server), false);
+        PioDataServer dataServer = new PioDataServer(id, server);
+        announcer.announce(path, jsonMapper.writeValueAsBytes(dataServer), false);
       }
       catch (JsonProcessingException e) {
         throw Throwables.propagate(e);

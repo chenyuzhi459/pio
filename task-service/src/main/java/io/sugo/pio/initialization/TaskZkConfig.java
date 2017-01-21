@@ -50,7 +50,7 @@ public class TaskZkConfig {
         return ZKPaths.makePath(getBase(), subPath);
     }
 
-    public String getBase()
+    private String getBase()
     {
         return base == null ? getZkPathsConfig().defaultPath("indexer") : base;
     }

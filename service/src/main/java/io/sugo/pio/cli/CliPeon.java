@@ -82,7 +82,6 @@ public class CliPeon extends GuiceRunnable {
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class);
                         Jerseys.addResource(binder, QueryResource.class);
                         LifecycleModule.register(binder, QueryResource.class);
-                        binder.bind(NodeTypeConfig.class).toInstance(new NodeTypeConfig(nodeType));
                         LifecycleModule.register(binder, Server.class);
                     }
                 });

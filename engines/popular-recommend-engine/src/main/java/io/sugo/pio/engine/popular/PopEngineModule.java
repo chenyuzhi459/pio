@@ -16,9 +16,9 @@ public class PopEngineModule implements EngineModule {
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
                 new SimpleModule(PopEngineModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(PopularEngineFactory.class, "detail_factory"),
-                                new NamedType(PopQuery.class, "detail_query"),
-                                new NamedType(PopularModelFactory.class, "detail_model")));
+                        .registerSubtypes(new NamedType(PopularEngineFactory.class, "pop_factory"),
+                                new NamedType(PopQuery.class, "pop_query"),
+                                new NamedType(PopularModelFactory.class, "pop_model")));
     }
 
     @Override

@@ -25,7 +25,7 @@ public abstract class ServerInventoryView implements ServerView, InventoryView
 {
   private static final Logger log = new Logger(ServerInventoryView.class);
 
-  private final CuratorInventoryManager<PioServer> inventoryManager;
+  private final CuratorInventoryManager<PioDataServer> inventoryManager;
   private final AtomicBoolean started = new AtomicBoolean(false);
 
   private final ConcurrentMap<ServerCallback, Executor> serverCallbacks = new MapMaker().makeMap();
@@ -47,13 +47,13 @@ public abstract class ServerInventoryView implements ServerView, InventoryView
           }
         },
         Execs.singleThreaded("ServerInventoryView-%s"),
-        new CuratorInventoryManagerStrategy<PioServer>()
+        new CuratorInventoryManagerStrategy<PioDataServer>()
         {
           @Override
-          public PioServer deserializeContainer(byte[] bytes)
+          public PioDataServer deserializeContainer(byte[] bytes)
           {
             try {
-              return jsonMapper.readValue(bytes, PioServer.class);
+              return jsonMapper.readValue(bytes, PioDataServer.class);
             }
             catch (IOException e) {
               throw Throwables.propagate(e);
@@ -61,7 +61,7 @@ public abstract class ServerInventoryView implements ServerView, InventoryView
           }
 
           @Override
-          public void newContainer(PioServer container)
+          public void newContainer(PioDataServer container)
           {
             log.info("New Server[%s]", container);
             runServerCallbacks(new Function<ServerCallback, CallbackAction>()
@@ -75,7 +75,7 @@ public abstract class ServerInventoryView implements ServerView, InventoryView
           }
 
           @Override
-          public void deadContainer(PioServer deadContainer)
+          public void deadContainer(PioDataServer deadContainer)
           {
             log.info("Server Disappeared[%s]", deadContainer);
             runServerCallbacks(new Function<ServerCallback, CallbackAction>()
@@ -89,7 +89,7 @@ public abstract class ServerInventoryView implements ServerView, InventoryView
           }
 
           @Override
-          public PioServer updateContainer(PioServer oldContainer, PioServer newContainer)
+          public PioDataServer updateContainer(PioDataServer oldContainer, PioDataServer newContainer)
           {
             log.info("Server updated[%s]", newContainer);
             runServerCallbacks(new Function<ServerCallback, CallbackAction>()
@@ -139,13 +139,13 @@ public abstract class ServerInventoryView implements ServerView, InventoryView
   }
 
   @Override
-  public PioServer getInventoryValue(String containerKey)
+  public PioDataServer getInventoryValue(String containerKey)
   {
     return inventoryManager.getInventoryValue(containerKey);
   }
 
   @Override
-  public Iterable<PioServer> getInventory()
+  public Iterable<PioDataServer> getInventory()
   {
     return inventoryManager.getInventory();
   }
