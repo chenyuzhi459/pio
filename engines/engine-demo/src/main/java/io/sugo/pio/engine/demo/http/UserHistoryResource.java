@@ -22,7 +22,7 @@ import java.util.*;
 
 /**
  */
-@Path("query/userHistory")
+@Path("query/userSearch")
 public class UserHistoryResource {
     private final String ITEM_NAME = "item_name";
     private final ObjectMapper jsonMapper = new ObjectMapper();

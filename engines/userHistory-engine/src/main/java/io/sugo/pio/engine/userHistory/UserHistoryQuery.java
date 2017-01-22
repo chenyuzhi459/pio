@@ -36,6 +36,6 @@ public class UserHistoryQuery implements PredictionQueryObject {
 
     @Override
     public String getType() {
-        return "userhistory";
+        return "userSearch";
     }
 }

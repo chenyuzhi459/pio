@@ -16,9 +16,9 @@ public class SearchEngineModule implements EngineModule {
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
                 new SimpleModule(SearchEngineModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(SearchEngineFactory.class, "Search_factory"),
-                                new NamedType(SearchQuery.class, "Search_query"),
-                                new NamedType(SearchModelFactory.class, "Search_model")));
+                        .registerSubtypes(new NamedType(SearchEngineFactory.class, "search_factory"),
+                                new NamedType(SearchQuery.class, "search_query"),
+                                new NamedType(SearchModelFactory.class, "search_model")));
     }
 
     @Override
