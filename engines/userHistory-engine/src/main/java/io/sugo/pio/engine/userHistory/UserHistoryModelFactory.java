@@ -56,8 +56,10 @@ public class UserHistoryModelFactory implements ModelFactory<UserHistoryResult> 
 
                 String searchWord = UserHistoryQuery.getItem_name();
                 List<String> seaItemIds = GetSearchItemId(searchWord);
-                List<String> lastItemIds = GetSimilarItems(hisItemIds, seaItemIds, queryNum);
-
+                List<String> lastItemIds = null;
+                if (hisItemIds != null && seaItemIds!= null){
+                    lastItemIds = GetSimilarItems(hisItemIds, seaItemIds, queryNum);
+                }
                 return new UserHistoryResult(lastItemIds);
             }catch (IOException e) {
                 e.printStackTrace();
@@ -75,7 +77,10 @@ public class UserHistoryModelFactory implements ModelFactory<UserHistoryResult> 
             List<String> resultFields = new ArrayList<>();
             resultFields.add(io.sugo.pio.engine.search.Constants.ITEM_ID());
             Map<String, List<String>> res = searchModel.predict(map, resultFields, null, queryNum,analyzer);
-            List<String> searchIds = res.get(io.sugo.pio.engine.search.Constants.ITEM_ID());
+            List<String> searchIds = null;
+            if (res != null){
+                searchIds = res.get(io.sugo.pio.engine.search.Constants.ITEM_ID());
+            }
             return searchIds;
         }
 
