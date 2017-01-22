@@ -78,7 +78,7 @@ public class CliOverlord extends ServerRunnable {
                     private void configureTaskStorage(Binder binder)
                     {
                         PolyBind.createChoice(
-                                binder, "druid.indexer.storage.type", Key.get(TaskStorage.class), Key.get(HeapMemoryTaskStorage.class)
+                                binder, "pio.task.storage.type", Key.get(TaskStorage.class), Key.get(HeapMemoryTaskStorage.class)
                         );
                         final MapBinder<String, TaskStorage> storageBinder = PolyBind.optionBinder(
                                 binder,

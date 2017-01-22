@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.server.PioNode;
-import io.sugo.pio.server.coordination.PioServerMetadata;
 
 /**
  */
@@ -14,19 +13,17 @@ public class PioServer implements Comparable
 
   private static final Logger log = new Logger(PioServer.class);
 
-  private final Object lock = new Object();
-
-  private final PioServerMetadata metadata;
+  private final String name;
+  private final String host;
+  private final int priority;
 
   public PioServer(
-      PioNode node,
-      String type
+      PioNode node
   )
   {
     this(
         node.getHostAndPort(),
         node.getHostAndPort(),
-        type,
         DEFAULT_PRIORITY
     );
   }
@@ -35,36 +32,30 @@ public class PioServer implements Comparable
   public PioServer(
       @JsonProperty("name") String name,
       @JsonProperty("host") String host,
-      @JsonProperty("type") String type,
       @JsonProperty("priority") int priority
   )
   {
-    this.metadata = new PioServerMetadata(name, host, type, priority);
+    this.name = name;
+    this.host = host;
+    this.priority = priority;
   }
 
+  @JsonProperty
   public String getName()
   {
-    return metadata.getName();
+    return name;
   }
 
-  public PioServerMetadata getMetadata()
-  {
-    return metadata;
-  }
-
+  @JsonProperty
   public String getHost()
   {
-    return metadata.getHost();
+    return host;
   }
 
-  public String getType()
-  {
-    return metadata.getType();
-  }
-
+  @JsonProperty
   public int getPriority()
   {
-    return metadata.getPriority();
+    return priority;
   }
 
   @Override
@@ -79,7 +70,14 @@ public class PioServer implements Comparable
 
     PioServer that = (PioServer) o;
 
-    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) {
+    if (priority != that.priority) {
+      return false;
+    }
+
+    if (host != null ? !host.equals(that.host) : that.host != null) {
+      return false;
+    }
+    if (name != null ? !name.equals(that.name) : that.name != null) {
       return false;
     }
 
@@ -92,10 +90,13 @@ public class PioServer implements Comparable
     return getName() != null ? getName().hashCode() : 0;
   }
 
-  @Override
   public String toString()
   {
-    return metadata.toString();
+    return "PioServer{" +
+            "name='" + name + '\'' +
+            ", host='" + host + '\'' +
+            ", priority='" + priority + '\'' +
+            '}';
   }
 
   @Override

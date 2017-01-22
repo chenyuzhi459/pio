@@ -16,11 +16,11 @@ public interface ServerView
 
   public static interface ServerCallback
   {
-    public CallbackAction serverRemoved(PioServer server);
+    public CallbackAction serverRemoved(PioDataServer server);
 
-    public CallbackAction serverAdded(PioServer server);
+    public CallbackAction serverAdded(PioDataServer server);
 
-    public CallbackAction serverUpdated(PioServer oldServer, PioServer newServer);
+    public CallbackAction serverUpdated(PioDataServer oldServer, PioDataServer newServer);
 
   }
 }

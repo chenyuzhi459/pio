@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(name = "prediction", value = PredictionQuery.class)
 })
 public interface Query<Q> {
-    @JsonProperty
     public String getType();
 
     @JsonProperty

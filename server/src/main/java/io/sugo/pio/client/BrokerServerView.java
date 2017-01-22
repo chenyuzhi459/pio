@@ -57,20 +57,20 @@ public class BrokerServerView implements ServerView {
                 new ServerView.ServerCallback()
                 {
                     @Override
-                    public ServerView.CallbackAction serverRemoved(PioServer server)
+                    public ServerView.CallbackAction serverRemoved(PioDataServer server)
                     {
                         removeServer(server);
                         return ServerView.CallbackAction.CONTINUE;
                     }
 
                     @Override
-                    public CallbackAction serverAdded(PioServer server) {
+                    public CallbackAction serverAdded(PioDataServer server) {
                         addServer(server);
                         return ServerView.CallbackAction.CONTINUE;
                     }
 
                     @Override
-                    public CallbackAction serverUpdated(PioServer oldServer, PioServer newServer) {
+                    public CallbackAction serverUpdated(PioDataServer oldServer, PioDataServer newServer) {
                         updateServer(oldServer, newServer);
                         return ServerView.CallbackAction.CONTINUE;
                     }
@@ -103,19 +103,19 @@ public class BrokerServerView implements ServerView {
         }
     }
 
-    private void addServer(PioServer server)
+    private void addServer(PioDataServer server)
     {
         synchronized (lock) {
-            ServerSelector selector = selectors.get(server.getType());
+            ServerSelector selector = selectors.get(server.getId());
             if (selector == null) {
                 selector = new ServerSelector(tierSelectorStrategy);
-                selectors.put(server.getType(), selector);
+                selectors.put(server.getId(), selector);
             }
 
-            QueryablePioServer queryablePioServer = clients.get(server.getName());
+            QueryablePioServer queryablePioServer = clients.get(server.getServer().getName());
             if (queryablePioServer == null) {
-                queryablePioServer = new QueryablePioServer(baseView.getInventoryValue(server.getName()), makeDirectClient(server));
-                QueryablePioServer exists = clients.put(server.getName(), queryablePioServer);
+                queryablePioServer = new QueryablePioServer(baseView.getInventoryValue(server.getServer().getName()).getServer(), makeDirectClient(server));
+                QueryablePioServer exists = clients.put(server.getServer().getName(), queryablePioServer);
                 if (exists != null) {
                     log.warn("QueryRunner for server[%s] already existed!? Well it's getting replaced", server);
                 }
@@ -124,41 +124,41 @@ public class BrokerServerView implements ServerView {
         }
     }
 
-    private void updateServer(PioServer oldServer, PioServer newServer) {
+    private void updateServer(PioDataServer oldServer, PioDataServer newServer) {
         synchronized (lock) {
-            ServerSelector oldSelector = selectors.get(oldServer.getType());
-            QueryablePioServer oldQueryablePioServer = clients.get(oldServer.getName());
+            ServerSelector oldSelector = selectors.get(oldServer.getId());
+            QueryablePioServer oldQueryablePioServer = clients.get(oldServer.getServer().getName());
             if (oldQueryablePioServer != null) {
-                clients.remove(oldServer.getName());
+                clients.remove(oldServer.getServer().getName());
                 if (null != oldSelector) {
                     oldSelector.removeServer(oldQueryablePioServer);
                 }
             }
 
-            QueryablePioServer queryablePioServer = new QueryablePioServer(baseView.getInventoryValue(newServer.getName()), makeDirectClient(newServer));
-            clients.put(newServer.getName(), queryablePioServer);
+            QueryablePioServer queryablePioServer = new QueryablePioServer(baseView.getInventoryValue(newServer.getServer().getName()).getServer(), makeDirectClient(newServer));
+            clients.put(newServer.getServer().getName(), queryablePioServer);
 
-            ServerSelector newSelector = selectors.get(newServer.getType());
+            ServerSelector newSelector = selectors.get(newServer.getId());
             if (newSelector == null) {
                 newSelector = new ServerSelector(tierSelectorStrategy);
-                selectors.put(newServer.getType(), newSelector);
+                selectors.put(newServer.getId(), newSelector);
             }
             newSelector.addServer(queryablePioServer);
         }
     }
 
-    private DirectPioClient makeDirectClient(PioServer server)
+    private DirectPioClient makeDirectClient(PioDataServer server)
     {
-        return new DirectPioClient(objectMapper, httpClient, server.getHost());
+        return new DirectPioClient(objectMapper, httpClient, server.getServer().getHost());
     }
 
-    private QueryablePioServer removeServer(PioServer server)
+    private QueryablePioServer removeServer(PioDataServer server)
     {
-        return clients.remove(server.getName());
+        return clients.remove(server.getId());
     }
 
-    public ServerSelector getServerSelector(String serverType) {
-        return selectors.get(serverType);
+    public ServerSelector getServerSelector(String id) {
+        return selectors.get(id);
     }
 
     public <Q, R> QueryRunner<Q, R> getQueryRunner(PioServer server)

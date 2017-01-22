@@ -50,9 +50,7 @@ public class SQLMetadataStorageActionHandlerFactory implements MetadataStorageAc
         jsonMapper,
         payloadTypes,
         entryType,
-        config.getEntryTable(entryType),
-        config.getLogTable(entryType),
-        config.getLockTable(entryType)
+        config.getEntryTable(entryType)
     );
   }
 }

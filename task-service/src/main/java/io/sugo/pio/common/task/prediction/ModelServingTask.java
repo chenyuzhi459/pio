@@ -12,6 +12,7 @@ import io.sugo.pio.engine.prediction.PredictionModel;
 import io.sugo.pio.engine.prediction.PredictionQueryObject;
 import io.sugo.pio.query.Query;
 import io.sugo.pio.query.QueryRunner;
+import io.sugo.pio.server.coordination.DataServerAnnouncer;
 
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
     private final Repository repository;
     private final ModelFactory modelFactory;
+    private final String modelId;
 
     @JsonIgnore
     private PredictionModel<R> model;
@@ -30,10 +32,12 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
     @JsonCreator
     public ModelServingTask(
             @JsonProperty("id") String id,
+            @JsonProperty("modelId") String modelId,
             @JsonProperty("context") Map<String, Object> context,
             @JsonProperty("repository") Repository repository,
             @JsonProperty("modelFactory") ModelFactory<R> modelFactory) {
         super(id, context);
+        this.modelId = modelId;
         this.repository = repository;
         this.modelFactory = modelFactory;
     }
@@ -45,12 +49,19 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
 
     @Override
     public TaskStatus run(TaskToolbox toolbox) throws Exception {
+        DataServerAnnouncer announcer =  toolbox.getSegmentAnnouncer();
         model = modelFactory.loadModel(repository);
+        announcer.announce(modelId);
         synchronized (handoffCondition) {
             handoffCondition.wait();
         }
 
         return TaskStatus.success(getId());
+    }
+
+    @JsonProperty
+    public String getModelId() {
+        return modelId;
     }
 
     @JsonProperty
@@ -86,7 +97,10 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
 
         @Override
         public R run(Query<PredictionQueryObject> query, Map<String, Object> responseContext) {
-            return predictionModel.predict(query.getQueryObject());
+            if (null != predictionModel) {
+                return predictionModel.predict(query.getQueryObject());
+            }
+            return null;
         }
     }
 
