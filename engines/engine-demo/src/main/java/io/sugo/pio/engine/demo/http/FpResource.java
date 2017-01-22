@@ -45,11 +45,14 @@ public class FpResource {
 
             int queryNum = 10;
             Map<String, List<String>> lastRes = new HashMap();
-            if (!itemIds.isEmpty()){
+            if (itemIds != null){
                 lastRes = GetListItem(itemIds, queryNum);
             }
+            else {
+                lastRes = null;
+            }
             String str;
-            if (!lastRes.isEmpty()) {
+            if (lastRes != null) {
                 List<String> filmIds = lastRes.get(Constants.ITEMID());
                 List<String> filmNames = new ArrayList<>(filmIds.size());
                 for (String id: filmIds) {
