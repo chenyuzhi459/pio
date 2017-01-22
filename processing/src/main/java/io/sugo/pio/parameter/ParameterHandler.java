@@ -5,6 +5,67 @@ import java.util.List;
 /**
  */
 public interface  ParameterHandler {
+    /**
+     * string expansion key which will be replaced with the current system date and time
+     */
+    public static final String STRING_EXPANSION_MACRO_TIME = "t";
+    /**
+     * string expansion key which will be replaced with the number of times the operator was
+     * applied.
+     */
+    public static final String STRING_EXPANSION_MACRO_NUMBER_APPLIED_TIMES_USER_FRIENDLY = "execution_count";
+    /**
+     * string expansion key which will be replaced with the name of the operator.
+     */
+    public static final String STRING_EXPANSION_MACRO_OPERATORNAME_USER_FRIENDLY = "operator_name";
+    /**
+     * string expansion key which will be replaced with the name of the operator.
+     */
+    public static final String STRING_EXPANSION_MACRO_OPERATORNAME = "n";
+    /**
+     * string expansion key which will be replaced with the class of the operator.
+     */
+    public static final String STRING_EXPANSION_MACRO_OPERATORCLASS = "c";
+    /**
+     * string expansion key which will be replaced with the number of times the operator was
+     * applied.
+     */
+    public static final String STRING_EXPANSION_MACRO_NUMBER_APPLIED_TIMES = "a";
+    /**
+     * string expansion key which will be replaced with the number of times the operator was applied
+     * plus one (a shortcut for %{p[1]}).
+     */
+    public static final String STRING_EXPANSION_MACRO_NUMBER_APPLIED_TIMES_PLUS_ONE = "b";
+    /**
+     * string expansion key which will be replaced with %.
+     */
+    public static final String STRING_EXPANSION_MACRO_PERCENT_SIGN = "%";
+    /**
+     * string expansion key which will be replaced with the number of times the operator was applied
+     * plus the specified number.
+     */
+    public static final String STRING_EXPANSION_MACRO_NUMBER_APPLIED_TIMES_SHIFTED = "p";
+    /**
+     * indicates the the start of a string expansion parameter
+     */
+    public static final String STRING_EXPANSION_MACRO_PARAMETER_START = "[";
+    /**
+     * indicates the the end of a string expansion parameter
+     */
+    public static final String STRING_EXPANSION_MACRO_PARAMETER_END = "]";
+    /**
+     * string expansion key which will be replaced with the specified value of the operator with the
+     * specified name.
+     */
+    public static final String STRING_EXPANSION_MACRO_OPERATORVALUE = "v";
+    /**
+     * indicates the start of a macro
+     */
+    public static final String MACRO_STRING_START = "%{";
+    /**
+     * indicates the end of a macro
+     */
+    public static final String MACRO_STRING_END = "}";
     /** Returns a collection of all parameters of this parameter handler. */
     Parameters getParameters();
 

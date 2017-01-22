@@ -22,8 +22,7 @@ public final class ProcessRootOperator extends OperatorChain {
     public static final String PARAMETER_RANDOM_SEED = "random_seed";
     private OperatorProcess operatorProcess;
 
-    public ProcessRootOperator(){
-        super("execution_unit");
+    public ProcessRootOperator() {
     }
 
     @JsonIgnore
@@ -64,7 +63,7 @@ public final class ProcessRootOperator extends OperatorChain {
      * Convenience backport method to get the results of a process.
      */
     public IOContainer getResults(boolean omitNullResults) {
-        InputPorts inputPorts = getExecutionUnit(0).getInnerSinks();
+        InputPorts inputPorts = getExecutionUnit().getInnerSinks();
         return inputPorts.createIOContainer(false, omitNullResults);
     }
 
@@ -88,5 +87,10 @@ public final class ProcessRootOperator extends OperatorChain {
     public void setProcess(OperatorProcess operatorProcess) {
         this.operatorProcess = operatorProcess;
         registerOperator(this.operatorProcess);
+    }
+
+    @Override
+    public OperatorProcess getProcess() {
+        return operatorProcess;
     }
 }

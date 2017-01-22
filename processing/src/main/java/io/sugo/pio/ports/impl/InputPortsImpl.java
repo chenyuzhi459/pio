@@ -8,7 +8,6 @@ import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.PortOwner;
 import io.sugo.pio.ports.metadata.MetaData;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -48,6 +47,13 @@ public class InputPortsImpl extends AbstractPorts<InputPort> implements InputPor
     @Override
     public InputPort createPort(String name, MetaData metaData) {
         InputPort in = createPort(name);
+        return in;
+    }
+
+    @Override
+    public InputPort createPassThroughPort(String name) {
+        InputPort in = new InputPortImpl(this, name);
+        addPort(in);
         return in;
     }
 

@@ -1,6 +1,8 @@
 package io.sugo.pio.ports.impl;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.operator.UserError;
 import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.Ports;
 import io.sugo.pio.ports.metadata.MetaDataError;
@@ -16,6 +18,7 @@ public abstract class AbstractPort implements Port {
     private final List<MetaDataError> errorList = new LinkedList<>();
     private final Ports<? extends Port> ports;
 
+    @JsonProperty
     private String name;
 
     private static final ReferenceCache<IOObject> IOO_REFERENCE_CACHE = new ReferenceCache<>(20);
@@ -73,9 +76,22 @@ public abstract class AbstractPort implements Port {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Deprecated
+    @Override
+    public <T extends IOObject> T getDataOrNull() throws UserError {
+        IOObject data = getAnyDataOrNull();
+        return (T) data;
+    }
+
     @Override
     public final String getName() {
         return name;
+    }
+
+    /** Don't use this method. Use {@link Ports#renamePort(Port,String)}. */
+    protected void setName(String newName) {
+        this.name = newName;
     }
 
     @Override

@@ -1,15 +1,20 @@
 package io.sugo.pio;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.metamx.common.IAE;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.operator.Status;
+import io.sugo.pio.ports.Connection;
+import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.repository.RepositoryAccessor;
+import io.sugo.pio.repository.RepositoryLocation;
 import org.joda.time.DateTime;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  */
@@ -22,12 +27,20 @@ public class OperatorProcess {
     private DateTime createTime;
     private DateTime updateTime;
     private ProcessRootOperator rootOperator;
+    private RepositoryAccessor repositoryAccessor;
+    private ProcessLocation processLocation;
+    private final List<ProcessStateListener> processStateListeners = Collections.synchronizedList(new LinkedList<>());
+    /** The macro handler can be used to replace (user defined) macro strings. */
+    private final MacroHandler macroHandler = new MacroHandler(this);
 
+    private transient final Logger logger = Logger.getLogger(Process.class.getName());
     /**
      * This map holds the names of all operators in the process. Operators are automatically
      * registered during adding and unregistered after removal.
      */
     private Map<String, Operator> operatorNameMap = new HashMap<>();
+
+    private List<Connection> connections;
 
     public OperatorProcess(String name) {
         this(name, new ProcessRootOperator());
@@ -40,6 +53,7 @@ public class OperatorProcess {
         setRootOperator(rootOperator);
         this.createTime = new DateTime();
         this.updateTime = this.createTime;
+        connections = new ArrayList<>();
     }
 
     @JsonProperty
@@ -102,6 +116,65 @@ public class OperatorProcess {
         return rootOperator;
     }
 
+    @JsonProperty
+    public List<Connection> getConnections() {
+        return connections;
+    }
+
+    public void setConnections(List<Connection> connections) {
+        this.connections = connections;
+        if (connections != null && !connections.isEmpty()) {
+            for (Connection connection : connections) {
+                connect(connection, false);
+            }
+        }
+    }
+
+    public Logger getLogger() {
+        return this.logger;
+    }
+
+    public RepositoryAccessor getRepositoryAccessor() {
+        return repositoryAccessor;
+    }
+
+    public RepositoryLocation getRepositoryLocation() {
+        if (processLocation instanceof RepositoryProcessLocation) {
+            return ((RepositoryProcessLocation) processLocation).getRepositoryLocation();
+        } else {
+            return null;
+        }
+    }
+
+    public void setProcessLocation(final ProcessLocation processLocation) {
+        // keep process file version if same file, otherwise overwrite
+        if (this.processLocation != null && !this.processLocation.equals(processLocation)) {
+//            this.isProcessConverted = false;
+//            getLogger().info("Decoupling process from location " + this.processLocation
+//                    + ". Process is now associated with file " + processLocation + ".");
+        }
+        this.processLocation = processLocation;
+//        fireUpdate();
+    }
+
+    public ProcessLocation getProcessLocation() {
+        return this.processLocation;
+    }
+
+    public void addProcessStateListener(ProcessStateListener processStateListener) {
+        this.processStateListeners.add(processStateListener);
+    }
+
+    /** Removes the given process state listener. */
+    public void removeProcessStateListener(ProcessStateListener processStateListener) {
+        this.processStateListeners.remove(processStateListener);
+    }
+
+    /** Returns the macro handler. */
+    public MacroHandler getMacroHandler() {
+        return this.macroHandler;
+    }
+
     public void setRootOperator(ProcessRootOperator rootOperator) {
         this.rootOperator = rootOperator;
         this.rootOperator.setProcess(this);
@@ -151,5 +224,75 @@ public class OperatorProcess {
 
     public void failed() {
         setStatus(Status.FAILED);
+    }
+
+    public Operator getOperator(String operatorId) {
+        Operator operator = operatorNameMap.get(operatorId);
+        return operator;
+    }
+
+    public void removeOperator(String operatorId) {
+        Operator operator = operatorNameMap.get(operatorId);
+        if (operator != null) {
+            operator.remove();
+        }
+    }
+
+    public void connect(Connection dto, boolean add) {
+        Operator fromOperator = operatorNameMap.get(dto.getFromOperator());
+        Operator toOperator = operatorNameMap.get(dto.getToOperator());
+        if (fromOperator == null || toOperator == null) {
+            throw new IAE("fromOperator [%s] or toOperator [%s] not exists", dto.getFromOperator(), dto.getToOperator());
+        }
+
+        OutputPort fromPort = getFromPort(fromOperator, dto.getFromPort());
+        InputPort toPort = getToPort(toOperator, dto.getToPort());
+        if (fromPort == null || toPort == null) {
+            throw new IAE("fromPort [%s] or toPort [%s] not exists", dto.getFromPort(), dto.getToPort());
+        }
+
+        fromPort.connectTo(toPort);
+//        rootOperator.transformMetaData();
+        if (add) {
+            connections.add(dto);
+        }
+    }
+
+    public void disconnect(Connection dto) {
+        Operator fromOperator = operatorNameMap.get(dto.getFromOperator());
+        Operator toOperator = operatorNameMap.get(dto.getToOperator());
+        if (fromOperator == null || toOperator == null) {
+            throw new IAE("fromOperator [%s] or toOperator [%s] not exists", dto.getFromOperator(), dto.getToOperator());
+        }
+
+        OutputPort fromPort = getFromPort(fromOperator, dto.getFromPort());
+        InputPort toPort = getToPort(toOperator, dto.getToPort());
+        if (fromPort == null || toPort == null) {
+            throw new IAE("fromPort [%s] or toPort [%s] not exists", dto.getFromPort(), dto.getToPort());
+        }
+
+        fromPort.disconnect();
+        rootOperator.transformMetaData();
+        connections.remove(dto);
+    }
+
+    private InputPort getToPort(Operator toOperator, String toPort) {
+        List<InputPort> inputs = toOperator.getInputPorts().getAllPorts();
+        for (InputPort input : inputs) {
+            if (input.getName().equals(toPort)) {
+                return input;
+            }
+        }
+        return null;
+    }
+
+    private OutputPort getFromPort(Operator fromOperator, String fromPort) {
+        List<OutputPort> outputs = fromOperator.getOutputPorts().getAllPorts();
+        for (OutputPort output : outputs) {
+            if (output.getName().equals(fromPort)) {
+                return output;
+            }
+        }
+        return null;
     }
 }

@@ -10,11 +10,12 @@ import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MDTransformer;
+import io.sugo.pio.ports.metadata.SimpleProcessSetupError;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "operatorType")
 @JsonSubTypes(value = {
@@ -30,6 +31,24 @@ public abstract class Operator implements ParameterHandler, Serializable {
     private Parameters parameters = null;
 
     private Status status;
+    private boolean isRunning = false;
+    /**
+     * The values for this operator. The current value of a Value can be asked by the
+     * ProcessLogOperator.
+     */
+    private final Map<String, Value> valueMap = new TreeMap<>();
+    /**
+     * May differ from {@link #applyCount} if parallellized.
+     */
+    private int applyCountAtLastExecution = -1;
+    /**
+     * Number of times the operator was applied.
+     */
+    private AtomicInteger applyCount = new AtomicInteger();
+
+    private transient final Logger logger = Logger.getLogger(Operator.class.getName());
+
+    private OperatorVersion compatibilityLevel;
 
     /**
      * The list which stores the errors of this operator (parameter not set, wrong children number,
@@ -59,6 +78,13 @@ public abstract class Operator implements ParameterHandler, Serializable {
     public Operator() {
         this.inputPorts = createInputPorts(portOwner);
         this.outputPorts = createOutputPorts(portOwner);
+        addValue(new ValueDouble("applycount", "The number of times the operator was applied.", false) {
+
+            @Override
+            public double getDoubleValue() {
+                return applyCountAtLastExecution;
+            }
+        });
     }
 
     @JsonProperty
@@ -113,10 +139,57 @@ public abstract class Operator implements ParameterHandler, Serializable {
         }
     }
 
+    /**
+     * Adds an implementation of Value.
+     */
+    public void addValue(Value value) {
+        valueMap.put(value.getKey(), value);
+    }
+
+    /**
+     * Returns the value of the Value with the given key.
+     */
+    public final Value getValue(String key) {
+        return valueMap.get(key);
+    }
+
+    /**
+     * Returns all Values sorted by key.
+     */
+    public Collection<Value> getValues() {
+        return valueMap.values();
+    }
+
+    /**
+     * Returns the number of times this operator was already applied.
+     */
+    public int getApplyCount() {
+        return applyCountAtLastExecution;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    /**
+     * @see OperatorVersion
+     */
+    public void setCompatibilityLevel(OperatorVersion compatibilityLevel) {
+        this.compatibilityLevel = compatibilityLevel;
+    }
+
+    public OperatorVersion getCompatibilityLevel() {
+        if (compatibilityLevel == null) {
+            compatibilityLevel = OperatorVersion.getLatestVersion();
+        }
+        return compatibilityLevel;
+    }
+
+    @JsonProperty
     public InputPorts getInputPorts() {
         return inputPorts;
     }
-
+    @JsonProperty
     public OutputPorts getOutputPorts() {
         return outputPorts;
     }
@@ -174,6 +247,27 @@ public abstract class Operator implements ParameterHandler, Serializable {
         process.unregisterName(name);
     }
 
+    public void removeAndKeepConnections(List<Operator> keepConnectionsTo) {
+
+        getInputPorts().disconnectAllBut(keepConnectionsTo);
+        getOutputPorts().disconnectAllBut(keepConnectionsTo);
+
+        OperatorProcess process = getProcess();
+        if (enclosingExecutionUnit != null) {
+            enclosingExecutionUnit.removeOperator(this);
+        }
+        if (process != null) {
+            unregisterOperator(process);
+        }
+    }
+
+    /**
+     * Removes this operator from its parent.
+     */
+    public void remove() {
+        removeAndKeepConnections(null);
+    }
+
     /**
      * Performs the actual work of the operator and must be implemented by subclasses. Replaces the
      * old method <code>apply()</code>.
@@ -184,12 +278,107 @@ public abstract class Operator implements ParameterHandler, Serializable {
     public void execute() {
         try {
             setStatus(Status.RUNNING);
+            isRunning = true;
+            applyCountAtLastExecution = applyCount.incrementAndGet();
             doWork();
             setStatus(Status.SUCCESS);
         } catch (OperatorException oe) {
             setStatus(Status.FAILED);
             throw oe;
+        } finally {
+            isRunning = false;
         }
+    }
+
+    /**
+     * Clears all errors, checks the operator and its children and propagates meta data, propgatates
+     * dirtyness and sorts execution order.
+     */
+    public void checkAll() {
+        checkOperator();
+        getRoot().transformMetaData();
+        updateExecutionOrder();
+    }
+
+    private final void checkOperator() {
+        checkProperties();
+    }
+
+    public void updateExecutionOrder() {
+    }
+
+    /**
+     * Will count an error if a non optional property has no default value and is not defined by
+     * user. Returns the total number of errors.
+     */
+    public int checkProperties() {
+        int errorCount = 0;
+        Iterator<ParameterType> i = getParameters().getParameterTypes().iterator();
+        while (i.hasNext()) {
+            ParameterType type = i.next();
+            boolean optional = type.isOptional();
+            if (!optional) {
+                boolean parameterSet = getParameters().isSet(type.getKey());
+                if (type.getDefaultValue() == null && !parameterSet) {
+                    addError(new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, portOwner,
+                            "undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
+                    errorCount++;
+                } else if (type instanceof ParameterTypeAttribute && parameterSet) {
+                    try {
+                        if ("".equals(getParameter(type.getKey()))) {
+                            addError(new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, portOwner,
+                                    "undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
+                            errorCount++;
+                        }
+                    } catch (UndefinedParameterError e) {
+                        // Ignore
+                    }
+                }
+            }
+            if (!optional && type instanceof ParameterTypeDate) {
+                String value = getParameters().getParameter(type.getKey());
+                if (value != null && !ParameterTypeDate.isValidDate(value)) {
+                    addError(new SimpleProcessSetupError(ProcessSetupError.Severity.WARNING, portOwner, "invalid_date_format",
+                            new Object[]{type.getKey().replace('_', ' '), value}));
+                }
+            }
+        }
+        return errorCount;
+    }
+
+    /**
+     * Returns the first ancestor that does not have a parent. Note that this is not necessarily a
+     * ProcessRootOperator!
+     */
+    public Operator getRoot() {
+        if (getParent() == null) {
+            return this;
+        } else {
+            return getParent().getRoot();
+        }
+    }
+
+    public Logger getLogger() {
+        if (getProcess() == null) {
+            return logger;
+        } else {
+            return getProcess().getLogger();
+        }
+    }
+
+    /**
+     * Returns the parameter type with the given name. Will return null if this operator does not
+     * have a parameter with the given name.
+     */
+    public ParameterType getParameterType(String name) {
+        Iterator<ParameterType> i = getParameters().getParameterTypes().iterator();
+        while (i.hasNext()) {
+            ParameterType current = i.next();
+            if (current.getKey().equals(name)) {
+                return current;
+            }
+        }
+        return null;
     }
 
     /**
@@ -210,6 +399,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * been created yet, it will now be created. Creation had to be moved out of constructor for
      * meta data handling in subclasses needing a port.
      */
+    @JsonProperty
     @Override
     public Parameters getParameters() {
         if (parameters == null) {
@@ -385,7 +575,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
     /**
      * Returns the ExecutionUnit that contains this operator.
      */
-    public final ExecutionUnit getExecutionUnit() {
+    public ExecutionUnit getExecutionUnit() {
         return enclosingExecutionUnit;
     }
 
@@ -394,6 +584,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * the meta data on the input Ports to be already calculated.
      */
     public void transformMetaData() {
+        getInputPorts().checkPreconditions();
         getTransformer().transformMetaData();
     }
 

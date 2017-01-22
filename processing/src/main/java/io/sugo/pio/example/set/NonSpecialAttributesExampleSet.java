@@ -68,7 +68,7 @@ public class NonSpecialAttributesExampleSet extends AbstractExampleSet {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.rapidminer.operator.ResultObjectAdapter#getAnnotations()
+	 * @see io.sugo.pio.operator.ResultObjectAdapter#getAnnotations()
 	 */
 	@Override
 	public Annotations getAnnotations() {

@@ -4,7 +4,7 @@ package io.sugo.pio.parameter;
  * A parameter type for categories. These are several Strings and one of these is the default value.
  * Additionally users can define other strings than these given in as pre-defined categories.
  * Operators ask for the defined String with the method
- * {@link com.rapidminer.operator.Operator#getParameterAsString(String)}.
+ * {@link io.sugo.pio.operator.Operator#getParameterAsString(String)}.
  *
  */
 public class ParameterTypeStringCategory extends ParameterTypeSingle {

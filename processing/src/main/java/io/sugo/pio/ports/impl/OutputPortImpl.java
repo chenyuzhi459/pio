@@ -27,7 +27,7 @@ public class OutputPortImpl extends AbstractOutputPort {
         setData(object);
         if (isConnected()) {
             getDestination().receive(object);
+            System.out.println(String.format("deliver data from %s to %s", getName(), getDestination().getName()));
         }
-        System.out.println(String.format("deliver data from %s to %s", getName(), getDestination().getName()));
     }
 }

@@ -1,33 +1,24 @@
 package io.sugo.pio.tools.plugin;
 
 import io.sugo.pio.tools.*;
-import io.sugo.pio.util.OperatorService;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.*;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.*;
-import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.logging.Level;
 
 
 /**
@@ -818,7 +809,7 @@ public class Plugin {
 
 	/**
 	 * This method will try to invoke the public static method initPlugin() of the class
-	 * com.rapidminer.PluginInit for arbitrary initializations of the plugins. It is called directly
+	 * io.sugo.pio.PluginInit for arbitrary initializations of the plugins. It is called directly
 	 * after registering the plugins.
 	 */
 	public static void initPlugins() {

@@ -22,6 +22,7 @@ public class MDTransformer {
             try {
                 rule.transformMD();
             } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }

@@ -1,26 +1,18 @@
 package io.sugo.pio.operator;
 
-import io.sugo.pio.example.ExampleSet;
-import io.sugo.pio.operator.preprocessing.MaterializeDataInMemory;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;
-import io.sugo.pio.parameter.UndefinedParameterError;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  */
 public abstract class ParallelOperatorChain extends OperatorChain {
     public static String PARAMETER_ENABLE_PARALLEL_EXECUTION = "enable_parallel_execution";
 
-    public ParallelOperatorChain(String name) {
-        super(name);
-    }
+//    public ParallelOperatorChain() {
+//        super();
+//    }
 
 //    protected <T> T getAndCheckForStop(final Future<T> future) throws OperatorException {
 //        try {

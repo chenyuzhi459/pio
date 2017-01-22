@@ -1,14 +1,17 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  */
 public class ParameterTypeInt extends ParameterTypeNumber {
+    @JsonProperty
     private int defaultValue = -1;
-
+    @JsonProperty
     private int min = Integer.MIN_VALUE;
-
+    @JsonProperty
     private int max = Integer.MAX_VALUE;
-
+    @JsonProperty
     private boolean noDefault = true;
 
     public ParameterTypeInt(String key, String description, int min, int max) {

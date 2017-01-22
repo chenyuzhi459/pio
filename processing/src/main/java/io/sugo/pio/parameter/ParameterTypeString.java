@@ -1,8 +1,11 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  */
 public class ParameterTypeString extends ParameterType {
+    @JsonProperty
     private String defaultValue = null;
 
     public ParameterTypeString(String key, String description, String defaultValue) {

@@ -16,7 +16,6 @@ import java.util.List;
  * This interface must be implemented by classes implementing an AttributeFilterCondition for the
  * AttributeFilter operator.
  * 
- * @author Sebastian Land, Ingo Mierswa
  */
 public interface AttributeFilterCondition {
 

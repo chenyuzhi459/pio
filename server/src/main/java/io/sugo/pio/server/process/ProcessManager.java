@@ -16,6 +16,7 @@ import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.metadata.MetadataProcessManager;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.Status;
+import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
 import org.joda.time.DateTime;
 
@@ -145,7 +146,7 @@ public class ProcessManager {
 
     public OperatorProcess delete(String id) {
         OperatorProcess process = get(id);
-        if (process != null && Status.DELETED.equals(process.getStatus())) {
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
             process.setStatus(Status.DELETED);
             process.setUpdateTime(new DateTime());
             metadataProcessManager.update(process);
@@ -212,8 +213,7 @@ public class ProcessManager {
 
     }
 
-    public Operator addOperator(OperatorDto dto) {
-        String processId = dto.getProcessId();
+    public OperatorProcess addOperator(String processId, OperatorDto dto) {
         OperatorProcess process = get(processId);
         OperatorMeta meta = operatorMetaMap.get(dto.getOperatorType());
         try {
@@ -221,10 +221,72 @@ public class ProcessManager {
             operator.setName(meta.getName() + "-" + UUID.randomUUID().toString());
             operator.setxPos(dto.getxPos());
             operator.setyPos(dto.getyPos());
-            process.getRootOperator().getExecutionUnit(0).addOperator(operator);
-            return operator;
+            process.getRootOperator().getExecutionUnit().addOperator(operator);
+            process.setUpdateTime(new DateTime());
+            metadataProcessManager.update(process);
+            return process;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Operator getOperator(String processId, String operatorId) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            Operator operator = process.getOperator(operatorId);
+            return operator;
+        } else {
+            return null;
+        }
+    }
+
+    public OperatorProcess deleteOperator(String processId, String operatorId) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            process.setUpdateTime(new DateTime());
+            process.removeOperator(operatorId);
+            metadataProcessManager.update(process);
+            return process;
+        } else {
+            return null;
+        }
+    }
+
+    public OperatorProcess connect(String processId, Connection dto) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            process.setUpdateTime(new DateTime());
+            process.connect(dto, true);
+            metadataProcessManager.update(process);
+            process.getRootOperator().getExecutionUnit().transformMetaData();
+            return process;
+        } else {
+            return null;
+        }
+    }
+
+    public OperatorProcess disconnect(String processId, Connection dto) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            process.setUpdateTime(new DateTime());
+            process.disconnect(dto);
+            metadataProcessManager.update(process);
+            process.getRootOperator().getExecutionUnit().transformMetaData();
+            return process;
+        } else {
+            return null;
+        }
+    }
+
+    public Operator updateParameter(String processId, String operatorId, String key, String value) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            Operator operator = process.getOperator(operatorId);
+            operator.setParameter(key, value);
+            metadataProcessManager.update(process);
+            return operator;
+        } else {
+            return null;
         }
     }
 }

@@ -55,7 +55,7 @@ public class ParameterService {
 	}
 
 	/**
-	 * Reads the configuration file if allowed by the {@link com.rapidminer.operator.ExecutionMode}.
+	 * Reads the configuration file if allowed by the {@link io.sugo.pio.operator.ExecutionMode}.
 	 */
 	public static void init() {
 		if (!intialized) {

@@ -1,10 +1,9 @@
 package io.sugo.pio.ports.impl;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.IOObject;
-import io.sugo.pio.ports.Port;
-import io.sugo.pio.ports.PortOwner;
-import io.sugo.pio.ports.Ports;
+import io.sugo.pio.ports.*;
 
 import java.util.*;
 
@@ -16,6 +15,9 @@ public abstract class AbstractPorts<T extends Port> implements Ports<T> {
 
     private final PortOwner owner;
 
+    private List<PortExtender> portExtenders;
+
+    @JsonProperty
     public List<T> getPortList() {
         return portList;
     }
@@ -52,14 +54,67 @@ public abstract class AbstractPorts<T extends Port> implements Ports<T> {
     }
 
     @Override
+    public void removePort(T port) throws PortException {
+        if (!portList.contains(port) || port.getPorts() != this) {
+            throw new PortException("Cannot remove " + port + ".");
+        } else {
+            if (port.isConnected()) {
+                if (port instanceof OutputPort) {
+                    ((OutputPort) port).disconnect();
+                } else {
+                    ((InputPort) port).getSource().disconnect();
+                }
+            }
+            portList.remove(port);
+            portMap.remove(port.getName());
+        }
+    }
+
+    @Override
     public PortOwner getOwner() {
         return owner;
+    }
+
+    @Override
+    public void renamePort(T port, String newName) {
+        if (portMap.containsKey(newName)) {
+            throw new PortException("Port name already used: " + port.getName());
+        }
+        portMap.remove(port.getName());
+        ((AbstractPort) port).setName(newName);
+        portMap.put(newName, port);
     }
 
     @Override
     public List<T> getAllPorts() {
         synchronized (portList) {
             return Collections.unmodifiableList(new ArrayList<>(portList));
+        }
+    }
+
+    @Override
+    public void pushDown(T port) {
+        if (!portList.contains(port)) {
+            throw new PortException("Cannot push down " + port.getName() + ": port does not belong to " + this);
+        }
+        portList.remove(port);
+        portList.add(port);
+    }
+
+    @Override
+    public void registerPortExtender(PortExtender extender) {
+        if (portExtenders == null) {
+            portExtenders = new LinkedList<>();
+        }
+        portExtenders.add(extender);
+    }
+
+    @Override
+    public void unlockPortExtenders() {
+        if (portExtenders != null) {
+            for (PortExtender extender : portExtenders) {
+                extender.ensureMinimumNumberOfPorts(0);
+            }
         }
     }
 

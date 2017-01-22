@@ -14,9 +14,11 @@ public class ParameterTypeAttributes extends ParameterTypeAttribute {
 
 	private static final long serialVersionUID = -4177652183651031337L;
 
-	public static final String ATTRIBUTE_SEPARATOR_CHARACTER = "|";
+//	public static final String ATTRIBUTE_SEPARATOR_CHARACTER = "|";
+	public static final String ATTRIBUTE_SEPARATOR_CHARACTER = ";";
 
-	public static final String ATTRIBUTE_SEPARATOR_REGEX = "\\|";
+//	public static final String ATTRIBUTE_SEPARATOR_REGEX = "\\|";
+	public static final String ATTRIBUTE_SEPARATOR_REGEX = ";";
 
 	public ParameterTypeAttributes(final String key, String description, InputPort inPort) {
 		this(key, description, inPort, true, Ontology.ATTRIBUTE_VALUE);

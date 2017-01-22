@@ -9,7 +9,6 @@ import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.parameter.*;
-import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.tools.Ontology;
 
@@ -108,8 +107,8 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 	 */
 	private List<OperatorException> importErrors = new LinkedList<OperatorException>();
 
-	public AbstractDataReader(Class<? extends IOObject> generatedClass, OutputPort outputPort) {
-		super(generatedClass, outputPort);
+	public AbstractDataReader(Class<? extends IOObject> generatedClass) {
+		super(generatedClass);
 	}
 
 	protected abstract DataSet getDataSet() throws OperatorException, IOException;
@@ -626,7 +625,7 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see com.rapidminer.operator.io.AbstractReader#getParameterTypes()
+	 * @see io.sugo.pio.operator.io.AbstractReader#getParameterTypes()
 	 */
 	@Override
 	public List<ParameterType> getParameterTypes() {
@@ -645,7 +644,7 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 		// hidden param
 		ParameterTypeList typeList = new ParameterTypeList(PARAMETER_META_DATA, "The meta data information",
 				new ParameterTypeInt(PARAMETER_COLUMN_INDEX, "The column index", 0, 9999), //
-				new ParameterTypeTupel(PARAMETER_COLUMN_META_DATA, "the meta data information of one column", //
+				new ParameterTypeTuple(PARAMETER_COLUMN_META_DATA, "the meta data information of one column", //
 						new ParameterTypeString(PARAMETER_COLUMN_NAME, "Describes the attributes name.", ""), //
 						new ParameterTypeBoolean(PARAMETER_COLUMN_SELECTED, "Indicates if a column is selected", true), //
 						new ParameterTypeCategory(PARAMETER_COLUM_VALUE_TYPE, "Indicates the value type of an attribute",
@@ -1088,7 +1087,7 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 				}
 
 				tuple = map[1];
-				metadata = ParameterTypeTupel.transformString2Tupel(tuple);
+				metadata = ParameterTypeTuple.transformString2Tupel(tuple);
 
 				// return the parameter
 				return metadata[parameterIndex];
@@ -1159,7 +1158,7 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 					metadata = new String[4];
 				} else {
 					tuple = map[1];
-					metadata = ParameterTypeTupel.transformString2Tupel(tuple);
+					metadata = ParameterTypeTuple.transformString2Tupel(tuple);
 				}
 				// create new entries with default values
 				metadata[NAME_PARAMETER] = name;
@@ -1171,7 +1170,7 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 				metadata[ROLE_PARAMETER] = role;
 
 				// write everything back
-				tuple = ParameterTypeTupel.transformTupel2String(metadata);
+				tuple = ParameterTypeTuple.transformTupel2String(metadata);
 				map[1] = tuple;
 
 				// list.set(index, map);

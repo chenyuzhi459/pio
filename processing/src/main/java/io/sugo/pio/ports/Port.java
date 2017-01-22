@@ -1,6 +1,7 @@
 package io.sugo.pio.ports;
 
 import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.operator.UserError;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.MetaDataError;
 
@@ -8,7 +9,7 @@ import java.io.Serializable;
 
 /**
  */
-public interface Port extends Serializable{
+public interface Port extends Serializable {
     public static final int CLEAR_META_DATA_ERRORS = 1 << 0;
     public static final int CLEAR_METADATA = 1 << 1;
     public static final int CLEAR_DATA = 1 << 2;
@@ -28,7 +29,9 @@ public interface Port extends Serializable{
      */
     boolean isConnected();
 
-    /** Report an error in the current process setup. */
+    /**
+     * Report an error in the current process setup.
+     */
     public void addError(MetaDataError metaDataError);
 
     /**
@@ -61,6 +64,15 @@ public interface Port extends Serializable{
 
     /**
      * Returns the last object delivered to the connected {@link InputPort} or received from the
+     * connected {@link OutputPort}
+     *
+     * @throws UserError If data is not of the requested type.
+     * @deprecated call {@link #getDataOrNull(Class)}
+     */
+    public <T extends IOObject> T getDataOrNull() throws UserError;
+
+    /**
+     * Returns the last object delivered to the connected {@link InputPort} or received from the
      * connected {@link OutputPort}. Never throws an exception.
      */
     IOObject getAnyDataOrNull();
@@ -70,7 +82,9 @@ public interface Port extends Serializable{
      */
     Ports<? extends Port> getPorts();
 
-    /** Returns the string "OperatorName.PortName". */
+    /**
+     * Returns the string "OperatorName.PortName".
+     */
     public String getSpec();
 
     /**

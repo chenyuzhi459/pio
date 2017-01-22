@@ -33,4 +33,19 @@ public class OperatorVersion extends VersionNumber {
 	public OperatorVersion(int major, int minor, int buildNumber) {
 		super(major, minor, buildNumber);
 	}
+
+	public static OperatorVersion getLatestVersion() {
+		try {
+//			Plugin plugin = desc.getProvider();
+//			if (plugin == null) {
+//				return new OperatorVersion(RapidMiner.getLongVersion());
+//			} else {
+//				return new OperatorVersion(plugin.getVersion());
+//			}
+			return new OperatorVersion("OperatorVersionV1");
+		} catch (IllegalArgumentException e) {
+			// returning current version
+			return new OperatorVersion(5, 0, 0);
+		}
+	}
 }

@@ -1,19 +1,9 @@
 package io.sugo.pio.server.http.dto;
 
 public class OperatorDto {
-    private String processId;
     private String operatorType;
     private int xPos;
     private int yPos;
-
-
-    public String getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(String processId) {
-        this.processId = processId;
-    }
 
     public String getOperatorType() {
         return operatorType;

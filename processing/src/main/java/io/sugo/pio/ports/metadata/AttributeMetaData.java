@@ -1,13 +1,13 @@
 package io.sugo.pio.ports.metadata;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.AttributeRole;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.tools.Ontology;
-import io.sugo.pio.tools.ParameterService;
 import io.sugo.pio.tools.Range;
 import io.sugo.pio.tools.Tools;
 
@@ -32,6 +32,7 @@ public class AttributeMetaData implements Serializable {
 
 	private ExampleSetMetaData owner = null;
 
+	@JsonProperty
 	private String name;
 
 	private int type = Ontology.ATTRIBUTE_VALUE;

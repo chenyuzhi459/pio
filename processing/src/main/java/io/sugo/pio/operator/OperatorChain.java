@@ -6,6 +6,9 @@ import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "chainType", defaultImpl = ProcessRootOperator.class)
 //@JsonSubTypes(value = {
 //        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class)
@@ -13,21 +16,31 @@ import io.sugo.pio.ports.impl.OutputPortsImpl;
 public abstract class OperatorChain extends Operator {
 
     @JsonProperty
-    private ExecutionUnit[] execUnits;
+    private List<ExecutionUnit> execUnits;
 
-    public OperatorChain(String... executionUnitNames) {
-        execUnits = new ExecutionUnit[executionUnitNames.length];
-        for (int i = 0; i < execUnits.length; i++) {
-            execUnits[i] = new ExecutionUnit(this, executionUnitNames[i]);
-        }
+    public OperatorChain() {
+        execUnits = new ArrayList<>();
     }
 
-    public ExecutionUnit[] getExecUnits() {
+    public List<ExecutionUnit> getExecUnits() {
         return execUnits;
     }
 
-    public void setExecUnits(ExecutionUnit[] execUnits) {
+    public void setExecUnits(List<ExecutionUnit> execUnits) {
         this.execUnits = execUnits;
+    }
+
+    @Override
+    public ExecutionUnit getExecutionUnit() {
+        final ExecutionUnit execUnit;
+        if (execUnits.isEmpty()) {
+            execUnit = new ExecutionUnit();
+            execUnit.setEnclosingOperator(this);
+            execUnits.add(execUnit);
+        } else {
+            execUnit = execUnits.get(0);
+        }
+        return execUnit;
     }
 
     /**
@@ -60,13 +73,9 @@ public abstract class OperatorChain extends Operator {
 
     @Override
     public void doWork() {
-        for (ExecutionUnit subprocess : execUnits) {
-            subprocess.execute();
+        for (ExecutionUnit execUnit : execUnits) {
+            execUnit.execute();
         }
-    }
-
-    public ExecutionUnit getExecutionUnit(int index) {
-        return execUnits[index];
     }
 
     @Override
@@ -74,7 +83,9 @@ public abstract class OperatorChain extends Operator {
         super.registerOperator(process);
         for (ExecutionUnit execUnit : execUnits) {
             for (Operator child : execUnit.getOperators()) {
+                execUnit.setEnclosingOperator(this);
                 child.registerOperator(process);
+                child.setEnclosingExecutionUnit(execUnit);
             }
         }
     }
@@ -89,6 +100,13 @@ public abstract class OperatorChain extends Operator {
             for (Operator child : execUnit.getOperators()) {
                 child.unregisterOperator(process);
             }
+        }
+    }
+
+    @Override
+    public void updateExecutionOrder() {
+        for (ExecutionUnit unit : execUnits) {
+            unit.updateExecutionOrder();
         }
     }
 }

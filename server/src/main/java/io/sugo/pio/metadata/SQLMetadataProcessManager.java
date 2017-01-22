@@ -14,6 +14,7 @@ import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.operator.Status;
+import io.sugo.pio.ports.Connection;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.tweak.HandleCallback;
@@ -70,7 +71,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                     public OperatorProcess withHandle(Handle handle) throws Exception {
 
                         StringBuilder builder = new StringBuilder();
-                        builder.append("SELECT id, name, description, status, created_date, update_date, operators ")
+                        builder.append("SELECT id, name, description, status, created_date, update_date, operators, connections ")
                                 .append(" FROM %1$s ")
                                 .append(" WHERE id = :id ");
 //                        if (active) {
@@ -98,8 +99,12 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     ProcessRootOperator root = jsonMapper.readValue(
                                             r.getBytes("operators"), new TypeReference<ProcessRootOperator>() {
                                             });
+                                    List<Connection> connections = jsonMapper.readValue(
+                                            r.getBytes("connections"), new TypeReference<List<Connection>>() {}
+                                    );
                                     OperatorProcess process = new OperatorProcess(name, root);
                                     process.setId(id);
+                                    process.setConnections(connections);
                                     process.setDescription(description);
                                     process.setStatus(status);
                                     process.setCreateTime(createTime);
@@ -122,7 +127,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                     public List<OperatorProcess> withHandle(Handle handle) throws Exception {
 
                         return handle.createQuery(String.format(
-                                "SELECT id, name, description, status, created_date, update_date, operators " +
+                                "SELECT id, name, description, status, created_date, update_date, operators, connections " +
                                         " FROM %1$s " +
                                         " ORDER BY created_date DESC",
                                 getOperatorProcessTable()
@@ -139,8 +144,12 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     ProcessRootOperator root = jsonMapper.readValue(
                                             r.getBytes("operators"), new TypeReference<ProcessRootOperator>() {
                                             });
+                                    List<Connection> connections = jsonMapper.readValue(
+                                            r.getBytes("connections"), new TypeReference<List<Connection>>() {}
+                                    );
                                     OperatorProcess process = new OperatorProcess(name, root);
                                     process.setId(id);
+                                    process.setConnections(connections);
                                     process.setDescription(description);
                                     process.setStatus(status);
                                     process.setCreateTime(createTime);
@@ -180,8 +189,8 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(
                                     String.format(
-                                            "INSERT INTO %s (id, name, description, status, created_date, update_date, operators) " +
-                                                    " VALUES (:id, :name, :description, :status, :created_date, :update_date, :operators)",
+                                            "INSERT INTO %s (id, name, description, status, created_date, update_date, operators, connections) " +
+                                                    " VALUES (:id, :name, :description, :status, :created_date, :update_date, :operators, :connections)",
                                             getOperatorProcessTable()
                                     )
                             )
@@ -192,6 +201,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     .bind("created_date", process.getCreateTime())
                                     .bind("update_date", process.getUpdateTime())
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
+                                    .bind("connections", jsonMapper.writeValueAsBytes(process.getConnections()))
                                     .execute();
                             return null;
                         }
@@ -211,7 +221,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                         @Override
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(
-                                    String.format("UPDATE %s SET name=:name, description=:description, status=:status, update_date=:update_date, operators = :operators WHERE id = :id",
+                                    String.format("UPDATE %s SET name=:name, description=:description, status=:status, update_date=:update_date, operators = :operators, connections=:connections WHERE id = :id",
                                             getOperatorProcessTable())
                             )
                                     .bind("id", process.getId())
@@ -220,6 +230,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     .bind("status", process.getStatus().name())
                                     .bind("update_date", process.getUpdateTime().toString())
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
+                                    .bind("connections", jsonMapper.writeValueAsBytes(process.getConnections()))
                                     .execute();
                             return null;
                         }

@@ -1,6 +1,7 @@
 package io.sugo.pio.parameter;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
@@ -36,6 +37,7 @@ public class ParameterTypeAttribute extends ParameterTypeString {
 			this.inPort = inPort;
 		}
 
+		@JsonProperty
 		@Override
 		public MetaData getMetaData() {
 			if (inPort != null) {
@@ -57,6 +59,7 @@ public class ParameterTypeAttribute extends ParameterTypeString {
 	private static final String ELEMENT_ALLOWED_TYPE = "Type";
 
 	// private transient InputPort inPort;
+	@JsonProperty
 	private MetaDataProvider metaDataProvider;
 
 	private int[] allowedValueTypes;

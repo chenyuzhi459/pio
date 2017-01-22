@@ -80,7 +80,6 @@ public class ProcessResource {
         } catch (JSONException e) {
             return Response.serverError().build();
         }
-
     }
 
     @DELETE
