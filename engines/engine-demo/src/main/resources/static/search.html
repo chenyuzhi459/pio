@@ -97,10 +97,6 @@
 								});
 					    </script>
             </div>
-            <div style="text-align: right;">
-                <input id="search-box" type="text" style="">
-                <input type="button" value="search" onclick="location.href='search.html?text='+$('#search-box').val()">
-            </div>
             <div class="clear"></div>
         </div>
 
@@ -114,6 +110,33 @@
                 </div>
                 <div class="section group">
                     <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in searchItems">
+                        <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
+                        <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
+                        <div class="price-details">
+                            <div class="price-number">
+                                <p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
+                            </div>
+                            <div class="add-cart">
+                                <h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="wrap">
+            <div class="content">
+                <div class="content_bottom">
+                    <div class="heading">
+                        <h3>猜你喜欢</h3>
+                    </div>
+                </div>
+                <div class="section group">
+                    <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in userSearchItems">
                         <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
                         <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
                         <div class="price-details">
@@ -151,6 +174,7 @@
                 el: '#app',
                 data: {
                     searchItems: [],
+                    userSearchItems: [],
                     userId: window.localStorage.getItem("userId") || ''
                 },
                 methods: {
@@ -159,7 +183,6 @@
 					},
                     search: function (text) {
                         var that = this
-
                         $.ajax({
                             url: '/pio/query/itemSearch',
                             beforeSend(req) {
@@ -180,6 +203,28 @@
                         })
                     },
 
+                    userSearch: function (text) {
+                        var that = this
+                        $.ajax({
+                            url: '/pio/query/userHistory',
+                            beforeSend(req) {
+                                req.setRequestHeader('Content-Type', 'application/json')
+                            },
+                            data: JSON.stringify({
+                                'user_id': that.userId, 'item_name': text, 'num': 8, 'type': 'UserHistory_query'
+                            }),
+                            dataType: 'json',
+                            type: 'post',
+                            success(data) {
+                                var temp = []
+                                for (let m = 0; m < data.item_id.length; m++) {
+                                    that.queryOmdb(data.item_id[m] ,data.item_name[m], temp)
+                                }
+                                that.userSearchItems = temp
+                            }
+                        })
+                    },
+
                     queryOmdb: function (id, title, temp) {
                         $.ajax({
                             url: 'http://www.omdbapi.com/?t=' + escape(title),
@@ -194,6 +239,7 @@
                 }
             })
             detailUR.search(qs("text"))
+            detailUR.userSearch(qs("text"))
 		});
 
 	</script>

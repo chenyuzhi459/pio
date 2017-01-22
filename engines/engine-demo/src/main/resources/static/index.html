@@ -64,7 +64,8 @@
 						<!--</div>-->
 						<div class="search_box">
 							<form>
-								<input type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}"><input type="submit" value="">
+								<input class="search-keyword" type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}">
+								<input class="search-submit" type="submit" value="" >
 							</form>
 						</div>
 						<div class="clear"></div>
@@ -96,10 +97,6 @@
 					
 								});
 					    </script>
-				</div>
-				<div style="text-align: right;">
-					<input id="search-box" type="text" style="">
-					<input type="button" value="search" onclick="location.href='search.html?text='+$('#search-box').val()">
 				</div>
 			 <div class="clear"></div>
   		</div>     
@@ -276,7 +273,13 @@
 <div style="display:none"><script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script></div>
 </div>
 	<script>
-
+	$(function() {
+		$('.search-submit').click(function(ev){
+			ev.stopPropagation()
+			ev.preventDefault()
+			location.href = '/search.html?text=' + $('.search-keyword').val()
+		})
+	})
 	</script>
 </body>
 </html>
