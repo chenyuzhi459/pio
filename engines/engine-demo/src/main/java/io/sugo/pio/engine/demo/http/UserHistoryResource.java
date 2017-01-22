@@ -54,9 +54,7 @@ public class UserHistoryResource {
             UserHistoryResult userHistoryResult = userHistoryModelFactory.loadModel(repository).predict(userHistoryQuery);
             List<String> itemIds = userHistoryResult.getItems();
             Map<String , List<String>> res = new HashMap<>();
-            if(!res.isEmpty()){
-                res.put(Constants.ITEM_ID(), itemIds);
-            }
+            res.put(Constants.ITEM_ID(), itemIds);
             String str;
             if (!res.isEmpty()) {
                 List<String> filmIds = itemIds;
