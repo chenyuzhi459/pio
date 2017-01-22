@@ -215,7 +215,7 @@
                                 req.setRequestHeader('Content-Type', 'application/json')
                             },
                             data: JSON.stringify({
-                                'category': category, 'num': 12
+                                'category': category, 'num': 12, 'type': 'pop_query'
                             }),
                             dataType: 'json',
                             type: 'post',
@@ -241,7 +241,7 @@
                                 req.setRequestHeader('Content-Type', 'application/json')
                             },
                             data: JSON.stringify({
-                                'user_id': that.userId, 'num': 14
+                                'user_id': that.userId, 'num': 14, "type":"als_query"
                             }),
                             dataType: 'json',
                             type: 'post',

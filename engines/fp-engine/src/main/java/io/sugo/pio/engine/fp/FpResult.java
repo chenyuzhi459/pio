@@ -1,13 +1,14 @@
-package io.sugo.pio.engine.detail;
+package io.sugo.pio.engine.fp;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  */
-public class DetailResult {
+public class FpResult {
     private List<String> items;
 
-    public DetailResult(List<String> items){
+    public FpResult(List<String> items){
         this.items = items;
     }
 

@@ -7,6 +7,7 @@ import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.Constants;
 import io.sugo.pio.engine.demo.data.HtcBatchEventHose;
+import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.search.SearchEngineFactory;
 import io.sugo.pio.engine.search.data.SearchModelData;
@@ -28,7 +29,8 @@ public class SearchTraining extends AbstractTraining{
     @Override
     protected void doTrain(JavaSparkContext sc) throws IOException {
         FileUtils.deleteDirectory(new File(SearchResource.REPOSITORY_PATH));
-        BatchEventHose eventHose = new HtcBatchEventHose(Constants.HTCDATA_PATH, Constants.HTC_SEPERATOR);
+//        BatchEventHose eventHose = new HtcBatchEventHose(Constants.HTCDATA_PATH, Constants.HTC_SEPERATOR);
+        BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         EngineFactory<SearchTrainingData, SearchPreparaData, SearchModelData> engineFactory = new SearchEngineFactory(propHose, eventHose);
         Preparator<SearchTrainingData, SearchPreparaData> preparator = engineFactory.createPreparator();

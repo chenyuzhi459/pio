@@ -5,9 +5,8 @@ import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.ItemUtil;
-import io.sugo.pio.engine.fp.Constants;
-import io.sugo.pio.engine.fp.FpQuery;
-import io.sugo.pio.engine.fp.LucenceConstants;
+import io.sugo.pio.engine.demo.ObjectMapperUtil;
+import io.sugo.pio.engine.fp.*;
 import org.apache.lucene.search.SortField;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,16 +22,9 @@ import java.util.*;
  */
 @Path("query/itemfp")
 public class FpResource {
-    private final ObjectMapper jsonMapper = new ObjectMapper();
-    private final QueryableModelData modelData;
     private static final String ITEM_NAME = "item_name";
-
     public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/fp";
 
-    public FpResource() throws IOException {
-        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-        modelData = new QueryableModelData(repository);
-    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -43,25 +35,18 @@ public class FpResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            FpQuery query = jsonMapper.readValue(in, FpQuery.class);
-            Map<String, Object> map = new LinkedHashMap<>();
 
-            if (query.getItem_id() != null) {
-                map.put(Constants.ITEMID(), query.getItem_id());
-            }
+            ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
+            FpQuery fpQuery = jsonMapper.readValue(in, FpQuery.class);
+            FpModelFactory fpModelFactory = new FpModelFactory();
+            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+            FpResult searchResult = fpModelFactory.loadModel(repository).predict(fpQuery);
+            List<String> itemIds = searchResult.getItems();
 
             int queryNum = 10;
-            if (query.getNum() != null) {
-                String Num = query.getNum();
-                queryNum = Integer.parseInt(Num);
-            }
-
-            List<String> resultFields = new ArrayList<>();
-            resultFields.add(Constants.CONSEQUENTS());
-            Map<String, List<String>> res = modelData.predict(map, resultFields, new SortField(LucenceConstants.SCORE(), SortField.Type.INT, true), queryNum, null);
             Map<String, List<String>> lastRes = new HashMap();
-            if (!res.isEmpty()){
-                lastRes = GetListItem(res, queryNum);
+            if (!itemIds.isEmpty()){
+                lastRes = GetListItem(itemIds, queryNum);
             }
             String str;
             if (!lastRes.isEmpty()) {
@@ -82,10 +67,10 @@ public class FpResource {
         return Response.status(Response.Status.ACCEPTED).entity("items not found").build();
     }
 
-    private Map<String, List<String>> GetListItem(Map<String, List<String>> itemSeqMap, int num){
+    private Map<String, List<String>> GetListItem(List<String> itemSeqMap, int num){
         Map<String, List<String>> result = new HashMap<>();
         Set<String> itemSet = new HashSet<>();
-        List<String> itemSeq = itemSeqMap.get(Constants.CONSEQUENTS());
+        List<String> itemSeq = itemSeqMap;
         for(String items:itemSeq){
             String[] item = items.split(Constants.CONSEQUENT_SEP());
             if (itemSet.size() >= num){

@@ -14,21 +14,23 @@ import java.io.IOException;
  */
 public class DemoServer {
     public static void main(String[] args) throws Exception {
-        train();
+//        train();
         startServer();
     }
 
     private static void train() throws IOException {
         PopularTraining popularTraining = new PopularTraining();
         popularTraining.train();
-        ALSTraining alsTraining = new ALSTraining();
-        alsTraining.train();
-        DetailTraining detailTraining = new DetailTraining();
-        detailTraining.train();
-        FpTraining fpTraining = new FpTraining();
-        fpTraining.train();
+//        ALSTraining alsTraining = new ALSTraining();
+//        alsTraining.train();
+//        DetailTraining detailTraining = new DetailTraining();
+//        detailTraining.train();
+//        FpTraining fpTraining = new FpTraining();
+//        fpTraining.train();
         SearchTraining searchTraining = new SearchTraining();
         searchTraining.train();
+//        UserHistoryTraining userHistoryTraining = new UserHistoryTraining();
+//        userHistoryTraining.train();
     }
 
     private static void startServer() throws Exception {

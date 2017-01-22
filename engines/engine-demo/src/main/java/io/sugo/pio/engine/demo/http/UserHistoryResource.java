@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
-import io.sugo.pio.engine.demo.ObjectMapperUtil;
 import io.sugo.pio.engine.search.Constants;
-import io.sugo.pio.engine.search.SearchModelFactory;
 import io.sugo.pio.engine.search.SearchQuery;
-import io.sugo.pio.engine.search.SearchResult;
 import org.ansj.lucene5.AnsjAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
 
@@ -23,9 +20,17 @@ import java.util.*;
 
 /**
  */
-@Path("query/itemSearch")
-public class SearchResource {
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/search";
+@Path("query/userHistory")
+public class UserHistoryResource {
+    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private final QueryableModelData modelData;
+
+    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/userhistory";
+
+    public UserHistoryResource() throws IOException {
+        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+        modelData = new QueryableModelData(repository);
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -36,17 +41,24 @@ public class SearchResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             SearchQuery query = jsonMapper.readValue(in, SearchQuery.class);
-            SearchModelFactory searchModelFactory = new SearchModelFactory();
-            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            SearchResult searchResult = searchModelFactory.loadModel(repository).predict(query);
-            List<String> itemIds = searchResult.getItems();
-            List<String> itemNames = searchResult.getNames();
-            Map<String , List<String>> res = new HashMap<>();
-            res.put(Constants.ITEM_ID(), itemIds);
-            res.put(Constants.ITEM_NAME(), itemNames);
+            Map<String, Object> map = new LinkedHashMap<>();
+            Map<String, Object> mapSyn = new LinkedHashMap<>();
 
+            if (query.getItem_name() != null) {
+                map.put(Constants.ITEM_NAME(), query.getItem_name());
+            }
+            int queryNum = 10;
+            if (query.getNum() != null) {
+                String Num = query.getNum();
+                queryNum = Integer.parseInt(Num);
+            }
+
+            List<String> resultFields = new ArrayList<>();
+            resultFields.add(Constants.ITEM_NAME());
+            resultFields.add(Constants.ITEM_ID());
+            Analyzer analyzer = new AnsjAnalyzer(AnsjAnalyzer.TYPE.index_ansj);
+            Map<String, List<String>> res = modelData.predict(map, resultFields, null, queryNum, analyzer);
             String str;
             if (!res.isEmpty()) {
                 str = jsonMapper.writeValueAsString(res);

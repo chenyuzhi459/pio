@@ -3,8 +3,9 @@ package io.sugo.pio.engine.fp;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.engine.prediction.PredictionQueryObject;
 
-public class FpQuery {
+public class FpQuery implements PredictionQueryObject {
     private String item_id;
     private String num;
 
@@ -24,5 +25,10 @@ public class FpQuery {
 
     public String getNum() {
         return num;
+    }
+
+    @Override
+    public String getType() {
+        return "itemfp";
     }
 }

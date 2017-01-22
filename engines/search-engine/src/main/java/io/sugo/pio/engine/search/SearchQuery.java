@@ -3,8 +3,9 @@ package io.sugo.pio.engine.search;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.engine.prediction.PredictionQueryObject;
 
-public class SearchQuery {
+public class SearchQuery implements PredictionQueryObject {
     private String item_name;
     private String num;
 
@@ -24,5 +25,10 @@ public class SearchQuery {
 
     public String getNum() {
         return num;
+    }
+
+    @Override
+    public String getType() {
+        return "itemSearch";
     }
 }

@@ -1,4 +1,4 @@
-package io.sugo.pio.engine.popular;
+package io.sugo.pio.engine.detail;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
@@ -11,14 +11,14 @@ import java.util.List;
 
 /**
  */
-public class PopEngineModule implements EngineModule {
+public class DetailEngineModule implements EngineModule {
     @Override
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
-                new SimpleModule(PopEngineModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(PopularEngineFactory.class, "pop_factory"),
-                                new NamedType(PopQuery.class, "pop_query"),
-                                new NamedType(PopularModelFactory.class, "pop_model")));
+                new SimpleModule(DetailEngineModule.class.getSimpleName())
+                        .registerSubtypes(new NamedType(DetailEngineFactory.class, "detail_factory"),
+                                new NamedType(DetailQuery.class, "detail_query"),
+                                new NamedType(DetailModelFactory.class, "detail_model")));
     }
 
     @Override

@@ -16,12 +16,6 @@ class SearchDatasource(propertyHose: PropertyHose, batchEventHose: BatchEventHos
   override def readTraining(sc: JavaSparkContext): SearchTrainingData = {
     val originalRDD = propertyHose.find(sc).rdd.map(s => s.asScala)
       .map(itemInf => (itemInf(Constants.ITEM_ID).toString, itemInf(Constants.ITEM_NAME).toString) )
-
-//    val htcData = batchEventHose.find(sc).rdd.map(s => s.getProperties.asScala.toMap)
-//      .filter(!_.isEmpty)
-//      .map{ pros =>
-//        (pros(Constants.ITEM_ID).toString, pros(Constants.ITEM_NAME).toString)
-//      }
     new SearchTrainingData(originalRDD)
   }
 }
