@@ -1,27 +1,22 @@
 package io.sugo.pio.engine.demo.http;
 
-import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.Constants;
-import io.sugo.pio.engine.demo.data.HtcBatchEventHose;
 import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.search.SearchEngineFactory;
 import io.sugo.pio.engine.search.data.SearchModelData;
 import io.sugo.pio.engine.search.data.SearchPreparaData;
 import io.sugo.pio.engine.search.data.SearchTrainingData;
-import io.sugo.pio.engine.search.param.SearchDatasourceParams;
 import io.sugo.pio.engine.training.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.execution.vectorized.ColumnVector;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  */
