@@ -25,17 +25,7 @@ import java.util.*;
 @Path("query/userSearch")
 public class UserHistoryResource {
     private final String ITEM_NAME = "item_name";
-    private final ObjectMapper jsonMapper = new ObjectMapper();
-    private final QueryableModelData modelData;
-
     public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/userhistory";
-    public static final String SEARCH_PATH = "engines/engine-demo/src/main/resources/index/search";
-    public static final String DETAIL_PATH = "engines/engine-demo/src/main/resources/index/detail";
-
-    public UserHistoryResource() throws IOException {
-        Repository repository = new LocalFileRepository(DETAIL_PATH);
-        modelData = new QueryableModelData(repository);
-    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
