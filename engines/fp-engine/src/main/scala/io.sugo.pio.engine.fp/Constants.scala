@@ -2,13 +2,13 @@ package io.sugo.pio.engine.fp
 
 
 object Constants {
-  val USERID = "user_id"
-  val ITEMID = "item_id"
-  val GRADE = "grade"
-  val ANTECEDENT = "antecedent"
-  val CONSEQUENTS = "consequents"
-  val TIMENUM = "timenum";
-  val CONSEQUENT_SEP="::"
+  val USERID: String= "user_id"
+  val ITEMID: String= "item_id"
+  val GRADE: String = "grade"
+  val ANTECEDENT: String = "antecedent"
+  val CONSEQUENTS: String = "consequents"
+  val TIMENUM: String = "timenum";
+  val CONSEQUENT_SEP: String="::"
 }
 
 object LucenceConstants{
