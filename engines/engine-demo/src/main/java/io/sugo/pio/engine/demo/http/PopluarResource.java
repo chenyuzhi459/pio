@@ -22,16 +22,8 @@ import java.util.*;
  */
 @Path("query/itempop")
 public class PopluarResource {
-    private final ObjectMapper jsonMapper = new ObjectMapper();
-    private final QueryableModelData modelData;
     private static final String ITEM_NAME = "item_name";
-
     public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/pop";
-
-    public PopluarResource() throws IOException {
-        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-        modelData = new QueryableModelData(repository);
-    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

@@ -40,35 +40,6 @@ public class UserHistoryResource {
             @QueryParam("pretty") String pretty,
             @Context final HttpServletRequest req
     ) {
-        try {
-            SearchQuery query = jsonMapper.readValue(in, SearchQuery.class);
-            Map<String, Object> map = new LinkedHashMap<>();
-            Map<String, Object> mapSyn = new LinkedHashMap<>();
-
-            if (query.getItem_name() != null) {
-                map.put(Constants.ITEM_NAME(), query.getItem_name());
-            }
-            int queryNum = 10;
-            if (query.getNum() != null) {
-                String Num = query.getNum();
-                queryNum = Integer.parseInt(Num);
-            }
-
-            List<String> resultFields = new ArrayList<>();
-            resultFields.add(Constants.ITEM_NAME());
-            resultFields.add(Constants.ITEM_ID());
-            Analyzer analyzer = new AnsjAnalyzer(AnsjAnalyzer.TYPE.index_ansj);
-            Map<String, List<String>> res = modelData.predict(map, resultFields, null, queryNum, analyzer);
-            String str;
-            if (!res.isEmpty()) {
-                str = jsonMapper.writeValueAsString(res);
-            } else {
-                str = "items not found";
-            }
-            return Response.status(Response.Status.ACCEPTED).entity(str).build();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
         return Response.status(Response.Status.ACCEPTED).entity("items not found").build();
     }
 }

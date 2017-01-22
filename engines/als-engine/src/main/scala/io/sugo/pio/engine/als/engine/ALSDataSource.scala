@@ -6,7 +6,6 @@ import io.sugo.pio.engine.data.input.BatchEventHose
 import io.sugo.pio.engine.training.DataSource
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.mllib.recommendation.Rating
-import org.apache.spark.sql.SQLContext
 
 class ALSDataSource(batchEventHose: BatchEventHose) extends DataSource[ALSTrainingData] with Serializable {
   override def readTraining(javaSparkContext: JavaSparkContext): ALSTrainingData = {

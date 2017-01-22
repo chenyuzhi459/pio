@@ -30,3 +30,4 @@ public class DetailQuery implements PredictionQueryObject {
         return "detail";
     }
 }
+

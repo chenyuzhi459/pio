@@ -69,5 +69,4 @@ package object engine {
       similarRDD
     }
   }
-
 }

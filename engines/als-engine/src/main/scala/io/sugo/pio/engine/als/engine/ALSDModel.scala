@@ -4,7 +4,6 @@ import io.sugo.pio.engine.common.lucene.RepositoryDirectory
 import io.sugo.pio.engine.common.utils.LuceneUtils
 import org.apache.lucene.document._
 import java.lang.{Float => jFloat}
-
 import io.sugo.pio.engine.als.{Constants, LucenceConstants}
 import io.sugo.pio.engine.als.data.ALSModelData
 import io.sugo.pio.engine.data.output.Repository

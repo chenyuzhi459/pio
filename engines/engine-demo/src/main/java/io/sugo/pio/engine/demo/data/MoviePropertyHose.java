@@ -65,5 +65,4 @@ public class MoviePropertyHose implements PropertyHose {
             return map;
         }
     }
-
 }

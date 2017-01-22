@@ -64,6 +64,4 @@ public class QueryableModelData {
         }
         return res;
     }
-
-
 }

@@ -4,7 +4,6 @@ package io.sugo.pio.engine.common.utils;
 import io.sugo.pio.engine.common.lucene.NoopAnalyzer;
 import io.sugo.pio.engine.common.lucene.SearchResult;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -12,10 +11,8 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 
 public class LuceneUtils {
     public static IndexWriter getWriter(Directory dir, Analyzer analyzer) {

@@ -57,3 +57,4 @@ public class DetailModelFactory implements ModelFactory<DetailResult>{
         }
     }
 }
+

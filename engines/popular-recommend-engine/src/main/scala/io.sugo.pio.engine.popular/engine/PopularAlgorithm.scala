@@ -27,3 +27,4 @@ class PopularAlgorithm() extends Algorithm[PopularPreparaData, PopularModelData]
     items
   }
 }
+

@@ -28,3 +28,4 @@ class DetailAlgorithm extends Algorithm[DetailPreparedData, DetailModelData] {
     new DetailModelData(modelData)
   }
 }
+

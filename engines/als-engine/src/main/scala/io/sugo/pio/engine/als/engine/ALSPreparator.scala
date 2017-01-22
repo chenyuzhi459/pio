@@ -9,3 +9,4 @@ class ALSPreparator extends Preparator[ALSTrainingData, ALSPreparedData] {
     new ALSPreparedData(td.trainingData)
   }
 }
+

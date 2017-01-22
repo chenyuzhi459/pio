@@ -15,3 +15,4 @@ class DetailDataSource(batchEventHose: BatchEventHose) extends DataSource[Detail
     DetailTrainingData(events)
   }
 }
+

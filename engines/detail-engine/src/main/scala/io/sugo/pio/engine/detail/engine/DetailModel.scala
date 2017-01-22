@@ -30,3 +30,4 @@ class DetailModel extends Model[DetailModelData] with Serializable {
     })
   }
 }
+

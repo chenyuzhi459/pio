@@ -50,3 +50,4 @@ public class MovieBatchEventHose implements BatchEventHose {
         return find(sc);
     }
 }
+

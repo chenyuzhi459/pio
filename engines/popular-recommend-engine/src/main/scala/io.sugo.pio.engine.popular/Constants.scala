@@ -11,3 +11,4 @@ object Constants {
 object LucenceConstants{
   val SCORE: String = "score"
 }
+

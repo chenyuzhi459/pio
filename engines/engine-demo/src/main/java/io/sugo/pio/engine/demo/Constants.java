@@ -15,7 +15,6 @@ public class Constants {
     //HTC
     public static final String HTCDATA_PATH = Constants.class.getClassLoader().getResource("htc/htcData.txt").getPath();
     public static final String HTC_SEPERATOR = "::";
-
     //
     public static final String USER_ID = "user_id";
     public static final String ITEM_ID = "item_id";

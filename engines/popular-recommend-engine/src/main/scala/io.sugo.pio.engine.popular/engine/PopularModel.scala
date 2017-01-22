@@ -29,3 +29,4 @@ class PopularModel extends Model[PopularModelData] {
     })
   }
 }
+

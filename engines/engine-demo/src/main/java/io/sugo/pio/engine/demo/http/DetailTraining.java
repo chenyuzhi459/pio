@@ -2,7 +2,6 @@ package io.sugo.pio.engine.demo.http;
 
 import io.sugo.pio.engine.demo.Constants;
 import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
-import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.detail.DetailEngineFactory;
 import io.sugo.pio.engine.detail.data.DetailModelData;
 import io.sugo.pio.engine.detail.data.DetailPreparedData;
@@ -12,7 +11,6 @@ import io.sugo.pio.engine.training.DataSource;
 import io.sugo.pio.engine.training.Model;
 import io.sugo.pio.engine.training.Preparator;
 import io.sugo.pio.engine.data.input.BatchEventHose;
-import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import org.apache.commons.io.FileUtils;
