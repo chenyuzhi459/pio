@@ -1,16 +1,11 @@
 package io.sugo.pio.engine.demo.http;
 
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sugo.pio.engine.EngineModule;
 import io.sugo.pio.engine.als.*;
-import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.demo.ItemUtil;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
-import io.sugo.pio.engine.popular.LucenceConstants;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
-import org.apache.lucene.search.SortField;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
