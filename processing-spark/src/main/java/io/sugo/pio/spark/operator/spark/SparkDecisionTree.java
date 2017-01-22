@@ -2,13 +2,13 @@ package io.sugo.pio.spark.operator.spark;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.operator.OperatorGroup;
+import io.sugo.pio.operator.learner.PredictionModel;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler.SparkOperation;
-import io.sugo.pio.operator.OperatorDescription;
-import io.sugo.pio.operator.learner.PredictionModel;
 import io.sugo.pio.spark.transfer.model.ModelTransferObject;
 import io.sugo.pio.spark.transfer.parameter.SparkDecisionTreeParameter;
 import io.sugo.pio.spark.transfer.parameter.SparkParameter;
@@ -81,6 +81,21 @@ public class SparkDecisionTree extends AbstractSparkLearner {
     @Override
     protected PredictionModel convertModelFromMTO(ModelTransferObject mto, HadoopExampleSet exampleSet) {
         return null;
+    }
+
+    @Override
+    public String getFullName() {
+        return "SparkDecisionTree";
+    }
+
+    @Override
+    public OperatorGroup getGroup() {
+        return OperatorGroup.algorithmModel;
+    }
+
+    @Override
+    public String getDescription() {
+        return "SparkDecisionTree";
     }
 
     public List<ParameterType> getParameterTypes() {

@@ -58,14 +58,14 @@ public class ProcessRunner implements Runnable {
                     try {
                         log.info("start execute Process:%s", process.getId());
                         process.run();
-                        metadataProcessManager.updateStatus(process);
+                        metadataProcessManager.update(process);
                         process.success();
-                        metadataProcessManager.updateStatus(process);
+                        metadataProcessManager.update(process);
                         log.info("Process:%s finished successfully", process.getId());
                     } catch (RuntimeException re) {
                         log.error(re, "Process %s run failed", process.getId());
                         process.failed();
-                        metadataProcessManager.updateStatus(process);
+                        metadataProcessManager.update(process);
                     }
                 }
             } catch (InterruptedException e) {

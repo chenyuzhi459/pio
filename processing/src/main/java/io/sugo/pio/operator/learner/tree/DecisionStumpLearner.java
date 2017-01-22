@@ -3,6 +3,7 @@ package io.sugo.pio.operator.learner.tree;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.OperatorCapability;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.ParameterType;
 
 import java.util.LinkedList;
@@ -16,8 +17,24 @@ import java.util.List;
  */
 public class DecisionStumpLearner extends AbstractTreeLearner {
 
-	public DecisionStumpLearner() {
-		super("decisionStumpLearner");
+	@Override
+	public String getName() {
+		return "decisionStumpLearner";
+	}
+
+	@Override
+	public String getFullName() {
+		return "decisionStumpLearner";
+	}
+
+	@Override
+	public String getDescription() {
+		return "decisionStumpLearner";
+	}
+
+	@Override
+	public OperatorGroup getGroup() {
+		return OperatorGroup.algorithmModel;
 	}
 
 	@Override

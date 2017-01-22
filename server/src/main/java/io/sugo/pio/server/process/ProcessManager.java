@@ -1,5 +1,7 @@
 package io.sugo.pio.server.process;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -10,8 +12,18 @@ import com.metamx.common.lifecycle.LifecycleStop;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ManageLifecycle;
+import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.metadata.MetadataProcessManager;
+import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.Status;
+import io.sugo.pio.ports.Connection;
+import io.sugo.pio.server.http.dto.OperatorDto;
+import org.joda.time.DateTime;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 @ManageLifecycle
@@ -27,8 +39,11 @@ public class ProcessManager {
     private final MetadataProcessManager metadataProcessManager;
     private final OperatorProcessLoader loader;
 
+    private static String operatorMetaJson;
+    private static Map<String, OperatorMeta> operatorMetaMap;
+
     @Inject
-    public ProcessManager(ProcessManagerConfig config, MetadataProcessManager metadataProcessManager) {
+    public ProcessManager(@Json ObjectMapper jsonMapper, ProcessManagerConfig config, MetadataProcessManager metadataProcessManager) {
         this.config = config;
         this.metadataProcessManager = metadataProcessManager;
         this.executeMaxThread = config.getExecuteMaxThread();
@@ -50,6 +65,22 @@ public class ProcessManager {
             this.runners[i] = new ProcessRunner(queue, i, processCache, metadataProcessManager);
         }
         loader = new OperatorProcessLoader(this.metadataProcessManager);
+        if (operatorMetaMap == null) {
+            operatorMetaMap = OperatorMapHelper.getAllOperatorMetas(jsonMapper);
+            try {
+                operatorMetaJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(operatorMetaMap.values());
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static String getOperatorMetaJson() {
+        return operatorMetaJson;
+    }
+
+    public static Map<String, OperatorMeta> getOperatorMetaMap() {
+        return operatorMetaMap;
     }
 
     @LifecycleStart
@@ -92,6 +123,40 @@ public class ProcessManager {
         }
     }
 
+    public OperatorProcess create(String name, String description) {
+        OperatorProcess process = new OperatorProcess(name);
+        process.setDescription(description);
+        processCache.put(process.getId(), process);
+        metadataProcessManager.insert(process);
+        return process;
+    }
+
+    public OperatorProcess update(String id, String name, String description) {
+        OperatorProcess process = get(id);
+        if (name != null && name != "") {
+            process.setName(name);
+        }
+        if (description != null && description != "") {
+            process.setDescription(description);
+        }
+        process.setUpdateTime(new DateTime());
+        metadataProcessManager.update(process);
+        return process;
+    }
+
+    public OperatorProcess delete(String id) {
+        OperatorProcess process = get(id);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            process.setStatus(Status.DELETED);
+            process.setUpdateTime(new DateTime());
+            metadataProcessManager.update(process);
+            processCache.invalidate(id);
+            return process;
+        } else {
+            return null;
+        }
+    }
+
     public String register(OperatorProcess process) {
         try {
             processCache.put(process.getId(), process);
@@ -104,10 +169,23 @@ public class ProcessManager {
         }
     }
 
+    public List<OperatorProcess> getAll() {
+        List<OperatorProcess> processes = metadataProcessManager.getAll();
+        if (processes == null || processes.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return processes;
+    }
+
     public OperatorProcess get(String id) {
         loader.setProcessId(id);
         try {
-            return processCache.get(id, loader);
+            OperatorProcess process = processCache.get(id, loader);
+            if (process == null || Status.DELETED.equals(process.getStatus())) {
+                processCache.invalidate(id);
+                return null;
+            }
+            return process;
         } catch (ExecutionException e) {
             log.error(e, "get process %s error", id);
             throw new RuntimeException(e);
@@ -125,13 +203,90 @@ public class ProcessManager {
 
         @Override
         public OperatorProcess call() throws Exception {
-            OperatorProcess process = metadataProcessManager.get(processId);
+            OperatorProcess process = metadataProcessManager.get(processId, true);
             return process;
         }
 
         public void setProcessId(String processId) {
             this.processId = processId;
         }
+
     }
 
+    public OperatorProcess addOperator(String processId, OperatorDto dto) {
+        OperatorProcess process = get(processId);
+        OperatorMeta meta = operatorMetaMap.get(dto.getOperatorType());
+        try {
+            Operator operator = (Operator) meta.getType().getType().newInstance();
+            operator.setName(meta.getName() + "-" + UUID.randomUUID().toString());
+            operator.setxPos(dto.getxPos());
+            operator.setyPos(dto.getyPos());
+            process.getRootOperator().getExecutionUnit().addOperator(operator);
+            process.setUpdateTime(new DateTime());
+            metadataProcessManager.update(process);
+            return process;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Operator getOperator(String processId, String operatorId) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            Operator operator = process.getOperator(operatorId);
+            return operator;
+        } else {
+            return null;
+        }
+    }
+
+    public OperatorProcess deleteOperator(String processId, String operatorId) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            process.setUpdateTime(new DateTime());
+            process.removeOperator(operatorId);
+            metadataProcessManager.update(process);
+            return process;
+        } else {
+            return null;
+        }
+    }
+
+    public OperatorProcess connect(String processId, Connection dto) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            process.setUpdateTime(new DateTime());
+            process.connect(dto, true);
+            metadataProcessManager.update(process);
+            process.getRootOperator().getExecutionUnit().transformMetaData();
+            return process;
+        } else {
+            return null;
+        }
+    }
+
+    public OperatorProcess disconnect(String processId, Connection dto) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            process.setUpdateTime(new DateTime());
+            process.disconnect(dto);
+            metadataProcessManager.update(process);
+            process.getRootOperator().getExecutionUnit().transformMetaData();
+            return process;
+        } else {
+            return null;
+        }
+    }
+
+    public Operator updateParameter(String processId, String operatorId, String key, String value) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            Operator operator = process.getOperator(operatorId);
+            operator.setParameter(key, value);
+            metadataProcessManager.update(process);
+            return operator;
+        } else {
+            return null;
+        }
+    }
 }

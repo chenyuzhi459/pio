@@ -1,33 +1,46 @@
 package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.common.base.Preconditions;
+import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
-import io.sugo.pio.tools.Pair;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "chainType", defaultImpl = ProcessRootOperator.class)
-@JsonSubTypes(value = {
-        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class)
-})
+//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "chainType", defaultImpl = ProcessRootOperator.class)
+//@JsonSubTypes(value = {
+//        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class)
+//})
 public abstract class OperatorChain extends Operator {
 
-    private ExecutionUnit[] execUnits;
+    @JsonProperty
+    private List<ExecutionUnit> execUnits;
 
-    public OperatorChain(String name, String... executionUnitNames) {
-        super(name);
-        execUnits = new ExecutionUnit[executionUnitNames.length];
-        for (int i = 0; i < execUnits.length; i++) {
-            execUnits[i] = new ExecutionUnit(this, executionUnitNames[i]);
+    public OperatorChain() {
+        execUnits = new ArrayList<>();
+    }
+
+    public List<ExecutionUnit> getExecUnits() {
+        return execUnits;
+    }
+
+    public void setExecUnits(List<ExecutionUnit> execUnits) {
+        this.execUnits = execUnits;
+    }
+
+    @Override
+    public ExecutionUnit getExecutionUnit() {
+        final ExecutionUnit execUnit;
+        if (execUnits.isEmpty()) {
+            execUnit = new ExecutionUnit();
+            execUnit.setEnclosingOperator(this);
+            execUnits.add(execUnit);
+        } else {
+            execUnit = execUnits.get(0);
         }
+        return execUnit;
     }
 
     /**
@@ -36,8 +49,7 @@ public abstract class OperatorChain extends Operator {
      * (dis)connection behavior, optionally by customized {@link InputPort} instances) by overriding
      * this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link InputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
@@ -51,8 +63,7 @@ public abstract class OperatorChain extends Operator {
      * (dis)connection behavior, optionally by customized {@link OutputPort} instances) by
      * overriding this method.
      *
-     * @param portOwner
-     *            The owner of the ports.
+     * @param portOwner The owner of the ports.
      * @return The {@link OutputPorts} instance, never {@code null}.
      * @since 7.3.0
      */
@@ -62,13 +73,40 @@ public abstract class OperatorChain extends Operator {
 
     @Override
     public void doWork() {
-        for (ExecutionUnit subprocess : execUnits) {
-            subprocess.execute();
+        for (ExecutionUnit execUnit : execUnits) {
+            execUnit.execute();
         }
     }
 
-    public ExecutionUnit getExecutionUnit(int index) {
-        return execUnits[index];
+    @Override
+    protected void registerOperator(OperatorProcess process) {
+        super.registerOperator(process);
+        for (ExecutionUnit execUnit : execUnits) {
+            for (Operator child : execUnit.getOperators()) {
+                execUnit.setEnclosingOperator(this);
+                child.registerOperator(process);
+                child.setEnclosingExecutionUnit(execUnit);
+            }
+        }
     }
 
+    /**
+     * Unregisters this chain and all of its children from the given process.
+     */
+    @Override
+    protected void unregisterOperator(OperatorProcess process) {
+        super.unregisterOperator(process);
+        for (ExecutionUnit execUnit : execUnits) {
+            for (Operator child : execUnit.getOperators()) {
+                child.unregisterOperator(process);
+            }
+        }
+    }
+
+    @Override
+    public void updateExecutionOrder() {
+        for (ExecutionUnit unit : execUnits) {
+            unit.updateExecutionOrder();
+        }
+    }
 }

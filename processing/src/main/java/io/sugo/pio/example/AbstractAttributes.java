@@ -148,7 +148,6 @@ public abstract class AbstractAttributes implements Attributes {
         return getSpecial(LABEL_NAME);
     }
 
-    @Override
     public void setLabel(Attribute label) {
         setSpecialAttribute(label, LABEL_NAME);
     }

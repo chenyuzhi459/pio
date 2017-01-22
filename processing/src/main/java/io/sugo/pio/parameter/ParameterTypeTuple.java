@@ -1,8 +1,8 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.tools.Pair;
 import io.sugo.pio.tools.Tools;
-import org.w3c.dom.Element;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Sebastian Land
  */
-public class ParameterTypeTupel extends CombinedParameterType {
+public class ParameterTypeTuple extends CombinedParameterType {
 
 	private static final long serialVersionUID = 7292052301201204321L;
 
@@ -34,12 +34,12 @@ public class ParameterTypeTupel extends CombinedParameterType {
 	private static final char[] XML_SPECIAL_CHARACTERS = new char[] { XML_SEPERATOR_CHAR };
 	private static final char INTERNAL_SEPERATOR_CHAR = '.'; // Parameters.PAIR_SEPARATOR; //'.';
 	private static final char[] INTERNAL_SPECIAL_CHARACTERS = new char[] { INTERNAL_SEPERATOR_CHAR };
-
+	@JsonProperty
 	private Object[] defaultValues = null;
-
+	@JsonProperty
 	private ParameterType[] types;
 
-	public ParameterTypeTupel(String key, String description, ParameterType... parameterTypes) {
+	public ParameterTypeTuple(String key, String description, ParameterType... parameterTypes) {
 		super(key, description, parameterTypes);
 		this.types = parameterTypes;
 	}
@@ -51,13 +51,13 @@ public class ParameterTypeTupel extends CombinedParameterType {
 			for (int i = 0; i < types.length; i++) {
 				defaultValues[i] = types[i].getDefaultValue() == null ? "" : types[i].getDefaultValue() + "";
 			}
-			return ParameterTypeTupel.transformTupel2String(defaultValues);
+			return ParameterTypeTuple.transformTupel2String(defaultValues);
 		} else {
 			String[] defStrings = new String[defaultValues.length];
 			for (int i = 0; i < defaultValues.length; i++) {
 				defStrings[i] = defaultValues[i] + "";
 			}
-			return ParameterTypeTupel.transformTupel2String(defStrings);
+			return ParameterTypeTuple.transformTupel2String(defStrings);
 		}
 	}
 

@@ -7,12 +7,11 @@ import io.sugo.pio.example.table.AttributeFactory;
 import io.sugo.pio.example.table.AttributeTypeException;
 import io.sugo.pio.example.table.DataRow;
 import io.sugo.pio.example.table.DataRowFactory;
-import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.OperatorVersion;
-import io.sugo.pio.operator.UserError;
 import io.sugo.pio.example.util.ExampleSetBuilder;
 import io.sugo.pio.example.util.ExampleSets;
+import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.UserError;
 import io.sugo.pio.tools.Ontology;
 
 import java.text.DateFormat;
@@ -69,7 +68,7 @@ public class DataResultSetTranslator {
 	/**
 	 * From this version, the binominal data type never will be chosen, because it fails too often.
 	 */
-	public static final OperatorVersion VERSION_6_0_3 = new OperatorVersion(6, 0, 3);
+//	public static final OperatorVersion VERSION_6_0_3 = new OperatorVersion(6, 0, 3);
 
 	private Operator operator;
 

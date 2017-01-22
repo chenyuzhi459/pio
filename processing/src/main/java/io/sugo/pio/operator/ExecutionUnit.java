@@ -10,6 +10,8 @@ import io.sugo.pio.ports.*;
 import java.io.Serializable;
 import java.util.*;
 
+import static com.sun.org.glassfish.external.probe.provider.StatsProviderManager.unregister;
+
 /**
  */
 public class ExecutionUnit implements Serializable {
@@ -20,22 +22,18 @@ public class ExecutionUnit implements Serializable {
         }
     };
 
-    private String name;
-
     private OperatorChain enclosingOperator;
-    private final InputPorts innerInputPorts;
-    private final OutputPorts innerOutputPorts;
+    private InputPorts innerInputPorts;
+    private OutputPorts innerOutputPorts;
+    @JsonProperty("operators")
     private List<Operator> operators = new ArrayList<>();
+    private List<Operator> executionOrder = new ArrayList<>();
 
     @JsonCreator
-    public ExecutionUnit(
-            OperatorChain enclosingOperator, String name
-    ) {
-        this.name = name;
-
-        this.enclosingOperator = enclosingOperator;
-        innerInputPorts = enclosingOperator.createInnerSinks(portOwner);
-        innerOutputPorts = enclosingOperator.createInnerSources(portOwner);
+    public ExecutionUnit() {
+        for (Operator operator : operators) {
+            registerOperator(operator, true);
+        }
     }
 
     public InputPorts getInnerSinks() {
@@ -56,9 +54,8 @@ public class ExecutionUnit implements Serializable {
     /**
      * Adds the operator to this execution unit.
      *
-     * @param registerWithProcess
-     *            Typically true. If false, the operator will not be registered with its parent
-     *            process.
+     * @param registerWithProcess Typically true. If false, the operator will not be registered with its parent
+     *                            process.
      * @return the new index of the operator.
      */
     public int addOperator(Operator operator, boolean registerWithProcess) {
@@ -90,6 +87,18 @@ public class ExecutionUnit implements Serializable {
         registerOperator(operator, true);
     }
 
+    /**
+     * Removes the given operator. Don't call this method directly but call
+     * {@link Operator#remove()}.
+     */
+    protected void removeOperator(Operator operator) {
+        if (!operators.contains(operator)) {
+            throw new NoSuchElementException("Operator " + operator.getName() + " not contained!");
+        }
+        operators.remove(operator);
+        unregister(operator);
+    }
+
     private void registerOperator(Operator operator, boolean registerWithProcess) {
         operator.setEnclosingExecutionUnit(this);
         OperatorProcess process = getEnclosingOperator().getProcess();
@@ -100,9 +109,27 @@ public class ExecutionUnit implements Serializable {
 
     public void setEnclosingOperator(OperatorChain enclosingOperator) {
         this.enclosingOperator = enclosingOperator;
+        innerInputPorts = enclosingOperator.createInnerSinks(portOwner);
+        innerOutputPorts = enclosingOperator.createInnerSources(portOwner);
     }
 
-    /** Helper class to count the number of dependencies of an operator. */
+    protected void updateExecutionOrder() {
+        this.executionOrder = topologicalSort();
+        if (!this.executionOrder.equals(operators)) {
+            if (operators.size() != executionOrder.size()) {
+                // we have a circle. without a check, operator vanishes.
+                return;
+            }
+            this.operators = this.executionOrder;
+        }
+        for (Operator operator : this.operators) {
+            operator.updateExecutionOrder();
+        }
+    }
+
+    /**
+     * Helper class to count the number of dependencies of an operator.
+     */
     private static class EdgeCounter {
 
         private final Map<Operator, Integer> numIncomingEdges = new LinkedHashMap<Operator, Integer>();
@@ -197,13 +224,37 @@ public class ExecutionUnit implements Serializable {
         for (Operator op : sorted) {
             op.transformMetaData();
         }
+        if (sorted.size() != operators.size()) {
+            List<Operator> remainder = new LinkedList<Operator>(operators);
+            remainder.removeAll(sorted);
+            for (Operator nodeInCircle : remainder) {
+                for (OutputPort outputPort : nodeInCircle.getOutputPorts().getAllPorts()) {
+                    InputPort destination = outputPort.getDestination();
+                    if (destination != null && remainder.contains(destination.getPorts().getOwner().getOperator())) {
+                        if (destination.getSource() != null) {
+                            // (source can be null *during* a disconnect in which case
+                            // both the source and the destination fire an update
+                            // which leads to this inconsistent state)
+//                            destination.addError(new OperatorLoopError(destination));
+                        }
+//                        outputPort.addError(new OperatorLoopError(outputPort));
+                    }
+                }
+            }
+        }
+        getInnerSinks().checkPreconditions();
     }
 
 
-    /** Returns an unmodifiable view of the operators contained in this process. */
-    @JsonProperty("operators")
+    /**
+     * Returns an unmodifiable view of the operators contained in this process.
+     */
     public List<Operator> getOperators() {
         return Collections.unmodifiableList(new ArrayList<>(operators));
+    }
+
+    public void setOperators(List<Operator> operators) {
+        this.operators = operators;
     }
 
     /**

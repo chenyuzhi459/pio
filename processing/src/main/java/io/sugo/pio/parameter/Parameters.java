@@ -1,15 +1,20 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.*;
 
 /**
  */
 public class Parameters implements Cloneable, Iterable<String> {
 
-    public static final char PAIR_SEPARATOR = '\u241D';
-    public static final char RECORD_SEPARATOR = '\u241E';
+//    public static final char PAIR_SEPARATOR = '\u241D';
+//    public static final char RECORD_SEPARATOR = '\u241E';
+public static final char PAIR_SEPARATOR = ':';
+    public static final char RECORD_SEPARATOR = ';';
 
     /** Maps parameter keys (i.e. Strings) to their value (Objects). */
+    @JsonProperty
     private final Map<String, String> keyToValueMap = new LinkedHashMap<String, String>();
 
     /** Maps parameter keys (i.e. Strings) to their <code>ParameterType</code>. */
@@ -32,6 +37,7 @@ public class Parameters implements Cloneable, Iterable<String> {
      * Returns a list of <tt>ParameterTypes</tt> describing the parameters of this operator. This
      * list will be generated during construction time of the Operator.
      */
+    @JsonProperty
     public Collection<ParameterType> getParameterTypes() {
         return keyToTypeMap.values();
     }
@@ -99,6 +105,14 @@ public class Parameters implements Cloneable, Iterable<String> {
                 return type.toString(defaultValue);
             }
         }
+    }
+
+    /**
+     * Returns the value of the parameter as specified by the process definition file (without
+     * substituting default values etc.)
+     */
+    public String getParameterAsSpecified(String key) {
+        return keyToValueMap.get(key);
     }
 
     /**

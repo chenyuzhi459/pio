@@ -47,8 +47,8 @@ public abstract class AbstractWeighting extends Operator implements CapabilityPr
 
 	/**
 	 */
-	public AbstractWeighting(String name) {
-		this(name, false);
+	public AbstractWeighting() {
+		this(false);
 	}
 
 	/**
@@ -58,8 +58,7 @@ public abstract class AbstractWeighting extends Operator implements CapabilityPr
 	 * @param checkForLabel
 	 *            if no label exist, the operator throws an UserError and shows a MetaData warning
 	 */
-	public AbstractWeighting(String name, boolean checkForLabel) {
-		super(name);
+	public AbstractWeighting(boolean checkForLabel) {
 		if (isExampleSetMandatory()) {
 			exampleSetInput.addPrecondition(new CapabilityPrecondition(this, exampleSetInput));
 		}

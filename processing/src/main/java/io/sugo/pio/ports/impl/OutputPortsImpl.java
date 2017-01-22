@@ -31,6 +31,13 @@ public class OutputPortsImpl extends AbstractPorts<OutputPort> implements Output
     }
 
     @Override
+    public OutputPort createPassThroughPort(String name) {
+        OutputPort in = new OutputPortImpl(this, name);
+        addPort(in);
+        return in;
+    }
+
+    @Override
     public void disconnectAll() {
         disconnectAllBut(null);
     }

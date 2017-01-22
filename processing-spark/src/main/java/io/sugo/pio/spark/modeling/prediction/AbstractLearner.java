@@ -1,15 +1,11 @@
 package io.sugo.pio.spark.modeling.prediction;
 
-import io.sugo.pio.spark.SparkOperator;
-import io.sugo.pio.spark.datahandler.HadoopExampleSet;
-import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler.SparkOperation;
-import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.learner.PredictionModel;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-
-import java.util.Arrays;
-import java.util.Collection;
+import io.sugo.pio.spark.SparkOperator;
+import io.sugo.pio.spark.datahandler.HadoopExampleSet;
+import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler.SparkOperation;
 
 /**
  */
@@ -23,9 +19,8 @@ public abstract class AbstractLearner extends SparkOperator {
 //    private final OutputPort weightsOutput = createOutputPort("weights", this.canCalculateWeights());
 //    private final OutputPort exampleSetOutput = createOutputPort("exampleSet");
 
-    public AbstractLearner(SparkOperation sparkOperation, String name,
+    public AbstractLearner(SparkOperation sparkOperation,
                            InputPort exampleSetInput, OutputPort modelOutput) {
-        super(name);
         this.exampleSetInput = exampleSetInput;
         this.modelOutput = modelOutput;
         this.sparkOperation = sparkOperation;

@@ -12,10 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-/**
- * @author Sebastian Land
- * 
- */
 public abstract class AbstractAttributeFilterCondition implements AttributeFilterCondition {
 
 	/**

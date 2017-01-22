@@ -1,13 +1,10 @@
 package io.sugo.pio.operator.preprocessing.discretization;
 
-import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.preprocessing.PreprocessingOperator;
 import io.sugo.pio.parameter.UndefinedParameterError;
-import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.tools.Ontology;
-import io.sugo.pio.util.OperatorService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,10 +15,6 @@ import java.util.Set;
  * @author Simon Fischer
  */
 public abstract class AbstractDiscretizationOperator extends PreprocessingOperator {
-
-	public AbstractDiscretizationOperator(String name) {
-		super(name);
-	}
 
 	@Override
 	protected Collection<AttributeMetaData> modifyAttributeMetaData(ExampleSetMetaData emd, AttributeMetaData amd)

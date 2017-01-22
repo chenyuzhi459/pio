@@ -5,7 +5,4 @@ import io.sugo.pio.operator.OperatorChain;
 /**
  */
 public abstract class SparkOperatorChain extends OperatorChain implements KillableOperation {
-    public SparkOperatorChain(String name) {
-        super(name);
-    }
 }

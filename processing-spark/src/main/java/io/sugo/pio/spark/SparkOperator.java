@@ -1,21 +1,17 @@
 package io.sugo.pio.spark;
 
-import io.sugo.pio.operator.*;
+import io.sugo.pio.operator.IOObject;
+import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.OperatorChain;
+import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.spark.datahandler.HadoopExampleSet;
 import io.sugo.pio.spark.datahandler.mapreducehdfs.MapReduceHDFSHandler;
-import io.sugo.pio.ports.OutputPort;
-
-import java.util.Collection;
 
 /**
  */
 public abstract class SparkOperator extends Operator implements KillableOperation {
     private SparkNest sparkNest = null;
-
-    public SparkOperator(String name) {
-        super(name);
-    }
 
     public SparkNest getSparkNest() {
         if(sparkNest == null) {

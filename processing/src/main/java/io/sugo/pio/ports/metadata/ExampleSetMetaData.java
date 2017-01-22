@@ -1,11 +1,11 @@
 package io.sugo.pio.ports.metadata;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.AttributeRole;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.tools.Ontology;
-import io.sugo.pio.tools.ParameterService;
 import io.sugo.pio.tools.Tools;
 
 import java.util.*;
@@ -26,6 +26,7 @@ public class ExampleSetMetaData extends MetaData {
 
 	private MDInteger numberOfExamples = new MDInteger();
 
+	@JsonProperty
 	private Map<String, AttributeMetaData> attributeMetaData = new LinkedHashMap<String, AttributeMetaData>();
 
 	private boolean nominalDataWasShrinked = false;

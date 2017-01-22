@@ -14,6 +14,8 @@ import io.sugo.pio.ports.metadata.MetaDataInfo;
 import java.util.LinkedList;
 import java.util.List;
 
+import static io.sugo.pio.parameter.ParameterTypeAttributes.ATTRIBUTE_SEPARATOR_CHARACTER;
+
 /**
  * A filter condition for subsets of attributes.
  * 
@@ -23,7 +25,7 @@ public class SubsetAttributeFilter extends AbstractAttributeFilterCondition {
 
 	public static final String PARAMETER_ATTRIBUTES = "attributes";
 
-	public static final String PARAMETER_ATTRIBUTES_SEPERATOR = "\\|";
+//	public static final String PARAMETER_ATTRIBUTES_SEPERATOR = "\\|";
 
 	private String attributeNames;
 
@@ -39,7 +41,7 @@ public class SubsetAttributeFilter extends AbstractAttributeFilterCondition {
 			return MetaDataInfo.YES;
 		}
 		boolean found = false;
-		for (String attributeName : attributeNames.split(PARAMETER_ATTRIBUTES_SEPERATOR)) {
+		for (String attributeName : attributeNames.split(ATTRIBUTE_SEPARATOR_CHARACTER)) {
 			if (attribute.getName().equals(attributeName)) {
 				found = true;
 			}
@@ -52,7 +54,7 @@ public class SubsetAttributeFilter extends AbstractAttributeFilterCondition {
 		if (attributeNames == null || attributeNames.length() == 0) {
 			return ScanResult.REMOVE;
 		}
-		for (String attributeName : attributeNames.split(PARAMETER_ATTRIBUTES_SEPERATOR)) {
+		for (String attributeName : attributeNames.split(ATTRIBUTE_SEPARATOR_CHARACTER)) {
 			if (attribute.getName().equals(attributeName)) {
 				return ScanResult.KEEP;
 			}

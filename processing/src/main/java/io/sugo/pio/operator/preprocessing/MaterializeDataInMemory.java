@@ -12,6 +12,7 @@ import io.sugo.pio.example.table.NominalMapping;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.example.util.ExampleSetBuilder;
 import io.sugo.pio.example.util.ExampleSets;
+import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.io.ExampleSource;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeCategory;
@@ -30,8 +31,24 @@ import java.util.List;
  */
 public class MaterializeDataInMemory extends AbstractDataProcessing {
 
-	public MaterializeDataInMemory(String name) {
-		super("materializeDataInMemory");
+	@Override
+	public String getName() {
+		return "materializeDataInMemory";
+	}
+
+	@Override
+	public String getFullName() {
+		return "materializeDataInMemory";
+	}
+
+	@Override
+	public String getDescription() {
+		return "materializeDataInMemory";
+	}
+
+	@Override
+	public OperatorGroup getGroup() {
+		return OperatorGroup.algorithmModel;
 	}
 
 	@Override
