@@ -1,5 +1,7 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * A parameter type for categories. These are several Strings and one of these is the default value.
  * Additionally users can define other strings than these given in as pre-defined categories.
@@ -18,9 +20,9 @@ public class ParameterTypeStringCategory extends ParameterTypeSingle {
 	protected static final String ELEMENT_VALUE = "Value";
 
 	protected static final String ATTRIBUTE_IS_EDITABLE = "is-editable";
-
+	@JsonProperty
 	private String defaultValue = null;
-
+	@JsonProperty
 	private String[] categories = new String[0];
 
 	private boolean editable = true;

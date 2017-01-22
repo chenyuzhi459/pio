@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ParameterTypeCategory extends ParameterTypeSingle {
 
+    @JsonProperty
     private int defaultValue = 0;
 
     @JsonProperty

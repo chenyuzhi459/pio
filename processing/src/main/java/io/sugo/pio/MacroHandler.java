@@ -2,7 +2,6 @@ package io.sugo.pio;
 
 
 import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.OperatorVersion;
 import io.sugo.pio.operator.Value;
 import io.sugo.pio.parameter.UndefinedMacroError;
 import io.sugo.pio.parameter.UndefinedParameterError;
@@ -45,7 +44,7 @@ public class MacroHandler extends Observable {
 			Operator.STRING_EXPANSION_MACRO_NUMBER_APPLIED_TIMES_USER_FRIENDLY,
 			Operator.STRING_EXPANSION_MACRO_OPERATORNAME_USER_FRIENDLY };
 
-	private static final OperatorVersion THROW_ERROR_ON_UNDEFINED_MACRO = new OperatorVersion(6, 0, 3);
+//	private static final OperatorVersion THROW_ERROR_ON_UNDEFINED_MACRO = new OperatorVersion(6, 0, 3);
 
 	/**
 	 * This HashSet contains the keys of legacy macros which will be replaced while string

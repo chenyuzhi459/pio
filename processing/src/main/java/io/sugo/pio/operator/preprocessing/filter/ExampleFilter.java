@@ -10,8 +10,9 @@ import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.preprocessing.AbstractDataProcessing;
 import io.sugo.pio.operator.tools.ExpressionEvaluationException;
-import io.sugo.pio.parameter.*;
-import io.sugo.pio.parameter.conditions.EqualStringCondition;
+import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeList;
+import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
@@ -128,9 +129,10 @@ public class ExampleFilter extends AbstractDataProcessing {
 	public ExampleSet apply(final ExampleSet inputSet) throws OperatorException {
 		getLogger().fine(getName() + ": input set has " + inputSet.size() + " examples.");
 
-		String className = getParameterAsString(PARAMETER_CONDITION_CLASS);
-		String parameter = getParameterAsString(PARAMETER_PARAMETER_STRING);
-		getLogger().fine("Creating condition '" + className + "' with parameter '" + parameter + "'");
+//		String className = getParameterAsString(PARAMETER_CONDITION_CLASS);
+//		String parameter = getParameterAsString(PARAMETER_PARAMETER_STRING);
+//		getLogger().fine("Creating condition '" + className + "' with parameter '" + parameter + "'");
+		String className = ConditionedExampleSet.KNOWN_CONDITION_NAMES[ConditionedExampleSet.CONDITION_CUSTOM_FILTER];
 		Condition condition = null;
 		try {
 			String rawParameterString = getParameters().getParameterAsSpecified(PARAMETER_FILTERS_LIST);
@@ -138,34 +140,6 @@ public class ExampleFilter extends AbstractDataProcessing {
 			condition = new CustomFilter(inputSet, operatorFilterList,
 					getParameterAsBoolean(PARAMETER_FILTERS_LOGIC_AND), getProcess().getMacroHandler());
 
-//			if (className.equals(ConditionedExampleSet.KNOWN_CONDITION_NAMES[ConditionedExampleSet.CONDITION_CUSTOM_FILTER])) {
-//				// special handling for custom_filters, as they cannot be instantiated via a simple
-//				// string parameter
-//				// this is necessary as operator.getParameterList() replaces '%{test}' by 'test'
-//				String rawParameterString = getParameters().getParameterAsSpecified(PARAMETER_FILTERS_LIST);
-//				if (rawParameterString == null) {
-//					throw new UndefinedParameterError(PARAMETER_FILTER, this);
-//				}
-//				List<String[]> operatorFilterList = ParameterTypeList.transformString2List(rawParameterString);
-//				condition = new CustomFilter(inputSet, operatorFilterList,
-//						getParameterAsBoolean(PARAMETER_FILTERS_LOGIC_AND), getProcess().getMacroHandler());
-//			} else if (className
-//					.equals(ConditionedExampleSet.KNOWN_CONDITION_NAMES[ConditionedExampleSet.CONDITION_EXPRESSION])) {
-//				// special handling for expression, has different
-//				String expression = getParameterAsString(PARAMETER_PARAMETER_EXPRESSION);
-//				if (expression == null || expression.isEmpty()) {
-//					throw new UndefinedParameterError(PARAMETER_PARAMETER_EXPRESSION, this);
-//				}
-//				try {
-//					condition = new ExpressionFilter(inputSet, expression, this);
-//				} catch (ExpressionException e) {
-//					throw new UserError(this, "cannot_parse_expression", expression, e.getShortMessage());
-//				}
-//			} else {
-//				condition = ConditionedExampleSet.createCondition(className, inputSet, parameter);
-//			}
-//		} catch (ConditionCreationException e) {
-//			throw new UserError(this, e, 904, className, e.getMessage());
 		} catch (AttributeTypeException e) {
 			throw new UserError(this, e, "filter_wrong_type", e.getMessage());
 		} catch (IllegalArgumentException e) {
@@ -206,12 +180,11 @@ public class ExampleFilter extends AbstractDataProcessing {
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = super.getParameterTypes();
 
-		ParameterType type = new ParameterTypeFilter(PARAMETER_FILTER, "Defines the list of filters to apply.",
-				getInputPort(), true);
-		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, false,
-				ConditionedExampleSet.KNOWN_CONDITION_NAMES[ConditionedExampleSet.CONDITION_CUSTOM_FILTER]));
-//		type.setExpert(false);
-		types.add(type);
+//		ParameterType type = new ParameterTypeFilter(PARAMETER_FILTER, "Defines the list of filters to apply.",
+//				getInputPort(), true);
+//		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, false,
+//				ConditionedExampleSet.KNOWN_CONDITION_NAMES[ConditionedExampleSet.CONDITION_CUSTOM_FILTER]));
+//		types.add(type);
 
 //		type = new ParameterTypeString(PARAMETER_PARAMETER_STRING,
 //				"Parameter string for the condition, e.g. 'attribute=value' for the AttributeValueFilter.", true);
@@ -241,29 +214,29 @@ public class ExampleFilter extends AbstractDataProcessing {
 
 		// hidden parameter, only used to store the filters set via the ParameterTypeFilter dialog
 		// above
-		type = new ParameterTypeList(PARAMETER_FILTERS_LIST, "The list of filters.", new ParameterTypeString(
-				"PARAMETER_FILTERS_ENTRY_KEY", "A key entry of the filters list."), new ParameterTypeString(
-						"PARAMETER_FILTERS_ENTRY_VALUE", "A value entry of the filters list."));
+		ParameterType type = new ParameterTypeList(PARAMETER_FILTERS_LIST, "The list of filters.", new ParameterTypeString(
+				PARAMETER_FILTERS_ENTRY_KEY, "A key entry of the filters list."), new ParameterTypeString(
+						PARAMETER_FILTERS_ENTRY_VALUE, "A value entry of the filters list."));
 		type.setHidden(true);
-		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, true,
-				ConditionedExampleSet.KNOWN_CONDITION_NAMES[8]));
+//		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, true,
+//				ConditionedExampleSet.KNOWN_CONDITION_NAMES[8]));
 		types.add(type);
 
 		// hidden parameter, only used to store if the filters from the ParameterTypeFilter dialog
 		// above should be ANDed or ORed
-		type = new ParameterTypeBoolean(PARAMETER_FILTERS_LOGIC_AND, "Logic operator for filters.", true);
-		type.setHidden(true);
-		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, true,
-				ConditionedExampleSet.KNOWN_CONDITION_NAMES[8]));
-		types.add(type);
+//		type = new ParameterTypeBoolean(PARAMETER_FILTERS_LOGIC_AND, "Logic operator for filters.", true);
+//		type.setHidden(true);
+//		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, true,
+//				ConditionedExampleSet.KNOWN_CONDITION_NAMES[8]));
+//		types.add(type);
 
 		// hidden parameter, only used to store if the meta data should be checked in the
 		// ParameterTypeFilter dialog
-		type = new ParameterTypeBoolean(PARAMETER_FILTERS_CHECK_METADATA, "Check meta data for comparators.", true);
-		type.setHidden(true);
-		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, true,
-				ConditionedExampleSet.KNOWN_CONDITION_NAMES[8]));
-		types.add(type);
+//		type = new ParameterTypeBoolean(PARAMETER_FILTERS_CHECK_METADATA, "Check meta data for comparators.", true);
+//		type.setHidden(true);
+//		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, true,
+//				ConditionedExampleSet.KNOWN_CONDITION_NAMES[8]));
+//		types.add(type);
 
 		return types;
 	}

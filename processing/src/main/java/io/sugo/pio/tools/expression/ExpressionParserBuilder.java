@@ -2,7 +2,6 @@ package io.sugo.pio.tools.expression;
 
 
 import io.sugo.pio.OperatorProcess;
-import io.sugo.pio.operator.OperatorVersion;
 import io.sugo.pio.tools.expression.internal.ConstantResolver;
 import io.sugo.pio.tools.expression.internal.SimpleExpressionContext;
 import io.sugo.pio.tools.expression.internal.antlr.AntlrParser;
@@ -27,7 +26,7 @@ public class ExpressionParserBuilder {
 	 * The last version which contained the old expression parser with different functions and
 	 * different Macro handling.
 	 */
-	public static final OperatorVersion OLD_EXPRESSION_PARSER_FUNCTIONS = new OperatorVersion(6, 4, 0);
+//	public static final OperatorVersion OLD_EXPRESSION_PARSER_FUNCTIONS = new OperatorVersion(6, 4, 0);
 
 	private OperatorProcess process;
 	private boolean compatibleWithOldParser;
@@ -163,11 +162,11 @@ public class ExpressionParserBuilder {
 	 *            the version of the associated operator
 	 * @return the builder
 	 */
-	public ExpressionParserBuilder withCompatibility(OperatorVersion version) {
-		if (version.isAtMost(OLD_EXPRESSION_PARSER_FUNCTIONS)) {
-			compatibleWithOldParser = true;
-		}
-		return this;
-	}
+//	public ExpressionParserBuilder withCompatibility(OperatorVersion version) {
+//		if (version.isAtMost(OLD_EXPRESSION_PARSER_FUNCTIONS)) {
+//			compatibleWithOldParser = true;
+//		}
+//		return this;
+//	}
 
 }

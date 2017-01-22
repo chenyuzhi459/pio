@@ -1,5 +1,7 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,9 +32,11 @@ public class ParameterTypeList extends CombinedParameterType {
 	private static final String ATTRIBUTE_KEY = "key";
 	private static final String ATTRIBUTE_VALUE = "value";
 
+	@JsonProperty
 	private List<String[]> defaultList = new LinkedList<>();
-
+	@JsonProperty
 	private final ParameterType valueType;
+	@JsonProperty
 	private final ParameterType keyType;
 
 	/**

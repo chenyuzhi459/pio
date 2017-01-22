@@ -5,7 +5,6 @@ import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.Statistics;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.operator.OperatorVersion;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.preprocessing.PreprocessingModel;
 import io.sugo.pio.parameter.*;
@@ -53,7 +52,7 @@ public class BinDiscretization extends AbstractDiscretizationOperator {
      * Incompatible version, old version writes into the exampleset, if original output port is not
      * connected.
      */
-    private static final OperatorVersion VERSION_MAY_WRITE_INTO_DATA = new OperatorVersion(7, 1, 1);
+//    private static final OperatorVersion VERSION_MAY_WRITE_INTO_DATA = new OperatorVersion(7, 1, 1);
 
     @Override
     public String getName() {

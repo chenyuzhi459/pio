@@ -17,10 +17,6 @@ public class SQLExecutionTest {
         for (Module m : module.getJacksonModules()) {
             jsonMapper.registerModule(m);
         }
-//        System.out.println(
-//                jsonMapper.writerWithDefaultPrettyPrinter()
-//                        .writeValueAsString(
-//                                OperatorMapHelper.getAllOperatorMetas(jsonMapper).values()));
     }
 
     @Test

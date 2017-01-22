@@ -48,7 +48,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     private transient final Logger logger = Logger.getLogger(Operator.class.getName());
 
-    private OperatorVersion compatibilityLevel;
+//    private OperatorVersion compatibilityLevel;
 
     /**
      * The list which stores the errors of this operator (parameter not set, wrong children number,
@@ -174,16 +174,16 @@ public abstract class Operator implements ParameterHandler, Serializable {
     /**
      * @see OperatorVersion
      */
-    public void setCompatibilityLevel(OperatorVersion compatibilityLevel) {
-        this.compatibilityLevel = compatibilityLevel;
-    }
+//    public void setCompatibilityLevel(OperatorVersion compatibilityLevel) {
+//        this.compatibilityLevel = compatibilityLevel;
+//    }
 
-    public OperatorVersion getCompatibilityLevel() {
-        if (compatibilityLevel == null) {
-            compatibilityLevel = OperatorVersion.getLatestVersion();
-        }
-        return compatibilityLevel;
-    }
+//    public OperatorVersion getCompatibilityLevel() {
+//        if (compatibilityLevel == null) {
+//            compatibilityLevel = OperatorVersion.getLatestVersion();
+//        }
+//        return compatibilityLevel;
+//    }
 
     @JsonProperty
     public InputPorts getInputPorts() {

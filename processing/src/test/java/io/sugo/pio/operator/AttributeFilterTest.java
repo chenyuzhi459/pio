@@ -7,13 +7,15 @@ import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ProcessingPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter;
-import io.sugo.pio.parameter.Parameters;
 import io.sugo.pio.ports.Connection;
 import org.junit.Test;
 
+import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_NAME;
+import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_TARGET_ROLE;
 import static io.sugo.pio.operator.preprocessing.filter.ExampleFilter.PARAMETER_FILTERS_LIST;
 
 public class AttributeFilterTest {
@@ -33,12 +35,6 @@ public class AttributeFilterTest {
 
     @Test
     public void test() throws JsonProcessingException {
-        System.out.println(Parameters.RECORD_SEPARATOR);
-        String tmp = Parameters.RECORD_SEPARATOR + "";
-        System.out.println(Parameters.PAIR_SEPARATOR);
-        tmp = Parameters.PAIR_SEPARATOR + "";
-
-        System.out.println();
         OperatorProcess process = new OperatorProcess("testProcess");
         process.setDescription("testProcess desc");
 
@@ -61,9 +57,15 @@ public class AttributeFilterTest {
         ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:age.is_not_missing.;filters_entry_key:is_default.equals.Y");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
-        Connection dto = new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input");
-        process.connect(dto, true);
+        ChangeAttributeRole role = new ChangeAttributeRole();
+        role.setName("change_role");
+        role.setParameter(PARAMETER_NAME,"is_default");
+        role.setParameter(PARAMETER_TARGET_ROLE, "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role);
+
+        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
         process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
+        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
 
         process.getRootOperator().getExecutionUnit().transformMetaData();
 

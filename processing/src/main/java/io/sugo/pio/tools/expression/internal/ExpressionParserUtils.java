@@ -6,7 +6,6 @@ import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
 import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.OperatorVersion;
 import io.sugo.pio.operator.ProcessStoppedException;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
@@ -16,7 +15,6 @@ import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.RandomGenerator;
 import io.sugo.pio.tools.expression.*;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -227,12 +225,12 @@ public final class ExpressionParserUtils {
 	 * @return an array which contains
 	 *         {@link ExpressionParserBuilder#OLD_EXPRESSION_PARSER_FUNCTIONS} as last element
 	 */
-	public static OperatorVersion[] addIncompatibleExpressionParserChange(OperatorVersion... incompatibleVersions) {
-		OperatorVersion[] extendedIncompatibleVersions = Arrays.copyOf(incompatibleVersions,
-				incompatibleVersions.length + 1);
-		extendedIncompatibleVersions[incompatibleVersions.length] = ExpressionParserBuilder.OLD_EXPRESSION_PARSER_FUNCTIONS;
-		return extendedIncompatibleVersions;
-	}
+//	public static OperatorVersion[] addIncompatibleExpressionParserChange(OperatorVersion... incompatibleVersions) {
+//		OperatorVersion[] extendedIncompatibleVersions = Arrays.copyOf(incompatibleVersions,
+//				incompatibleVersions.length + 1);
+//		extendedIncompatibleVersions[incompatibleVersions.length] = ExpressionParserBuilder.OLD_EXPRESSION_PARSER_FUNCTIONS;
+//		return extendedIncompatibleVersions;
+//	}
 
 	/**
 	 * Uses the {@link ExpressionParserBuilder} to create an {@link ExpressionParser} with all

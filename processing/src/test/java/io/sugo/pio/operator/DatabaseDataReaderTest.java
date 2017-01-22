@@ -12,15 +12,10 @@ public class DatabaseDataReaderTest {
     private static final ObjectMapper jsonMapper = new DefaultObjectMapper();
 
     static {
-
         ProcessingPioModule module = new ProcessingPioModule();
         for (Module m : module.getJacksonModules()) {
             jsonMapper.registerModule(m);
         }
-//        System.out.println(
-//                jsonMapper.writerWithDefaultPrettyPrinter()
-//                        .writeValueAsString(
-//                                OperatorMapHelper.getAllOperatorMetas(jsonMapper).values()));
     }
 
     @Test

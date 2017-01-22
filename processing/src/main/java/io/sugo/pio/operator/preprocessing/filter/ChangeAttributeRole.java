@@ -6,13 +6,14 @@ import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.operator.OperatorVersion;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.error.AttributeNotFoundError;
 import io.sugo.pio.operator.preprocessing.AbstractDataProcessing;
 import io.sugo.pio.parameter.*;
-import io.sugo.pio.ports.metadata.*;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.ports.metadata.AttributeMetaData;
+import io.sugo.pio.ports.metadata.AttributeSetPrecondition;
+import io.sugo.pio.ports.metadata.ExampleSetMetaData;
+import io.sugo.pio.ports.metadata.MetaData;
 
 import java.util.List;
 
@@ -67,7 +68,7 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
     private static final String[] TARGET_ROLES = new String[]{REGULAR_NAME, Attributes.ID_NAME, Attributes.LABEL_NAME,
             Attributes.PREDICTION_NAME, Attributes.CLUSTER_NAME, Attributes.WEIGHT_NAME, Attributes.BATCH_NAME};
 
-    private final OperatorVersion VERSION_BEFORE_KEEPING_SPECIAL_ATT_WHEN_IT_LOSE_ROLE = new OperatorVersion(5, 3, 13);
+//    private final OperatorVersion VERSION_BEFORE_KEEPING_SPECIAL_ATT_WHEN_IT_LOSE_ROLE = new OperatorVersion(5, 3, 13);
 
     public ChangeAttributeRole() {
         getExampleSetInputPort().addPrecondition(
@@ -127,14 +128,14 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
                 } else {
                     AttributeMetaData oldRole = metaData.getAttributeByRole(targetRole);
                     if (oldRole != null && oldRole != amd) {
-                        if (getCompatibilityLevel().compareTo(VERSION_BEFORE_KEEPING_SPECIAL_ATT_WHEN_IT_LOSE_ROLE) > 0) {
-                            oldRole.setRegular();
-                        } else {
-                            getInputPort().addError(
-                                    new SimpleMetaDataError(Severity.WARNING, getInputPort(), "already_contains_role",
-                                            targetRole));
-                            metaData.removeAttribute(oldRole);
-                        }
+                        oldRole.setRegular();
+//                        if (getCompatibilityLevel().compareTo(VERSION_BEFORE_KEEPING_SPECIAL_ATT_WHEN_IT_LOSE_ROLE) > 0) {
+//                        } else {
+//                            getInputPort().addError(
+//                                    new SimpleMetaDataError(Severity.WARNING, getInputPort(), "already_contains_role",
+//                                            targetRole));
+//                            metaData.removeAttribute(oldRole);
+//                        }
                     }
                     amd.setRole(targetRole);
                 }
@@ -174,13 +175,13 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
         if (newRole.equals(REGULAR_NAME)) {
             exampleSet.getAttributes().addRegular(attribute);
         } else {
-            if (getCompatibilityLevel().compareTo(VERSION_BEFORE_KEEPING_SPECIAL_ATT_WHEN_IT_LOSE_ROLE) > 0) {
+//            if (getCompatibilityLevel().compareTo(VERSION_BEFORE_KEEPING_SPECIAL_ATT_WHEN_IT_LOSE_ROLE) > 0) {
                 Attribute oldOne = exampleSet.getAttributes().getSpecial(newRole);
                 if (oldOne != null) {
                     exampleSet.getAttributes().remove(oldOne);
                     exampleSet.getAttributes().addRegular(oldOne);
                 }
-            }
+//            }
             exampleSet.getAttributes().setSpecialAttribute(attribute, newRole);
         }
     }

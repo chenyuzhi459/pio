@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.guice.ProcessingPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
-import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
+import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import org.junit.Test;
 
-public class ExampleFilterTest {
+public class ChangeAttributeRoleTest {
     private static final ObjectMapper jsonMapper = new DefaultObjectMapper();
 
     static {
@@ -21,12 +21,11 @@ public class ExampleFilterTest {
     @Test
     public void test() throws JsonProcessingException {
 
-        ExampleFilter ef = new ExampleFilter();
+        ChangeAttributeRole role = new ChangeAttributeRole();
 
         System.out.println(
                 jsonMapper.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(ef)
+                        .writeValueAsString(role)
         );
     }
-
 }
