@@ -1,9 +1,7 @@
 package io.sugo.pio.engine.demo;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import io.sugo.pio.engine.demo.http.ALSTraining;
-import io.sugo.pio.engine.demo.http.DetailTraining;
-import io.sugo.pio.engine.demo.http.PopularTraining;
+import io.sugo.pio.engine.demo.http.*;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -21,12 +19,18 @@ public class DemoServer {
     }
 
     private static void train() throws IOException {
-        PopularTraining popularTraining = new PopularTraining();
-        popularTraining.train();
-        ALSTraining alsTraining = new ALSTraining();
-        alsTraining.train();
-        DetailTraining detailTraining = new DetailTraining();
-        detailTraining.train();
+//        PopularTraining popularTraining = new PopularTraining();
+//        popularTraining.train();
+//        ALSTraining alsTraining = new ALSTraining();
+//        alsTraining.train();
+//        DetailTraining detailTraining = new DetailTraining();
+//        detailTraining.train();
+//        FpTraining fpTraining = new FpTraining();
+//        fpTraining.train();
+//        SearchTraining searchTraining = new SearchTraining();
+//        searchTraining.train();
+        UserHistoryTraining userHistoryTraining = new UserHistoryTraining();
+        userHistoryTraining.train();
     }
 
     private static void startServer() throws Exception {

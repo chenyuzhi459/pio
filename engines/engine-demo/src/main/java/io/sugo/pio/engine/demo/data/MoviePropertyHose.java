@@ -2,6 +2,7 @@ package io.sugo.pio.engine.demo.data;
 
 import com.google.common.collect.Maps;
 import io.sugo.pio.engine.data.input.PropertyHose;
+import io.sugo.pio.engine.demo.Constants;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
@@ -58,11 +59,10 @@ public class MoviePropertyHose implements PropertyHose {
             }
 
             Map<String, Object> map = Maps.newHashMap();
-            map.put("movieId", Integer.parseInt(tokens[0]));
-            map.put("title", title);
-            map.put("tags", gens);
+            map.put(Constants.ITEM_ID, Integer.parseInt(tokens[0]));
+            map.put(Constants.ITEM_NAME, title);
+            map.put(Constants.CATEGORY, gens);
             return map;
         }
     }
-
 }

@@ -22,3 +22,4 @@ class DetailPreparator extends Preparator[DetailTrainingData, DetailPreparedData
     new DetailPreparedData(rowAdjustedIds)
   }
 }
+

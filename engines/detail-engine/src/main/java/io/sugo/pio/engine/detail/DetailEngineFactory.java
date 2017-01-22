@@ -40,3 +40,4 @@ public class DetailEngineFactory implements EngineFactory<DetailTrainingData, De
         return new DetailModel();
     }
 }
+

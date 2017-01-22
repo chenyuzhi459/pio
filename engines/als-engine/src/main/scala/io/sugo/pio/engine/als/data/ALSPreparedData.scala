@@ -5,3 +5,4 @@ import org.apache.spark.rdd.RDD
 
 
 case class ALSPreparedData(trainingData: RDD[Rating])
+

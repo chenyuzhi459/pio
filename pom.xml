@@ -33,6 +33,9 @@
         <module>engines/popular-recommend-engine</module>
         <module>engines/detail-engine</module>
         <module>engines/als-engine</module>
+        <module>engines/fp-engine</module>
+        <module>engines/userHistory-engine</module>
+        <module>engines/search-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>
     </modules>

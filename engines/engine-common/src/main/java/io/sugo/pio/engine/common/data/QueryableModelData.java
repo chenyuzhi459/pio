@@ -5,6 +5,7 @@ import io.sugo.pio.engine.common.lucene.SearchResult;
 import io.sugo.pio.engine.common.utils.LuceneUtils;
 import io.sugo.pio.engine.data.output.Repository;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -30,16 +31,16 @@ public class QueryableModelData {
      * @return
      * @throws IOException
      */
-    public Map<String, List<String>> predict(Map<String, Object> params, List<String> resultFields, SortField sortField, int queryNum) throws IOException {
+    public Map<String, List<String>> predict(Map<String, Object> params, List<String> resultFields, SortField sortField, int queryNum, Analyzer analyzer) throws IOException {
         String[] fields = new String[params.size()];
         params.keySet().toArray(fields);
         String[] qs = new String[params.size()];
         params.values().toArray(qs);
         SearchResult result;
         if (params.size() == 1) {
-            result = LuceneUtils.search(indexSearcher, fields[0], qs[0], queryNum, sortField, null);
+            result = LuceneUtils.search(indexSearcher, fields[0], qs[0], queryNum, sortField, null, analyzer);
         } else {
-            result = LuceneUtils.groupSearch(indexSearcher, fields, qs, queryNum, sortField, null);
+            result = LuceneUtils.groupSearch(indexSearcher, fields, qs, queryNum, sortField, null, analyzer);
         }
 
         TopDocs topDocs = result.getTopDocs();
@@ -63,6 +64,4 @@ public class QueryableModelData {
         }
         return res;
     }
-
-
 }

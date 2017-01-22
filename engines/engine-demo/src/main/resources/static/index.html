@@ -55,20 +55,21 @@
 					<div class="logo">
 						<a href="index.html"><img src="images/logo.png" alt="" /></a>
 					</div>
-					<!--<div class="header_top_right">-->
+					<div class="header_top_right">
 						<!--<div class="cart">-->
 							<!--<p><span>Cart</span><div id="dd" class="wrapper-dropdown-2"> (empty)-->
 							<!--<ul class="dropdown">-->
 									<!--<li>you have no items in your Shopping cart</li>-->
 							<!--</ul></div></p>-->
 						<!--</div>-->
-						<!--<div class="search_box">-->
-							<!--<form>-->
-								<!--<input type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}"><input type="submit" value="">-->
-							<!--</form>-->
-						<!--</div>-->
-						<!--<div class="clear"></div>-->
-					<!--</div>-->
+						<div class="search_box">
+							<form>
+								<input class="search-keyword" type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}">
+								<input class="search-submit" type="submit" value="" >
+							</form>
+						</div>
+						<div class="clear"></div>
+					</div>
 						  <script type="text/javascript">
 								function DropDown(el) {
 									this.dd = el;
@@ -125,7 +126,7 @@
 						  	 </ul>
 						</div>					
 		  	         </div>
-						    <div class="header_bottom_right">					 
+						    <div class="header_bottom_right">
 						 	    <!------ Slider ------------>
 								<div class="section group">
 									<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in popItems">
@@ -176,6 +177,7 @@
 			</div>
 		</div>
 	</div>
+
    <div class="footer">
 			 <div class="copy_right">
 				<p>Copyright &copy; 2016.Sugo All rights reserved.</p>
@@ -189,6 +191,7 @@
 		});
 
         $(function () {
+
             var detailUR = new Vue({
                 el: '#app',
                 data: {
@@ -209,7 +212,7 @@
                                 req.setRequestHeader('Content-Type', 'application/json')
                             },
                             data: JSON.stringify({
-                                'detailCategory': category, 'num': 12
+                                'category': category, 'num': 12, 'type': 'pop_query'
                             }),
                             dataType: 'json',
                             type: 'post',
@@ -235,7 +238,7 @@
                                 req.setRequestHeader('Content-Type', 'application/json')
                             },
                             data: JSON.stringify({
-                                'userId': that.userId, 'num': 14
+                                'user_id': that.userId, 'num': 14, "type":"als_query"
                             }),
                             dataType: 'json',
                             type: 'post',
@@ -269,6 +272,15 @@
     <a href="#" id="toTop"><span id="toTopHover"> </span></a>
 <div style="display:none"><script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script></div>
 </div>
+	<script>
+	$(function() {
+		$('.search-submit').click(function(ev){
+			ev.stopPropagation()
+			ev.preventDefault()
+			location.href = '/search.html?text=' + $('.search-keyword').val()
+		})
+	})
+	</script>
 </body>
 </html>
 

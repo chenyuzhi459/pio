@@ -300,7 +300,8 @@ body {
 	margin-left: 0;
 }
 .images_1_of_5 {
-	width: 15.72%;
+	/*width: 15.72%;*/
+	width: 8%;
 	padding:1.5%; 
 	text-align: center;
 	position: relative;

@@ -3,6 +3,7 @@ package io.sugo.pio.engine.demo.data;
 import com.google.common.collect.Maps;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.Event;
+import io.sugo.pio.engine.demo.Constants;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
@@ -36,9 +37,10 @@ public class MovieBatchEventHose implements BatchEventHose {
         public Event call(String str) throws Exception {
             String[] res = str.split(seperator);
             Map<String, Object> map = Maps.newHashMap();
-            map.put("userId", Integer.parseInt(res[0]));
-            map.put("movieId", Integer.parseInt(res[1]));
-            map.put("rating", Float.parseFloat(res[2]));
+            map.put(Constants.USER_ID, Integer.parseInt(res[0]));
+            map.put(Constants.ITEM_ID, Integer.parseInt(res[1]));
+            map.put(Constants.GRADE, Float.parseFloat(res[2]));
+            map.put(Constants.TIMENUM, Long.parseLong(res[3]));
             return new Event(System.currentTimeMillis(), map);
         }
     }
@@ -48,3 +50,4 @@ public class MovieBatchEventHose implements BatchEventHose {
         return find(sc);
     }
 }
+

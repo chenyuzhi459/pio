@@ -11,3 +11,4 @@ class PopularPreparator extends Preparator[PopularTrainingData, PopularPreparaDa
     new PopularPreparaData(td.actionData, td.itemData)
   }
 }
+

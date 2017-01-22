@@ -1,14 +1,11 @@
 package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.demo.ItemUtil;
-import io.sugo.pio.engine.popular.Constants;
-import io.sugo.pio.engine.popular.LucenceConstants;
-import io.sugo.pio.engine.popular.PopQuery;
+import io.sugo.pio.engine.demo.ObjectMapperUtil;
+import io.sugo.pio.engine.popular.*;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
-import org.apache.lucene.search.SortField;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -17,25 +14,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
 @Path("query/itempop")
 public class PopluarResource {
-    private final ObjectMapper jsonMapper = new ObjectMapper();
-    private final QueryableModelData modelData;
     private static final String ITEM_NAME = "item_name";
-
-    public static final String REPOSITORY_PATH = "src/main/resources/index/pop";
-
-    public PopluarResource() throws IOException {
-        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-        modelData = new QueryableModelData(repository);
-    }
+    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/pop";
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -46,22 +32,16 @@ public class PopluarResource {
             @Context final HttpServletRequest req
     ) {
         try {
+            ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             PopQuery query = jsonMapper.readValue(in, PopQuery.class);
-            Map<String, Object> map = new LinkedHashMap<>();
+            PopularModelFactory popularModelFactory = new PopularModelFactory();
+            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
 
-            if (query.getDetailCategory() != null) {
-                map.put(Constants.DETAIL_CATEGORY(), query.getDetailCategory());
-            }
+            PopResult popResult = popularModelFactory.loadModel(repository).predict(query);
+            List<String> itemIds = popResult.getItems();
+            Map<String , List<String>> res = new HashMap<>();
+            res.put(Constants.ITEM_ID(), itemIds);
 
-            int queryNum = 10;
-            if (query.getNum() != null) {
-                String Num = query.getNum();
-                queryNum = Integer.parseInt(Num);
-            }
-
-            List<String> resultFields = new ArrayList<>();
-            resultFields.add(Constants.ITEM_ID());
-            Map<String, List<String>> res = modelData.predict(map, resultFields, new SortField(LucenceConstants.SCORE(), SortField.Type.INT, true), queryNum);
             String str;
             if (!res.isEmpty()) {
                 List<String> filmIds = res.get(Constants.ITEM_ID());
