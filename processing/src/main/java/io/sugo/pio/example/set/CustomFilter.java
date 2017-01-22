@@ -474,6 +474,10 @@ public class CustomFilter implements Condition {
             return symbol;
         }
 
+        public int getValueType() {
+            return valueType;
+        }
+
         /**
          * Returns the helptext for this comparator.
          *

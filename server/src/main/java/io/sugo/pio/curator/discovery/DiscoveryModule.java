@@ -116,7 +116,7 @@ public class DiscoveryModule implements Module
   @Override
   public void configure(Binder binder)
   {
-    JsonConfigProvider.bind(binder, "druid.discovery.curator", CuratorDiscoveryConfig.class);
+    JsonConfigProvider.bind(binder, "pio.discovery.curator", CuratorDiscoveryConfig.class);
 
     binder.bind(CuratorServiceAnnouncer.class).in(LazySingleton.class);
 

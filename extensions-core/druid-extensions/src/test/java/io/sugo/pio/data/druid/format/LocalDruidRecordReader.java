@@ -1,27 +1,26 @@
 package io.sugo.pio.data.druid.format;
 
-import com.metamx.common.Pair;
 import io.sugo.pio.data.druid.directory.bytebuffer.ByteBufferDirectory;
 import io.sugo.pio.data.druid.directory.zip.ZipDirectory;
 import io.sugo.pio.data.druid.internal.DruidDirectoryReader;
 import io.sugo.pio.data.druid.internal.FieldMappings;
+import io.sugo.pio.data.druid.tools.Pair;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.lucene.store.Directory;
-import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.Map;
 
 /**
  */
-public class LocalDruidRecordReader extends RecordReader<DateTime, Map> {
+public class LocalDruidRecordReader extends RecordReader<Long, Map> {
     private final FieldMappings fieldMappings;
     private final Directory directory;
     private final DruidDirectoryReader druidDirectoryReader;
 
-    private DateTime key;
+    private Long key;
     private Map<String, Object> value;
 
     public LocalDruidRecordReader(String path) throws IOException {
@@ -36,19 +35,19 @@ public class LocalDruidRecordReader extends RecordReader<DateTime, Map> {
 
     @Override
     public boolean nextKeyValue() throws IOException, InterruptedException {
-        Pair<DateTime, Map<String, Object>> pair = druidDirectoryReader.read();
-        if(null == pair.rhs) {
+        Pair<Long, Map<String, Object>> pair = druidDirectoryReader.read();
+        if(null == pair.getSecond()) {
             value = null;
             return false;
         } else {
-            key = pair.lhs;
-            value = pair.rhs;
+            key = pair.getFirst();
+            value = pair.getSecond();
             return true;
         }
     }
 
     @Override
-    public DateTime getCurrentKey() throws IOException, InterruptedException {
+    public Long getCurrentKey() throws IOException, InterruptedException {
         return key;
     }
 

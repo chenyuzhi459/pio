@@ -3,7 +3,6 @@ package io.sugo.pio.cli;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -11,13 +10,12 @@ import com.metamx.common.lifecycle.Lifecycle;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
+import io.sugo.pio.common.TaskToolboxFactory;
 import io.sugo.pio.common.config.TaskConfig;
-import io.sugo.pio.guice.Jerseys;
-import io.sugo.pio.guice.JsonConfigProvider;
-import io.sugo.pio.guice.LifecycleModule;
-import io.sugo.pio.guice.ManageLifecycle;
+import io.sugo.pio.guice.*;
 import io.sugo.pio.overlord.TaskRunner;
 import io.sugo.pio.overlord.ThreadPoolTaskRunner;
+import io.sugo.pio.query.QueryWalker;
 import io.sugo.pio.server.QueryResource;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import io.sugo.pio.worker.executor.ExecutorLifecycle;
@@ -26,8 +24,6 @@ import org.eclipse.jetty.server.Server;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  */
@@ -41,9 +37,6 @@ public class CliPeon extends GuiceRunnable {
     public List<String> taskAndStatusFile;
 
     private static final Logger log = new Logger(CliPeon.class);
-
-    @Inject
-    private Properties properties;
 
     public CliPeon()
     {
@@ -59,6 +52,8 @@ public class CliPeon extends GuiceRunnable {
                         binder.bindConstant().annotatedWith(Names.named("serviceName")).to("pio/peon");
                         binder.bindConstant().annotatedWith(Names.named("servicePort")).to(-1);
 
+                        binder.bind(TaskToolboxFactory.class).in(LazySingleton.class);
+
                         JsonConfigProvider.bind(binder, "pio.task", TaskConfig.class);
 
                         binder.bind(ExecutorLifecycle.class).in(ManageLifecycle.class);
@@ -70,6 +65,7 @@ public class CliPeon extends GuiceRunnable {
                         );
 
                         binder.bind(TaskRunner.class).to(ThreadPoolTaskRunner.class);
+                        binder.bind(QueryWalker.class).to(ThreadPoolTaskRunner.class);
                         binder.bind(ThreadPoolTaskRunner.class).in(ManageLifecycle.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class);
@@ -98,14 +94,6 @@ public class CliPeon extends GuiceRunnable {
                 );
                 Runtime.getRuntime().addShutdownHook(hook);
                 injector.getInstance(ExecutorLifecycle.class).join();
-
-                // Sanity check to help debug unexpected non-daemon threads
-                final Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-                for (Thread thread : threadSet) {
-                    if (!thread.isDaemon() && thread != Thread.currentThread()) {
-                    }
-                }
-
                 // Explicitly call lifecycle stop, dont rely on shutdown hook.
                 lifecycle.stop();
                 Runtime.getRuntime().removeShutdownHook(hook);

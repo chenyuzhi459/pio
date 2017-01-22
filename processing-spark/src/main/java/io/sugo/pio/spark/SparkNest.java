@@ -2,7 +2,6 @@ package io.sugo.pio.spark;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.inject.Injector;
-import io.sugo.pio.guice.GuiceInjectors;
 import io.sugo.pio.operator.OperatorChain;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.ParameterType;
@@ -19,7 +18,7 @@ public class SparkNest extends OperatorChain {
     private final MapReduceHDFSHandler mapReduceHDFSHandler;
     private static final SparkConfig sparkConfig;
 
-    final static Injector injector = GuiceInjectors.makeStartupInjector();
+    final static Injector injector = null;
 
     static {
         sparkConfig = injector.getInstance(SparkConfig.class);

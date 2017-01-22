@@ -23,7 +23,7 @@ import java.util.Collections;
 public abstract class AbstractSparkLearner<T extends ModelTransferObject, M extends PredictionModel> extends AbstractLearner {
     public AbstractSparkLearner(SparkOperation sparkOperation, String name,
                                 InputPort exampleSetInput, OutputPort modelOutput) {
-        super(sparkOperation, name, exampleSetInput, modelOutput);
+        super(sparkOperation, exampleSetInput, modelOutput);
     }
 
     @Override

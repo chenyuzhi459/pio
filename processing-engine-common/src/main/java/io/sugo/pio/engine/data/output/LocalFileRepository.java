@@ -1,5 +1,8 @@
 package io.sugo.pio.engine.data.output;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -7,9 +10,11 @@ import java.nio.file.Paths;
 /**
  */
 public class LocalFileRepository implements Repository {
+    @JsonProperty
     private String path;
 
-    public LocalFileRepository(String path) {
+    @JsonCreator
+    public LocalFileRepository(@JsonProperty("path") String path) {
         this.path = path;
         try {
             Files.createDirectories(Paths.get(path));
@@ -80,6 +85,11 @@ public class LocalFileRepository implements Repository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean isDistributed() {
+        return false;
     }
 
     static class LocalFSFileInputStream extends FSInputStream {

@@ -1,7 +1,6 @@
 package io.sugo.pio.repository;
 
 import io.sugo.pio.OperatorProcess;
-import io.sugo.pio.data.output.Repository;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.UserError;
 import org.skife.jdbi.v2.Folder;

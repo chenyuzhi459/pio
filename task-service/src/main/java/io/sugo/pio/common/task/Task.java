@@ -3,6 +3,8 @@ package io.sugo.pio.common.task;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.common.TaskStatus;
+import io.sugo.pio.common.TaskToolbox;
+import io.sugo.pio.common.task.prediction.ModelServingTask;
 import io.sugo.pio.query.QueryRunner;
 
 import java.util.Map;
@@ -12,14 +14,14 @@ import java.util.Map;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(value = {
         @JsonSubTypes.Type(name = "noop", value = NoopTask.class),
-        @JsonSubTypes.Type(name = "model", value = NoopTask.class),
+        @JsonSubTypes.Type(name = "model", value = ModelServingTask.class),
 })
-public interface Task {
+public interface Task<Q> {
     /**
      * Returns query runners for this task. If this task is not meant to answer queries over its datasource, this method
      * should return null.
      */
-    public <Q, R> QueryRunner<Q, R> getQueryRunner();
+    public <R> QueryRunner<Q, R> getQueryRunner();
 
     /**
      * Returns an extra classpath that should be prepended to the default classpath when running this task. If no
@@ -63,7 +65,7 @@ public interface Task {
      *
      * @throws Exception if this task failed
      */
-    TaskStatus run() throws Exception;
+    TaskStatus run(TaskToolbox toolbox) throws Exception;
 
     /**
      * Returns ID of this task. Must be unique across all tasks ever created.

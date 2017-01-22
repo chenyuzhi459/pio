@@ -36,7 +36,7 @@ public class HttpClientModule implements Module
 {
   public static HttpClientModule global()
   {
-    return new HttpClientModule("druid.global.http", Global.class);
+    return new HttpClientModule("pio.global.http", Global.class);
   }
 
   private final String propertyPrefix;

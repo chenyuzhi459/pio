@@ -41,7 +41,13 @@ public class SQLMetadataStoragePioModule implements Module {
                 Key.get(SQLMetadataProcessManager.class),
                 defaultPropertyValue
         );
-
+        PolyBind.createChoiceWithDefault(
+                binder,
+                PROPERTY,
+                Key.get(MetadataStorageActionHandlerFactory.class),
+                Key.get(SQLMetadataStorageActionHandlerFactory.class),
+                defaultPropertyValue
+        );
     }
 
     @Override

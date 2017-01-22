@@ -41,6 +41,8 @@ import java.util.concurrent.TimeUnit;
 /**
  */
 public class ForkingTaskRunner implements TaskRunner {
+    private static final Logger log = new Logger(ForkingTaskRunner.class);
+
     private static final String CHILD_PROPERTY_PREFIX = "pio.task.fork.property.";
     private static final String TASK_RESTORE_FILENAME = "restore.json";
 
@@ -77,6 +79,47 @@ public class ForkingTaskRunner implements TaskRunner {
         this.exec = MoreExecutors.listeningDecorator(
                 Execs.multiThreaded(workerConfig.getCapacity(), "forking-task-runner-%d")
         );
+    }
+
+    @Override
+    public List<Pair<Task, ListenableFuture<TaskStatus>>> restore() {
+        final File restoreFile = getRestoreFile();
+        final TaskRestoreInfo taskRestoreInfo;
+        if (restoreFile.exists()) {
+            try {
+                taskRestoreInfo = jsonMapper.readValue(restoreFile, TaskRestoreInfo.class);
+            }
+            catch (Exception e) {
+                log.error(e, "Failed to read restorable tasks from file[%s]. Skipping restore.", restoreFile);
+                return ImmutableList.of();
+            }
+        } else {
+            return ImmutableList.of();
+        }
+
+        final List<Pair<Task, ListenableFuture<TaskStatus>>> retVal = Lists.newArrayList();
+        for (final String taskId : taskRestoreInfo.getRunningTasks()) {
+            try {
+                final File taskFile = new File(taskConfig.getTaskDir(taskId), "task.json");
+                final Task task = jsonMapper.readValue(taskFile, Task.class);
+
+                if (!task.getId().equals(taskId)) {
+                    throw new ISE("WTF?! Task[%s] restore file had wrong id[%s].", taskId, task.getId());
+                }
+
+                if (taskConfig.isRestoreTasksOnRestart() && task.canRestore()) {
+                    log.info("Restoring task[%s].", task.getId());
+                    retVal.add(Pair.of(task, run(task)));
+                }
+            }
+            catch (Exception e) {
+                log.warn(e, "Failed to restore task[%s]. Trying to restore other tasks.", taskId);
+            }
+        }
+
+        log.info("Restored %,d tasks.", retVal.size());
+
+        return retVal;
     }
 
     @Override
@@ -275,6 +318,7 @@ public class ForkingTaskRunner implements TaskRunner {
                                                     final ByteSink logSink = Files.asByteSink(logFile, FileWriteMode.APPEND);
                                                     try (final OutputStream toLogfile = logSink.openStream()) {
                                                         ByteStreams.copy(processHolder.process.getInputStream(), toLogfile);
+                                                        toLogfile.flush();
                                                         final int statusCode = processHolder.process.waitFor();
                                                         if (statusCode == 0) {
                                                             runFailed = false;
@@ -332,6 +376,29 @@ public class ForkingTaskRunner implements TaskRunner {
         }
         saveRunningTasks();
         return tasks.get(task.getId()).getResult();
+    }
+
+    @Override
+    public void shutdown(final String taskid)
+    {
+        final ForkingTaskRunnerWorkItem taskInfo;
+
+        synchronized (tasks) {
+            taskInfo = tasks.get(taskid);
+
+            if (taskInfo == null) {
+                log.info("Ignoring request to cancel unknown task: %s", taskid);
+                return;
+            }
+
+            taskInfo.shutdown = true;
+        }
+
+        if (taskInfo.processHolder != null) {
+            // Will trigger normal failure mechanisms due to process exit
+            log.info("Killing process for task: %s", taskid);
+            taskInfo.processHolder.process.destroy();
+        }
     }
 
     @Override

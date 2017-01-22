@@ -2,6 +2,6 @@ package io.sugo.pio.engine.prediction;
 
 /**
  */
-public interface PredictionModel<Q, R> {
-    public R predict(Q query);
+public interface PredictionModel<R> {
+    public R predict(PredictionQueryObject query);
 }

@@ -23,6 +23,7 @@ public class MySQLConnector extends SQLMetadataConnector
 {
     private static final Logger log = new Logger(MySQLConnector.class);
     private static final String PAYLOAD_TYPE = "LONGBLOB";
+    private static final String SERIAL_TYPE = "BIGINT(20) AUTO_INCREMENT";
 
     private final DBI dbi;
 
@@ -50,6 +51,13 @@ public class MySQLConnector extends SQLMetadataConnector
     {
         return PAYLOAD_TYPE;
     }
+
+    @Override
+    protected String getSerialType()
+    {
+        return SERIAL_TYPE;
+    }
+
 
     @Override
     public boolean tableExists(Handle handle, String tableName)

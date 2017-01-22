@@ -1,11 +1,10 @@
 package io.sugo.pio.data.druid.internal;
 
 import com.google.common.collect.Maps;
-import com.metamx.common.Pair;
+import io.sugo.pio.data.druid.tools.Pair;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.store.Directory;
-import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,9 +29,9 @@ public class DruidDirectoryReader {
         }
     }
 
-    public Pair<DateTime, Map<String, Object>> read() {
+    public Pair<Long, Map<String, Object>> read() {
         if (cursor.isDone()) {
-            return new Pair<>(new DateTime(0), null);
+            return new Pair<>(0L, null);
         }
 
         long time = timeDimensionSelector.getValues().get(0);
@@ -46,7 +45,7 @@ public class DruidDirectoryReader {
         }
 
         cursor.advance();
-        return new Pair<>(new DateTime(time), event);
+        return new Pair<>(time, event);
     }
 
     public void close() {

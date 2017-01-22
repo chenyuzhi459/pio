@@ -5,10 +5,13 @@ package io.sugo.pio.overlord;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.*;
+import com.google.inject.Inject;
 import com.metamx.common.ISE;
 import com.metamx.common.Pair;
 import io.sugo.pio.common.TaskLocation;
 import io.sugo.pio.common.TaskStatus;
+import io.sugo.pio.common.TaskToolbox;
+import io.sugo.pio.common.TaskToolboxFactory;
 import io.sugo.pio.common.config.TaskConfig;
 import io.sugo.pio.common.task.Task;
 import io.sugo.pio.concurrent.Execs;
@@ -23,6 +26,7 @@ import org.joda.time.Interval;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
@@ -31,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 /**
  */
 public class ThreadPoolTaskRunner<T> implements TaskRunner, QueryWalker {
+    private final TaskToolboxFactory toolboxFactory;
     private final TaskConfig taskConfig;
     private final ListeningExecutorService executorService = buildExecutorService(0);
     private ThreadPoolTaskRunnerWorkItem runningItem = null;
@@ -39,12 +44,21 @@ public class ThreadPoolTaskRunner<T> implements TaskRunner, QueryWalker {
 
     private volatile boolean stopping = false;
 
+    @Inject
     public ThreadPoolTaskRunner(
+            TaskToolboxFactory toolboxFactory,
             TaskConfig taskConfig,
             @Self PioNode node
     ) {
+        this.toolboxFactory = toolboxFactory;
         this.taskConfig = taskConfig;
         this.location = TaskLocation.create(node.getHost(), node.getPort());
+    }
+
+    @Override
+    public List<Pair<Task, ListenableFuture<TaskStatus>>> restore()
+    {
+        return ImmutableList.of();
     }
 
     @Override
@@ -78,10 +92,12 @@ public class ThreadPoolTaskRunner<T> implements TaskRunner, QueryWalker {
 
     @Override
     public ListenableFuture<TaskStatus> run(Task task) {
+        final TaskToolbox toolbox = toolboxFactory.build(task);
         final ListenableFuture<TaskStatus> statusFuture = executorService
                 .submit(new ThreadPoolTaskRunnerCallable(
                         task,
-                        location
+                        location,
+                        toolbox
                 ));
         final ThreadPoolTaskRunnerWorkItem taskRunnerWorkItem = new ThreadPoolTaskRunnerWorkItem(
                 task,
@@ -107,6 +123,15 @@ public class ThreadPoolTaskRunner<T> implements TaskRunner, QueryWalker {
         );
 
         return statusFuture;
+    }
+
+    @Override
+    public void shutdown(String taskid) {
+        if (null != runningItem) {
+            if (runningItem.getTaskId().equals(taskid)) {
+                runningItem.getResult().cancel(true);
+            }
+        }
     }
 
     @Override
@@ -242,11 +267,13 @@ public class ThreadPoolTaskRunner<T> implements TaskRunner, QueryWalker {
     {
         private final Task task;
         private final TaskLocation location;
+        private final TaskToolbox toolbox;
 
-        public ThreadPoolTaskRunnerCallable(Task task, TaskLocation location)
+        public ThreadPoolTaskRunnerCallable(Task task, TaskLocation location, TaskToolbox toolbox)
         {
             this.task = task;
             this.location = location;
+            this.toolbox = toolbox;
         }
 
         @Override
@@ -261,7 +288,7 @@ public class ThreadPoolTaskRunner<T> implements TaskRunner, QueryWalker {
                         location
                 );
                 TaskRunnerUtils.notifyStatusChanged(listeners, task.getId(), TaskStatus.running(task.getId()));
-                status = task.run();
+                status = task.run(toolbox);
             }
             catch (InterruptedException e) {
                 status = TaskStatus.failure(task.getId());

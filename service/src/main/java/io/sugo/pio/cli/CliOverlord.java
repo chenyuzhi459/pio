@@ -12,10 +12,7 @@ import com.metamx.common.logger.Logger;
 import io.airlift.airline.Command;
 import io.sugo.pio.common.config.TaskConfig;
 import io.sugo.pio.guice.*;
-import io.sugo.pio.overlord.ForkingTaskRunnerFactory;
-import io.sugo.pio.overlord.RemoteTaskRunnerFactory;
-import io.sugo.pio.overlord.TaskMaster;
-import io.sugo.pio.overlord.TaskRunnerFactory;
+import io.sugo.pio.overlord.*;
 import io.sugo.pio.overlord.config.TaskQueueConfig;
 import io.sugo.pio.overlord.http.OverlordRedirectInfo;
 import io.sugo.pio.overlord.http.OverlordResource;
@@ -68,6 +65,7 @@ public class CliOverlord extends ServerRunnable {
                         binder.bind(TaskMaster.class).in(ManageLifecycle.class);
 
                         configureRunners(binder);
+                        configureTaskStorage(binder);
                         binder.bind(RedirectFilter.class).in(LazySingleton.class);
                         binder.bind(RedirectInfo.class).to(OverlordRedirectInfo.class).in(LazySingleton.class);
 
@@ -75,6 +73,23 @@ public class CliOverlord extends ServerRunnable {
                         Jerseys.addResource(binder, OverlordResource.class);
 
                         LifecycleModule.register(binder, Server.class);
+                    }
+
+                    private void configureTaskStorage(Binder binder)
+                    {
+                        PolyBind.createChoice(
+                                binder, "pio.task.storage.type", Key.get(TaskStorage.class), Key.get(HeapMemoryTaskStorage.class)
+                        );
+                        final MapBinder<String, TaskStorage> storageBinder = PolyBind.optionBinder(
+                                binder,
+                                Key.get(TaskStorage.class)
+                        );
+
+                        storageBinder.addBinding("local").to(HeapMemoryTaskStorage.class);
+                        binder.bind(HeapMemoryTaskStorage.class).in(LazySingleton.class);
+
+                        storageBinder.addBinding("metadata").to(MetadataTaskStorage.class).in(ManageLifecycle.class);
+                        binder.bind(MetadataTaskStorage.class).in(LazySingleton.class);
                     }
 
                     private void configureRunners(Binder binder)

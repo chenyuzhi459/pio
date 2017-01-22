@@ -3,8 +3,6 @@ package io.sugo.pio.data.druid.format;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.*;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -14,7 +12,7 @@ import java.util.*;
 
 /**
  */
-public class LocalDruidInputFormat extends InputFormat<DateTime, Map> implements Configurable {
+public class LocalDruidInputFormat extends InputFormat<Long, Map> implements Configurable {
 
     public static final String DRUID_DATASOURCE = "druid.datasource";
     public static final String DRUID_PATH = "druid.path";
@@ -24,7 +22,8 @@ public class LocalDruidInputFormat extends InputFormat<DateTime, Map> implements
     private Configuration conf;
     private String datasource;
     private String path;
-    private Interval interval;
+    private String startTime;
+    private String untilTime;
 
     @Override
     public void setConf(Configuration conf) {
@@ -32,9 +31,8 @@ public class LocalDruidInputFormat extends InputFormat<DateTime, Map> implements
 
         this.datasource = conf.get(DRUID_DATASOURCE);
         this.path = conf.get(DRUID_PATH);;
-        DateTime startTime = new DateTime(conf.get(DRUID_STARTTIME));
-        DateTime untilTime = new DateTime(conf.get(DRUID_ENDTIME));
-        interval = new Interval(startTime, untilTime);
+        startTime = conf.get(DRUID_STARTTIME);
+        untilTime = conf.get(DRUID_ENDTIME);
     }
 
     @Override
@@ -73,7 +71,7 @@ public class LocalDruidInputFormat extends InputFormat<DateTime, Map> implements
     }
 
     @Override
-    public RecordReader<DateTime, Map> createRecordReader(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
+    public RecordReader<Long, Map> createRecordReader(InputSplit split, TaskAttemptContext context) throws IOException, InterruptedException {
         LocalDruidInputSplit druidSplit = (LocalDruidInputSplit)split;
         return new LocalDruidRecordReader(druidSplit.getPath());
     }

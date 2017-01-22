@@ -1,15 +1,23 @@
 package io.sugo.pio.overlord;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.metamx.common.Pair;
 import io.sugo.pio.common.TaskStatus;
 import io.sugo.pio.common.task.Task;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 /**
  */
 public interface TaskRunner {
+    /**
+     * Some task runners can restart previously-running tasks after being bounced. This method does that, and returns
+     * the list of tasks (and status futures).
+     */
+    List<Pair<Task, ListenableFuture<TaskStatus>>> restore();
+
     /**
      * Register a listener with this task runner. On registration, the listener will get events corresponding to the
      * current state of known tasks.
@@ -34,6 +42,14 @@ public interface TaskRunner {
      * @return task status, eventually
      */
     ListenableFuture<TaskStatus> run(Task task);
+
+    /**
+     * Inform the task runner it can clean up any resources associated with a task. This implies shutdown of any
+     * currently-running tasks.
+     *
+     * @param taskid task ID to clean up resources for
+     */
+    void shutdown(String taskid);
 
     /**
      * Stop this task runner. This may block until currently-running tasks can be gracefully stopped. After calling

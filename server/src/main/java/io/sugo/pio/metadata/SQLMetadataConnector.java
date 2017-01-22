@@ -63,6 +63,17 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         return PAYLOAD_TYPE;
     }
 
+    /**
+     * Auto-incrementing SQL type to use for IDs
+     * Must be an integer type, which values will be automatically set by the database
+     * <p/>
+     * The resulting string will be interpolated into the table creation statement, e.g.
+     * <code>CREATE TABLE druid_table ( id <type> NOT NULL, ... )</code>
+     *
+     * @return String representing the SQL type and auto-increment statement
+     */
+    protected abstract String getSerialType();
+
     public abstract boolean tableExists(Handle handle, final String tableName);
 
     public String getValidationQuery() { return "SELECT 1"; }
@@ -174,6 +185,27 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         );
     }
 
+    public void createEntryTable(final String tableName)
+    {
+        createTable(
+                tableName,
+                ImmutableList.of(
+                        String.format(
+                                "CREATE TABLE %1$s (\n"
+                                        + "  id VARCHAR(255) NOT NULL,\n"
+                                        + "  created_date VARCHAR(255) NOT NULL,\n"
+                                        + "  payload %2$s NOT NULL,\n"
+                                        + "  status_payload %2$s NOT NULL,\n"
+                                        + "  active BOOLEAN NOT NULL DEFAULT FALSE,\n"
+                                        + "  PRIMARY KEY (id)\n"
+                                        + ")",
+                                tableName, getPayloadType()
+                        ),
+                        String.format("CREATE INDEX idx_%1$s_active_created_date ON %1$s(active, created_date)", tableName)
+                )
+        );
+    }
+
     @Override
     public Void insertOrUpdate(
             final String tableName,
@@ -271,6 +303,16 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     {
         if (config.get().isCreateTables()) {
             createOperatorProcessTable(tablesConfigSupplier.get().getOperatorProcessTable());
+        }
+    }
+
+    @Override
+    public void createTaskTables()
+    {
+        if (config.get().isCreateTables()) {
+            final MetadataStorageTablesConfig tablesConfig = tablesConfigSupplier.get();
+            final String entryType = tablesConfig.getTaskEntryType();
+            createEntryTable(tablesConfig.getEntryTable(entryType));
         }
     }
 

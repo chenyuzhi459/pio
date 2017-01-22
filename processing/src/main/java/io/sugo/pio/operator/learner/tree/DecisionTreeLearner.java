@@ -24,14 +24,9 @@ import java.util.List;
  * CART / C4.5.
  * </p>
  *
- * @rapidminer.index C4.5
- * @rapidminer.index CART
- *
- * @deprecated Use {@link ParallelDecisionTreeLearner} instead
  *
  * @author Sebastian Land, Ingo Mierswa
  */
-@Deprecated
 public class DecisionTreeLearner extends AbstractTreeLearner {
 
 	/** The parameter name for the maximum tree depth. */

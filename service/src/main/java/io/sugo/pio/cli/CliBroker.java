@@ -6,7 +6,12 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Command;
+import io.sugo.pio.client.BrokerServerView;
+import io.sugo.pio.client.CachingClusteredClient;
+import io.sugo.pio.client.selector.ServerSelectorStrategy;
+import io.sugo.pio.client.selector.TierSelectorStrategy;
 import io.sugo.pio.guice.Jerseys;
+import io.sugo.pio.guice.JsonConfigProvider;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.query.QueryWalker;
@@ -41,7 +46,12 @@ public class CliBroker extends ServerRunnable {
                         );
                         binder.bindConstant().annotatedWith(Names.named("servicePort")).to(8082);
 
+                        binder.bind(CachingClusteredClient.class).in(LazySingleton.class);
+                        binder.bind(BrokerServerView.class).in(LazySingleton.class);
                         binder.bind(QueryWalker.class).to(ClientQueryWalker.class).in(LazySingleton.class);
+
+                        JsonConfigProvider.bind(binder, "pio.broker.select", TierSelectorStrategy.class);
+                        JsonConfigProvider.bind(binder, "pio.broker.balancer", ServerSelectorStrategy.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
                         Jerseys.addResource(binder, QueryResource.class);

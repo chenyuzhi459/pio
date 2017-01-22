@@ -37,9 +37,7 @@ public interface Port extends Serializable {
     /**
      * Returns the meta data currently assigned to this port.
      *
-     * @deprecated use {@link #getMetaData(Class)} instead
      */
-    @Deprecated
     MetaData getMetaData();
 
     /**
