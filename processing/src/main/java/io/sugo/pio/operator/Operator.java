@@ -389,6 +389,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * ATTENTION! This will create new parameterTypes. For calling already existing parameter types
      * use getParameters().getParameterTypes();
      */
+    @JsonProperty
     @Override
     public List<ParameterType> getParameterTypes() {
         return new LinkedList<>();

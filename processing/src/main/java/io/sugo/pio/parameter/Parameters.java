@@ -8,20 +8,27 @@ import java.util.*;
  */
 public class Parameters implements Cloneable, Iterable<String> {
 
-//    public static final char PAIR_SEPARATOR = '\u241D';
+    //    public static final char PAIR_SEPARATOR = '\u241D';
 //    public static final char RECORD_SEPARATOR = '\u241E';
-public static final char PAIR_SEPARATOR = ':';
+    public static final char PAIR_SEPARATOR = ':';
     public static final char RECORD_SEPARATOR = ';';
 
-    /** Maps parameter keys (i.e. Strings) to their value (Objects). */
+    /**
+     * Maps parameter keys (i.e. Strings) to their value (Objects).
+     */
     @JsonProperty
     private final Map<String, String> keyToValueMap = new LinkedHashMap<String, String>();
 
-    /** Maps parameter keys (i.e. Strings) to their <code>ParameterType</code>. */
+    /**
+     * Maps parameter keys (i.e. Strings) to their <code>ParameterType</code>.
+     */
     private final Map<String, ParameterType> keyToTypeMap = new LinkedHashMap<String, ParameterType>();
 
-    /** Creates an empty parameters object without any parameter types. */
-    public Parameters() {}
+    /**
+     * Creates an empty parameters object without any parameter types.
+     */
+    public Parameters() {
+    }
 
     /**
      * Constructs an instance of <code>Parameters</code> for the given list of
@@ -46,7 +53,9 @@ public static final char PAIR_SEPARATOR = ':';
         keyToTypeMap.put(type.getKey(), type);
     }
 
-    /** Performs a deep clone on this parameters object. */
+    /**
+     * Performs a deep clone on this parameters object.
+     */
     @Override
     public Object clone() {
         Parameters clone = new Parameters();
@@ -74,7 +83,9 @@ public static final char PAIR_SEPARATOR = ':';
         return keyToTypeMap.keySet().iterator();
     }
 
-    /** Returns the type of the parameter with the given type. */
+    /**
+     * Returns the type of the parameter with the given type.
+     */
     public ParameterType getParameterType(String key) {
         return keyToTypeMap.get(key);
     }

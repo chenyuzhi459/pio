@@ -284,12 +284,12 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                                 "CREATE TABLE %1$s (\n"
                                         + "  id VARCHAR(255) NOT NULL,\n"
                                         + "  name VARCHAR(50) NOT NULL,\n"
-                                        + "  description VARCHAR(250) NOT NULL,\n"
+                                        + "  description VARCHAR(250),\n"
                                         + "  status VARCHAR(20) NOT NULL,\n"
                                         + "  created_date VARCHAR(50) NOT NULL,\n"
                                         + "  update_date VARCHAR(50) NOT NULL,\n"
                                         + "  operators %2$s NOT NULL,\n"
-                                        + "  connections %3$s NOT NULL,\n"
+                                        + "  connections %3$s,\n"
                                         + "  PRIMARY KEY (id)\n"
                                         + ")",
                                 tableName, getPayloadType(), getPayloadType()

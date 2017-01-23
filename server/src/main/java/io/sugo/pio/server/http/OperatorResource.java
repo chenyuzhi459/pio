@@ -12,7 +12,6 @@ import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
 import io.sugo.pio.server.process.ProcessManager;
 import io.sugo.pio.server.utils.JsonUtil;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.*;
@@ -45,7 +44,11 @@ public class OperatorResource {
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON})
     public Response operators() {
-        return Response.ok(processManager.getOperatorMetaJson()).build();
+        try {
+            return Response.ok(processManager.getOperatorMetaJson()).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
+        }
     }
 
     @POST
@@ -73,8 +76,12 @@ public class OperatorResource {
             @PathParam("processId") final String processId,
             @PathParam("operatorId") final String operatorId
     ) {
-        Operator operator = processManager.getOperator(processId, operatorId);
-        return Response.ok(operator).build();
+        try {
+            Operator operator = processManager.getOperator(processId, operatorId);
+            return Response.ok(operator).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
+        }
     }
 
 
@@ -85,8 +92,12 @@ public class OperatorResource {
             @PathParam("processId") final String processId,
             @PathParam("operatorId") final String operatorId
     ) {
-        OperatorProcess process = processManager.deleteOperator(processId, operatorId);
-        return Response.ok(process).build();
+        try {
+            OperatorProcess process = processManager.deleteOperator(processId, operatorId);
+            return Response.ok(process).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
+        }
     }
 
     @POST
@@ -140,8 +151,8 @@ public class OperatorResource {
 
             Operator operator = processManager.updateParameter(processId, operatorId, key, value);
             return Response.ok(operator).build();
-        } catch (JSONException e) {
-            return Response.serverError().build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
         }
     }
 }

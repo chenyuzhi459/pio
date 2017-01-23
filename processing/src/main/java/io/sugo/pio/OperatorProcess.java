@@ -23,14 +23,16 @@ public class OperatorProcess {
     private String id;
     private String name;
     private String description;
-    private Status status = Status.QUEUE;
+    private Status status = Status.INIT;
     private DateTime createTime;
     private DateTime updateTime;
     private ProcessRootOperator rootOperator;
     private RepositoryAccessor repositoryAccessor;
     private ProcessLocation processLocation;
     private final List<ProcessStateListener> processStateListeners = Collections.synchronizedList(new LinkedList<>());
-    /** The macro handler can be used to replace (user defined) macro strings. */
+    /**
+     * The macro handler can be used to replace (user defined) macro strings.
+     */
     private final MacroHandler macroHandler = new MacroHandler(this);
 
     private transient final Logger logger = Logger.getLogger(Process.class.getName());
@@ -40,7 +42,7 @@ public class OperatorProcess {
      */
     private Map<String, Operator> operatorNameMap = new HashMap<>();
 
-    private List<Connection> connections;
+    private Set<Connection> connections;
 
     public OperatorProcess(String name) {
         this(name, new ProcessRootOperator());
@@ -53,7 +55,7 @@ public class OperatorProcess {
         setRootOperator(rootOperator);
         this.createTime = new DateTime();
         this.updateTime = this.createTime;
-        connections = new ArrayList<>();
+        connections = new HashSet<>();
     }
 
     @JsonProperty
@@ -117,15 +119,20 @@ public class OperatorProcess {
     }
 
     @JsonProperty
-    public List<Connection> getConnections() {
+    public Set<Connection> getConnections() {
         return connections;
     }
 
-    public void setConnections(List<Connection> connections) {
-        this.connections = connections;
+    public void setConnections(Set<Connection> connections) {
+        this.connections.addAll(connections);
         if (connections != null && !connections.isEmpty()) {
             for (Connection connection : connections) {
                 connect(connection, false);
+            }
+            try {
+                rootOperator.getExecutionUnit().transformMetaData();
+            } catch (Exception e) {
+
             }
         }
     }
@@ -165,12 +172,16 @@ public class OperatorProcess {
         this.processStateListeners.add(processStateListener);
     }
 
-    /** Removes the given process state listener. */
+    /**
+     * Removes the given process state listener.
+     */
     public void removeProcessStateListener(ProcessStateListener processStateListener) {
         this.processStateListeners.remove(processStateListener);
     }
 
-    /** Returns the macro handler. */
+    /**
+     * Returns the macro handler.
+     */
     public MacroHandler getMacroHandler() {
         return this.macroHandler;
     }
@@ -259,21 +270,26 @@ public class OperatorProcess {
     }
 
     public void disconnect(Connection dto) {
-        Operator fromOperator = operatorNameMap.get(dto.getFromOperator());
-        Operator toOperator = operatorNameMap.get(dto.getToOperator());
-        if (fromOperator == null || toOperator == null) {
-            throw new IAE("fromOperator [%s] or toOperator [%s] not exists", dto.getFromOperator(), dto.getToOperator());
+        if (connections.contains(dto)) {
+            Operator fromOperator = operatorNameMap.get(dto.getFromOperator());
+            Operator toOperator = operatorNameMap.get(dto.getToOperator());
+            if (fromOperator == null || toOperator == null) {
+                throw new IAE("fromOperator [%s] or toOperator [%s] not exists", dto.getFromOperator(), dto.getToOperator());
+            }
+
+            OutputPort fromPort = getFromPort(fromOperator, dto.getFromPort());
+            InputPort toPort = getToPort(toOperator, dto.getToPort());
+            if (fromPort == null || toPort == null) {
+                throw new IAE("fromPort [%s] or toPort [%s] not exists", dto.getFromPort(), dto.getToPort());
+            }
+
+            if (fromPort.isConnected()) {
+                fromPort.disconnect();
+            }
+            rootOperator.transformMetaData();
+            connections.remove(dto);
         }
 
-        OutputPort fromPort = getFromPort(fromOperator, dto.getFromPort());
-        InputPort toPort = getToPort(toOperator, dto.getToPort());
-        if (fromPort == null || toPort == null) {
-            throw new IAE("fromPort [%s] or toPort [%s] not exists", dto.getFromPort(), dto.getToPort());
-        }
-
-        fromPort.disconnect();
-        rootOperator.transformMetaData();
-        connections.remove(dto);
     }
 
     private InputPort getToPort(Operator toOperator, String toPort) {
