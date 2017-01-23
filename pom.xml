@@ -36,6 +36,7 @@
         <module>engines/als-engine</module>
         <module>engines/fp-engine</module>
         <module>engines/search-engine</module>
+        <module>engines/online-content-based-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>
     </modules>
