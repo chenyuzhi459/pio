@@ -22,6 +22,11 @@ public class PopEngineModule implements EngineModule {
     }
 
     @Override
+    public String getEngineName() {
+        return "PopEngine";
+    }
+
+    @Override
     public void configure(Binder binder) {
     }
 }

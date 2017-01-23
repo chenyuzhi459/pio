@@ -6,7 +6,7 @@ import io.sugo.pio.dl4j.model.MultiLayerNetModel;
 import io.sugo.pio.dl4j.modeling.prediction.AbstractDLModelLearner;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.Model;
-import io.sugo.pio.operator.OperatorDescription;
+import io.sugo.pio.operator.OperatorGroup;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 
@@ -15,6 +15,21 @@ import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 public class SimpleNeuralNetwork extends AbstractDLModelLearner {
     public SimpleNeuralNetwork() {
         super();
+    }
+
+    @Override
+    public String getFullName() {
+        return SimpleNeuralNetwork.class.getSimpleName();
+    }
+
+    @Override
+    public OperatorGroup getGroup() {
+        return OperatorGroup.algorithmModel;
+    }
+
+    @Override
+    public String getDescription() {
+        return SimpleNeuralNetwork.class.getSimpleName();
     }
 
     @Override

@@ -22,6 +22,11 @@ public class ALSEngineModule implements EngineModule {
     }
 
     @Override
+    public String getEngineName() {
+        return "ALSEngine";
+    }
+
+    @Override
     public void configure(Binder binder) {
     }
 }

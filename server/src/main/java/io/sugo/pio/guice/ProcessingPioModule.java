@@ -7,6 +7,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import io.sugo.pio.initialization.PioModule;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import io.sugo.pio.operator.learner.functions.LogisticRegression;
+import io.sugo.pio.operator.learner.tree.DecisionTreeLearner;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
@@ -25,7 +27,9 @@ public class ProcessingPioModule implements PioModule {
                                 new NamedType(DatabaseDataReader.class, "db_data_reader"),
                                 new NamedType(AttributeFilter.class, "attribute_filter"),
                                 new NamedType(ExampleFilter.class, "example_filter"),
-                                new NamedType(ChangeAttributeRole.class, "change_attribute_role")
+                                new NamedType(ChangeAttributeRole.class, "change_attribute_role"),
+                                new NamedType(DecisionTreeLearner.class, "decision_tree_learner"),
+                                new NamedType(LogisticRegression.class, "logistic_regression")
                         )
         );
     }

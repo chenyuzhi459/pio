@@ -22,6 +22,11 @@ public class SearchEngineModule implements EngineModule {
     }
 
     @Override
+    public String getEngineName() {
+        return "SearchEngine";
+    }
+
+    @Override
     public void configure(Binder binder) {
     }
 }

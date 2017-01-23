@@ -35,7 +35,6 @@
         <module>engines/detail-engine</module>
         <module>engines/als-engine</module>
         <module>engines/fp-engine</module>
-        <module>engines/userHistory-engine</module>
         <module>engines/search-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>
@@ -537,6 +536,25 @@
             <build>
                 <pluginManagement>
                     <plugins>
+                        <!--<plugin>-->
+                            <!--<groupId>org.antlr</groupId>-->
+                            <!--<artifactId>antlr4-maven-plugin</artifactId>-->
+                            <!--<version>4.3</version>-->
+                            <!--<executions>-->
+                                <!--<execution>-->
+                                    <!--<id>antlr</id>-->
+                                    <!--<goals>-->
+                                        <!--<goal>antlr4</goal>-->
+                                    <!--</goals>-->
+                                    <!--<phase>none</phase>-->
+                                <!--</execution>-->
+                            <!--</executions>-->
+                            <!--<configuration>-->
+                                <!--<outputDirectory>src/generated/java</outputDirectory>-->
+                                <!--<listener>true</listener>-->
+                                <!--<treatWarningsAsErrors>true</treatWarningsAsErrors>-->
+                            <!--</configuration>-->
+                        <!--</plugin>-->
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>

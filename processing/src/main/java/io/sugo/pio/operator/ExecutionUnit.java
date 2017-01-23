@@ -10,8 +10,6 @@ import io.sugo.pio.ports.*;
 import java.io.Serializable;
 import java.util.*;
 
-import static com.sun.org.glassfish.external.probe.provider.StatsProviderManager.unregister;
-
 /**
  */
 public class ExecutionUnit implements Serializable {
@@ -96,8 +94,8 @@ public class ExecutionUnit implements Serializable {
             throw new NoSuchElementException("Operator " + operator.getName() + " not contained!");
         }
         operators.remove(operator);
-        unregister(operator);
     }
+
 
     private void registerOperator(Operator operator, boolean registerWithProcess) {
         operator.setEnclosingExecutionUnit(this);

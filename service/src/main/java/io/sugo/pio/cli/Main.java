@@ -28,15 +28,20 @@ public class Main {
                 );
 
         builder.withGroup("tools")
-                .withDescription("Various tools for working with Druid")
+                .withDescription("Various tools for working with pio")
                 .withDefaultCommand(Help.class)
                 .withCommands(
                         PullDependencies.class,
                         CreateTables.class
                 );
 
+        builder.withGroup("train")
+                .withDescription("Train engine for pio")
+                .withDefaultCommand(Help.class)
+                .withCommands(CliTrainer.class);
+
         builder.withGroup("internal")
-                .withDescription("Processes that Druid runs \"internally\", you should rarely use these directly")
+                .withDescription("Processes that pio runs \"internally\", you should rarely use these directly")
                 .withDefaultCommand(Help.class)
                 .withCommands(CliPeon.class);
 

@@ -7,16 +7,12 @@ import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.Model;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorChain;
-import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.impl.InputPortImpl;
-import io.sugo.pio.ports.impl.OutputPortImpl;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -113,11 +109,6 @@ public abstract class AbstractDLModelLearner extends OperatorChain {
      * The name for &quot;The value of local random seed.&quot;
      */
     public static final String PARAMETER_LOCAL_RANDOM_SEED = "local_random_seed";
-
-
-    public AbstractDLModelLearner() {
-        super(null, null, "Layer Structure", null, null);
-    }
 
     @Override
     public void doWork() {

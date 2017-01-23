@@ -5,8 +5,9 @@ import io.sugo.pio.tools.expression.ExpressionContext;
 import io.sugo.pio.tools.expression.Function;
 import io.sugo.pio.tools.expression.FunctionDescription;
 import io.sugo.pio.tools.expression.FunctionInputException;
-import io.sugo.pio.tools.expression.internal.antlr.FunctionExpressionParser.FunctionContext;
-import io.sugo.pio.tools.expression.internal.antlr.FunctionExpressionParser.OperationExpContext;
+import io.sugo.pio.tools.expression.internal.antlr.generated.FunctionExpressionParser.OperationExpContext;
+import io.sugo.pio.tools.expression.internal.antlr.generated.FunctionExpressionParser.FunctionContext;
+import io.sugo.pio.tools.expression.internal.antlr.generated.FunctionExpressionParserBaseListener;
 
 /**
  * Antlr ParseTreeListener that checks if the operators in the expression are known, the functions

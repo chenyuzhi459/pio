@@ -22,6 +22,13 @@ public class FpEngineModule implements EngineModule {
     }
 
     @Override
+    public String getEngineName() {
+        return "FPEngine";
+    }
+
+    @Override
     public void configure(Binder binder) {
     }
+
+
 }
