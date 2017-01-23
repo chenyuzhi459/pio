@@ -78,6 +78,11 @@
             <artifactId>detail-engine</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>io.sugo</groupId>
+            <artifactId>ocb-engine</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 

@@ -243,11 +243,24 @@
                             dataType: 'json',
                             type: 'post',
                             success(data) {
-                                var temp = []
-                                for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdb(data.item_id[m], data.item_name[m], temp)
-                                }
-                                that.customItems = temp
+                            	$.ajax(
+                            		url: '/pio/query/click/request',
+									beforeSend(req) {
+										req.setRequestHeader('Content-Type', 'application/json')
+									},
+									data: JSON.stringify({
+										'userId': that.userId, 'items': data.item_id
+									}),
+									dataType: 'json',
+									type: 'post',
+									success(data2) {
+										var temp = []
+										for (let m = 0; m < data2.item_id.length; m++) {
+											that.queryOmdb(data2.item_id[m], data2.item_name[m], temp)
+										}
+										that.customItems = temp
+									}
+                            	)
                             }
                         })
                     },
