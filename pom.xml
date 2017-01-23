@@ -29,6 +29,7 @@
         <!--engines-->
         <module>engines/engine-common</module>
         <module>engines/engine-demo</module>
+        <module>engines/jdbc-extensions</module>
         <module>engines/template-engine</module>
         <module>engines/popular-recommend-engine</module>
         <module>engines/detail-engine</module>
