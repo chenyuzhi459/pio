@@ -29,8 +29,6 @@ public class DemoServer {
         fpTraining.train();
         SearchTraining searchTraining = new SearchTraining();
         searchTraining.train();
-        UserHistoryTraining userHistoryTraining = new UserHistoryTraining();
-        userHistoryTraining.train();
     }
 
     private static void startServer() throws Exception {

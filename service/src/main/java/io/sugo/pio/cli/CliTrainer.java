@@ -52,6 +52,7 @@ public class CliTrainer extends GuiceRunnable {
                     {
                         binder.bindConstant().annotatedWith(Names.named("serviceName")).to("pio/trainer");
                         binder.bindConstant().annotatedWith(Names.named("servicePort")).to(0);
+
                     }
                 }
         );
@@ -84,7 +85,8 @@ public class CliTrainer extends GuiceRunnable {
             }
 
         }
-        System.out.println(extensionURLs);
+
+
 //        System.out.println(EngineModule.class.getProtectionDomain().getCodeSource().getLocation().getPath());
     }
 }

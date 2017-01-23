@@ -8,7 +8,6 @@ import io.sugo.pio.engine.detail.DetailEngineModule;
 import io.sugo.pio.engine.fp.FpEngineModule;
 import io.sugo.pio.engine.popular.PopEngineModule;
 import io.sugo.pio.engine.search.SearchEngineModule;
-import io.sugo.pio.engine.userHistory.UserHistoryEngineModule;
 
 /**
  */
@@ -38,11 +37,6 @@ public class ObjectMapperUtil {
         }
 
         engineModule = new SearchEngineModule();
-        for(Module module: engineModule.getJacksonModules()) {
-            jsonMapper.registerModule(module);
-        }
-
-        engineModule = new UserHistoryEngineModule();
         for(Module module: engineModule.getJacksonModules()) {
             jsonMapper.registerModule(module);
         }
