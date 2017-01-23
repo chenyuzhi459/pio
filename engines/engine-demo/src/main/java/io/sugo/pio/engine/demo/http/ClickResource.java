@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.EvictingQueue;
 import io.sugo.pio.engine.demo.Click;
 import io.sugo.pio.engine.training.Algorithm;
+import io.sugo.pio.engine.demo.data.MovieItemFeature;
+import io.sugo.pio.engine.ocb.Similarity;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -14,9 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -24,6 +24,7 @@ import java.util.Map;
 public class ClickResource {
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private static final Map<String, EvictingQueue<Click>> clickMap = new HashMap<>();
+    private MovieItemFeature itemFeature = new MovieItemFeature();
 
     @POST
     @Path("/submit")
@@ -60,10 +61,26 @@ public class ClickResource {
             @Context final HttpServletRequest req
     ) {
         try {
+            String str;
+            Similarity similarity = new Similarity();
+            TreeMap<Double,String> similarityMap = new TreeMap<Double,String>();
             ClickQuery query = jsonMapper.readValue(in, ClickQuery.class);
+            List<String> items = query.items;
             EvictingQueue<Click> clicks = clickMap.get(query.getUserId());
-
-            return Response.status(Response.Status.ACCEPTED).entity("ok").build();
+            for(String itemQ:items) {
+                List<String> featureQ = itemFeature.getItemFeature(itemQ);
+                Double similarityValue = 0.0;
+                for (Click click : clicks) {
+                    String itemC = click.getItemId();
+                    List<String> featureC = itemFeature.getItemFeature(itemC);
+                    Double featureSimilarity =similarity.getSimilarity(featureQ,featureC);
+                    similarityValue += featureSimilarity;
+                }
+                similarityMap.put(similarityValue,itemQ);
+            }
+            List<String> rankItems=new ArrayList(similarityMap.values());
+            str = jsonMapper.writeValueAsString(rankItems);
+            return Response.status(Response.Status.ACCEPTED).entity(str).build();
         }catch (IOException e) {
             e.printStackTrace();
         }
