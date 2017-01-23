@@ -2,8 +2,6 @@
  * Parser Grammar for the FunctionExpressionParser. Relies on the tokens of the FunctionExpressionLexer
  * and defines the hierarchy of operations.
  * 
- * @author Gisa Schaefer
- * @since 6.5.0
  */
 parser grammar FunctionExpressionParser;
 

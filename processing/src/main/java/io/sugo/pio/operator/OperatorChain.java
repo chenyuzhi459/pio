@@ -43,6 +43,18 @@ public abstract class OperatorChain extends Operator {
         return execUnit;
     }
 
+    public ExecutionUnit getExecutionUnit(int idx) {
+        final ExecutionUnit execUnit;
+        if (execUnits.isEmpty() || execUnits.size() < idx + 1) {
+            execUnit = new ExecutionUnit();
+            execUnit.setEnclosingOperator(this);
+            execUnits.add(execUnit);
+        } else {
+            execUnit = execUnits.get(idx);
+        }
+        return execUnit;
+    }
+
     /**
      * This method returns an arbitrary implementation of {@link InputPorts} for inner sink port
      * initialization. Useful for adding an arbitrary implementation (e.g. changing port creation &

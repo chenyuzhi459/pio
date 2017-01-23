@@ -1,23 +1,4 @@
-/**
- * Copyright (C) 2001-2016 by RapidMiner and the contributors
- *
- * Complete list of developers available at our web site:
- *
- * http://rapidminer.com
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License along with this program.
- * If not, see http://www.gnu.org/licenses/.
- */
-// Generated from FunctionExpressionParser.g4 by ANTLR 4.5
-package io.sugo.pio.tools.expression.internal.antlr;
+package io.sugo.pio.tools.expression.internal.antlr.generated;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
@@ -149,15 +130,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_operationExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterOperationExp(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterOperationExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitOperationExp(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitOperationExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitOperationExp(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitOperationExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -223,7 +204,7 @@ public class FunctionExpressionParser extends Parser {
 			setState(53);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
@@ -392,15 +373,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_atomExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterAtomExp(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterAtomExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitAtomExp(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitAtomExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitAtomExp(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitAtomExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -499,15 +480,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_lowerExp; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterLowerExp(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterLowerExp(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitLowerExp(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitLowerExp(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitLowerExp(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitLowerExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -557,15 +538,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_function; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterFunction(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterFunction(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitFunction(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitFunction(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitFunction(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitFunction(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -645,15 +626,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_attribute; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterAttribute(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterAttribute(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitAttribute(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitAttribute(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitAttribute(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitAttribute(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -687,15 +668,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_scopeConstant; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterScopeConstant(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterScopeConstant(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitScopeConstant(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitScopeConstant(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitScopeConstant(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitScopeConstant(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -729,15 +710,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_indirectScopeConstant; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterIndirectScopeConstant(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterIndirectScopeConstant(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitIndirectScopeConstant(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitIndirectScopeConstant(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitIndirectScopeConstant(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitIndirectScopeConstant(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -771,15 +752,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_string; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterString(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterString(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitString(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitString(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitString(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitString(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -813,15 +794,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_variable; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterVariable(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterVariable(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitVariable(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitVariable(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitVariable(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitVariable(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -855,15 +836,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_real; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterReal(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterReal(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitReal(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitReal(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitReal(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitReal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -897,15 +878,15 @@ public class FunctionExpressionParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_integer; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).enterInteger(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).enterInteger(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof FunctionExpressionParserListener ) ((FunctionExpressionParserListener)listener).exitInteger(this);
+			if ( listener instanceof FunctionExpressionParserListener) ((FunctionExpressionParserListener)listener).exitInteger(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof FunctionExpressionParserVisitor ) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitInteger(this);
+			if ( visitor instanceof FunctionExpressionParserVisitor) return ((FunctionExpressionParserVisitor<? extends T>)visitor).visitInteger(this);
 			else return visitor.visitChildren(this);
 		}
 	}

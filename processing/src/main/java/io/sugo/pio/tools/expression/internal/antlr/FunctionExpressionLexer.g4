@@ -1,8 +1,6 @@
 /*
  * Lexer Grammar for the FunctionExpressionLexer. Defines the tokens that are also used in the Parser Grammar.
  * 
- * @author Gisa Schaefer
- * @since 6.5.0
  */
 lexer grammar FunctionExpressionLexer;
 

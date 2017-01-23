@@ -1,12 +1,10 @@
 package io.sugo.pio.dl4j.layers;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.sugo.pio.operator.OperatorDescription;
-import io.sugo.pio.parameter.*;
-import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
-import io.sugo.pio.ports.InputPort;
-import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.operator.OperatorGroup;
+import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeCategory;
+import io.sugo.pio.parameter.ParameterTypeInt;
+import io.sugo.pio.parameter.ParameterTypeString;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -66,13 +64,6 @@ public class OutputLayer extends AbstractLayer {
     };
 
     private int numNodes;
-
-    @JsonCreator
-    public OutputLayer(
-            @JsonProperty("name") String name
-    ) {
-        super(name);
-    }
 
     @Override
     public Layer getLayer() {
@@ -144,6 +135,21 @@ public class OutputLayer extends AbstractLayer {
     @Override
     public int getNumNodes() {
         return numNodes;
+    }
+
+    @Override
+    public String getFullName() {
+        return OutputLayer.class.getSimpleName();
+    }
+
+    @Override
+    public OperatorGroup getGroup() {
+        return OperatorGroup.algorithmModel;
+    }
+
+    @Override
+    public String getDescription() {
+        return OutputLayer.class.getSimpleName();
     }
 
     @Override

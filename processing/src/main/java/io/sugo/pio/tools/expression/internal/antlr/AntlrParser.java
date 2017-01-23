@@ -1,6 +1,8 @@
 package io.sugo.pio.tools.expression.internal.antlr;
 
 import io.sugo.pio.tools.expression.*;
+import io.sugo.pio.tools.expression.internal.antlr.generated.FunctionExpressionLexer;
+import io.sugo.pio.tools.expression.internal.antlr.generated.FunctionExpressionParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
