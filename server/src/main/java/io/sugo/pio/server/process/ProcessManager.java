@@ -131,13 +131,16 @@ public class ProcessManager {
         return process;
     }
 
-    public OperatorProcess update(String id, String name, String description) {
-        OperatorProcess process = get(id);
+    public OperatorProcess update(String id, String name, String description, String status) {
+        OperatorProcess process = get(id, true);
         if (name != null && name != "") {
             process.setName(name);
         }
         if (description != null && description != "") {
             process.setDescription(description);
+        }
+        if (status != null && status != "") {
+            process.setStatus(Status.valueOf(status));
         }
         process.setUpdateTime(new DateTime());
         metadataProcessManager.update(process);
@@ -157,20 +160,22 @@ public class ProcessManager {
         }
     }
 
-    public String register(OperatorProcess process) {
+    public OperatorProcess run(String id) {
         try {
-            processCache.put(process.getId(), process);
-            metadataProcessManager.insert(process);
+            OperatorProcess process = get(id);
             queue.offer(process, 10, TimeUnit.SECONDS);
+            process.setStatus(Status.QUEUE);
+            process.setUpdateTime(new DateTime());
+            metadataProcessManager.update(process);
             log.info("queue size:%d", queue.size());
-            return process.getId();
+            return process;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<OperatorProcess> getAll() {
-        List<OperatorProcess> processes = metadataProcessManager.getAll();
+    public List<OperatorProcess> getAll(boolean all) {
+        List<OperatorProcess> processes = metadataProcessManager.getAll(all);
         if (processes == null || processes.isEmpty()) {
             return new ArrayList<>();
         }
@@ -178,10 +183,14 @@ public class ProcessManager {
     }
 
     public OperatorProcess get(String id) {
+        return get(id, false);
+    }
+
+    public OperatorProcess get(String id, boolean all) {
         loader.setProcessId(id);
         try {
             OperatorProcess process = processCache.get(id, loader);
-            if (process == null || Status.DELETED.equals(process.getStatus())) {
+            if (process == null || (!all && Status.DELETED.equals(process.getStatus()))) {
                 processCache.invalidate(id);
                 return null;
             }
@@ -214,7 +223,7 @@ public class ProcessManager {
     }
 
     public OperatorProcess addOperator(String processId, OperatorDto dto) {
-        OperatorProcess process = get(processId);
+        OperatorProcess process = get(processId, false);
         OperatorMeta meta = operatorMetaMap.get(dto.getOperatorType());
         try {
             Operator operator = (Operator) meta.getType().getType().newInstance();

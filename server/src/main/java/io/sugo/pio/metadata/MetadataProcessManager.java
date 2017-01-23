@@ -14,9 +14,9 @@ public interface MetadataProcessManager
   void stop();
 
   OperatorProcess get(String id);
-  OperatorProcess get(String id, boolean active);
+  OperatorProcess get(String id, boolean includeDelete);
   void insert(OperatorProcess spec);
   boolean update(OperatorProcess pi);
 
-  List<OperatorProcess> getAll();
+  List<OperatorProcess> getAll(boolean includeDelete);
 }

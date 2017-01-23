@@ -8,7 +8,6 @@ import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.server.process.ProcessManager;
 import io.sugo.pio.server.utils.JsonUtil;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.*;
@@ -41,9 +40,13 @@ public class ProcessResource {
     @GET
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON})
-    public Response getAll() {
-        List<OperatorProcess> processes = processManager.getAll();
-        return Response.ok(processes).build();
+    public Response getAll(@QueryParam("all") boolean all) {
+        try {
+            List<OperatorProcess> processes = processManager.getAll(all);
+            return Response.ok(processes).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
+        }
     }
 
     @POST
@@ -59,8 +62,8 @@ public class ProcessResource {
 
             OperatorProcess process = processManager.create(name, description);
             return Response.ok(process).build();
-        } catch (JSONException e) {
-            return Response.serverError().build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
         }
     }
 
@@ -74,11 +77,12 @@ public class ProcessResource {
 
             String name = JsonUtil.getString(jsonObject, "name");
             String description = JsonUtil.getString(jsonObject, "description");
+            String status = JsonUtil.getString(jsonObject, "status");
 
-            OperatorProcess process = processManager.update(id, name, description);
+            OperatorProcess process = processManager.update(id, name, description, status);
             return Response.ok(process).build();
-        } catch (JSONException e) {
-            return Response.serverError().build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
         }
     }
 
@@ -86,16 +90,36 @@ public class ProcessResource {
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response delete(@PathParam("id") final String id) {
-        OperatorProcess process = processManager.delete(id);
-        return Response.ok(process).build();
+        try {
+            OperatorProcess process = processManager.delete(id);
+            return Response.ok(process).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
+        }
     }
 
     @GET
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public Response get(@PathParam("id") final String id) {
-        OperatorProcess process = processManager.get(id);
-        return Response.ok(process).build();
+    public Response get(@PathParam("id") final String id, @QueryParam("all") boolean all) {
+        try {
+            OperatorProcess process = processManager.get(id, all);
+            return Response.ok(process).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/run/{id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response run(@PathParam("id") final String id) {
+        try {
+            OperatorProcess process = processManager.run(id);
+            return Response.ok(process).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
+        }
     }
 
 }

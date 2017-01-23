@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 
 import java.io.Serializable;
 
-public class Connection implements Serializable{
+public class Connection implements Serializable {
     private String fromOperator;
     private String fromPort;
     private String toOperator;
@@ -18,7 +18,7 @@ public class Connection implements Serializable{
             @JsonProperty("fromPort") String fromPort,
             @JsonProperty("toOperator") String toOperator,
             @JsonProperty("toPort") String toPort
-    ){
+    ) {
         Preconditions.checkNotNull(fromOperator, "Must specify a fromOperator");
         Preconditions.checkNotNull(fromPort, "Must specify a fromPort");
         Preconditions.checkNotNull(toOperator, "Must specify a toOperator");
@@ -97,8 +97,7 @@ public class Connection implements Serializable{
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + fromOperator.hashCode();
+        int result = fromOperator.hashCode();
         result = 31 * result + fromPort.hashCode();
         result = 31 * result + toOperator.hashCode();
         result = 31 * result + toPort.hashCode();

@@ -91,12 +91,6 @@ public class ParameterTypeAttribute extends ParameterTypeString {
 		this(key, description, new InputPortMetaDataProvider(inPort), optional, valueTypes);
 	}
 
-	/**
-	 * @deprecated use
-	 *             {@link ParameterTypeAttribute#ParameterTypeAttribute(String, String, InputPort, boolean, boolean, int...)}
-	 *             instead
-	 */
-	@Deprecated
 	public ParameterTypeAttribute(final String key, String description, MetaDataProvider metaDataProvider, boolean optional,
 								  int... valueTypes) {
 		super(key, description, "");

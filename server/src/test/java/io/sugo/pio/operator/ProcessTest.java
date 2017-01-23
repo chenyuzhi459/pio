@@ -73,6 +73,13 @@ public class ProcessTest {
                 jsonMapper.writerWithDefaultPrettyPrinter()
                         .writeValueAsString(process)
         );
-        process.run();
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        System.out.println();
+        System.out.println();
+        System.out.println(
+                jsonMapper.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(set)
+        );
     }
 }

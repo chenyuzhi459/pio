@@ -53,8 +53,6 @@ public class ProcessRunner implements Runnable {
             try {
                 OperatorProcess process = queue.poll(WAIT_TIME, TimeUnit.SECONDS);
                 if (process != null) {
-//                    log.info("queue size:%d", queue.size());
-//                    process = processCache.getIfPresent(process.getId());
                     try {
                         log.info("start execute Process:%s", process.getId());
                         process.run();
