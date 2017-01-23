@@ -22,6 +22,11 @@ public class DetailEngineModule implements EngineModule {
     }
 
     @Override
+    public String getEngineName() {
+        return "DetailEngine";
+    }
+
+    @Override
     public void configure(Binder binder) {
     }
 }

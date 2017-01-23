@@ -5,13 +5,14 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
+import io.sugo.pio.engine.EngineExtensionModule;
 import io.sugo.pio.engine.EngineModule;
 
 import java.util.List;
 
 /**
  */
-public class JdbcEngineModule implements EngineModule {
+public class JdbcEngineModule implements EngineExtensionModule {
     @Override
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(

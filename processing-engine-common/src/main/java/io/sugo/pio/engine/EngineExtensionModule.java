@@ -6,10 +6,7 @@ import java.util.List;
 
 /**
  */
-public interface EngineModule extends com.google.inject.Module
+public interface EngineExtensionModule extends com.google.inject.Module
 {
     List<? extends Module> getJacksonModules();
-
-    String getEngineName();
 }
-

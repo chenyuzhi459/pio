@@ -67,7 +67,7 @@ public class ClickResource {
         }catch (IOException e) {
             e.printStackTrace();
         }
-        return Response.status(Response.Status.ACCEPTED).entity("ok").build();
+        return Response.status(Response.Status.ACCEPTED).entity("items not found").build();
     }
 
     static class ClickQuery {
