@@ -37,6 +37,7 @@
         <module>engines/fp-engine</module>
         <module>engines/search-engine</module>
         <module>engines/online-content-based-engine</module>
+        <module>engines/userHistory-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>
     </modules>

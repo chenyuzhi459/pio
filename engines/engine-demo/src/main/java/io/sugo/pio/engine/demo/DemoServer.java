@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class DemoServer {
     public static void main(String[] args) throws Exception {
-//        train();
+        train();
         startServer();
     }
 
@@ -29,6 +29,8 @@ public class DemoServer {
         fpTraining.train();
         SearchTraining searchTraining = new SearchTraining();
         searchTraining.train();
+        UserHistoryTraining userHistoryTraining = new UserHistoryTraining();
+        userHistoryTraining.train();
     }
 
     private static void startServer() throws Exception {
