@@ -37,7 +37,7 @@ public class MaterializeDataInMemory extends AbstractDataProcessing {
 	}
 
 	@Override
-	public String getFullName() {
+	public String getDefaultFullName() {
 		return "materializeDataInMemory";
 	}
 

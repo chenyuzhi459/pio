@@ -138,7 +138,7 @@ public class OutputLayer extends AbstractLayer {
     }
 
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return OutputLayer.class.getSimpleName();
     }
 

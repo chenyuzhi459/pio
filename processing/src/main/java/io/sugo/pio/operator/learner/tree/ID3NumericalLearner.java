@@ -27,7 +27,7 @@ public class ID3NumericalLearner extends AbstractTreeLearner {
 	}
 
 	@Override
-	public String getFullName() {
+	public String getDefaultFullName() {
 		return "ID3NumericalLearner";
 	}
 

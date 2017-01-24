@@ -77,8 +77,8 @@ public class OperatorMeta {
     }
 
     @JsonProperty
-    public OperatorGroup getGroup() {
-        return group;
+    public String getGroup() {
+        return group.getDescription();
     }
 
     public OperatorMeta setGroup(OperatorGroup group) {

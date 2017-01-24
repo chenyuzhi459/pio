@@ -2,8 +2,9 @@ package io.sugo.pio.server.http.dto;
 
 public class OperatorDto {
     private String operatorType;
-    private int xPos;
-    private int yPos;
+    private Integer xPos;
+    private Integer yPos;
+    private String fullName;
 
     public String getOperatorType() {
         return operatorType;
@@ -13,19 +14,27 @@ public class OperatorDto {
         this.operatorType = operatorType;
     }
 
-    public int getxPos() {
+    public Integer getxPos() {
         return xPos;
     }
 
-    public void setxPos(int xPos) {
+    public void setxPos(Integer xPos) {
         this.xPos = xPos;
     }
 
-    public int getyPos() {
+    public Integer getyPos() {
         return yPos;
     }
 
-    public void setyPos(int yPos) {
+    public void setyPos(Integer yPos) {
         this.yPos = yPos;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

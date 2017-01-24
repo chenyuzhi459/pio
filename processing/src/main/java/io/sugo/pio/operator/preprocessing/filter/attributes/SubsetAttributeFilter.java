@@ -3,6 +3,7 @@ package io.sugo.pio.operator.preprocessing.filter.attributes;
 
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.set.ConditionCreationException;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.ParameterHandler;
 import io.sugo.pio.parameter.ParameterType;
@@ -65,7 +66,7 @@ public class SubsetAttributeFilter extends AbstractAttributeFilterCondition {
 	@Override
 	public List<ParameterType> getParameterTypes(ParameterHandler operator, final InputPort inPort, int... valueTypes) {
 		List<ParameterType> types = new LinkedList<ParameterType>();
-		ParameterType type = new ParameterTypeAttributes(PARAMETER_ATTRIBUTES, "The attribute which should be chosen.",
+		ParameterType type = new ParameterTypeAttributes(PARAMETER_ATTRIBUTES, I18N.getMessage("pio.AttributeFilter.subset.attributes"),
 				inPort, valueTypes);
 		types.add(type);
 		return types;

@@ -33,7 +33,7 @@ public class ChiSquaredWeighting extends AbstractWeighting {
 	}
 
 	@Override
-	public String getFullName() {
+	public String getDefaultFullName() {
 		return "chiSquaredWeighting";
 	}
 

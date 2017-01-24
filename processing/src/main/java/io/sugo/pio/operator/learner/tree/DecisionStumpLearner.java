@@ -23,7 +23,7 @@ public class DecisionStumpLearner extends AbstractTreeLearner {
 	}
 
 	@Override
-	public String getFullName() {
+	public String getDefaultFullName() {
 		return "decisionStumpLearner";
 	}
 

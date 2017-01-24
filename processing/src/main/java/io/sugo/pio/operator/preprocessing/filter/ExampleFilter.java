@@ -5,6 +5,7 @@ import io.sugo.pio.example.set.Condition;
 import io.sugo.pio.example.set.ConditionedExampleSet;
 import io.sugo.pio.example.set.CustomFilter;
 import io.sugo.pio.example.table.AttributeTypeException;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.UserError;
@@ -174,8 +175,8 @@ public class ExampleFilter extends AbstractDataProcessing {
     }
 
     @Override
-    public String getFullName() {
-        return ExampleFilter.class.getSimpleName();
+    public String getDefaultFullName() {
+        return I18N.getMessage("pio.ExampleFilter.name");
     }
 
     @Override
@@ -185,7 +186,7 @@ public class ExampleFilter extends AbstractDataProcessing {
 
     @Override
     public String getDescription() {
-        return ExampleFilter.class.getSimpleName();
+        return I18N.getMessage("pio.ExampleFilter.description");
     }
 
     @Override
@@ -228,25 +229,25 @@ public class ExampleFilter extends AbstractDataProcessing {
 
         // hidden parameter, only used to store the filters set via the ParameterTypeFilter dialog
         // above
-        type = new ParameterTypeList(PARAMETER_FILTERS_LIST, "The list of filters.", new ParameterTypeString(
-                PARAMETER_FILTERS_ENTRY_KEY, "A key entry of the filters list."), new ParameterTypeString(
-                PARAMETER_FILTERS_ENTRY_VALUE, "A value entry of the filters list."));
+//        type = new ParameterTypeList(PARAMETER_FILTERS_LIST, I18N.getMessage("pio.ExampleFilter.filters_list"), new ParameterTypeString(
+//                PARAMETER_FILTERS_ENTRY_KEY, "A key entry of the filters list."), new ParameterTypeString(
+//                PARAMETER_FILTERS_ENTRY_VALUE, "A value entry of the filters list."));
 //        type.setHidden(true);
 //		type.registerDependencyCondition(new EqualStringCondition(this, PARAMETER_CONDITION_CLASS, true,
 //				ConditionedExampleSet.KNOWN_CONDITION_NAMES[8]));
-        types.add(type);
+//        types.add(type);
 
         List<CompareTuple> compareOpts = new ArrayList<>();
         CustomFilter.CustomFilters[] filters = CustomFilter.CustomFilters.values();
         for (CustomFilter.CustomFilters filter : filters) {
             compareOpts.add(new CompareTuple(filter.getSymbol(), filter.getValueType()));
         }
-        type = new ParameterTypeCompare(PARAMETER_FILTERS_LIST, "The list of filters.", getInputPort(), compareOpts);
+        type = new ParameterTypeCompare(PARAMETER_FILTERS_LIST, I18N.getMessage("pio.ExampleFilter.filters_list"), getInputPort(), compareOpts);
         types.add(type);
 
         // hidden parameter, only used to store if the filters from the ParameterTypeFilter dialog
         // above should be ANDed or ORed
-        type = new ParameterTypeBoolean(PARAMETER_FILTERS_LOGIC_AND, "Match All", true);
+        type = new ParameterTypeBoolean(PARAMETER_FILTERS_LOGIC_AND, I18N.getMessage("pio.ExampleFilter.filters_logic_and"), true);
         types.add(type);
 
         // hidden parameter, only used to store if the meta data should be checked in the

@@ -4,6 +4,7 @@ package io.sugo.pio.operator.preprocessing.filter;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.UserError;
@@ -80,8 +81,8 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
     }
 
     @Override
-    public String getFullName() {
-        return ChangeAttributeRole.class.getSimpleName();
+    public String getDefaultFullName() {
+        return I18N.getMessage("pio.ChangeAttributeRole.name");
     }
 
     @Override
@@ -91,7 +92,7 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
 
     @Override
     public String getDescription() {
-        return ChangeAttributeRole.class.getSimpleName();
+        return I18N.getMessage("pio.ChangeAttributeRole.description");
     }
 
     @Override
@@ -189,19 +190,22 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
-        types.add(new ParameterTypeAttribute(PARAMETER_NAME, "The name of the attribute whose role should be changed.",
+        types.add(new ParameterTypeAttribute(PARAMETER_NAME,
+                I18N.getMessage("pio.ChangeAttributeRole.attribute_name"),
                 getExampleSetInputPort(), false, false));
         ParameterType type = new ParameterTypeStringCategory(PARAMETER_TARGET_ROLE,
-                "The target role of the attribute (only changed if parameter change_attribute_type is true).", TARGET_ROLES,
+                I18N.getMessage("pio.ChangeAttributeRole.target_role"), TARGET_ROLES,
                 TARGET_ROLES[0]);
 //		type.setExpert(false);
         types.add(type);
 
         types.add(new ParameterTypeList(PARAMETER_CHANGE_ATTRIBUTES,
-                "This parameter defines additional attribute role combinations.", new ParameterTypeAttribute(PARAMETER_NAME,
-                "The name of the attribute whose role should be changed.", getExampleSetInputPort(), false, false),
+                I18N.getMessage("pio.ChangeAttributeRole.set_additional_roles"),
+                new ParameterTypeAttribute(PARAMETER_NAME,
+                        I18N.getMessage("pio.ChangeAttributeRole.attribute_name"),
+                        getExampleSetInputPort(), false, false),
                 new ParameterTypeStringCategory(PARAMETER_TARGET_ROLE,
-                        "The target role of the attribute (only changed if parameter change_attribute_type is true).",
+                        I18N.getMessage("pio.ChangeAttributeRole.target_role"),
                         TARGET_ROLES, TARGET_ROLES[0])));
         return types;
     }

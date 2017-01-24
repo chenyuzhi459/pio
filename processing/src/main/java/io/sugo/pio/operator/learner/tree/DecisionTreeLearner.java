@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.learner.tree;
 
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorCapability;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
@@ -43,18 +44,13 @@ public class DecisionTreeLearner extends AbstractTreeLearner {
 	public static final String PARAMETER_NUMBER_OF_PREPRUNING_ALTERNATIVES = "number_of_prepruning_alternatives";
 
 	@Override
-	public String getName() {
-		return "DecisionTree";
-	}
-
-	@Override
-	public String getFullName() {
-		return "DecisionTree";
+	public String getDefaultFullName() {
+		return I18N.getMessage("pio.DecisionTreeLearner.name");
 	}
 
 	@Override
 	public String getDescription() {
-		return "DecisionTree";
+		return I18N.getMessage("pio.DecisionTreeLearner.description");
 	}
 
 	@Override
@@ -113,7 +109,8 @@ public class DecisionTreeLearner extends AbstractTreeLearner {
 	@Override
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = super.getParameterTypes();
-		ParameterType type = new ParameterTypeInt(PARAMETER_MAXIMAL_DEPTH, "The maximum tree depth (-1: no bound)", -1,
+		ParameterType type = new ParameterTypeInt(PARAMETER_MAXIMAL_DEPTH,
+				"The maximum tree depth (-1: no bound)", -1,
 				Integer.MAX_VALUE, 20);
 		types.add(type);
 		type = new ParameterTypeDouble(PARAMETER_CONFIDENCE,

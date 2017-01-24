@@ -60,7 +60,7 @@ public class BinDiscretization extends AbstractDiscretizationOperator {
     }
 
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return "BinDiscretization";
     }
 

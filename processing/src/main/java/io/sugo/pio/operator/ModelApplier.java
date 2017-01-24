@@ -52,7 +52,7 @@ public class ModelApplier extends Operator {
     }
 
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return "modelApplier";
     }
 

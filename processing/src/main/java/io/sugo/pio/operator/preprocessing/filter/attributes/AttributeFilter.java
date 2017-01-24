@@ -4,6 +4,7 @@ package io.sugo.pio.operator.preprocessing.filter.attributes;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.features.selection.AbstractFeatureSelection;
@@ -73,8 +74,8 @@ public class AttributeFilter extends AbstractFeatureSelection {
 	}
 
 	@Override
-	public String getFullName() {
-		return "AttributeFilter";
+	public String getDefaultFullName() {
+		return I18N.getMessage("pio.AttributeFilter.name");
 	}
 
 	@Override
@@ -84,7 +85,7 @@ public class AttributeFilter extends AbstractFeatureSelection {
 
 	@Override
 	public String getDescription() {
-		return "AttributeFilter";
+		return I18N.getMessage("pio.AttributeFilter.description");
 	}
 
 	@Override

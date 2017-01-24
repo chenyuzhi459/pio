@@ -2,6 +2,8 @@ package io.sugo.pio.cli;
 
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceFilter;
+import io.sugo.pio.server.initialization.jetty.JettyServerInitUtils;
+import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -9,8 +11,6 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.ResourceCollection;
-import io.sugo.pio.server.initialization.jetty.JettyServerInitUtils;
-import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 
 /**
  */
@@ -19,6 +19,7 @@ public class UIJettyServerInitializer implements JettyServerInitializer {
     public void initialize(Server server, Injector injector) {
         final ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
         root.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+        root.setInitParameter("org.eclipse.jetty.servlet.Default.useFileMappedBuffer", "false");
         root.setWelcomeFiles(new String[]{"index.html"});
 
         ServletHolder holderPwd = new ServletHolder("default", DefaultServlet.class);
@@ -27,7 +28,8 @@ public class UIJettyServerInitializer implements JettyServerInitializer {
         root.setBaseResource(
                 new ResourceCollection(
                         new String[]{
-                                this.getClass().getClassLoader().getResource("static").toExternalForm(),
+//                                this.getClass().getClassLoader().getResource("static").toExternalForm(),
+                                "/work/pio/src/sugo-pio/service/src/main/resources/static"
                         }
                 )
         );

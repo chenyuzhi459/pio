@@ -8,6 +8,7 @@ import io.sugo.pio.example.table.DataRow;
 import io.sugo.pio.example.table.DataRowFactory;
 import io.sugo.pio.example.util.ExampleSetBuilder;
 import io.sugo.pio.example.util.ExampleSets;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.extension.jdbc.tools.jdbc.DatabaseHandler;
 import io.sugo.pio.operator.extension.jdbc.tools.jdbc.StatementCreator;
@@ -279,7 +280,6 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         } catch (OperatorException var3) {
             ;
         }
-
     }
 
     protected boolean isMetaDataCacheable() {
@@ -287,8 +287,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     }
 
     @Override
-    public String getFullName() {
-        return "DatabaseDataReader";
+    public String getDefaultFullName() {
+        return I18N.getMessage("pio.DatabaseDataReader.name");
     }
 
     @Override
@@ -298,7 +298,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 
     @Override
     public String getDescription() {
-        return "DatabaseDataReader";
+        return I18N.getMessage("pio.DatabaseDataReader.description");
     }
 
     public List<ParameterType> getParameterTypes() {
