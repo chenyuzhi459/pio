@@ -127,7 +127,7 @@
 	   </div>
            </div>
 				<div class="rightsidebar span_3_of_1 sidebar">
-					<h2>Specials</h2>
+					<h2>相似推荐</h2>
 					 	<div class="special_movies" v-for="(item, index) in relatedFilms">
 					 	   <div class="movie_poster">
 					 		  <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title"><img :src="item.Poster" alt="" /></a>
@@ -151,7 +151,7 @@
 				<div class="content">
 					<div class="content_bottom">
 						<div class="heading">
-							<h3>frequent Products</h3>
+							<h3>组合推荐</h3>
 						</div>
 					</div>
 					<div class="section group">
@@ -250,6 +250,24 @@
                         })
 					},
 
+					clickPost: function(item_id) {
+						var that = this
+						$.ajax({
+                            url: '/pio/query/click/submit',
+                            beforeSend(req) {
+                                req.setRequestHeader('Content-Type', 'application/json')
+                            },
+                            data: JSON.stringify({
+                                'userId': that.userId, 'itemId': item_id
+                            }),
+                            dataType: 'json',
+                            type: 'post',
+                            success(data) {
+								console.log("click behavior")
+                            }
+                        })
+					},
+
                     queryOmdbById: function (imdbId) {
                         var that = this
                         $.ajax({
@@ -275,8 +293,10 @@
                     }
                 }
             })
+
 			detailUR.queryOmdbById(qs("imdbId"))
             detailUR.queryRelated(qs("id"))
+            detailUR.clickPost(qs("id"))
             detailUR.queryFp(qs("id"))
 		});
 	</script>
