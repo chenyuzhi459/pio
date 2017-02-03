@@ -1,6 +1,5 @@
 package io.sugo.pio.engine.fp.engine
 
-import io.sugo.pio.engine.common.data.QueryableModelData
 import io.sugo.pio.engine.common.lucene.RepositoryDirectory
 import io.sugo.pio.engine.common.utils.LuceneUtils
 import io.sugo.pio.engine.fp.{Constants, LucenceConstants}
@@ -11,8 +10,8 @@ import java.lang.{Float => jFloat}
 import io.sugo.pio.engine.data.output.Repository
 import io.sugo.pio.engine.training.Model
 
-class FpModel extends Model[FpModelData] {
-  override def save(md: FpModelData, repository: Repository): Unit = {
+class FpModel(val repository: Repository) extends Model[FpModelData] {
+  override def save(md: FpModelData): Unit = {
     val resItem = md.fpData
     resItem.coalesce(1).foreachPartition(iter => {
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository))

@@ -1,26 +1,18 @@
 package io.sugo.pio.cli;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.inject.Binder;
 import com.google.inject.Inject;
-import com.google.inject.Module;
-import com.google.inject.name.Names;
 import com.metamx.common.logger.Logger;
-import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
-import io.sugo.pio.engine.EngineModule;
+import io.sugo.pio.engine.TrainingWorkFlow;
 import io.sugo.pio.guice.EnginesConfig;
-import io.sugo.pio.guice.ExtensionsConfig;
-import io.sugo.pio.initialization.Initialization;
+import io.sugo.pio.spark.JobHelper;
+import io.sugo.pio.spark.SparkConfig;
+import io.sugo.pio.spark.SparkVersion;
+import io.sugo.pio.spark.handler.SparkSubmissionHandler;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.spark.deploy.yarn.Client;
 
-import java.io.File;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ServiceLoader;
 
 /**
  */
@@ -28,65 +20,50 @@ import java.util.ServiceLoader;
         name = "trainer",
         description = "Train the engine for pio"
 )
-public class CliTrainer extends GuiceRunnable {
-    @Arguments(description = "engine.json", required = true)
-    private String engineFile;
-
+public class CliTrainer implements Runnable {
     private static final Logger log = new Logger(CliTrainer.class);
 
     @Inject
     private EnginesConfig enginesConfig = null;
 
-
-    public CliTrainer() {
-        super(log);
-    }
-
-    @Override
-    protected List<? extends Module> getModules() {
-        return ImmutableList.<Module>of(
-                new Module()
-                {
-                    @Override
-                    public void configure(Binder binder)
-                    {
-                        binder.bindConstant().annotatedWith(Names.named("serviceName")).to("pio/trainer");
-                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(0);
-
-                    }
-                }
-        );
-    }
+    @Inject
+    private SparkConfig sparkConfig = null;
 
     @Override
     public void run() {
-        final List<URL> extensionURLs = Lists.newArrayList();
-        for (final File extension : Initialization.getEngineFilesToLoad(enginesConfig)) {
-//            System.out.println(extension);
-//            try {
-//                final URLClassLoader loader = Initialization.getClassLoaderForExtension(extension);
-//                for (EngineModule module : ServiceLoader.load(EngineModule.class, loader)) {
-//                    final String moduleName = module.getClass().getCanonicalName();
-//                    System.out.println(moduleName);
-//                }
+        try {
+            String sparkClass = TrainingWorkFlow.class.getName();
+            System.out.println(sparkClass);
+            URL jarUrl = TrainingWorkFlow.class.getProtectionDomain().getCodeSource().getLocation();
+//            final List<URL> extensionURLs = Lists.newArrayList();
+//            for (final File extension : Initialization.getEngineFilesToLoad(enginesConfig)) {
+//                final ClassLoader extensionLoader = Initialization.getClassLoaderForExtension(extension);
+//                extensionURLs.addAll(Arrays.asList(((URLClassLoader) extensionLoader).getURLs()));
 //            }
-//            catch (Exception e) {
-//                throw Throwables.propagate(e);
-//            }
-            try {
-                final ClassLoader extensionLoader = Initialization.getClassLoaderForExtension(extension);
-                for (EngineModule module : ServiceLoader.load(EngineModule.class, extensionLoader)) {
-                    System.out.println(module.getEngineName());
-                    extensionURLs.addAll(Arrays.asList(((URLClassLoader) extensionLoader).getURLs()));
-                }
-
-            } catch (Exception e) {
-                throw Throwables.propagate(e);
-            }
-
+//
+//            final List<URL> nonHadoopURLs = Lists.newArrayList();
+//            nonHadoopURLs.addAll(Arrays.asList(((URLClassLoader) TrainingWorkFlow.class.getClassLoader()).getURLs()));
+//
+//            final List<URL> jobUrls = Lists.newArrayList();
+//            jobUrls.addAll(nonHadoopURLs);
+//            jobUrls.addAll(extensionURLs);
+//
+//            System.setProperty("pio.spark.internal.classpath", Joiner.on(File.pathSeparator).join(jobUrls));
+//
+            SparkVersion sparkVersion = SparkVersion.getFromId(sparkConfig.getSparkVersion());
+            SparkSubmissionHandler ssh = SparkSubmissionHandler.createSubmissionHandler(sparkVersion);
+            ssh.initConf("trainingApp", sparkClass);
+            Configuration configuration = new Configuration();
+            JobHelper.setupClasspath(JobHelper.distributedClassPath(sparkConfig.getWorkingPath()),
+                    JobHelper.distributedClassPath(sparkConfig.getIntermediatePath()),
+                    configuration,
+                    ssh);
+            ssh.setUserJar(jarUrl.getFile());
+            Client client = new Client(ssh.createClientArguments(), configuration, ssh.getSparkConf());
+            client.submitApplication();
+        } catch (Exception e) {
+            log.error(e, "failure!!!!");
+            System.exit(1);
         }
-
-
-//        System.out.println(EngineModule.class.getProtectionDomain().getCodeSource().getLocation().getPath());
     }
 }

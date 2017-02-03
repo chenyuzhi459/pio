@@ -26,7 +26,8 @@ public class SearchTraining extends AbstractTraining{
         FileUtils.deleteDirectory(new File(SearchResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
-        EngineFactory<SearchTrainingData, SearchPreparaData, SearchModelData> engineFactory = new SearchEngineFactory(propHose, eventHose);
+        Repository repository = new LocalFileRepository(SearchResource.REPOSITORY_PATH);
+        EngineFactory<SearchTrainingData, SearchPreparaData, SearchModelData> engineFactory = new SearchEngineFactory(propHose, eventHose, repository);
         Preparator<SearchTrainingData, SearchPreparaData> preparator = engineFactory.createPreparator();
         DataSource<SearchTrainingData> dataSource = engineFactory.createDatasource();
         SearchTrainingData trainingData = dataSource.readTraining(sc);
@@ -34,7 +35,7 @@ public class SearchTraining extends AbstractTraining{
         Algorithm<SearchPreparaData, SearchModelData> alg = engineFactory.createAlgorithm();
         SearchModelData modelData = alg.train(sc, preparedData);
         Model<SearchModelData> model = engineFactory.createModel();
-        Repository repository = new LocalFileRepository(SearchResource.REPOSITORY_PATH);
-        model.save(modelData, repository);
+
+        model.save(modelData);
     }
 }

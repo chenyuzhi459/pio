@@ -9,9 +9,9 @@ import io.sugo.pio.engine.training.Model
 import org.apache.lucene.document._
 import java.lang.{Float => jFloat}
 
-class DetailModel extends Model[DetailModelData] with Serializable {
+class DetailModel(val repository: Repository) extends Model[DetailModelData] with Serializable {
 
-  override def save(md: DetailModelData, repository: Repository): Unit = {
+  override def save(md: DetailModelData): Unit = {
     val modelData = md.model
     modelData.coalesce(1).foreachPartition(iter => {
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository))

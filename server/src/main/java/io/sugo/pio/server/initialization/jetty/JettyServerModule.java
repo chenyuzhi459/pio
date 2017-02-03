@@ -14,9 +14,11 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.sun.jersey.spi.container.servlet.WebConfig;
+import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.Self;
 import io.sugo.pio.guice.annotations.JSR311Resource;
 import io.sugo.pio.server.PioNode;
+import io.sugo.pio.server.StatusResource;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -55,6 +57,7 @@ public class JettyServerModule extends JerseyServletModule
         binder.bind(PioGuiceContainer.class).in(Scopes.SINGLETON);
         binder.bind(CustomExceptionMapper.class).in(Singleton.class);
 
+        Jerseys.addResource(binder, StatusResource.class);
         serve("/*").with(PioGuiceContainer.class);
 
         //Adding empty binding for ServletFilterHolders so that injector returns
