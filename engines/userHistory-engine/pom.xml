@@ -10,19 +10,13 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>search-engine</artifactId>
+    <artifactId>userHistory-engine</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>io.sugo</groupId>
             <artifactId>engine-common</artifactId>
             <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.4-1201-jdbc41</version>
         </dependency>
 
         <dependency>
@@ -36,19 +30,6 @@
             <artifactId>spark-mllib_2.10</artifactId>
             <version>${spark.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.ansj</groupId>
-            <artifactId>ansj_seg</artifactId>
-            <version>5.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ansj</groupId>
-            <artifactId>ansj_lucene5_plug</artifactId>
-            <version>5.1.0.0</version>
-        </dependency>
-
-
 
         <dependency>
             <groupId>junit</groupId>
@@ -85,14 +66,8 @@
             <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.8.2</version>
-        </dependency>
 
     </dependencies>
-
 
     <build>
         <plugins>

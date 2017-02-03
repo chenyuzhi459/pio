@@ -104,7 +104,7 @@
 					<div class="header_bottom_left">				
 						<div class="categories">
 						   <ul>
-						  	   <h3>Categories</h3>
+						  	   <h3>流行推荐</h3>
 								   <li><a href="#" v-on:click="pop('Action')">Action</a></li>
 								   <li><a href="#" v-on:click="pop('Adventure')">Adventure</a></li>
 								   <li><a href="#" v-on:click="pop('Animation')">Animation</a></li>
@@ -156,11 +156,39 @@
 			<div class="content">
 				<div class="content_bottom">
 					<div class="heading">
-						<h3>Feature Products</h3>
+						<h3>个性化推荐</h3>
 					</div>
 				</div>
 				<div class="section group">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in customItems">
+						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
+						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
+						<div class="price-details">
+							<div class="price-number">
+								<p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
+							</div>
+							<div class="add-cart">
+								<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
+							</div>
+							<div class="clear"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!------------End Header ------------>
+	<div class="main">
+		<div class="wrap">
+			<div class="content">
+				<div class="content_bottom">
+					<div class="heading">
+						<h3>在线推荐</h3>
+					</div>
+				</div>
+				<div class="section group">
+					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
 						<div class="price-details">
@@ -197,6 +225,8 @@
                 data: {
                     popItems:[],
 					customItems: [],
+					cacheItems: [],
+					onlineItems: [],
 					userId: window.localStorage.getItem("userId") || ''
                 },
                 methods: {
@@ -252,6 +282,52 @@
                         })
                     },
 
+                    online: function () {
+                        var that = this
+						if (!that.userId) {
+                            return
+						}
+
+                        $.ajax({
+                            url: '/pio/query/als',
+                            beforeSend(req) {
+                                req.setRequestHeader('Content-Type', 'application/json')
+                            },
+                            data: JSON.stringify({
+                                'user_id': that.userId, 'num': 14, "type":"als_query"
+                            }),
+                            dataType: 'json',
+                            type: 'post',
+                            success(data) {
+                                var temp = []
+                                for (let m = 0; m < data.item_id.length; m++) {
+                                     that.cacheItems.push(data.item_id[m])
+                                }
+                                console.log(that.cacheItems)
+                                $.ajax({
+										url: '/pio/query/click/request',
+										beforeSend(req) {
+											req.setRequestHeader('Content-Type', 'application/json')
+										},
+										data: JSON.stringify({
+											'userId': "1", "items":that.cacheItems,
+										}),
+										dataType: 'json',
+										type: 'post',
+										success(data) {
+											var temp = []
+											console.log(that.cacheItems)
+											for (let m = 0; m < data.item_id.length; m++) {
+												that.queryOmdb(data.item_id[m], data.item_name[m], temp)
+											}
+											that.onlineItems = temp
+										}
+							     })
+
+                            }
+                        })
+                    },
+
                     queryOmdb: function (id, title, temp) {
                         $.ajax({
                             url: 'http://www.omdbapi.com/?t=' + escape(title),
@@ -267,6 +343,7 @@
             })
             detailUR.pop("Action")
             detailUR.custom()
+            detailUR.online()
         })
 	</script>
     <a href="#" id="toTop"><span id="toTopHover"> </span></a>

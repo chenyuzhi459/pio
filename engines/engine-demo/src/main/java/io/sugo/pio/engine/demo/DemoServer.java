@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class DemoServer {
     public static void main(String[] args) throws Exception {
-//        train();
+        train();
         startServer();
     }
 
