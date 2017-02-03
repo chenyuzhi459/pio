@@ -51,13 +51,13 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <outputDirectory>lib</outputDirectory>
             <excludes>
-                <exclude>distribution:distribution</exclude>
+                <exclude>io.sugo:distribution</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>
             <unpack>true</unpack>
             <includes>
-                <include>distribution:distribution</include>
+                <include>io.sugo:distribution</include>
             </includes>
         </dependencySet>
     </dependencySets>

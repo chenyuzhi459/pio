@@ -111,7 +111,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
             }
 
             prepared1.close();
-        } catch (SQLException var16) {
+        } catch (SQLException sqlEx) {
+            throw new OperatorException(DatabaseDataReader.class.getSimpleName(), sqlEx);
 //                LogService.getRoot().log(Level.WARNING, I18N.getMessage(LogService.getRoot().getResourceBundle(), "io.sugo.pio.operator.io.DatabaseDataReader.fetching_meta_data_error", new Object[]{var16}), var16);
         } finally {
             try {
