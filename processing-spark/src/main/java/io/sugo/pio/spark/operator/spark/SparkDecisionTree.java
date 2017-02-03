@@ -84,7 +84,7 @@ public class SparkDecisionTree extends AbstractSparkLearner {
     }
 
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return "SparkDecisionTree";
     }
 

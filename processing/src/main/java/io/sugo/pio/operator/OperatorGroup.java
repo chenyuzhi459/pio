@@ -1,12 +1,11 @@
 package io.sugo.pio.operator;
 
-/**
- * Created by root on 17-1-17.
- */
+import io.sugo.pio.i18n.I18N;
+
 public enum OperatorGroup {
-    source ("source","数据源"),
-    processing("processing", "数据处理"),
-    algorithmModel("algorithmModel", "算法建模");
+    source ("source", I18N.getMessage("pio.OperatorGroup.source")),
+    processing("processing", I18N.getMessage("pio.OperatorGroup.processing")),
+    algorithmModel("algorithmModel", I18N.getMessage("pio.OperatorGroup.algorithmModel"));
 
     private final String group;
     private final String description;

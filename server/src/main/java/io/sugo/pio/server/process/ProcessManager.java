@@ -13,6 +13,7 @@ import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.guice.annotations.Json;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.metadata.MetadataProcessManager;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.Status;
@@ -41,10 +42,12 @@ public class ProcessManager {
 
     private static String operatorMetaJson;
     private static Map<String, OperatorMeta> operatorMetaMap;
+    private ObjectMapper jsonMapper;
 
     @Inject
     public ProcessManager(@Json ObjectMapper jsonMapper, ProcessManagerConfig config, MetadataProcessManager metadataProcessManager) {
         this.config = config;
+        this.jsonMapper = jsonMapper;
         this.metadataProcessManager = metadataProcessManager;
         this.executeMaxThread = config.getExecuteMaxThread();
         queue = new ArrayBlockingQueue<>(config.getProcessQueueSize());
@@ -65,14 +68,6 @@ public class ProcessManager {
             this.runners[i] = new ProcessRunner(queue, i, processCache, metadataProcessManager);
         }
         loader = new OperatorProcessLoader(this.metadataProcessManager);
-        if (operatorMetaMap == null) {
-            operatorMetaMap = OperatorMapHelper.getAllOperatorMetas(jsonMapper);
-            try {
-                operatorMetaJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(operatorMetaMap.values());
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     public static String getOperatorMetaJson() {
@@ -85,6 +80,15 @@ public class ProcessManager {
 
     @LifecycleStart
     public void start() {
+        I18N.loadLanguageResource();
+
+        operatorMetaMap = OperatorMapHelper.getAllOperatorMetas(jsonMapper);
+        try {
+            operatorMetaJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(operatorMetaMap.values());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         for (int i = 0; i < config.getExecuteMaxThread(); i++) {
             this.runners[i].start();
         }
@@ -194,6 +198,7 @@ public class ProcessManager {
                 processCache.invalidate(id);
                 return null;
             }
+            process.getRootOperator().getExecutionUnit().transformMetaData();
             return process;
         } catch (ExecutionException e) {
             log.error(e, "get process %s error", id);
@@ -292,6 +297,27 @@ public class ProcessManager {
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             Operator operator = process.getOperator(operatorId);
             operator.setParameter(key, value);
+            metadataProcessManager.update(process);
+            return operator;
+        } else {
+            return null;
+        }
+    }
+
+    public Operator updateOperator(String processId, String operatorId, OperatorDto dto) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            Operator operator = process.getOperator(operatorId);
+            if (dto.getFullName() != null) {
+                operator.setFullName(dto.getFullName());
+            }
+            if (dto.getxPos() != null) {
+                operator.setxPos(dto.getxPos());
+            }
+            if (dto.getyPos() != null) {
+                operator.setyPos(dto.getyPos());
+            }
+
             metadataProcessManager.update(process);
             return operator;
         } else {

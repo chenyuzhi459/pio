@@ -118,7 +118,7 @@ public class DenseLayer extends AbstractLayer {
     }
 
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return DenseLayer.class.getSimpleName();
     }
 

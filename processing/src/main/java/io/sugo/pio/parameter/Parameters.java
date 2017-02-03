@@ -44,7 +44,7 @@ public class Parameters implements Cloneable, Iterable<String> {
      * Returns a list of <tt>ParameterTypes</tt> describing the parameters of this operator. This
      * list will be generated during construction time of the Operator.
      */
-    @JsonProperty
+//    @JsonProperty
     public Collection<ParameterType> getParameterTypes() {
         return keyToTypeMap.values();
     }

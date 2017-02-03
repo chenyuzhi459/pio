@@ -27,6 +27,7 @@ import com.metamx.common.concurrent.ScheduledExecutors;
 import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.metadata.MetadataStorageConnector;
 import io.sugo.pio.metadata.MetadataStorageTablesConfig;
 import org.joda.time.Duration;
@@ -76,6 +77,8 @@ public class ConfigManager
       if (started) {
         return;
       }
+
+      I18N.loadLanguageResource();
 
       poller = new PollingCallable();
       ScheduledExecutors.scheduleWithFixedDelay(

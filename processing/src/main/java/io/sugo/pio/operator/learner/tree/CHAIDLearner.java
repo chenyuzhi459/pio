@@ -49,7 +49,7 @@ public class CHAIDLearner extends DecisionTreeLearner {
 	}
 
 	@Override
-	public String getFullName() {
+	public String getDefaultFullName() {
 		return "CHAIDLearner";
 	}
 
