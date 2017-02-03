@@ -1,13 +1,10 @@
 package io.sugo.pio.engine.search.engine
 
-import java.sql.{DriverManager, ResultSet}
-
 import io.sugo.pio.engine.data.input.{BatchEventHose, PropertyHose}
-import io.sugo.pio.engine.search.data.SearchTrainingData
-import org.apache.spark.api.java.JavaSparkContext
 import io.sugo.pio.engine.search.Constants
-import io.sugo.pio.engine.search.param.SearchDatasourceParams
+import io.sugo.pio.engine.search.data.SearchTrainingData
 import io.sugo.pio.engine.training.DataSource
+import org.apache.spark.api.java.JavaSparkContext
 
 import scala.collection.JavaConverters._
 
