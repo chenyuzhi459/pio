@@ -278,7 +278,8 @@ public class Initialization {
                 new DerbyMetadataStoragePioModule(),
                 new ProcessPioModule(),
                 new ProcessingPioModule(),
-                new JacksonConfigManagerModule()
+                new JacksonConfigManagerModule(),
+                new SparkConfigModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);

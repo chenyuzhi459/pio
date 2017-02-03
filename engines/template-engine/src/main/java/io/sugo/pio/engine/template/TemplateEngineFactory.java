@@ -1,6 +1,7 @@
 package io.sugo.pio.engine.template;
 
 import io.sugo.pio.engine.data.input.BatchEventHose;
+import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.template.data.TemplateModelData;
 import io.sugo.pio.engine.template.engine.TemplateAlgorithm;
 import io.sugo.pio.engine.template.engine.TemplateModel;
@@ -13,10 +14,12 @@ import io.sugo.pio.engine.training.*;
 /**
  */
 public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData, TemplatePreparedData, TemplateModelData> {
-    private BatchEventHose eventHose;
+    private final BatchEventHose eventHose;
+    private final Repository repository;
 
-    public TemplateEngineFactory(BatchEventHose eventHose) {
+    public TemplateEngineFactory(BatchEventHose eventHose, Repository repository) {
         this.eventHose = eventHose;
+        this.repository = repository;
     }
 
     @Override
@@ -36,6 +39,6 @@ public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData
 
     @Override
     public Model<TemplateModelData> createModel() {
-        return new TemplateModel();
+        return new TemplateModel(repository);
     }
 }

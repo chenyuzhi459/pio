@@ -9,8 +9,9 @@ import io.sugo.pio.engine.training.Model
 import org.apache.lucene.document._
 
 
-class PopularModel extends Model[PopularModelData] {
-  override def save(md: PopularModelData, repository: Repository): Unit = {
+class PopularModel(val repository: Repository) extends Model[PopularModelData] {
+
+  override def save(md: PopularModelData): Unit = {
     val resItem = md.itemPopular
     resItem.coalesce(1).foreachPartition(iter => {
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository))

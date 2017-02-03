@@ -2,6 +2,7 @@ package io.sugo.pio.engine.detail;
 
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
+import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.detail.data.DetailModelData;
 import io.sugo.pio.engine.detail.data.DetailPreparedData;
 import io.sugo.pio.engine.detail.data.DetailTrainingData;
@@ -15,9 +16,11 @@ import io.sugo.pio.engine.training.*;
  */
 public class DetailEngineFactory implements EngineFactory<DetailTrainingData, DetailPreparedData, DetailModelData> {
     private final BatchEventHose batchEventHose;
+    private final Repository repository;
 
-    public DetailEngineFactory(BatchEventHose batchEventHose) {
+    public DetailEngineFactory(BatchEventHose batchEventHose, Repository repository) {
         this.batchEventHose = batchEventHose;
+        this.repository = repository;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class DetailEngineFactory implements EngineFactory<DetailTrainingData, De
 
     @Override
     public Model<DetailModelData> createModel() {
-        return new DetailModel();
+        return new DetailModel(repository);
     }
 }
 

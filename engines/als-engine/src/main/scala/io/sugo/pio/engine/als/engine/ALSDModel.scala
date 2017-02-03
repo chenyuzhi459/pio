@@ -9,9 +9,9 @@ import io.sugo.pio.engine.als.data.ALSModelData
 import io.sugo.pio.engine.data.output.Repository
 import io.sugo.pio.engine.training.Model
 
-class ALSDModel extends Model[ALSModelData] with Serializable {
+class ALSDModel(val repository: Repository) extends Model[ALSModelData] with Serializable {
 
-  override def save(md: ALSModelData, repository: Repository): Unit = {
+  override def save(md: ALSModelData): Unit = {
     val modelData = md.model
     modelData.coalesce(1).foreachPartition(iter => {
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository))

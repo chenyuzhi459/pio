@@ -11,8 +11,14 @@ import java.io.*;
 public class TemplateModel implements Model<TemplateModelData> {
     private final String filename = "model";
 
+    private Repository repository;
+
+    public TemplateModel(Repository repository) {
+        this.repository = repository;
+    }
+
     @Override
-    public void save(TemplateModelData templateModelData, Repository repository) {
+    public void save(TemplateModelData templateModelData) {
             OutputStream outputStream = repository.openOutput(filename);
         try {
             ObjectOutputStream objectWriter = new ObjectOutputStream(outputStream);

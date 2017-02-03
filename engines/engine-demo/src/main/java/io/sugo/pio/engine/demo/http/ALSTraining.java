@@ -26,7 +26,8 @@ public class ALSTraining extends AbstractTraining {
     protected void doTrain(JavaSparkContext sc) throws IOException {
         FileUtils.deleteDirectory(new File(ALSResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
-        ALSEngineFactory engineFactory = new ALSEngineFactory(eventHose);
+        Repository repository = new LocalFileRepository(ALSResource.REPOSITORY_PATH);
+        ALSEngineFactory engineFactory = new ALSEngineFactory(eventHose, repository);
         Preparator<ALSTrainingData, ALSPreparedData> preparator = engineFactory.createPreparator();
         DataSource<ALSTrainingData> dataSource = engineFactory.createDatasource();
         ALSTrainingData trainingData = dataSource.readTraining(sc);
@@ -34,7 +35,6 @@ public class ALSTraining extends AbstractTraining {
         Algorithm<ALSPreparedData, ALSModelData> alg = engineFactory.createAlgorithm();
         ALSModelData modelData = alg.train(sc, preparedData);
         Model<ALSModelData> model = engineFactory.createModel();
-        Repository repository = new LocalFileRepository(ALSResource.REPOSITORY_PATH);
-        model.save(modelData, repository);
+        model.save(modelData);
     }
 }

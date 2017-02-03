@@ -26,7 +26,8 @@ public class UserHistoryTraining extends AbstractTraining{
         FileUtils.deleteDirectory(new File(UserHistoryResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
-        EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> engineFactory = new UserHistoryEngineFactory(propHose, eventHose);
+        Repository repository = new LocalFileRepository(UserHistoryResource.REPOSITORY_PATH);
+        EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> engineFactory = new UserHistoryEngineFactory(propHose, eventHose, repository);
         Preparator<UserHistoryTrainingData, UserHistoryPreparaData> preparator = engineFactory.createPreparator();
         DataSource<UserHistoryTrainingData> dataSource = engineFactory.createDatasource();
         UserHistoryTrainingData trainingData = dataSource.readTraining(sc);
@@ -34,7 +35,6 @@ public class UserHistoryTraining extends AbstractTraining{
         Algorithm<UserHistoryPreparaData, UserHistoryModelData> alg = engineFactory.createAlgorithm();
         UserHistoryModelData modelData = alg.train(sc, preparedData);
         Model<UserHistoryModelData> model = engineFactory.createModel();
-        Repository repository = new LocalFileRepository(UserHistoryResource.REPOSITORY_PATH);
-        model.save(modelData, repository);
+        model.save(modelData);
     }
 }

@@ -37,7 +37,8 @@ public class DetailTraining extends AbstractTraining {
     protected void doTrain(JavaSparkContext sc) throws IOException {
         FileUtils.deleteDirectory(new File(DetailResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
-        DetailEngineFactory engineFactory = new DetailEngineFactory(eventHose);
+        Repository repository = new LocalFileRepository(DetailResource.REPOSITORY_PATH);
+        DetailEngineFactory engineFactory = new DetailEngineFactory(eventHose, repository);
         Preparator<DetailTrainingData, DetailPreparedData> preparator = engineFactory.createPreparator();
         DataSource<DetailTrainingData> dataSource = engineFactory.createDatasource();
         DetailTrainingData trainingData = dataSource.readTraining(sc);
@@ -45,7 +46,6 @@ public class DetailTraining extends AbstractTraining {
         Algorithm<DetailPreparedData, DetailModelData> alg = engineFactory.createAlgorithm();
         DetailModelData modelData = alg.train(sc, preparedData);
         Model<DetailModelData> model = engineFactory.createModel();
-        Repository repository = new LocalFileRepository(DetailResource.REPOSITORY_PATH);
-        model.save(modelData, repository);
+        model.save(modelData);
     }
 }

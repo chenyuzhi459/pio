@@ -1,15 +1,16 @@
 package io.sugo.pio.worker;
 
+import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 import io.sugo.pio.initialization.TaskZkConfig;
 
 import java.util.Arrays;
 
-import static org.apache.hadoop.yarn.util.StringHelper.JOINER;
-
 /**
  */
 public class WorkerCuratorCoordinator {
+    private static final Joiner JOINER = Joiner.on("/");
+
     private final String baseAnnouncementsPath;
     private final String baseTaskPath;
     private final String baseStatusPath;

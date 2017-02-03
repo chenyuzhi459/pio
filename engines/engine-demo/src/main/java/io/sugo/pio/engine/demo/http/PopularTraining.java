@@ -26,7 +26,8 @@ public class PopularTraining extends AbstractTraining {
         FileUtils.deleteDirectory(new File(PopluarResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
-        EngineFactory<PopularTrainingData, PopularPreparaData, PopularModelData> engineFactory = new PopularEngineFactory(propHose, eventHose);
+        Repository repository = new LocalFileRepository(PopluarResource.REPOSITORY_PATH);
+        EngineFactory<PopularTrainingData, PopularPreparaData, PopularModelData> engineFactory = new PopularEngineFactory(propHose, eventHose, repository);
         Preparator<PopularTrainingData, PopularPreparaData> preparator = engineFactory.createPreparator();
         DataSource<PopularTrainingData> dataSource = engineFactory.createDatasource();
         PopularTrainingData trainingData = dataSource.readTraining(sc);
@@ -34,7 +35,7 @@ public class PopularTraining extends AbstractTraining {
         Algorithm<PopularPreparaData, PopularModelData> alg = engineFactory.createAlgorithm();
         PopularModelData modelData = alg.train(sc, preparedData);
         Model<PopularModelData> model = engineFactory.createModel();
-        Repository repository = new LocalFileRepository(PopluarResource.REPOSITORY_PATH);
-        model.save(modelData, repository);
+
+        model.save(modelData);
     }
 }

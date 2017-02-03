@@ -12,8 +12,8 @@ import io.sugo.pio.engine.userHistory.{Constants, LucenceConstants}
 import io.sugo.pio.engine.userHistory.data.UserHistoryModelData
 
 
-class UserHistoryModel extends Model[UserHistoryModelData] {
-  override def save(md: UserHistoryModelData, repository: Repository): Unit = {
+class UserHistoryModel(val repository: Repository) extends Model[UserHistoryModelData] {
+  override def save(md: UserHistoryModelData): Unit = {
     val resItem = md.algData
     resItem.foreachPartition{ res =>
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository), null)

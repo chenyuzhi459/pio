@@ -2,6 +2,7 @@ package io.sugo.pio.engine.userHistory;
 
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
+import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.training.*;
 import io.sugo.pio.engine.userHistory.data.UserHistoryModelData;
 import io.sugo.pio.engine.userHistory.data.UserHistoryPreparaData;
@@ -16,11 +17,14 @@ import io.sugo.pio.engine.userHistory.engine.UserHistoryPreparator;
 public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
+    private final Repository repository;
 
     public UserHistoryEngineFactory(PropertyHose propertyHose,
-                                    BatchEventHose batchEventHose) {
+                                    BatchEventHose batchEventHose,
+                                    Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
+        this.repository = repository;
     }
 
     @Override
@@ -40,6 +44,6 @@ public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTraini
 
     @Override
     public Model<UserHistoryModelData> createModel() {
-        return new UserHistoryModel();
+        return new UserHistoryModel(repository);
     }
 }

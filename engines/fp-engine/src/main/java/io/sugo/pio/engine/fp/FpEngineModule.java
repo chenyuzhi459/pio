@@ -16,7 +16,7 @@ public class FpEngineModule implements EngineModule {
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
                 new SimpleModule(FpEngineModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(FpEngineFactory.class, "fp_factory"),
+                        .registerSubtypes(new NamedType(FPTrainingConfig.class, "fp_config"),
                                 new NamedType(FpQuery.class, "fp_query"),
                                 new NamedType(FpModelFactory.class, "fp_model")));
     }

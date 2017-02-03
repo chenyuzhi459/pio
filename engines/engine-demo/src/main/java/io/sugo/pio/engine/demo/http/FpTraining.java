@@ -27,7 +27,8 @@ public class FpTraining extends AbstractTraining{
         FileUtils.deleteDirectory(new File(FpResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
-        EngineFactory<FpTrainingData, FpPreparaData, FpModelData> engineFactory = new FpEngineFactory(propHose, eventHose);
+        Repository repository = new LocalFileRepository(FpResource.REPOSITORY_PATH);
+        EngineFactory<FpTrainingData, FpPreparaData, FpModelData> engineFactory = new FpEngineFactory(propHose, eventHose, repository);
         Preparator<FpTrainingData, FpPreparaData> preparator = engineFactory.createPreparator();
         DataSource<FpTrainingData> dataSource = engineFactory.createDatasource();
         FpTrainingData trainingData = dataSource.readTraining(sc);
@@ -35,8 +36,8 @@ public class FpTraining extends AbstractTraining{
         Algorithm<FpPreparaData, FpModelData> alg = engineFactory.createAlgorithm();
         FpModelData modelData = alg.train(sc, preparedData);
         Model<FpModelData> model = engineFactory.createModel();
-        Repository repository = new LocalFileRepository(FpResource.REPOSITORY_PATH);
-        model.save(modelData, repository);
+
+        model.save(modelData);
     }
 }
 

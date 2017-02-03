@@ -15,16 +15,13 @@ public class SparkConfig {
     private String sparkAssemblyJar = "hdfs://";
 
     @JsonProperty
-    private List<String> hadoopConfigFiles = new ArrayList<>();
-
-    @JsonProperty
     private String yarnQueue = "root.default";
 
     @JsonProperty
-    private String commonJarLocation;
+    private String intermediatePath;
 
     @JsonProperty
-    private String workDirectory = "hdfs://";
+    private String workingPath = "hdfs://";
 
     public String getSparkVersion() {
         return sparkVersion;
@@ -42,14 +39,6 @@ public class SparkConfig {
         this.sparkAssemblyJar = sparkAssemblyJar;
     }
 
-    public List<String> getHadoopConfigFiles() {
-        return hadoopConfigFiles;
-    }
-
-    public void setHadoopConfigFiles(List<String> hadoopConfigFiles) {
-        this.hadoopConfigFiles = hadoopConfigFiles;
-    }
-
     public String getYarnQueue() {
         return yarnQueue;
     }
@@ -58,19 +47,19 @@ public class SparkConfig {
         this.yarnQueue = yarnQueue;
     }
 
-    public String getCommonJarLocation() {
-        return commonJarLocation;
+    public String getWorkingPath() {
+        return workingPath;
     }
 
-    public void setCommonJarLocation(String commonJarLocation) {
-        this.commonJarLocation = commonJarLocation;
+    public void setWorkingPath(String workingPath) {
+        this.workingPath = workingPath;
     }
 
-    public String getWorkDirectory() {
-        return workDirectory;
+    public String getIntermediatePath() {
+        return intermediatePath;
     }
 
-    public void setWorkDirectory(String workDirectory) {
-        this.workDirectory = workDirectory;
+    public void setIntermediatePath(String intermediatePath) {
+        this.intermediatePath = intermediatePath;
     }
 }
