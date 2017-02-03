@@ -18,12 +18,11 @@ class SearchModel(val repository: Repository) extends Model[SearchModelData] {
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository), analyzer)
       res.foreach{ itemInf =>
         val doc = new Document
-        doc.add( new TextField(Constants.ITEM_ID, itemInf._1, Field.Store.YES))
+        doc.add( new StringField(Constants.ITEM_ID, itemInf._1, Field.Store.YES))
         doc.add( new TextField(Constants.ITEM_NAME, itemInf._2, Field.Store.YES))
         indexWriter.addDocument(doc)
       }
       indexWriter.close()
     }
-    println("save search model data is completed.")
   }
 }

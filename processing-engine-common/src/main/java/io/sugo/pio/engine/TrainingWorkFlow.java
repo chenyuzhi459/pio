@@ -31,11 +31,11 @@ public class TrainingWorkFlow {
             }
         }
 
-        if (args.length == 0) {
+        if (args.length <= 1) {
             System.exit(1);
         }
 
-        String trainingConfigStr = args[0];
+        String trainingConfigStr = args[1];
         TrainingConfig trainingConfig = mapper.readValue(trainingConfigStr, TrainingConfig.class);
         EngineFactory engineFactory = trainingConfig.getEngineFactory();
         DataSource dataSource = engineFactory.createDatasource();
