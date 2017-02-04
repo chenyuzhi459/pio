@@ -75,7 +75,6 @@ public class CliTrainer extends GuiceRunnable {
             jobUrls.addAll(nonHadoopURLs);
             jobUrls.addAll(extensionURLs);
             System.setProperty("pio.spark.internal.classpath", Joiner.on(File.pathSeparator).join(jobUrls));
-//
             SparkVersion sparkVersion = SparkVersion.getFromId(sparkConfig.getSparkVersion());
             SparkSubmissionHandler ssh = SparkSubmissionHandler.createSubmissionHandler(sparkVersion);
 
