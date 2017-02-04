@@ -23,8 +23,9 @@ import java.util.logging.Logger;
 })
 public abstract class Operator implements ParameterHandler, Serializable {
     private String name;
-    private int xPos;
-    private int yPos;
+    protected String fullName;
+    private Integer xPos;
+    private Integer yPos;
     /**
      * Parameters for this Operator.
      */
@@ -97,7 +98,18 @@ public abstract class Operator implements ParameterHandler, Serializable {
     }
 
     @JsonProperty
-    public abstract String getFullName();
+    public String getFullName() {
+        if (this.fullName == null) {
+            return getDefaultFullName();
+        }
+        return this.fullName;
+    }
+
+    public abstract String getDefaultFullName();
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
     @JsonProperty
     public abstract OperatorGroup getGroup();
@@ -106,20 +118,20 @@ public abstract class Operator implements ParameterHandler, Serializable {
     public abstract String getDescription();
 
     @JsonProperty
-    public int getxPos() {
+    public Integer getxPos() {
         return xPos;
     }
 
-    public void setxPos(int xPos) {
+    public void setxPos(Integer xPos) {
         this.xPos = xPos;
     }
 
     @JsonProperty
-    public int getyPos() {
+    public Integer getyPos() {
         return yPos;
     }
 
-    public void setyPos(int yPos) {
+    public void setyPos(Integer yPos) {
         this.yPos = yPos;
     }
 
@@ -184,11 +196,11 @@ public abstract class Operator implements ParameterHandler, Serializable {
 //        }
 //        return compatibilityLevel;
 //    }
-
     @JsonProperty
     public InputPorts getInputPorts() {
         return inputPorts;
     }
+
     @JsonProperty
     public OutputPorts getOutputPorts() {
         return outputPorts;

@@ -35,7 +35,7 @@ public class OperatorMapHelper {
                             Operator op = (Operator) o;
                             if (!operatorMap.containsKey(subType.getName())) {
                                 OperatorMeta meta = OperatorMeta.create(subType.getName())
-                                        .setFullName(op.getFullName())
+                                        .setFullName(op.getDefaultFullName())
                                         .setDescription(op.getDescription())
                                         .setType(subType)
                                         .setGroup(op.getGroup());

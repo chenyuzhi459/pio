@@ -23,7 +23,7 @@ public class ID3Learner extends AbstractTreeLearner {
     }
 
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return "ID3Learner";
     }
 

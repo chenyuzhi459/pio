@@ -18,7 +18,7 @@ public class SimpleNeuralNetwork extends AbstractDLModelLearner {
     }
 
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return SimpleNeuralNetwork.class.getSimpleName();
     }
 

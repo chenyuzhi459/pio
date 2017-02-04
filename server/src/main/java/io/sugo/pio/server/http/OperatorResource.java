@@ -155,4 +155,21 @@ public class OperatorResource {
             return Response.serverError().entity(e).build();
         }
     }
+
+    @POST
+    @Path("/update/{processId}/{operatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response updateOperator(
+            @PathParam("processId") final String processId,
+            @PathParam("operatorId") final String operatorId,
+            OperatorDto dto
+    ) {
+        try {
+            Operator operator = processManager.updateOperator(processId, operatorId, dto);
+            return Response.ok(operator).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e).build();
+        }
+    }
 }

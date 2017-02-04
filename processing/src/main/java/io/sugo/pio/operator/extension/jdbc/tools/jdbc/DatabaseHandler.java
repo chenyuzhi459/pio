@@ -8,6 +8,7 @@ import io.sugo.pio.example.AttributeRole;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.ProcessStoppedException;
@@ -940,13 +941,13 @@ public class DatabaseHandler implements AutoCloseable {
 //        ParameterTypeCategory type = new ParameterTypeCategory("database_system", "The used database system.", DatabaseService.getDBSystemNames(), 0);
 //        type.registerDependencyCondition(new EqualTypeCondition(handler, "define_connection", CONNECTION_MODES, true, new int[]{1}));
 //        types.add(type);
-        ParameterTypeString type2 = new ParameterTypeString("database_url", "The URL connection string for the database, e.g. \'jdbc:mysql://foo.bar:portnr/database\'", false);
+        ParameterTypeString type2 = new ParameterTypeString("database_url", I18N.getMessage("pio.DatabaseDataReader.connect.url"), false);
 //        type2.registerDependencyCondition(new EqualTypeCondition(handler, "define_connection", CONNECTION_MODES, true, new int[]{1}));
         types.add(type2);
-        type2 = new ParameterTypeString("username", "The database username.", false);
+        type2 = new ParameterTypeString("username", I18N.getMessage("pio.DatabaseDataReader.connect.username"), false);
 //        type2.registerDependencyCondition(new EqualTypeCondition(handler, "define_connection", CONNECTION_MODES, true, new int[]{1}));
         types.add(type2);
-        ParameterTypePassword type3 = new ParameterTypePassword("password", "The password for the database.");
+        ParameterTypePassword type3 = new ParameterTypePassword("password", I18N.getMessage("pio.DatabaseDataReader.connect.password"));
 //        type3.registerDependencyCondition(new EqualTypeCondition(handler, "define_connection", CONNECTION_MODES, true, new int[]{1}));
         types.add(type3);
 //        type2 = new ParameterTypeString("jndi_name", "JNDI name for a data source.");
@@ -961,7 +962,7 @@ public class DatabaseHandler implements AutoCloseable {
         if (!tableOnly) {
 //            type = new ParameterTypeCategory("define_query", "Specifies whether the database query should be defined directly, through a file or implicitely by a given table name.", QUERY_MODES, 0);
 //            types.add(type);
-            ParameterTypeSQLQuery type1 = new ParameterTypeSQLQuery("query", "An SQL query.");
+            ParameterTypeSQLQuery type1 = new ParameterTypeSQLQuery("query", I18N.getMessage("pio.DatabaseDataReader.query"));
 //            type1.registerDependencyCondition(new EqualTypeCondition(handler, "define_query", QUERY_MODES, true, new int[]{0}));
             types.add(type1);
 //            ParameterTypeFile type2 = new ParameterTypeFile("query_file", "A file containing an SQL query.", (String) null, true);

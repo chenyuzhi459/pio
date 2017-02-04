@@ -44,7 +44,7 @@ public class CliProcess extends ServerRunnable {
                         Jerseys.addResource(binder, ProcessResource.class);
                         Jerseys.addResource(binder, OperatorResource.class);
 
-                        binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
+                        binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
                     }
                 });

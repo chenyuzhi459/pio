@@ -33,7 +33,7 @@ public final class ProcessRootOperator extends OperatorChain {
 
     @JsonIgnore
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return null;
     }
 
@@ -50,12 +50,12 @@ public final class ProcessRootOperator extends OperatorChain {
     }
 
     @JsonIgnore
-    public int getxPos() {
+    public Integer getxPos() {
         return 0;
     }
 
     @JsonIgnore
-    public int getyPos() {
+    public Integer getyPos() {
         return 0;
     }
 

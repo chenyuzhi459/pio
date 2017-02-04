@@ -8,6 +8,7 @@ import io.sugo.pio.example.table.DataRow;
 import io.sugo.pio.example.table.DataRowFactory;
 import io.sugo.pio.example.util.ExampleSetBuilder;
 import io.sugo.pio.example.util.ExampleSets;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.extension.jdbc.tools.jdbc.DatabaseHandler;
 import io.sugo.pio.operator.extension.jdbc.tools.jdbc.StatementCreator;
@@ -110,7 +111,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
             }
 
             prepared1.close();
-        } catch (SQLException var16) {
+        } catch (SQLException sqlEx) {
+            throw new OperatorException(DatabaseDataReader.class.getSimpleName(), sqlEx);
 //                LogService.getRoot().log(Level.WARNING, I18N.getMessage(LogService.getRoot().getResourceBundle(), "io.sugo.pio.operator.io.DatabaseDataReader.fetching_meta_data_error", new Object[]{var16}), var16);
         } finally {
             try {
@@ -279,7 +281,6 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         } catch (OperatorException var3) {
             ;
         }
-
     }
 
     protected boolean isMetaDataCacheable() {
@@ -287,8 +288,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     }
 
     @Override
-    public String getFullName() {
-        return "DatabaseDataReader";
+    public String getDefaultFullName() {
+        return I18N.getMessage("pio.DatabaseDataReader.name");
     }
 
     @Override
@@ -298,7 +299,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 
     @Override
     public String getDescription() {
-        return "DatabaseDataReader";
+        return I18N.getMessage("pio.DatabaseDataReader.description");
     }
 
     public List<ParameterType> getParameterTypes() {

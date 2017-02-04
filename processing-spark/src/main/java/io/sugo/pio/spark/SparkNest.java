@@ -34,7 +34,7 @@ public class SparkNest extends OperatorChain {
     }
 
     @Override
-    public String getFullName() {
+    public String getDefaultFullName() {
         return "Spark Nest";
     }
 
