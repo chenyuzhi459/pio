@@ -10,7 +10,7 @@ import org.ansj.lucene5.AnsjAnalyzer
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.document._
 
-class SearchModel(val repository: Repository) extends Model[SearchModelData] {
+class SearchModel(val repository: Repository) extends Model[SearchModelData] with Serializable {
   override def save(md: SearchModelData): Unit = {
     val resItem = md.algData
     resItem.foreachPartition{ res =>

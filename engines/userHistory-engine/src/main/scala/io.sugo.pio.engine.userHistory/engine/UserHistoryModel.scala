@@ -12,7 +12,7 @@ import io.sugo.pio.engine.userHistory.{Constants, LucenceConstants}
 import io.sugo.pio.engine.userHistory.data.UserHistoryModelData
 
 
-class UserHistoryModel(val repository: Repository) extends Model[UserHistoryModelData] {
+class UserHistoryModel(val repository: Repository) extends Model[UserHistoryModelData] with Serializable {
   override def save(md: UserHistoryModelData): Unit = {
     val resItem = md.algData
     resItem.foreachPartition{ res =>
