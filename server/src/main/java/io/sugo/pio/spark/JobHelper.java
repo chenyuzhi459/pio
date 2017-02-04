@@ -56,7 +56,7 @@ public class JobHelper {
             )
             throws IOException
     {
-        String classpathProperty = System.getProperty("druid.hadoop.internal.classpath");
+        String classpathProperty = System.getProperty("pio.spark.internal.classpath");
         if (classpathProperty == null) {
             classpathProperty = System.getProperty("java.class.path");
         }

@@ -27,6 +27,10 @@
             <artifactId>pio-server</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-yarn_2.10</artifactId>
+        </dependency>
         <!--<dependency>-->
             <!--<groupId>io.airlift</groupId>-->
             <!--<artifactId>airline</artifactId>-->
