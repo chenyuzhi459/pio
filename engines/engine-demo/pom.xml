@@ -18,18 +18,48 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.sugo</groupId>
+            <groupId>io.sugo.pio.engines</groupId>
             <artifactId>popular-recommender-engine</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.sugo</groupId>
+            <groupId>io.sugo.pio.engines</groupId>
             <artifactId>als-engine</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.sugo</groupId>
+            <groupId>io.sugo.pio.engines</groupId>
             <artifactId>detail-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>fp-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>search-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>als-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>detail-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>ocb-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>userHistory-engine</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
@@ -57,36 +87,6 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-servlet</artifactId>
             <version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sugo</groupId>
-            <artifactId>fp-engine</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sugo</groupId>
-            <artifactId>search-engine</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sugo</groupId>
-            <artifactId>als-engine</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sugo</groupId>
-            <artifactId>detail-engine</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sugo</groupId>
-            <artifactId>ocb-engine</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sugo</groupId>
-            <artifactId>userHistory-engine</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 
