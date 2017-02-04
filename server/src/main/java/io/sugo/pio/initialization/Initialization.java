@@ -13,6 +13,7 @@ import com.metamx.common.ISE;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.curator.CuratorModule;
 import io.sugo.pio.curator.discovery.DiscoveryModule;
+import io.sugo.pio.engine.EngineExtensionModule;
 import io.sugo.pio.engine.EngineModule;
 import io.sugo.pio.guice.*;
 import io.sugo.pio.guice.annotations.Client;
@@ -103,7 +104,7 @@ public class Initialization {
      *
      * @return A collection that contains distinct extension modules
      */
-    public synchronized static <T> Collection<T> getFromEngines(EnginesConfig config, Class<T> clazz)
+    private synchronized static <T> Collection<T> getFromEngines(EnginesConfig config, Class<T> clazz)
     {
         final Set<T> retVal = Sets.newHashSet();
         final Set<String> loadedExtensionNames = Sets.newHashSet();
@@ -125,6 +126,63 @@ public class Initialization {
         }
 
         for (File extension : getEngineFilesToLoad(config)) {
+            log.info("Loading extension [%s] for class [%s]", extension.getName(), clazz.getName());
+            try {
+                final URLClassLoader loader = getClassLoaderForExtension(extension);
+                for (T module : ServiceLoader.load(clazz, loader)) {
+                    final String moduleName = module.getClass().getCanonicalName();
+                    if (moduleName == null) {
+                        log.warn(
+                                "Extension module [%s] was ignored because it doesn't have a canonical name, is it a local or anonymous class?",
+                                module.getClass().getName()
+                        );
+                    } else if (!loadedExtensionNames.contains(moduleName)) {
+                        log.info("Adding local file system extension module [%s] for class [%s]", moduleName, clazz.getName());
+                        loadedExtensionNames.add(moduleName);
+                        retVal.add(module);
+                    }
+                }
+            }
+            catch (Exception e) {
+                throw Throwables.propagate(e);
+            }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Look for extension modules for the given class from both classpath and extensions directory. A user should never
+     * put the same two extensions in classpath and extensions directory, if he/she does that, the one that is in the
+     * classpath will be loaded, the other will be ignored.
+     *
+     * @param config Engines configuration
+     * @param clazz  The class of extension module (e.g., DruidModule)
+     *
+     * @return A collection that contains distinct extension modules
+     */
+    private synchronized static <T> Collection<T> getFromEngineExtensions(EnginesConfig config, Class<T> clazz)
+    {
+        final Set<T> retVal = Sets.newHashSet();
+        final Set<String> loadedExtensionNames = Sets.newHashSet();
+
+        if (config.searchCurrentClassloader()) {
+            for (T module : ServiceLoader.load(clazz, Thread.currentThread().getContextClassLoader())) {
+                final String moduleName = module.getClass().getCanonicalName();
+                if (moduleName == null) {
+                    log.warn(
+                            "Extension module [%s] was ignored because it doesn't have a canonical name, is it a local or anonymous class?",
+                            module.getClass().getName()
+                    );
+                } else if (!loadedExtensionNames.contains(moduleName)) {
+                    log.info("Adding classpath extension module [%s] for class [%s]", moduleName, clazz.getName());
+                    loadedExtensionNames.add(moduleName);
+                    retVal.add(module);
+                }
+            }
+        }
+
+        for (File extension : getEngineExtensionFilesToLoad(config)) {
             log.info("Loading extension [%s] for class [%s]", extension.getName(), clazz.getName());
             try {
                 final URLClassLoader loader = getClassLoaderForExtension(extension);
@@ -208,7 +266,7 @@ public class Initialization {
      */
     public static File[] getEngineFilesToLoad(EnginesConfig config)
     {
-        final File rootExtensionsDir = new File(config.getDirectory());
+        final File rootExtensionsDir = new File(config.getEnginesDirectory());
         if (!rootExtensionsDir.exists() || !rootExtensionsDir.isDirectory()) {
             log.warn("Root extensions directory [%s] is not a directory!?", rootExtensionsDir);
             return new File[]{};
@@ -234,6 +292,30 @@ public class Initialization {
             }
         }
         return enginesToLoad == null ? new File[]{} : enginesToLoad;
+    }
+
+    /**
+     * Find all the extension files that should be loaded by druid.
+     * <p/>
+     * If user explicitly specifies druid.extensions.loadList, then it will look for those extensions under root
+     * extensions directory. If one of them is not found, druid will fail loudly.
+     * <p/>
+     * If user doesn't specify druid.extension.toLoad (or its value is empty), druid will load all the extensions
+     * under the root extensions directory.
+     *
+     * @param config ExtensionsConfig configured by druid.extensions.xxx
+     *
+     * @return an array of druid extension files that will be loaded by druid process
+     */
+    public static File[] getEngineExtensionFilesToLoad(EnginesConfig config)
+    {
+        final File rootExtensionsDir = new File(config.getExtensionsDirectory());
+        if (!rootExtensionsDir.exists() || !rootExtensionsDir.isDirectory()) {
+            log.warn("Root extensions directory [%s] is not a directory!?", rootExtensionsDir);
+            return new File[]{};
+        }
+        File[] extensionsToLoad = rootExtensionsDir.listFiles();
+        return extensionsToLoad == null ? new File[]{} : extensionsToLoad;
     }
 
     /**
@@ -278,8 +360,7 @@ public class Initialization {
                 new DerbyMetadataStoragePioModule(),
                 new ProcessPioModule(),
                 new ProcessingPioModule(),
-                new JacksonConfigManagerModule(),
-                new SparkConfigModule()
+                new JacksonConfigManagerModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);
@@ -298,6 +379,10 @@ public class Initialization {
 
         final EnginesConfig enginesConfig = baseInjector.getInstance(EnginesConfig.class);
         for (EngineModule module : getFromEngines(enginesConfig, EngineModule.class)) {
+            extensionModules.addModule(module);
+        }
+
+        for (EngineExtensionModule module : getFromEngineExtensions(enginesConfig, EngineExtensionModule.class)) {
             extensionModules.addModule(module);
         }
 

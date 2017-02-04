@@ -27,6 +27,14 @@
             <outputDirectory>engines</outputDirectory>
         </fileSet>
 
+        <fileSet>
+            <directory>${project.build.directory}/engine-extensions</directory>
+            <includes>
+                <include>*/*</include>
+            </includes>
+            <outputDirectory>engine-extensions</outputDirectory>
+        </fileSet>
+
         <!--<fileSet>-->
             <!--<directory>${project.build.directory}/hadoop-dependencies</directory>-->
             <!--<includes>-->

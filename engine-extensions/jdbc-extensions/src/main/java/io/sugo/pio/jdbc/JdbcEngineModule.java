@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import io.sugo.pio.engine.EngineExtensionModule;
-import io.sugo.pio.engine.EngineModule;
 
 import java.util.List;
 

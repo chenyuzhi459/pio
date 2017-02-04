@@ -9,7 +9,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.sugo.pio.extensions</groupId>
+    <groupId>io.sugo.pio.engine-extensions</groupId>
     <artifactId>hdfs-extensions</artifactId>
 
     <dependencies>
@@ -21,7 +21,6 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

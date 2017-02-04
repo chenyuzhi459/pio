@@ -10,13 +10,15 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
+    <groupId>io.sugo.pio.engine-extensions</groupId>
     <artifactId>jdbc-extensions</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>io.sugo</groupId>
-            <artifactId>engine-common</artifactId>
+            <artifactId>pio-processing-engine-common</artifactId>
             <version>${project.parent.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>

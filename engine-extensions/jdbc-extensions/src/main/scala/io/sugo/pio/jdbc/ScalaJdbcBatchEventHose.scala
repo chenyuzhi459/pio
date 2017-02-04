@@ -4,8 +4,6 @@ import java.sql.{DriverManager, ResultSet}
 
 import io.sugo.pio.engine.data.input.{BatchEventHose, Event}
 import org.apache.spark.api.java.{JavaRDD, JavaSparkContext}
-import org.joda.time.DateTime
-
 import scala.collection.JavaConverters._
 
 /**
@@ -26,7 +24,7 @@ class ScalaJdbcBatchEventHose(timeColumn: String, url: String, table: String, us
     resRDD
   }
 
-  def findMysql(sc: JavaSparkContext): JavaRDD[Event] = {
+  private def findMysql(sc: JavaSparkContext): JavaRDD[Event] = {
     val sqlRDD = new MysqlPagedJdbcRdd(
       sc,
       () => {
@@ -37,13 +35,13 @@ class ScalaJdbcBatchEventHose(timeColumn: String, url: String, table: String, us
       count - 1,
       par,
       (r: ResultSet) => {
-        new Event(DateTime.now().getMillis, pNames.asScala.map(name=> (name, r.getObject(name))).toMap.asJava)
+        new Event(System.currentTimeMillis, pNames.asScala.map(name=> (name, r.getObject(name))).toMap.asJava)
       }
-    );
+    )
     sqlRDD
   }
 
-  def findPostgres(sc: JavaSparkContext): JavaRDD[Event] = {
+  private def findPostgres(sc: JavaSparkContext): JavaRDD[Event] = {
     val sqlRDD = new PostgresPagedJdbcRdd(
       sc,
       () => {
@@ -54,7 +52,7 @@ class ScalaJdbcBatchEventHose(timeColumn: String, url: String, table: String, us
       count - 1,
       par,
       (r: ResultSet) => {
-        new Event(DateTime.now().getMillis, pNames.asScala.map(name=> (name, r.getObject(name))).toMap.asJava)
+        new Event(System.currentTimeMillis, pNames.asScala.map(name=> (name, r.getObject(name))).toMap.asJava)
       }
     );
     sqlRDD

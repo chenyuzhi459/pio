@@ -69,7 +69,8 @@
                                 <argument>-Dpio.extensions.directory=${project.build.directory}/extensions</argument>
                                 <argument>-Dpio.extensions.hadoopDependenciesDir=${project.build.directory}/hadoop-dependencies</argument>
                                 <argument>-Dpio.engines.loadList=[]</argument>
-                                <argument>-Dpio.engines.directory=${project.build.directory}/engines</argument>
+                                <argument>-Dpio.engines.enginesDirectory=${project.build.directory}/engines</argument>
+                                <argument>-Dpio.engines.extensionsDirectory=${project.build.directory}/engine-extensions</argument>
                                 <argument>io.sugo.pio.cli.Main</argument>
                                 <argument>tools</argument>
                                 <argument>pull-deps</argument>
@@ -96,6 +97,12 @@
                                 <argument>io.sugo.pio.engines:popular-recommender-engine</argument>
                                 <argument>-e</argument>
                                 <argument>io.sugo.pio.engines:search-engine</argument>
+                                <argument>-ee</argument>
+                                <argument>io.sugo.pio.engine-extensions:jdbc-extensions</argument>
+                                <argument>-ee</argument>
+                                <argument>io.sugo.pio.engine-extensions:druid-extensions</argument>
+                                <argument>-ee</argument>
+                                <argument>io.sugo.pio.engine-extensions:hdfs-extensions</argument>
                                 <argument>--no-default-hadoop</argument>
                                 <argument>-h</argument>
                                 <argument>org.apache.hadoop:hadoop-client:${hadoop.version}</argument>

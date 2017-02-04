@@ -9,7 +9,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.sugo.pio.extensions</groupId>
+    <groupId>io.sugo.pio.engine-extensions</groupId>
     <artifactId>druid-extensions</artifactId>
 
     <properties>
@@ -24,6 +24,10 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
             <version>${lucene.version}</version>
@@ -33,7 +37,6 @@
             <artifactId>httpclient</artifactId>
             <version>${httpclient.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>
