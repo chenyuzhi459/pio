@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
-import io.sugo.pio.engine.search.Constants;
-import io.sugo.pio.engine.search.SearchModelFactory;
-import io.sugo.pio.engine.search.SearchQuery;
-import io.sugo.pio.engine.search.SearchResult;
+import io.sugo.pio.engine.textSimilar.TextSimilarModelFactory;
+import io.sugo.pio.engine.textSimilar.TextSimilarQuery;
+import io.sugo.pio.engine.textSimilar.TextSimilarResult;
+import io.sugo.pio.engine.textSimilar.engine.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -16,13 +16,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  */
-@Path("query/itemSearch")
-public class SearchResource {
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/search";
+@Path("query/itemTextSimilar")
+public class TextSimilarResource {
+    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/textSimilar";
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -34,15 +36,13 @@ public class SearchResource {
     ) {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
-            SearchQuery query = jsonMapper.readValue(in, SearchQuery.class);
-            SearchModelFactory searchModelFactory = new SearchModelFactory();
+            TextSimilarQuery query = jsonMapper.readValue(in, TextSimilarQuery.class);
+            TextSimilarModelFactory TextSimilarModelFactory = new TextSimilarModelFactory();
             Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            SearchResult searchResult = searchModelFactory.loadModel(repository).predict(query);
-            List<String> itemIds = searchResult.getItems();
-            List<String> itemNames = searchResult.getNames();
+            TextSimilarResult TextSimilarResult = TextSimilarModelFactory.loadModel(repository).predict(query);
+            List<String> itemIds = TextSimilarResult.getItems();
             Map<String , List<String>> res = new HashMap<>();
             res.put(Constants.ITEM_ID(), itemIds);
-            res.put(Constants.ITEM_NAME(), itemNames);
 
             String str;
             if (!res.isEmpty()) {

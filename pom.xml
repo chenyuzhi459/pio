@@ -42,6 +42,7 @@
         <module>engines/search-engine</module>
         <module>engines/online-content-based-engine</module>
         <module>engines/userHistory-engine</module>
+        <module>engines/textSimilar-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>
     </modules>

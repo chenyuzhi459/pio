@@ -19,4 +19,9 @@ public class Constants {
     public static final String GRADE = "grade";
     public static final String CATEGORY = "category";
     public static final String TIMENUM = "timenum";
+
+    //htc
+    public static final String HTC_DATA_PATH = Constants.class.getClassLoader().getResource("htc/htcData.txt").getPath();
+    public static final String HTC_DATA_SEPERATOR = "::";
+    public static final String ITEM_CONTENT = "item_content";
 }

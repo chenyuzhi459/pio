@@ -62,6 +62,11 @@
             <artifactId>userHistory-engine</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>textSimilar-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
