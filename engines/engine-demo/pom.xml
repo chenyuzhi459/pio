@@ -88,6 +88,11 @@
             <artifactId>jersey-servlet</artifactId>
             <version>${jersey.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.10</artifactId>
+        </dependency>
+
     </dependencies>
 
 
