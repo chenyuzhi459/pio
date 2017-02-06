@@ -198,7 +198,6 @@ public class ProcessManager {
                 processCache.invalidate(id);
                 return null;
             }
-            process.getRootOperator().getExecutionUnit().transformMetaData();
             return process;
         } catch (ExecutionException e) {
             log.error(e, "get process %s error", id);

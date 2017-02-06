@@ -127,7 +127,11 @@ public class OperatorProcess {
         this.connections.addAll(connections);
         if (connections != null && !connections.isEmpty()) {
             for (Connection connection : connections) {
-                connect(connection, false);
+                try {
+                    connect(connection, false);
+                } catch (IAE iae) {
+
+                }
             }
             try {
                 rootOperator.getExecutionUnit().transformMetaData();
@@ -247,6 +251,13 @@ public class OperatorProcess {
         if (operator != null) {
             operator.remove();
         }
+        List<Connection> toDel = new ArrayList<>();
+        for (Connection conn : connections) {
+            if (conn.getFromOperator().equals(operatorId) || conn.getToOperator().equals(operatorId)) {
+                toDel.add(conn);
+            }
+        }
+        connections.removeAll(toDel);
     }
 
     public void connect(Connection dto, boolean add) {

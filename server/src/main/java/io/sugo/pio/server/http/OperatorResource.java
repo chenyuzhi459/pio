@@ -47,7 +47,7 @@ public class OperatorResource {
         try {
             return Response.ok(processManager.getOperatorMetaJson()).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -65,7 +65,7 @@ public class OperatorResource {
             OperatorProcess process = processManager.addOperator(processId, dto);
             return Response.ok(process).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -80,7 +80,7 @@ public class OperatorResource {
             Operator operator = processManager.getOperator(processId, operatorId);
             return Response.ok(operator).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -96,7 +96,7 @@ public class OperatorResource {
             OperatorProcess process = processManager.deleteOperator(processId, operatorId);
             return Response.ok(process).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -113,7 +113,7 @@ public class OperatorResource {
             OperatorProcess process = processManager.connect(processId, dto);
             return Response.ok(process).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -130,7 +130,7 @@ public class OperatorResource {
             OperatorProcess process = processManager.disconnect(processId, dto);
             return Response.ok(process).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -152,7 +152,7 @@ public class OperatorResource {
             Operator operator = processManager.updateParameter(processId, operatorId, key, value);
             return Response.ok(operator).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -169,7 +169,7 @@ public class OperatorResource {
             Operator operator = processManager.updateOperator(processId, operatorId, dto);
             return Response.ok(operator).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 }

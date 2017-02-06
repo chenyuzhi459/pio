@@ -2,90 +2,89 @@
     <title>Home</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="css/demo.css" rel="stylesheet" type="text/css" media="all"/>
     <script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
     <script type="text/javascript" src="js/jquery.json.min.js"></script>
     <script type="text/javascript" src="js/demo.js"></script>
-    <style>
-        div {
-            margin: 2px 5px 2px 2px;
-            padding: 2px 2px 2px 2px;
-        }
-		.section {
-		    margin: 10px 10px 10px 10px;
-			overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
-		}
-		#wrap
-        {
-            overflow: hidden;
-            <!--width: 1560px;-->
-            margin: 0 auto;
-        }
-        #left, #center, #right
-        {
-            border: 1px solid;
-            margin: 10px 10px 10px 10px;
-        }
-        #left
-        {
-            float: left;
-            width: 500px;
-        }
-        #center
-        {
-            float: left;
-        }
-        #right
-        {
-            float: left;
-            width: 500px;
-        }
-
-    </style>
 </head>
 <body>
 <div id="app">
     <div class="main">
         <div class="wrap">
             <div class="content">
-                <div class="content_bottom">
-                    <div id="wrap">
-                        <div id="left">
-                            <button id="allOperatorBtn">所有算子</button>：
-                            <div id="allOperatorsDiv" style="margin-left: 10px">
-                                <textarea id="allOperators" rows="20" cols="65"></textarea>
-                            </div>
-                        </div>
-                        <div id="center">
-                            <button id="allProcessBtn">所有项目</button>：
-                            <select id="processSelect"></select>
-                            <br/>
-                            <div id="allProcessDiv" style="margin-left: 10px; width: 620px;">
-                                <textarea id="allProcess" rows="20" cols="85"></textarea>
-                            </div>
-                            <select id="operatorSelect"></select>
-                            <br/>
-                            <div id="operatorDiv" style="margin-left: 10px; width: 620px;">
-                                <textarea id="operatorJson" rows="20" cols="85" style="display:hidden;"></textarea>
-                            </div>
-
-                            <br/>
-                        </div>
-                        <div id="right">
-                            <div style="border:1px solid;">
-                                项目<div id="processId"></div>
-                                <div>项目名称：<input id="processName" style="width:400px"></div>
-                                <div>项目描述：<input id="processDesc" style="width:400px"></div>
-                                <button id="processCreateBtn">创建</button>
-                                <button id="processUpdateBtn">修改</button>
-                            </div>
-                            <div style="border:1px solid;">
-                                <div>创建项目</div>
-                            </div>
+                <div class="section group">
+                    <table id="operatorTable">
+                        <caption>算子类型</caption>
+                        <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>中文名</th>
+                            <th>描述</th>
+                            <th>类型</th>
+                            <th>操作</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="container">
+                    <div class="left">
+                        <table id="processTable">
+                            <caption>项目列表</caption>
+                            <thead>
+                            <tr>
+                                <th style="width:180px;">项目编号</th>
+                                <th>项目名称</th>
+                                <th>描述</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="center">
+                        <table id="processOperatorTable">
+                            <caption>算子列表</caption>
+                            <thead>
+                            <tr>
+                                <th style="width:300px;">名称</th>
+                                <th>中文名</th>
+                                <th>描述</th>
+                                <th>类型</th>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <table id="connectionTable">
+                            <caption>连线</caption>
+                            <thead>
+                            <tr>
+                                <th style="width:180px;">起始算子</th>
+                                <th>起始端口</th>
+                                <th style="width:180px;">目的算子</th>
+                                <th>目的端口</th>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <div style="margin-left: 10px; width: 620px;">
+                            <textarea id="processJson" rows="20" cols="85"></textarea>
                         </div>
                     </div>
-                </div>
-                <div class="section group">
-
+                    <div class="right">
+                        <div style="border:1px solid; overflow:hidden;">
+                            项目
+                            <div id="processId"></div>
+                            <div>项目名称：<input id="processName" style="width:250px"></div>
+                            <div>项目描述：<input id="processDesc" style="width:250px"></div>
+                            <button id="processCreateBtn">创建</button>
+                            <button id="processUpdateBtn">修改</button>
+                        </div>
+                        <div style="border:1px solid;">
+                            <div>创建项目</div>
+                        </div>
+                    </div>
 
                 </div>
             </div>
