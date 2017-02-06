@@ -303,7 +303,6 @@
                                 for (let m = 0; m < data.item_id.length; m++) {
                                      that.cacheItems.push(data.item_id[m])
                                 }
-                                console.log(that.cacheItems)
                                 $.ajax({
 										url: '/pio/query/click/request',
 										beforeSend(req) {

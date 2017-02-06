@@ -21,15 +21,19 @@
 
         <!--extensions-->
         <module>extensions-core/dl4j-extensions</module>
-        <module>extensions-core/druid-extensions</module>
-        <module>extensions-core/hdfs-extensions</module>
+
         <module>extensions-core/mysql-metadata-storage</module>
         <module>extensions-core/postgresql-metadata-storage</module>
 
         <!--engines-->
         <module>engines/engine-common</module>
         <module>engines/engine-demo</module>
-        <module>engines/jdbc-extensions</module>
+
+        <!--engine-extensions-->
+        <module>engine-extensions/hdfs-extensions</module>
+        <module>engine-extensions/druid-extensions</module>
+        <module>engine-extensions/jdbc-extensions</module>
+
         <module>engines/template-engine</module>
         <module>engines/popular-recommend-engine</module>
         <module>engines/detail-engine</module>
@@ -38,6 +42,7 @@
         <module>engines/search-engine</module>
         <module>engines/online-content-based-engine</module>
         <module>engines/userHistory-engine</module>
+        <module>engines/textSimilar-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>
     </modules>
@@ -330,6 +335,7 @@
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-core_2.10</artifactId>
                 <version>${spark.version}</version>
+                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
@@ -349,21 +355,25 @@
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-streaming_2.10</artifactId>
                 <version>${spark.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-sql_2.10</artifactId>
                 <version>${spark.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-mllib_2.10</artifactId>
                 <version>${spark.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-yarn_2.10</artifactId>
                 <version>${spark.version}</version>
+                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.hadoop</groupId>
@@ -387,17 +397,6 @@
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-client</artifactId>
                 <version>${hadoop.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-common</artifactId>
-                <version>${hadoop.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>

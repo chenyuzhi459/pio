@@ -1,12 +1,14 @@
 package io.sugo.pio.engine.fp.engine
 
+import java.util.Date
+
 import io.sugo.pio.engine.data.input.{BatchEventHose, PropertyHose}
 import io.sugo.pio.engine.fp.Constants
 import io.sugo.pio.engine.fp.data.FpTrainingData
 import io.sugo.pio.engine.training.DataSource
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.rdd.RDD
-import org.joda.time.DateTime
+
 import scala.collection.JavaConverters._
 
 class FpDatasource(propertyHose: PropertyHose, batchEventHose: BatchEventHose) extends DataSource[FpTrainingData]{
@@ -20,11 +22,11 @@ class FpDatasource(propertyHose: PropertyHose, batchEventHose: BatchEventHose) e
               val rate = actInf(Constants.GRADE).toString.toDouble
               val time = actInf(Constants.TIMENUM).toString.toLong
 
-              val dt = new DateTime(time)
+              val dt = new Date(time)
               val year = dt.getYear.toString
-              val month = dt.getMonthOfYear.toString
-              val day = dt.getDayOfMonth.toString
-              val hour = dt.getHourOfDay.toString
+              val month = dt.getMonth.toString
+              val day = dt.getDay.toString
+              val hour = dt.getHours.toString
               val session = year ++ month ++ day ++ hour
               if (rate >= minEffectRate){
                 (userId, itemId, session)

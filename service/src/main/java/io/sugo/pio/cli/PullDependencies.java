@@ -10,6 +10,7 @@ import com.metamx.common.StringUtils;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
+import io.sugo.pio.guice.EnginesConfig;
 import io.sugo.pio.guice.ExtensionsConfig;
 import io.tesla.aether.Repository;
 import io.tesla.aether.TeslaAether;
@@ -115,12 +116,29 @@ public class PullDependencies implements Runnable
   @Inject
   public ExtensionsConfig extensionsConfig;
 
+  @Inject
+  public EnginesConfig enginesConfig;
+
   @Option(
       name = {"-c", "--coordinate"},
       title = "coordinate",
-      description = "Extension coordinate to pull down, followed by a maven coordinate, e.g. io.druid.extensions:mysql-metadata-storage",
+      description = "Extension coordinate to pull down, followed by a maven coordinate, e.g. io.sugo.pio.extensions:mysql-metadata-storage",
       required = false)
   public List<String> coordinates = Lists.newArrayList();
+
+  @Option(
+          name = {"-e", "--engine-coordinate"},
+          title = "engine coordinate",
+          description = "Engine coordinate to pull down, followed by a maven coordinate, e.g. io.sugo.pio.engines:mysql-metadata-storage",
+          required = false)
+  public List<String> engineCoordinates = Lists.newArrayList();
+
+  @Option(
+          name = {"-ee", "--engine-extension-coordinate"},
+          title = "engine extension coordinate",
+          description = "Engine extension coordinate to pull down, followed by a maven coordinate, e.g. io.sugo.pio.engines:mysql-metadata-storage",
+          required = false)
+  public List<String> engineExtensionCoordinates = Lists.newArrayList();
 
   @Option(
       name = {"-h", "--hadoop-coordinate"},
@@ -185,11 +203,15 @@ public class PullDependencies implements Runnable
 
     final File extensionsDir = new File(extensionsConfig.getDirectory());
     final File hadoopDependenciesDir = new File(extensionsConfig.getHadoopDependenciesDir());
+    final File enginesDir = new File(enginesConfig.getEnginesDirectory());
+    final File engineExtensionsDir = new File(enginesConfig.getExtensionsDirectory());
 
     if (clean) {
       try {
         FileUtils.deleteDirectory(extensionsDir);
         FileUtils.deleteDirectory(hadoopDependenciesDir);
+        FileUtils.deleteDirectory(enginesDir);
+        FileUtils.deleteDirectory(engineExtensionsDir);
       }
       catch (IOException e) {
         log.error("Unable to clear extension directory at [%s]", extensionsConfig.getDirectory());
@@ -199,6 +221,8 @@ public class PullDependencies implements Runnable
 
     createRootExtensionsDirectory(extensionsDir);
     createRootExtensionsDirectory(hadoopDependenciesDir);
+    createRootExtensionsDirectory(enginesDir);
+    createRootExtensionsDirectory(engineExtensionsDir);
 
     log.info(
         "Start pull-deps with local repository [%s] and remote repositories [%s]",
@@ -217,6 +241,26 @@ public class PullDependencies implements Runnable
         downloadExtension(versionedArtifact, currExtensionDir);
       }
       log.info("Finish downloading dependencies for extension coordinates: [%s]", coordinates);
+
+      for (final String coordinate : engineCoordinates) {
+        final Artifact versionedArtifact = getArtifact(coordinate);
+
+        File currEngineDir = new File(enginesDir, versionedArtifact.getArtifactId());
+        createExtensionDirectory(coordinate, currEngineDir);
+
+        downloadExtension(versionedArtifact, currEngineDir);
+      }
+      log.info("Finish downloading dependencies for engine coordinates: [%s]", engineCoordinates);
+
+      for (final String coordinate : engineExtensionCoordinates) {
+        final Artifact versionedArtifact = getArtifact(coordinate);
+
+        File currEngineDir = new File(engineExtensionsDir, versionedArtifact.getArtifactId());
+        createExtensionDirectory(coordinate, currEngineDir);
+
+        downloadExtension(versionedArtifact, currEngineDir);
+      }
+      log.info("Finish downloading dependencies for engine extension coordinates: [%s]", engineExtensionCoordinates);
 
       if (!noDefaultHadoop && hadoopCoordinates.isEmpty()) {
         hadoopCoordinates.addAll(ImmutableList.of(

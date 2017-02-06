@@ -31,6 +31,8 @@ public class DemoServer {
         searchTraining.train();
         UserHistoryTraining userHistoryTraining = new UserHistoryTraining();
         userHistoryTraining.train();
+        TextSimilarTraining textSimilarTraining = new TextSimilarTraining();
+        textSimilarTraining.train();
     }
 
     private static void startServer() throws Exception {

@@ -4,7 +4,6 @@ import io.sugo.pio.engine.common.lucene.RepositoryDirectory;
 import io.sugo.pio.engine.common.lucene.SearchResult;
 import io.sugo.pio.engine.common.utils.LuceneUtils;
 import io.sugo.pio.engine.data.output.Repository;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -13,6 +12,7 @@ import org.apache.lucene.search.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +44,7 @@ public class QueryableModelData {
         }
 
         TopDocs topDocs = result.getTopDocs();
-        Map<String, List<String>> res = new HashedMap();
+        Map<String, List<String>> res = new HashMap<>();
         if (topDocs.totalHits == 0) {
             return res;
         }

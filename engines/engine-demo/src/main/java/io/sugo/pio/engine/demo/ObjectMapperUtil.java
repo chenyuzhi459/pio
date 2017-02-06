@@ -8,6 +8,7 @@ import io.sugo.pio.engine.detail.DetailEngineModule;
 import io.sugo.pio.engine.fp.FpEngineModule;
 import io.sugo.pio.engine.popular.PopEngineModule;
 import io.sugo.pio.engine.search.SearchEngineModule;
+import io.sugo.pio.engine.textSimilar.TextSimilarEngineModule;
 import io.sugo.pio.engine.userHistory.UserHistoryEngineModule;
 
 /**
@@ -46,6 +47,12 @@ public class ObjectMapperUtil {
         for(Module module: engineModule.getJacksonModules()) {
             jsonMapper.registerModule(module);
         }
+
+        engineModule = new TextSimilarEngineModule();
+        for(Module module: engineModule.getJacksonModules()) {
+            jsonMapper.registerModule(module);
+        }
+
     }
 
     public static ObjectMapper getObjectMapper() {

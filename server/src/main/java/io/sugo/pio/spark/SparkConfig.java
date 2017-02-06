@@ -18,7 +18,7 @@ public class SparkConfig {
     private String yarnQueue = "root.default";
 
     @JsonProperty
-    private String intermediatePath;
+    private String intermediatePath = "hdfs://";
 
     @JsonProperty
     private String workingPath = "hdfs://";

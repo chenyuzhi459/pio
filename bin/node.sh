@@ -3,17 +3,22 @@
 ## Initializtion script for druid nodes
 ## Runs druid nodes as a daemon and pipes logs to log/ directory
 
-usage="Usage: node.sh nodeType (start|stop)"
+usage="Usage: node.sh group nodeType (start|stop)"
 
-if [ $# -le 1 ]; then
+if [ $# -le 2 ]; then
   echo $usage
   exit 1
 fi
+
+cmdGroup=$1
+shift
 
 nodeType=$1
 shift
 
 startStop=$1
+shift
+
 pidDir=pids
 if [ ! -d "$pidDir" ]; then
     mkdir "$pidDir"
@@ -31,7 +36,7 @@ case $startStop in
       fi
     fi
 
-    nohup java `cat conf/jvm.config | xargs` -cp conf/:conf/$nodeType:lib/* io.sugo.pio.cli.Main server $nodeType &
+    nohup java `cat conf/jvm.config | xargs` -cp conf/:conf/$nodeType:lib/* io.sugo.pio.cli.Main $cmdGroup $nodeType $1 &
     nodeType_PID=$!
     echo $nodeType_PID > $pid
     echo "Started $nodeType node ($nodeType_PID)"

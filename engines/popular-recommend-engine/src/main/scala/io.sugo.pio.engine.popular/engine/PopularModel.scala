@@ -9,7 +9,7 @@ import io.sugo.pio.engine.training.Model
 import org.apache.lucene.document._
 
 
-class PopularModel(val repository: Repository) extends Model[PopularModelData] {
+class PopularModel(val repository: Repository) extends Model[PopularModelData] with Serializable {
 
   override def save(md: PopularModelData): Unit = {
     val resItem = md.itemPopular

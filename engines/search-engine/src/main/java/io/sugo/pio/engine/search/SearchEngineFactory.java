@@ -10,7 +10,6 @@ import io.sugo.pio.engine.search.engine.SearchAlgorithm;
 import io.sugo.pio.engine.search.engine.SearchDatasource;
 import io.sugo.pio.engine.search.engine.SearchModel;
 import io.sugo.pio.engine.search.engine.SearchPreparator;
-import io.sugo.pio.engine.search.param.SearchDatasourceParams;
 import io.sugo.pio.engine.training.*;
 
 /**

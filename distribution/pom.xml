@@ -42,11 +42,6 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.sugo</groupId>
-            <artifactId>pio-processing-spark</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.4.1</version>
@@ -73,6 +68,9 @@
                                 <argument>-Dpio.extensions.loadList=[]</argument>
                                 <argument>-Dpio.extensions.directory=${project.build.directory}/extensions</argument>
                                 <argument>-Dpio.extensions.hadoopDependenciesDir=${project.build.directory}/hadoop-dependencies</argument>
+                                <argument>-Dpio.engines.loadList=[]</argument>
+                                <argument>-Dpio.engines.enginesDirectory=${project.build.directory}/engines</argument>
+                                <argument>-Dpio.engines.extensionsDirectory=${project.build.directory}/engine-extensions</argument>
                                 <argument>io.sugo.pio.cli.Main</argument>
                                 <argument>tools</argument>
                                 <argument>pull-deps</argument>
@@ -82,8 +80,6 @@
                                 <argument>-l</argument>
                                 <argument>${settings.localRepository}</argument>
                                 <argument>-c</argument>
-                                <argument>io.sugo.pio.extensions:dl4j-extensions</argument>
-                                <argument>-c</argument>
                                 <argument>io.sugo.pio.extensions:druid-extensions</argument>
                                 <argument>-c</argument>
                                 <argument>io.sugo.pio.extensions:hdfs-extensions</argument>
@@ -91,6 +87,22 @@
                                 <argument>io.sugo.pio.extensions:mysql-metadata-storage</argument>
                                 <argument>-c</argument>
                                 <argument>io.sugo.pio.extensions:postgresql-metadata-storage</argument>
+                                <argument>-e</argument>
+                                <argument>io.sugo.pio.engines:als-engine</argument>
+                                <argument>-e</argument>
+                                <argument>io.sugo.pio.engines:detail-engine</argument>
+                                <argument>-e</argument>
+                                <argument>io.sugo.pio.engines:fp-engine</argument>
+                                <argument>-e</argument>
+                                <argument>io.sugo.pio.engines:popular-recommender-engine</argument>
+                                <argument>-e</argument>
+                                <argument>io.sugo.pio.engines:search-engine</argument>
+                                <argument>-ee</argument>
+                                <argument>io.sugo.pio.engine-extensions:jdbc-extensions</argument>
+                                <argument>-ee</argument>
+                                <argument>io.sugo.pio.engine-extensions:druid-extensions</argument>
+                                <argument>-ee</argument>
+                                <argument>io.sugo.pio.engine-extensions:hdfs-extensions</argument>
                                 <argument>--no-default-hadoop</argument>
                                 <argument>-h</argument>
                                 <argument>org.apache.hadoop:hadoop-client:${hadoop.version}</argument>

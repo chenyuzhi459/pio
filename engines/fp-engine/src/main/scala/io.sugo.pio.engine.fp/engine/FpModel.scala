@@ -10,7 +10,7 @@ import java.lang.{Float => jFloat}
 import io.sugo.pio.engine.data.output.Repository
 import io.sugo.pio.engine.training.Model
 
-class FpModel(val repository: Repository) extends Model[FpModelData] {
+class FpModel(val repository: Repository) extends Model[FpModelData] with Serializable {
   override def save(md: FpModelData): Unit = {
     val resItem = md.fpData
     resItem.coalesce(1).foreachPartition(iter => {
