@@ -18,15 +18,15 @@ import java.util.Map;
 @Path("query/movie")
 public class MovieInfoResource {
     @GET
-    @Path("/infoByTitle/{movieTitle}")
+    @Path("/infoByMovId/{movieId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getInfoByTitle(
+    public Response getInfoByMovId(
             InputStream in,
-            @PathParam("movieTitle") String title,
+            @PathParam("movieId") String movieId,
             @Context final HttpServletRequest req
     ) {
         try {
-            Map<String, Object> movieInfo = MovieInfoUtil.getMovieInfoByTitle(title);
+            Map<String, Object> movieInfo = MovieInfoUtil.getMovieInfoByMovId(movieId);
             String posterAddress = (String)movieInfo.get("Poster");
             String picName = "/movie_images/" + posterAddress.substring(posterAddress.lastIndexOf("/")+1);
             movieInfo.put("Poster", picName);
@@ -38,28 +38,6 @@ public class MovieInfoResource {
         } catch (Exception e) {
 
         }
-        return Response.status(Response.Status.ACCEPTED).entity("items not found, title="+ title).build();
-    }
-
-    @GET
-    @Path("/infoById/{imdbId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getInfoById(
-            InputStream in,
-            @PathParam("imdbId") String id,
-            @Context final HttpServletRequest req
-    ) {
-        try {
-            Map<String, Object> movieInfo = MovieInfoUtil.getMovieInfoById(id);
-            String posterAddress = (String)movieInfo.get("Poster");
-            String picName = "/movie_images/" + posterAddress.substring(posterAddress.lastIndexOf("/")+1);
-            movieInfo.put("Poster", picName);
-            ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
-            String str = jsonMapper.writeValueAsString(movieInfo);
-            return Response.status(Response.Status.ACCEPTED).entity(str).build();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Response.status(Response.Status.ACCEPTED).entity("items not found").build();
+        return Response.status(Response.Status.ACCEPTED).entity("items not found, title="+ movieId).build();
     }
 }

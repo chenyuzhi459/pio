@@ -242,14 +242,14 @@
                                 req.setRequestHeader('Content-Type', 'application/json')
                             },
                             data: JSON.stringify({
-                                'category': category, 'num': 12, 'type': 'pop_query'
+                                'category': category, 'num': 14, 'type': 'pop_query'
                             }),
                             dataType: 'json',
                             type: 'post',
                             success(data) {
 								var temp = []
                                 for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdb(data.item_id[m], data.item_name[m], temp)
+                                    that.queryOmdb(data.item_id[m], temp)
                                 }
                                 that.popItems = temp
                             }
@@ -275,7 +275,7 @@
                             success(data) {
                                 var temp = []
                                 for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdb(data.item_id[m], data.item_name[m], temp)
+                                    that.queryOmdb(data.item_id[m], temp)
                                 }
                                 that.customItems = temp
                             }
@@ -317,7 +317,7 @@
 											var temp = []
 											console.log(that.cacheItems)
 											for (let m = 0; m < data.item_id.length; m++) {
-												that.queryOmdb(data.item_id[m], data.item_name[m], temp)
+												that.queryOmdb(data.item_id[m], temp)
 											}
 											that.onlineItems = temp
 										}
@@ -327,9 +327,9 @@
                         })
                     },
 
-                    queryOmdb: function (id, title, temp) {
+                    queryOmdb: function (id, temp) {
                         $.ajax({
-                            url: '/pio/query/movie/infoByTitle/' + escape(title),
+                            url: '/pio/query/movie/infoByMovId/' + escape(id),
                             dataType: 'json',
                             type: 'get',
                             success(data) {

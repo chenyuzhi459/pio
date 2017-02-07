@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.EvictingQueue;
 import io.sugo.pio.engine.demo.Click;
-import io.sugo.pio.engine.demo.ItemUtil;
-import io.sugo.pio.engine.training.Algorithm;
 import io.sugo.pio.engine.demo.data.MovieItemFeature;
 import io.sugo.pio.engine.ocb.Similarity;
 
@@ -89,12 +87,6 @@ public class ClickResource {
             Map<String, List<String>> res = new HashMap<>();
             res.put("item_id", rankItems);
             if (!res.isEmpty()) {
-                List<String> filmIds = rankItems;
-                List<String> filmNames = new ArrayList<>(filmIds.size());
-                for (String id: filmIds) {
-                    filmNames.add(ItemUtil.getTitle(id));
-                }
-                res.put("item_name", filmNames);
                 str = jsonMapper.writeValueAsString(res);
             } else {
                 str = "items not found";

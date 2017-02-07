@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
-import io.sugo.pio.engine.demo.ItemUtil;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
 import io.sugo.pio.engine.userHistory.Constants;
 import io.sugo.pio.engine.userHistory.UserHistoryModelFactory;
@@ -72,12 +71,6 @@ public class UserHistoryResource {
             res.put(Constants.ITEM_ID(), lastItemIds);
             String str;
             if (!res.isEmpty()) {
-                List<String> filmIds = lastItemIds;
-                List<String> filmNames = new ArrayList<>(filmIds.size());
-                for (String id: filmIds) {
-                    filmNames.add(ItemUtil.getTitle(id));
-                }
-                res.put(ITEM_NAME, filmNames);
                 str = jsonMapper.writeValueAsString(res);
             } else {
                 str = "items not found";

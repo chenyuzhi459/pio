@@ -12,30 +12,24 @@ import java.util.Map;
 /**
  */
 public class MovieInfoUtil {
-    private static Map<String, Map<String, Object>> title2Info = new HashMap<>();
-    private static Map<String, Map<String, Object>> imdbId2Info = new HashMap<>();
+    private static Map<String, Map<String, Object>> movId2Info = new HashMap<>();
 
     static {
-        InputStream inputStream = ItemUtil.class.getClassLoader().getResourceAsStream("movieInf.txt");
+        InputStream inputStream = MovieInfoUtil.class.getClassLoader().getResourceAsStream("movieInf.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         ObjectMapper jsonMapper = new ObjectMapper();
         String line = null;
         try {
             while ((line = reader.readLine()) != null) {
                 Map<String, Object> movieInfo = jsonMapper.readValue(line, new HashMap<String, Object>().getClass());
-                title2Info.put((String)movieInfo.get("Title"), movieInfo);
-                imdbId2Info.put((String)movieInfo.get("imdbID"), movieInfo);
+                movId2Info.put((String)movieInfo.get("movid"), movieInfo);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Map<String, Object> getMovieInfoByTitle(String title) {
-        return title2Info.get(title);
-    }
-
-    public static Map<String, Object> getMovieInfoById(String title) {
-        return imdbId2Info.get(title);
+    public static Map<String, Object> getMovieInfoByMovId(String movId) {
+        return movId2Info.get(movId);
     }
 }
