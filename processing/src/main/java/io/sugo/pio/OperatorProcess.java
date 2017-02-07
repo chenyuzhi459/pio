@@ -105,6 +105,14 @@ public class OperatorProcess {
         this.updateTime = new DateTime();
     }
 
+    public void clearStatus(){
+        setStatus(Status.QUEUE);
+        Collection<Operator> operators = operatorNameMap.values();
+        for(Operator operator: operators){
+            operator.setStatus(Status.QUEUE);
+        }
+    }
+
     public void setCreateTime(DateTime createTime) {
         this.createTime = createTime;
     }

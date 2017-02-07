@@ -1,5 +1,6 @@
 package io.sugo.pio.ports.metadata;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.ProcessSetupError.Severity;
@@ -40,6 +41,11 @@ public class MetaData implements Serializable {
     public MetaData(Class<? extends IOObject> dataClass, Map<String, Object> keyValueMap) {
         this.dataClass = dataClass;
         this.keyValueMap.putAll(keyValueMap);
+    }
+
+    @JsonProperty
+    public String getObjectClassName(){
+        return dataClass.getName();
     }
 
     public Class<? extends IOObject> getObjectClass() {

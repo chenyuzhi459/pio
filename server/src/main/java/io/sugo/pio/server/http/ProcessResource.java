@@ -124,4 +124,15 @@ public class ProcessResource {
         }
     }
 
+    @GET
+    @Path("/result/{id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getResult(@PathParam("id") final String id) {
+        try {
+            OperatorProcess process = processManager.getResult(id);
+            return Response.ok(process).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
 }

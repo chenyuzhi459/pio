@@ -7,6 +7,7 @@ import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ProcessingPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
@@ -14,6 +15,7 @@ import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilte
 import io.sugo.pio.ports.Connection;
 import org.junit.Test;
 
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.*;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_NAME;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_TARGET_ROLE;
 import static io.sugo.pio.operator.preprocessing.filter.ExampleFilter.PARAMETER_FILTERS_LIST;
@@ -63,9 +65,23 @@ public class ProcessTest {
         role.setParameter(PARAMETER_TARGET_ROLE, "label");
         process.getRootOperator().getExecutionUnit().addOperator(role);
 
+        ParallelDecisionTreeLearner dt = new ParallelDecisionTreeLearner();
+        dt.setName("decision_tree");
+        dt.setParameter(PARAMETER_CRITERION, "gain_ratio");
+        dt.setParameter(PARAMETER_MAXIMAL_DEPTH, "20");
+        dt.setParameter(PARAMETER_PRUNING, "true");
+        dt.setParameter(PARAMETER_CONFIDENCE, "0.1");
+        dt.setParameter(PARAMETER_PRE_PRUNING, "true");
+        dt.setParameter(PARAMETER_MINIMAL_GAIN, "0.1");
+        dt.setParameter(PARAMETER_MINIMAL_LEAF_SIZE, "2");
+        dt.setParameter(PARAMETER_MINIMAL_SIZE_FOR_SPLIT, "4");
+        dt.setParameter(PARAMETER_NUMBER_OF_PREPRUNING_ALTERNATIVES, "3");
+        process.getRootOperator().getExecutionUnit().addOperator(dt);
+
         process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
         process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
         process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
+        process.connect(new Connection("change_role", "example set output", "decision_tree", "training set"), true);
 
         process.getRootOperator().getExecutionUnit().transformMetaData();
 
