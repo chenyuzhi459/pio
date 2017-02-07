@@ -271,7 +271,7 @@
                     queryOmdbById: function (imdbId) {
                         var that = this
                         $.ajax({
-                            url: 'http://www.omdbapi.com/?i=' + imdbId,
+                            url: '/pio/query/movie/infoById/' + imdbId,
                             dataType: 'json',
                             type: 'get',
                             success(data) {
@@ -282,7 +282,7 @@
 
                     queryOmdbByTitle: function (id, title, temp) {
                         $.ajax({
-                            url: 'http://www.omdbapi.com/?t=' + escape(title),
+                            url: '/pio/query/movie/infoByTitle/' + escape(title),
                             dataType: 'json',
                             type: 'get',
                             success(data) {

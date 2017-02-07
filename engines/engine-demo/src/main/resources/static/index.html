@@ -329,7 +329,7 @@
 
                     queryOmdb: function (id, title, temp) {
                         $.ajax({
-                            url: 'http://www.omdbapi.com/?t=' + escape(title),
+                            url: '/pio/query/movie/infoByTitle/' + escape(title),
                             dataType: 'json',
                             type: 'get',
                             success(data) {

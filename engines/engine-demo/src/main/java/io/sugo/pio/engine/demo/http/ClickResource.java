@@ -68,18 +68,23 @@ public class ClickResource {
             ClickQuery query = jsonMapper.readValue(in, ClickQuery.class);
             List<String> items = query.items;
             EvictingQueue<Click> clicks = clickMap.get(query.getUserId());
-            for(String itemQ:items) {
-                List<String> featureQ = itemFeature.getItemFeature(itemQ);
-                Double similarityValue = 0.0;
-                for (Click click : clicks) {
-                    String itemC = click.getItemId();
-                    List<String> featureC = itemFeature.getItemFeature(itemC);
-                    Double featureSimilarity =similarity.getSimilarity(featureQ,featureC);
-                    similarityValue += featureSimilarity;
+            List<String> rankItems;
+            if (null == clicks) {
+                rankItems = items;
+            } else {
+                for(String itemQ:items) {
+                    List<String> featureQ = itemFeature.getItemFeature(itemQ);
+                    Double similarityValue = 0.0;
+                    for (Click click : clicks) {
+                        String itemC = click.getItemId();
+                        List<String> featureC = itemFeature.getItemFeature(itemC);
+                        Double featureSimilarity =similarity.getSimilarity(featureQ,featureC);
+                        similarityValue += featureSimilarity;
+                    }
+                    similarityMap.put(similarityValue,itemQ);
                 }
-                similarityMap.put(similarityValue,itemQ);
+                rankItems = new ArrayList(similarityMap.values());
             }
-            List<String> rankItems=new ArrayList(similarityMap.values());
 
             Map<String, List<String>> res = new HashMap<>();
             res.put("item_id", rankItems);
