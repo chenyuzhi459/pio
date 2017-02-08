@@ -13,6 +13,8 @@ import java.util.ServiceLoader;
  */
 public class TrainingWorkFlow {
     public static void main(String[] args) throws IOException {
+        SparkConf sparkConf = new SparkConf();
+        JavaSparkContext sc = new JavaSparkContext(sparkConf);
         TrainingObjectMapper mapper = new TrainingObjectMapper();
         ServiceLoader<EngineModule> engineModules = ServiceLoader
                 .load(EngineModule.class);
@@ -31,19 +33,18 @@ public class TrainingWorkFlow {
             }
         }
 
-        if (args.length <= 1) {
+        if (args.length < 1) {
             System.exit(1);
         }
 
-        String trainingConfigStr = args[1];
+        String trainingConfigStr = args[0];
         TrainingConfig trainingConfig = mapper.readValue(trainingConfigStr, TrainingConfig.class);
         EngineFactory engineFactory = trainingConfig.getEngineFactory();
         DataSource dataSource = engineFactory.createDatasource();
         Preparator preparator = engineFactory.createPreparator();
         Model model = engineFactory.createModel();
         Algorithm alg = engineFactory.createAlgorithm();
-        SparkConf sparkConf = new SparkConf();
-        JavaSparkContext sc = new JavaSparkContext(sparkConf);
+
         Object trainingData = dataSource.readTraining(sc);
         Object preparedData = preparator.prepare(sc, trainingData);
         Object modelData = alg.train(sc, preparedData);

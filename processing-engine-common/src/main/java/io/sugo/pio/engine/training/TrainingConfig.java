@@ -10,9 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public abstract class TrainingConfig<EngineFactoryType extends EngineFactory> {
     private EngineFactoryType engineFactory;
 
-    @JsonCreator
     public TrainingConfig(
-            @JsonProperty EngineFactoryType engineFactory
+            EngineFactoryType engineFactory
     )
     {
         this.engineFactory = engineFactory;

@@ -39,6 +39,9 @@ public class ExtensionsConfig
   private String hadoopDependenciesDir = "hadoop-dependencies";
 
   @JsonProperty
+  private String sparkDependenciesDir = "spark-dependencies";
+
+  @JsonProperty
   private List<String> loadList;
 
   public boolean searchCurrentClassloader()
@@ -60,6 +63,10 @@ public class ExtensionsConfig
   public String getHadoopDependenciesDir()
   {
     return hadoopDependenciesDir;
+  }
+
+  public String getSparkDependenciesDir() {
+    return sparkDependenciesDir;
   }
 
   @Override

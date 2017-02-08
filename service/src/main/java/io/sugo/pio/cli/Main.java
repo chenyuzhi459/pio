@@ -43,7 +43,7 @@ public class Main {
         builder.withGroup("internal")
                 .withDescription("Processes that pio runs \"internally\", you should rarely use these directly")
                 .withDefaultCommand(Help.class)
-                .withCommands(CliPeon.class);
+                .withCommands(CliPeon.class, CliInternalTrainer.class);
 
         final Injector injector = GuiceInjectors.makeStartupInjector();
 //        final ExtensionsConfig config = injector.getInstance(ExtensionsConfig.class);

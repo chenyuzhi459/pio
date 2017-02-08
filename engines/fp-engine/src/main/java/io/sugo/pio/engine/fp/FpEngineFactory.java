@@ -22,9 +22,9 @@ public class FpEngineFactory implements EngineFactory<FpTrainingData, FpPreparaD
     private final Repository repository;
 
     @JsonCreator
-    public FpEngineFactory(@JsonProperty PropertyHose propertyHose,
-                           @JsonProperty BatchEventHose batchEventHose,
-                           @JsonProperty Repository repository) {
+    public FpEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
+                           @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                           @JsonProperty("repository") Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;

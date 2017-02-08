@@ -180,7 +180,7 @@ public class JobHelper {
                 }
             }
         }
-        additionalJarsList.add(hdfsPath.getName());
+        additionalJarsList.add(hdfsPath.toString());
     }
 
     static void uploadJar(File jarFile, final Path path, final FileSystem fs) throws IOException

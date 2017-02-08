@@ -34,6 +34,7 @@
 
     <properties>
         <hadoop.version>2.7.2</hadoop.version>
+        <spark.version>2.0.2</spark.version>
     </properties>
     <dependencies>
         <dependency>
@@ -68,6 +69,7 @@
                                 <argument>-Dpio.extensions.loadList=[]</argument>
                                 <argument>-Dpio.extensions.directory=${project.build.directory}/extensions</argument>
                                 <argument>-Dpio.extensions.hadoopDependenciesDir=${project.build.directory}/hadoop-dependencies</argument>
+                                <argument>-Dpio.extensions.sparkDependenciesDir=${project.build.directory}/spark-dependencies</argument>
                                 <argument>-Dpio.engines.loadList=[]</argument>
                                 <argument>-Dpio.engines.enginesDirectory=${project.build.directory}/engines</argument>
                                 <argument>-Dpio.engines.extensionsDirectory=${project.build.directory}/engine-extensions</argument>
@@ -79,10 +81,6 @@
                                 <argument>${project.parent.version}</argument>
                                 <argument>-l</argument>
                                 <argument>${settings.localRepository}</argument>
-                                <argument>-c</argument>
-                                <argument>io.sugo.pio.extensions:druid-extensions</argument>
-                                <argument>-c</argument>
-                                <argument>io.sugo.pio.extensions:hdfs-extensions</argument>
                                 <argument>-c</argument>
                                 <argument>io.sugo.pio.extensions:mysql-metadata-storage</argument>
                                 <argument>-c</argument>
@@ -106,6 +104,9 @@
                                 <argument>--no-default-hadoop</argument>
                                 <argument>-h</argument>
                                 <argument>org.apache.hadoop:hadoop-client:${hadoop.version}</argument>
+                                <argument>--no-default-spark</argument>
+                                <argument>-s</argument>
+                                <argument>org.apache.spark:spark-yarn_2.11:${spark.version}</argument>
                             </arguments>
                         </configuration>
                     </execution>
