@@ -113,6 +113,8 @@ function changeProcessShow(data){
             row.append($('<td></td>').text(item.status));
             $('#processOperatorTable').append(row);
             var column = $('<td></td>');
+            row.append(column);
+
             var view = $('<a href="javascript:void(0);">查看</a>');
             view.attr("operatorName", item.name);
             view.attr("processId", process.id);
@@ -123,7 +125,18 @@ function changeProcessShow(data){
                 changeOperator(processId, operatorName);
             });
             column.append(view);
-            row.append(column);
+
+            var result = $('<a href="javascript:void(0);">结果</a>');
+            result.attr("operatorName", item.name);
+            result.attr("processId", process.id);
+            result.click(function(obj){
+                var a = $(obj.target);
+                var processId = a.attr("processId");
+                var operatorName = a.attr("operatorName");
+                getOperatorResult(processId, operatorName);
+            });
+            column.append(result);
+
         });
     }
 
@@ -149,6 +162,19 @@ function changeOperator(processId, operatorName){
         }
     });
 }
+
+function getOperatorResult(processId, operatorName){
+    $.ajax({
+        url: hostUrl+"/pio/operator/result/" + processId + "/" + operatorName,
+        type: 'GET',
+        dataType:"json",
+        contentType: "application/json; charset=utf-8",
+        success: function(data){
+            $('#operatorJson').text(JSON.stringify(data, null, 4));
+        }
+    });
+}
+
 
 $('#operatorSelect').change(
     function(){

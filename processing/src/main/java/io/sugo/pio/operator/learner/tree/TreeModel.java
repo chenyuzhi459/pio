@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.learner.tree;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.ExampleSetUtilities;
@@ -18,6 +19,7 @@ public class TreeModel extends SimplePredictionModel {
 
 	private static final long serialVersionUID = 4368631725370998591L;
 
+	@JsonProperty
 	private Tree root;
 
 	public TreeModel(ExampleSet exampleSet, Tree root) {

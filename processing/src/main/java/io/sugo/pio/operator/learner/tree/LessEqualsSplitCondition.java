@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.learner.tree;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.tools.Ontology;
@@ -14,6 +15,7 @@ public class LessEqualsSplitCondition extends AbstractSplitCondition {
 
 	private static final long serialVersionUID = 6658964566718050949L;
 
+	@JsonProperty
 	private final double value;
 	private final int attValueType;
 

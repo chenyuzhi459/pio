@@ -676,4 +676,8 @@ public abstract class Operator implements ParameterHandler, Serializable {
             this.userData.put(key, data);
         }
     }
+
+    public IOContainer getResult(){
+        return new IOContainer(new ArrayList<>());
+    }
 }

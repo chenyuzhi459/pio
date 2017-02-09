@@ -43,6 +43,7 @@ public abstract class AbstractAttribute implements Attribute {
     private int tableIndex = Attribute.UNDEFINED_ATTRIBUTE_INDEX;
     private int valueType;
     private double defaultValue = 0.0;
+    private int blockType = Ontology.SINGLE_VALUE;
 
     // --------------------------------------------------------------------------------
 
@@ -141,6 +142,7 @@ public abstract class AbstractAttribute implements Attribute {
      */
     @Override
     public void setName(String v) {
+        this.constructionDescription = v;
     }
 
     /**
@@ -212,6 +214,10 @@ public abstract class AbstractAttribute implements Attribute {
         return valueType;
     }
 
+    public int getBlockType() {
+        return blockType;
+    }
+
     /**
      * Returns the attribute statistics.
      */
@@ -228,5 +234,20 @@ public abstract class AbstractAttribute implements Attribute {
     @Override
     public Annotations getAnnotations() {
         return annotations;
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer result = new StringBuffer();
+        result.append("#");
+        result.append(tableIndex);
+        result.append(": ");
+        result.append(getName());
+        result.append(" (");
+        result.append(Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(valueType));
+        result.append("/");
+        result.append(Ontology.ATTRIBUTE_BLOCK_TYPE.mapIndex(getBlockType()));
+        result.append(")");
+        return result.toString();
     }
 }

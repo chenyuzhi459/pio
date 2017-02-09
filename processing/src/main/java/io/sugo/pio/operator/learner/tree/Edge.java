@@ -1,5 +1,7 @@
 package io.sugo.pio.operator.learner.tree;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 
@@ -12,8 +14,10 @@ public class Edge implements Serializable, Comparable<Edge> {
 
 	private static final long serialVersionUID = -6470281011799533198L;
 
+	@JsonProperty
 	private SplitCondition condition;
 
+	@JsonProperty
 	private Tree child;
 
 	public Edge(Tree child, SplitCondition condition) {

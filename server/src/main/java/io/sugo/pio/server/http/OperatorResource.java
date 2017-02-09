@@ -172,4 +172,19 @@ public class OperatorResource {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
+
+    @GET
+    @Path("/result/{processId}/{operatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getResult(
+            @PathParam("processId") final String processId,
+            @PathParam("operatorId") final String operatorId
+    ) {
+        try {
+            Operator operator = processManager.getOperator(processId, operatorId);
+            return Response.ok(operator.getResult()).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
 }

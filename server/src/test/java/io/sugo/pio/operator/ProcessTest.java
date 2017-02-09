@@ -51,17 +51,17 @@ public class ProcessTest {
 
         AttributeFilter af = new AttributeFilter();
         af.setName("operator_attribute_filter");
-        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;education;is_default");
+        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
         process.getRootOperator().getExecutionUnit().addOperator(af);
 
         ExampleFilter ef = new ExampleFilter();
         ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:age.is_not_missing.;filters_entry_key:is_default.equals.Y");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         ChangeAttributeRole role = new ChangeAttributeRole();
         role.setName("change_role");
-        role.setParameter(PARAMETER_NAME,"is_default");
+        role.setParameter(PARAMETER_NAME, "is_default");
         role.setParameter(PARAMETER_TARGET_ROLE, "label");
         process.getRootOperator().getExecutionUnit().addOperator(role);
 
@@ -70,7 +70,7 @@ public class ProcessTest {
         dt.setParameter(PARAMETER_CRITERION, "gain_ratio");
         dt.setParameter(PARAMETER_MAXIMAL_DEPTH, "20");
         dt.setParameter(PARAMETER_PRUNING, "true");
-        dt.setParameter(PARAMETER_CONFIDENCE, "0.1");
+        dt.setParameter(PARAMETER_CONFIDENCE, "0.25");
         dt.setParameter(PARAMETER_PRE_PRUNING, "true");
         dt.setParameter(PARAMETER_MINIMAL_GAIN, "0.1");
         dt.setParameter(PARAMETER_MINIMAL_LEAF_SIZE, "2");
@@ -85,18 +85,27 @@ public class ProcessTest {
 
         process.getRootOperator().getExecutionUnit().transformMetaData();
 
-        System.out.println(
-                jsonMapper.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(af)
-        );
+//        System.out.println(
+//                jsonMapper.writerWithDefaultPrettyPrinter()
+//                        .writeValueAsString(af)
+//        );
 
 //        System.out.println(
 //                jsonMapper.writerWithDefaultPrettyPrinter()
 //                        .writeValueAsString(process)
 //        );
-//        IOContainer set = process.run();
-//        set = process.getRootOperator().getResults(true);
-//        System.out.println();
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+//
+//        System.out.println(
+//                jsonMapper.writerWithDefaultPrettyPrinter()
+//                        .writeValueAsString(role.getResult())
+//        );
+//        System.out.println(
+//                jsonMapper.writerWithDefaultPrettyPrinter()
+//                        .writeValueAsString(dt.getResult())
+//        );
+        System.out.println();
 //        System.out.println();
 //        System.out.println(
 //                jsonMapper.writerWithDefaultPrettyPrinter()
