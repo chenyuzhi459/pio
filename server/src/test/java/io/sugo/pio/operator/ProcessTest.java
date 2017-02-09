@@ -101,10 +101,10 @@ public class ProcessTest {
 //                jsonMapper.writerWithDefaultPrettyPrinter()
 //                        .writeValueAsString(role.getResult())
 //        );
-//        System.out.println(
-//                jsonMapper.writerWithDefaultPrettyPrinter()
-//                        .writeValueAsString(dt.getResult())
-//        );
+        System.out.println(
+                jsonMapper.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(dt.getResult())
+        );
         System.out.println();
 //        System.out.println();
 //        System.out.println(

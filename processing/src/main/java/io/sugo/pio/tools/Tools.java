@@ -69,6 +69,7 @@ public class Tools {
      * The line separator depending on the operating system.
      */
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private static final String WEB_LINE_SEPARATOR = "<br/>";
 
     /**
      * Number smaller than this value are considered as zero.
@@ -594,6 +595,10 @@ public class Tools {
      */
     public static String getLineSeparator() {
         return LINE_SEPARATOR;
+    }
+
+    public static String getWebLineSeparator() {
+        return WEB_LINE_SEPARATOR;
     }
 
     /**
