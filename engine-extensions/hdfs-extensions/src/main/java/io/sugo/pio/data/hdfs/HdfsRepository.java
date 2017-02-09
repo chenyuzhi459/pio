@@ -1,5 +1,7 @@
 package io.sugo.pio.data.hdfs;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.output.FSInputStream;
 import io.sugo.pio.engine.data.output.Repository;
 import org.apache.hadoop.conf.Configuration;
@@ -16,13 +18,18 @@ public class HdfsRepository implements Repository {
     private final String path;
     private final FileSystem fs;
 
-    public HdfsRepository(String path) {
+    public HdfsRepository(String path, Configuration configuration) {
         this.path = path;
         try {
-            this.fs = FileSystem.newInstance(new Configuration());
+            this.fs = FileSystem.newInstance(configuration);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @JsonCreator
+    public HdfsRepository(@JsonProperty("path") String path) {
+        this(path, new Configuration());
     }
 
     @Override

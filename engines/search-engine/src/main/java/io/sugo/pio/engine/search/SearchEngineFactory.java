@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.search;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
@@ -19,9 +21,10 @@ public class SearchEngineFactory implements EngineFactory<SearchTrainingData, Se
     private final PropertyHose propertyHose;
     private final Repository repository;
 
-    public SearchEngineFactory(PropertyHose propertyHose,
-                                BatchEventHose batchEventHose,
-                               Repository repository) {
+    @JsonCreator
+    public SearchEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
+                                @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                                @JsonProperty("repository") Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
@@ -45,5 +48,20 @@ public class SearchEngineFactory implements EngineFactory<SearchTrainingData, Se
     @Override
     public Model<SearchModelData> createModel() {
         return new SearchModel(repository);
+    }
+
+    @JsonProperty
+    public BatchEventHose getBatchEventHose() {
+        return batchEventHose;
+    }
+
+    @JsonProperty
+    public PropertyHose getPropertyHose() {
+        return propertyHose;
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 }

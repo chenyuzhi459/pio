@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.popular;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
@@ -19,9 +21,10 @@ public class PopularEngineFactory implements EngineFactory<PopularTrainingData, 
     private final PropertyHose propertyHose;
     private final Repository repository;
 
-    public PopularEngineFactory(PropertyHose propertyHose,
-                                BatchEventHose batchEventHose,
-                                Repository repository) {
+    @JsonCreator
+    public PopularEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
+                           @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                           @JsonProperty("repository") Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
@@ -45,5 +48,20 @@ public class PopularEngineFactory implements EngineFactory<PopularTrainingData, 
     @Override
     public Model<PopularModelData> createModel() {
         return new PopularModel(repository);
+    }
+
+    @JsonProperty
+    public BatchEventHose getBatchEventHose() {
+        return batchEventHose;
+    }
+
+    @JsonProperty
+    public PropertyHose getPropertyHose() {
+        return propertyHose;
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 }

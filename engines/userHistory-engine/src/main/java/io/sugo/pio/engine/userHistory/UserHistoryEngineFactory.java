@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.userHistory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
@@ -19,9 +21,11 @@ public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTraini
     private final PropertyHose propertyHose;
     private final Repository repository;
 
-    public UserHistoryEngineFactory(PropertyHose propertyHose,
-                                    BatchEventHose batchEventHose,
-                                    Repository repository) {
+
+    @JsonCreator
+    public UserHistoryEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
+                               @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                               @JsonProperty("repository") Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
@@ -45,5 +49,20 @@ public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTraini
     @Override
     public Model<UserHistoryModelData> createModel() {
         return new UserHistoryModel(repository);
+    }
+
+    @JsonProperty
+    public BatchEventHose getBatchEventHose() {
+        return batchEventHose;
+    }
+
+    @JsonProperty
+    public PropertyHose getPropertyHose() {
+        return propertyHose;
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 }
