@@ -1,7 +1,6 @@
 package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sugo.pio.engine.demo.ItemUtil;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
 import io.sugo.pio.engine.detail.*;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
@@ -45,12 +44,6 @@ public class DetailResource {
 
             String str;
             if (!res.isEmpty()) {
-                List<String> filmIds = res.get(Constants.RELATED_ITEM_ID());
-                List<String> filmNames = new ArrayList<>(filmIds.size());
-                for (String id: filmIds) {
-                    filmNames.add(ItemUtil.getTitle(id));
-                }
-                res.put(RELATED_ITEM_NAME, filmNames);
                 str = jsonMapper.writeValueAsString(res);
             } else {
                 str = "items not found";

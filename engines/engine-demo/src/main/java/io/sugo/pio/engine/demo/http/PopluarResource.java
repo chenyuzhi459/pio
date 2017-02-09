@@ -1,7 +1,6 @@
 package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sugo.pio.engine.demo.ItemUtil;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
 import io.sugo.pio.engine.popular.*;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
@@ -44,12 +43,6 @@ public class PopluarResource {
 
             String str;
             if (!res.isEmpty()) {
-                List<String> filmIds = res.get(Constants.ITEM_ID());
-                List<String> filmNames = new ArrayList<>(filmIds.size());
-                for (String id: filmIds) {
-                    filmNames.add(ItemUtil.getTitle(id));
-                }
-                res.put(ITEM_NAME, filmNames);
                 str = jsonMapper.writeValueAsString(res);
             } else {
                 str = "items not found";
@@ -60,6 +53,4 @@ public class PopluarResource {
         }
         return Response.status(Response.Status.ACCEPTED).entity("items not found").build();
     }
-
-
 }

@@ -1,13 +1,10 @@
 package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
-import io.sugo.pio.engine.demo.ItemUtil;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
 import io.sugo.pio.engine.fp.*;
-import org.apache.lucene.search.SortField;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -53,12 +50,6 @@ public class FpResource {
             }
             String str;
             if (lastRes != null) {
-                List<String> filmIds = lastRes.get(Constants.ITEMID());
-                List<String> filmNames = new ArrayList<>(filmIds.size());
-                for (String id: filmIds) {
-                    filmNames.add(ItemUtil.getTitle(id));
-                }
-                lastRes.put(ITEM_NAME, filmNames);
                 str = jsonMapper.writeValueAsString(lastRes);
             } else {
                 str = "items not found";

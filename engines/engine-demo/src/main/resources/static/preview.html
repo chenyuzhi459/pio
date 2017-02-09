@@ -221,7 +221,7 @@
                             success(data) {
                                 var temp = []
                                 for (let m = 0; m < data.related_item_id.length; m++) {
-                                    that.queryOmdbByTitle(data.related_item_id[m], data.related_item_name[m], temp)
+                                    that.queryOmdbByMovId(data.related_item_id[m], temp)
                                 }
                                 that.relatedFilms = temp
                             }
@@ -243,7 +243,7 @@
                             success(data) {
                                 var temp = []
                                 for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdbByTitle(data.item_id[m], data.item_name[m], temp)
+                                    that.queryOmdbByMovId(data.item_id[m], temp)
                                 }
                                 that.fpFilms = temp
                             }
@@ -271,7 +271,7 @@
                     queryOmdbById: function (imdbId) {
                         var that = this
                         $.ajax({
-                            url: 'http://www.omdbapi.com/?i=' + imdbId,
+                            url: '/pio/query/movie/infoById/' + imdbId,
                             dataType: 'json',
                             type: 'get',
                             success(data) {
@@ -280,9 +280,21 @@
                         })
                     },
 
-                    queryOmdbByTitle: function (id, title, temp) {
+                    getFilmData: function (id) {
+                        var that = this
                         $.ajax({
-                            url: 'http://www.omdbapi.com/?t=' + escape(title),
+                            url: '/pio/query/movie/infoByMovId/' + id,
+                            dataType: 'json',
+                            type: 'get',
+                            success(data) {
+                                that.filmData = data
+                            }
+                        })
+                    },
+
+                    queryOmdbByMovId: function (id, temp) {
+                        $.ajax({
+                            url: '/pio/query/movie/infoByMovId/' + escape(id),
                             dataType: 'json',
                             type: 'get',
                             success(data) {
@@ -294,7 +306,7 @@
                 }
             })
 
-			detailUR.queryOmdbById(qs("imdbId"))
+			detailUR.getFilmData(qs("id"))
             detailUR.queryRelated(qs("id"))
             detailUR.clickPost(qs("id"))
             detailUR.queryFp(qs("id"))
