@@ -152,21 +152,28 @@ public class Tree implements Serializable {
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
-		toString(null, this, "", buffer);
+		toString(null, this, "", buffer, Tools.getLineSeparator());
 		return buffer.toString();
 	}
 
-	private void toString(SplitCondition condition, Tree tree, String indent, StringBuffer buffer) {
+	public String toString(String separator) {
+		StringBuffer buffer = new StringBuffer();
+		toString(null, this, "", buffer, separator);
+		return buffer.toString();
+	}
+
+	private void toString(SplitCondition condition, Tree tree, String indent, StringBuffer buffer, String separator) {
 		if (condition != null) {
 			buffer.append(condition.toString());
 		}
 		if (!tree.isLeaf()) {
 			Iterator<Edge> childIterator = tree.childIterator();
 			while (childIterator.hasNext()) {
-				buffer.append(Tools.getLineSeparator());
+				buffer.append(separator);
+//				buffer.append(Tools.getWebLineSeparator());
 				buffer.append(indent);
 				Edge edge = childIterator.next();
-				toString(edge.getCondition(), edge.getChild(), indent + "|   ", buffer);
+				toString(edge.getCondition(), edge.getChild(), indent + "|   ", buffer, separator);
 			}
 		} else {
 			buffer.append(": ");
