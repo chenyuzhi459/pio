@@ -18,6 +18,7 @@
  */
 package io.sugo.pio.operator.learner.tree;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.tools.Tools;
 
@@ -37,8 +38,10 @@ public class Tree implements Serializable {
 
 	private static final long serialVersionUID = -5930873649086170840L;
 
+	@JsonProperty
 	private String label = null;
 
+	@JsonProperty
 	private List<Edge> children = new LinkedList<Edge>();
 
 	private Map<String, Integer> counterMap = new LinkedHashMap<String, Integer>();

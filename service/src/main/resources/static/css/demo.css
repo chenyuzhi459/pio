@@ -1,0 +1,60 @@
+div {
+    margin: 2px 5px 2px 2px;
+    padding: 2px 2px 2px 2px;
+}
+.section {
+    margin: 10px 10px 10px 10px;
+    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+.container
+{
+    overflow: hidden;
+}
+.left
+{
+    float: left;
+    border: 1px solid;
+    margin: 10px 10px 10px 10px;
+}
+.center
+{
+    float: left;
+    border: 1px solid;
+    margin: 10px 10px 10px 10px;
+}
+.right
+{
+    float: left;
+    border: 1px solid;
+    margin: 10px 10px 10px 10px;
+}
+
+table {
+    border-collapse: collapse;
+    font-family: Futura, Arial, sans-serif;
+}
+
+caption {
+    font-size: larger;
+    margin: 2px 2px 2px 2px;
+}
+
+th,td {
+     padding: 2px 5px 2px 5px;
+}
+
+th {
+    background: #555 no-repeat scroll 0 0;
+    border: 1px solid #777;
+    color: #fff;
+}
+
+td {
+    border: 1px solid#777;
+    word-break:break-all;
+    word-wrap:break-word;
+}
+
+tbody tr:nth-child(odd) {
+    background: #ccc;
+}

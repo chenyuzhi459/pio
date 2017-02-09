@@ -11,6 +11,9 @@ import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.ParameterService;
 import io.sugo.pio.tools.Tools;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A <tt>Learner</tt> is an operator that encapsulates the learning step of a machine learning
  * method. New learning schemes should extend this class to support the same parameters as other
@@ -26,6 +29,13 @@ public abstract class AbstractLearner extends Operator implements Learner {
             canEstimatePerformance());
     private final OutputPort weightsOutput = getOutputPorts().createPort("weights", canCalculateWeights());
     private final OutputPort exampleSetOutput = getOutputPorts().createPort("exampleSet");
+
+    @Override
+    public IOContainer getResult(){
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(modelOutput.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
+    }
 
     /** Creates a new abstract */
     public AbstractLearner() {

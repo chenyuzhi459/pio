@@ -7,7 +7,6 @@ import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeTypeException;
 import io.sugo.pio.parameter.ParameterTypeTuple;
-import io.sugo.pio.tools.I18N;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -857,32 +856,37 @@ public class CustomFilter implements Condition {
                 filterValue = substituteMacros(filterValue, macroHandler);
             }
             if (filter == null) {
-                throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
-                        "custom_filters.filter_not_found", filterSymbol));
+//                throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
+//                        "custom_filters.filter_not_found", filterSymbol));
+                throw new IllegalArgumentException("custom_filters.filter_not_found");
             }
             if (att == null) {
-                throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
-                        "custom_filters.attribute_not_found", attName));
+//                throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
+//                        "custom_filters.attribute_not_found", attName));
+                throw new IllegalArgumentException("custom_filters.attribute_not_found");
             }
 
             // special checks for numerical filters
             if (filter.isNumericalFilter()) {
                 // check if attribute is numerical
                 if (att.isNominal()) {
-                    throw new AttributeTypeException(I18N.getMessageOrNull(I18N.getErrorBundle(),
-                            "custom_filters.numerical_comparator_type_invalid", filter.getLabel(), att.getName()));
+//                    throw new AttributeTypeException(I18N.getMessageOrNull(I18N.getErrorBundle(),
+//                            "custom_filters.numerical_comparator_type_invalid", filter.getLabel(), att.getName()));
+                    throw new AttributeTypeException("custom_filters.numerical_comparator_type_invalid");
                 }
                 if (att.isDateTime()) {
                     // check if filter value works for date attribute
                     if (filterValue == null || "".equals(filterValue) || !isStringValidDoubleValue(filter, filterValue, att)) {
-                        throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
-                                "custom_filters.illegal_date_value", filterValue, att.getName()));
+//                        throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
+//                                "custom_filters.illegal_date_value", filterValue, att.getName()));
+                        throw new IllegalArgumentException("custom_filters.illegal_date_value");
                     }
                 } else if (att.isNumerical()) {
                     // check if filter value works for numerical attribute
                     if (filterValue == null || "".equals(filterValue) || !isStringValidDoubleValue(filter, filterValue, att)) {
-                        throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
-                                "custom_filters.illegal_numerical_value", filterValue, att.getName()));
+//                        throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
+//                                "custom_filters.illegal_numerical_value", filterValue, att.getName()));
+                        throw new IllegalArgumentException("custom_filters.illegal_numerical_value");
                     }
                 }
 
@@ -900,8 +904,9 @@ public class CustomFilter implements Condition {
                 conditionsOldDateFilter[counter] = yearString != null && yearString.length() == 2;
             } else if (filter.isNominalFilter()) {
                 if (!att.isNominal()) {
-                    throw new AttributeTypeException(I18N.getMessageOrNull(I18N.getErrorBundle(),
-                            "custom_filters.nominal_comparator_type_invalid", filter.getLabel(), att.getName()));
+//                    throw new AttributeTypeException(I18N.getMessageOrNull(I18N.getErrorBundle(),
+//                            "custom_filters.nominal_comparator_type_invalid", filter.getLabel(), att.getName()));
+                    throw new AttributeTypeException("custom_filters.nominal_comparator_type_invalid");
                 }
             }
 

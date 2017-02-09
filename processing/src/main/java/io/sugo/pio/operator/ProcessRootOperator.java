@@ -17,7 +17,7 @@ public final class ProcessRootOperator extends OperatorChain {
     /**
      * The property name for &quot;The default random seed (-1: random random seed).&quot;
      */
-    public static final String PROPERTY_RAPIDMINER_GENERAL_RANDOMSEED = "rapidminer.general.randomseed";
+    public static final String PROPERTY_PIO_GENERAL_RANDOMSEED = "pio.general.randomseed";
 
     public static final String PARAMETER_RANDOM_SEED = "random_seed";
     private OperatorProcess operatorProcess;
@@ -71,7 +71,7 @@ public final class ProcessRootOperator extends OperatorChain {
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
         int seed = 2001;
-        String seedProperty = ParameterService.getParameterValue(PROPERTY_RAPIDMINER_GENERAL_RANDOMSEED);
+        String seedProperty = ParameterService.getParameterValue(PROPERTY_PIO_GENERAL_RANDOMSEED);
         try {
             if (seedProperty != null) {
                 seed = Integer.parseInt(seedProperty);
