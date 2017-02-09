@@ -22,7 +22,7 @@ public class JdbcBatchEventHose implements BatchEventHose {
                                @JsonProperty("password") String password,
                                @JsonProperty("count") int count,
                                @JsonProperty("par") int par,
-                               @JsonProperty("pNames") Set<String> pNames) {
+                               @JsonProperty("pNames") String[] pNames) {
         this.delegate = new ScalaJdbcBatchEventHose(timeColumn, url, table, username, password, count, par, pNames);
     }
 
@@ -67,7 +67,7 @@ public class JdbcBatchEventHose implements BatchEventHose {
     }
 
     @JsonProperty
-    public Set<String> getPNames() {
+    public String[] getPNames() {
         return delegate.getPNames();
     }
 

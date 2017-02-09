@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 
 /**
   */
-class ScalaJdbcBatchEventHose(timeColumn: String, url: String, table: String, username: String, password: String, count: Int, par: Int, pNames: java.util.Set[String]) extends BatchEventHose with Serializable {
+class ScalaJdbcBatchEventHose(timeColumn: String, url: String, table: String, username: String, password: String, count: Int, par: Int, pNames: Array[String]) extends BatchEventHose with Serializable {
   override def find(sc: JavaSparkContext, starttime: Long, endTime: Long): JavaRDD[Event] = {
     find(sc)
   }
@@ -35,7 +35,7 @@ class ScalaJdbcBatchEventHose(timeColumn: String, url: String, table: String, us
       count - 1,
       par,
       (r: ResultSet) => {
-        new Event(System.currentTimeMillis, pNames.asScala.map(name=> (name, r.getObject(name))).toMap.asJava)
+        new Event(System.currentTimeMillis, pNames.map(name=> (name, r.getObject(name))).toMap.asJava)
       }
     )
     sqlRDD
@@ -52,7 +52,7 @@ class ScalaJdbcBatchEventHose(timeColumn: String, url: String, table: String, us
       count - 1,
       par,
       (r: ResultSet) => {
-        new Event(System.currentTimeMillis, pNames.asScala.map(name=> (name, r.getObject(name))).toMap.asJava)
+        new Event(System.currentTimeMillis, pNames.map(name=> (name, r.getObject(name))).toMap.asJava)
       }
     );
     sqlRDD

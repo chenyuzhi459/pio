@@ -13,6 +13,8 @@ import java.io.Serializable;
         @JsonSubTypes.Type(name = "local", value = LocalFileRepository.class)
 })
 public interface Repository extends Serializable {
+    void init();
+
     OutputStream openOutput(String name);
 
     String[] listAll();

@@ -10,7 +10,6 @@ import org.apache.spark.api.java.function.Function;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 
 /**
  */
@@ -24,7 +23,7 @@ public class JdbcPropertyHose implements PropertyHose {
                               @JsonProperty("password") String password,
                               @JsonProperty("count") int count,
                               @JsonProperty("par") int par,
-                              @JsonProperty("pNames") Set<String> pNames) {
+                              @JsonProperty("pNames") String[] pNames) {
         this.delegate = new ScalaJdbcBatchEventHose(null, url, table, username, password, count, par, pNames);
     }
 
@@ -73,7 +72,7 @@ public class JdbcPropertyHose implements PropertyHose {
     }
 
     @JsonProperty
-    public Set<String> getPNames() {
+    public String[] getPNames() {
         return delegate.getPNames();
     }
 }

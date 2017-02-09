@@ -16,16 +16,12 @@ import java.io.*;
  */
 public class HdfsRepository implements Repository {
     private final String path;
-    private final FileSystem fs;
+    private transient FileSystem fs;
 
     public HdfsRepository(String path, Configuration configuration) {
         this.path = path;
-        try {
-            this.fs = FileSystem.newInstance(configuration);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
+
 
     @JsonCreator
     public HdfsRepository(@JsonProperty("path") String path) {
@@ -36,6 +32,15 @@ public class HdfsRepository implements Repository {
     public OutputStream openOutput(String name) {
         try {
             return fs.create(new Path(path, name));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void init() {
+        try {
+            fs = FileSystem.newInstance(new Configuration());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -58,7 +63,7 @@ public class HdfsRepository implements Repository {
     @Override
     public long getSize(String name) {
         try {
-            return fs.getStatus(new Path(path, name)).getCapacity();
+            return fs.getContentSummary(new Path(path, name)).getLength();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -103,7 +108,7 @@ public class HdfsRepository implements Repository {
     @Override
     public FSInputStream openInput(String name) {
         try {
-            return new HdfsFileInputStream(FileSystem.newInstance(new Configuration()).open(new Path(path)));
+            return new HdfsFileInputStream(fs.open(new Path(path, name)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -12,10 +12,12 @@ class ALSDataSource(batchEventHose: BatchEventHose) extends DataSource[ALSTraini
     val sc = javaSparkContext.sc
     val events = batchEventHose.find(sc).rdd
     val trainingData = events.map({
-      e => Rating(e.getProperties.get(Constants.USER_ID).asInstanceOf[Int],
-        e.getProperties.get(Constants.ITEM_ID).asInstanceOf[Int],
-        e.getProperties.get(Constants.GRADE).asInstanceOf[Float])
+      e => Rating(e.getProperties.get(Constants.USER_ID).toString.toInt,
+        e.getProperties.get(Constants.ITEM_ID).toString.toInt,
+        e.getProperties.get(Constants.GRADE).toString.toFloat)
     })
     ALSTrainingData(trainingData)
   }
+
+
 }
