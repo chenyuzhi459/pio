@@ -24,7 +24,8 @@ public class Main {
                         CliBroker.class,
                         CliOverlord.class,
                         CliMiddleManager.class,
-                        CliPeon.class
+                        CliPeon.class,
+                        CliProxy.class
                 );
 
         builder.withGroup("tools")

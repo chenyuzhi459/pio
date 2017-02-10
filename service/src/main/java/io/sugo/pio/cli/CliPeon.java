@@ -49,8 +49,8 @@ public class CliPeon extends GuiceRunnable {
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        binder.bindConstant().annotatedWith(Names.named("serviceName")).to("pio/peon");
-                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(-1);
+                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_NAME)).to(CliConst.PEON_NAME);
+                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.PEON_PORT);
 
                         binder.bind(TaskToolboxFactory.class).in(LazySingleton.class);
 
