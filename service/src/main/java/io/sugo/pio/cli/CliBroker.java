@@ -44,7 +44,7 @@ public class CliBroker extends ServerRunnable {
                         binder.bindConstant().annotatedWith(Names.named("serviceName")).to(
                                 "pio/broker"
                         );
-                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(8082);
+                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(6082);
 
                         binder.bind(CachingClusteredClient.class).in(LazySingleton.class);
                         binder.bind(BrokerServerView.class).in(LazySingleton.class);
