@@ -22,23 +22,24 @@ public class SearchEngine extends Engine<SearchTrainingData, SearchPreparaData, 
     public SearchEngine(PropertyHose propertyHose,
                         BatchEventHose batchEventHose,
                         Repository repository) {
+        super(null);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
     @Override
-    public DataSource<SearchTrainingData> createDatasource() {
+    public DataSource<SearchTrainingData> createDatasource(Params params) {
         return new SearchDatasource(propertyHose, batchEventHose);
     }
 
     @Override
-    public Preparator<SearchTrainingData, SearchPreparaData> createPreparator() {
+    public Preparator<SearchTrainingData, SearchPreparaData> createPreparator(Params params) {
         return new SearchPreparator();
     }
 
     @Override
-    public Algorithm<SearchPreparaData, SearchModelData> createAlgorithm() {
+    public Algorithm<SearchPreparaData, SearchModelData> createAlgorithm(Params params) {
         return new SearchAlgorithm();
     }
 

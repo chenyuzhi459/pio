@@ -19,12 +19,15 @@ import io.sugo.pio.engine.training.*;
 public class ALSEngineFactory implements EngineFactory<ALSTrainingData, ALSPreparedData, ALSModelData> {
     private final BatchEventHose batchEventHose;
     private final Repository repository;
+    private final ALSEngineParams engineParams;
 
     @JsonCreator
     public ALSEngineFactory(@JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                            @JsonProperty("repository") Repository repository) {
+                            @JsonProperty("repository") Repository repository,
+                            @JsonProperty("engineParams") ALSEngineParams engineParams) {
         this.batchEventHose = batchEventHose;
         this.repository = repository;
+        this.engineParams = engineParams;
     }
 
     @JsonProperty
@@ -37,8 +40,13 @@ public class ALSEngineFactory implements EngineFactory<ALSTrainingData, ALSPrepa
         return repository;
     }
 
+    @JsonProperty
+    public ALSEngineParams getEngineParams() {
+        return engineParams;
+    }
+
     @Override
     public Engine createEngine() {
-        return new ALSEngine(batchEventHose, repository);
+        return new ALSEngine(batchEventHose, repository, engineParams);
     }
 }

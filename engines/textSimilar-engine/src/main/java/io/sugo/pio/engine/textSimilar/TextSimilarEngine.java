@@ -22,23 +22,24 @@ public class TextSimilarEngine extends Engine<TextSimilarTrainingData, TextSimil
     public TextSimilarEngine(PropertyHose propertyHose,
                                     BatchEventHose batchEventHose,
                                     Repository repository) {
+        super(null);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
     @Override
-    protected DataSource<TextSimilarTrainingData> createDatasource() {
+    protected DataSource<TextSimilarTrainingData> createDatasource(Params params) {
         return new TextSimilarDatasource(propertyHose, batchEventHose);
     }
 
     @Override
-    protected Preparator<TextSimilarTrainingData, TextSimilarPreparaData> createPreparator() {
+    protected Preparator<TextSimilarTrainingData, TextSimilarPreparaData> createPreparator(Params params) {
         return new TextSimilarPreparator();
     }
 
     @Override
-    protected Algorithm<TextSimilarPreparaData, TextSimilarModelData> createAlgorithm() {
+    protected Algorithm<TextSimilarPreparaData, TextSimilarModelData> createAlgorithm(Params params) {
         return new TextSimilarAlgorithm();
     }
 

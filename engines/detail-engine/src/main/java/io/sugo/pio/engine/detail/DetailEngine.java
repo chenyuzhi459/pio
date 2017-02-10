@@ -22,21 +22,22 @@ public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData,
     @JsonCreator
     public DetailEngine(@JsonProperty("batchEventHose") BatchEventHose batchEventHose,
                                @JsonProperty("repository") Repository repository) {
+        super(null);
         this.batchEventHose = batchEventHose;
         this.repository = repository;
     }
     @Override
-    protected DataSource<DetailTrainingData> createDatasource() {
+    protected DataSource<DetailTrainingData> createDatasource(Params params) {
         return new DetailDataSource(batchEventHose);
     }
 
     @Override
-    protected Preparator<DetailTrainingData, DetailPreparedData> createPreparator() {
+    protected Preparator<DetailTrainingData, DetailPreparedData> createPreparator(Params params) {
         return new DetailPreparator();
     }
 
     @Override
-    protected Algorithm<DetailPreparedData, DetailModelData> createAlgorithm() {
+    protected Algorithm<DetailPreparedData, DetailModelData> createAlgorithm(Params params) {
         return new DetailAlgorithm();
     }
 

@@ -20,22 +20,24 @@ public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModel
     private final Repository repository;
 
     public ALSEngine(BatchEventHose batchEventHose,
-                     Repository repository) {
+                     Repository repository,
+                     ALSEngineParams alsEngineParams) {
+        super(alsEngineParams);
         this.batchEventHose = batchEventHose;
         this.repository = repository;
     }
     @Override
-    protected DataSource<ALSTrainingData> createDatasource() {
+    protected DataSource<ALSTrainingData> createDatasource(Params params) {
         return new ALSDataSource(batchEventHose);
     }
 
     @Override
-    protected Preparator<ALSTrainingData, ALSPreparedData> createPreparator() {
+    protected Preparator<ALSTrainingData, ALSPreparedData> createPreparator(Params params) {
         return new ALSPreparator();
     }
 
     @Override
-    protected Algorithm<ALSPreparedData, ALSModelData> createAlgorithm() {
+    protected Algorithm<ALSPreparedData, ALSModelData> createAlgorithm(Params params) {
         return new ALSAlgorithm();
     }
 
