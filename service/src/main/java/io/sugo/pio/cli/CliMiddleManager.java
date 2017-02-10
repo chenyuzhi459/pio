@@ -42,7 +42,7 @@ public class CliMiddleManager extends ServerRunnable {
                     @Override
                     public void configure(Binder binder) {
                         binder.bindConstant().annotatedWith(Names.named("serviceName")).to("pio/middlemanager");
-                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(8091);
+                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(6091);
 
                         TaskServiceModuleHelper.configureTaskRunnerConfigs(binder);
 

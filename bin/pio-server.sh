@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-usage="Usage: pio-server.sh <broker|overlord|middleManager> (start|stop)"
+usage="Usage: pio-server.sh <broker|overlord|middleManager|process> (start|stop)"
 
 if [ $# -lt 2 ]; then
   echo $usage
