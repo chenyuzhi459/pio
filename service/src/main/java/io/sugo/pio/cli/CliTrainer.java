@@ -32,10 +32,6 @@ public class CliTrainer implements Runnable {
             "org.apache.spark:spark-yarn_2.11:2.0.2"
     );
 
-    private final List<String> finalHadoopDependencyCoordinates = ImmutableList.of(
-            "org.apache.hadoop:hadoop-client:2.7.2"
-    );
-
     @Arguments(description = "trainingSpec.json", required = true)
     public String trainingSpec;
 
