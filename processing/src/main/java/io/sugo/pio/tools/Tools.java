@@ -46,7 +46,6 @@ import java.util.*;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -70,6 +69,7 @@ public class Tools {
      * The line separator depending on the operating system.
      */
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private static final String WEB_LINE_SEPARATOR = "<br/>";
 
     /**
      * Number smaller than this value are considered as zero.
@@ -183,6 +183,11 @@ public class Tools {
 
         // init parameters
         int numberDigits = 3;
+        numberOfFractionDigits = numberDigits;
+        epsilonDisplayValue = Math.min(SMALLEST_MACHINE_EPSILON, 1.0 / Math.pow(10, numberOfFractionDigits));
+        NUMBER_FORMAT = new DecimalFormat(getDecimalFormatPattern(numberDigits),
+                DecimalFormatSymbols.getInstance(FORMAT_LOCALE));
+
         epsilonDisplayValue = Math.min(SMALLEST_MACHINE_EPSILON, 1.0 / Math.pow(10, numberOfFractionDigits));
     }
 
@@ -590,6 +595,10 @@ public class Tools {
      */
     public static String getLineSeparator() {
         return LINE_SEPARATOR;
+    }
+
+    public static String getWebLineSeparator() {
+        return WEB_LINE_SEPARATOR;
     }
 
     /**
@@ -1902,5 +1911,18 @@ public class Tools {
     /** Adds a new resource source. Might be used by plugins etc. */
     public static void addResourceSource(ResourceSource source) {
         ALL_RESOURCE_SOURCES.add(source);
+    }
+
+    private static String getDecimalFormatPattern(int fractionDigits) {
+        StringBuilder pattern = new StringBuilder();
+        pattern.append('0');
+        if (fractionDigits > 0) {
+            pattern.append('.');
+        }
+        for (int i = 0; i < fractionDigits; i++) {
+            pattern.append('0');
+        }
+
+        return pattern.toString();
     }
 }

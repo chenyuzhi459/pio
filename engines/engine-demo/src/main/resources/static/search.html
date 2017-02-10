@@ -196,7 +196,7 @@
                             success(data) {
                                 var temp = []
                                 for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdb(data.item_id[m] ,data.item_name[m], temp)
+                                    that.queryOmdb(data.item_id[m], temp)
                                 }
                                 that.searchItems = temp
                             }
@@ -218,16 +218,16 @@
                             success(data) {
                                 var temp = []
                                 for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdb(data.item_id[m] ,data.item_name[m], temp)
+                                    that.queryOmdb(data.item_id[m], temp)
                                 }
                                 that.userSearchItems = temp
                             }
                         })
                     },
 
-                    queryOmdb: function (id, title, temp) {
+                    queryOmdb: function (id, temp) {
                         $.ajax({
-                            url: 'http://www.omdbapi.com/?t=' + escape(title),
+                            url: '/pio/query/movie/infoByMovId/' + escape(id),
                             dataType: 'json',
                             type: 'get',
                             success(data) {

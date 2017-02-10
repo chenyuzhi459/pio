@@ -55,6 +55,7 @@ public class ProcessRunner implements Runnable {
                 if (process != null) {
                     try {
                         log.info("start execute Process:%s", process.getId());
+                        process.getRootOperator().getExecutionUnit().transformMetaData();
                         process.run();
                         metadataProcessManager.update(process);
                         process.success();

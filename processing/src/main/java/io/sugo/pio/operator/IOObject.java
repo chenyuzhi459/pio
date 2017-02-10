@@ -1,5 +1,8 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.sugo.pio.operator.learner.tree.TreeModel;
 import io.sugo.pio.ports.OutputPort;
 
 import java.io.IOException;
@@ -17,6 +20,10 @@ import java.io.Serializable;
  * 
  * @author Ingo Mierswa
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "dataType")
+@JsonSubTypes(value = {
+		@JsonSubTypes.Type(name = "tree_model", value = TreeModel.class)
+})
 public interface IOObject extends Serializable {
 
 	/** Sets the source of this IOObject. */

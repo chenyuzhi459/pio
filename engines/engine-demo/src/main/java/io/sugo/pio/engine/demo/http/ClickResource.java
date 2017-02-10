@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.EvictingQueue;
 import io.sugo.pio.engine.demo.Click;
-import io.sugo.pio.engine.demo.ItemUtil;
-import io.sugo.pio.engine.training.Algorithm;
 import io.sugo.pio.engine.demo.data.MovieItemFeature;
 import io.sugo.pio.engine.ocb.Similarity;
 
@@ -68,28 +66,27 @@ public class ClickResource {
             ClickQuery query = jsonMapper.readValue(in, ClickQuery.class);
             List<String> items = query.items;
             EvictingQueue<Click> clicks = clickMap.get(query.getUserId());
-            for(String itemQ:items) {
-                List<String> featureQ = itemFeature.getItemFeature(itemQ);
-                Double similarityValue = 0.0;
-                for (Click click : clicks) {
-                    String itemC = click.getItemId();
-                    List<String> featureC = itemFeature.getItemFeature(itemC);
-                    Double featureSimilarity =similarity.getSimilarity(featureQ,featureC);
-                    similarityValue += featureSimilarity;
+            List<String> rankItems;
+            if (null == clicks) {
+                rankItems = items;
+            } else {
+                for(String itemQ:items) {
+                    List<String> featureQ = itemFeature.getItemFeature(itemQ);
+                    Double similarityValue = 0.0;
+                    for (Click click : clicks) {
+                        String itemC = click.getItemId();
+                        List<String> featureC = itemFeature.getItemFeature(itemC);
+                        Double featureSimilarity =similarity.getSimilarity(featureQ,featureC);
+                        similarityValue += featureSimilarity;
+                    }
+                    similarityMap.put(similarityValue,itemQ);
                 }
-                similarityMap.put(similarityValue,itemQ);
+                rankItems = new ArrayList(similarityMap.values());
             }
-            List<String> rankItems=new ArrayList(similarityMap.values());
 
             Map<String, List<String>> res = new HashMap<>();
             res.put("item_id", rankItems);
             if (!res.isEmpty()) {
-                List<String> filmIds = rankItems;
-                List<String> filmNames = new ArrayList<>(filmIds.size());
-                for (String id: filmIds) {
-                    filmNames.add(ItemUtil.getTitle(id));
-                }
-                res.put("item_name", filmNames);
                 str = jsonMapper.writeValueAsString(res);
             } else {
                 str = "items not found";

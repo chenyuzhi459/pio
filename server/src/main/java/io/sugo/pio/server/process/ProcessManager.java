@@ -15,6 +15,7 @@ import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.metadata.MetadataProcessManager;
+import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.Status;
 import io.sugo.pio.ports.Connection;
@@ -167,8 +168,8 @@ public class ProcessManager {
     public OperatorProcess run(String id) {
         try {
             OperatorProcess process = get(id);
+            process.clearStatus();
             queue.offer(process, 10, TimeUnit.SECONDS);
-            process.setStatus(Status.QUEUE);
             process.setUpdateTime(new DateTime());
             metadataProcessManager.update(process);
             log.info("queue size:%d", queue.size());
@@ -198,7 +199,6 @@ public class ProcessManager {
                 processCache.invalidate(id);
                 return null;
             }
-            process.getRootOperator().getExecutionUnit().transformMetaData();
             return process;
         } catch (ExecutionException e) {
             log.error(e, "get process %s error", id);
@@ -323,5 +323,11 @@ public class ProcessManager {
         } else {
             return null;
         }
+    }
+
+    public OperatorProcess getResult(String id) {
+        OperatorProcess process = get(id);
+        IOContainer result = process.getRootOperator().getResults(true);
+        return process;
     }
 }

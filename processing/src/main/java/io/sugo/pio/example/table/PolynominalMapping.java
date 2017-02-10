@@ -139,7 +139,7 @@ public class PolynominalMapping implements NominalMapping {
 
     @Override
     public List<String> getValues() {
-        return null;
+        return indexToSymbolMap;
     }
 
     /** Returns the number of different nominal values. */

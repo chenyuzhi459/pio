@@ -2,6 +2,7 @@ package io.sugo.pio.server.http;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
@@ -45,7 +46,7 @@ public class ProcessResource {
             List<OperatorProcess> processes = processManager.getAll(all);
             return Response.ok(processes).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -59,11 +60,12 @@ public class ProcessResource {
 
             String name = JsonUtil.getString(jsonObject, "name");
             String description = JsonUtil.getString(jsonObject, "description");
+            Preconditions.checkNotNull(name, "process name cannot be null");
 
             OperatorProcess process = processManager.create(name, description);
             return Response.ok(process).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -82,7 +84,7 @@ public class ProcessResource {
             OperatorProcess process = processManager.update(id, name, description, status);
             return Response.ok(process).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -106,7 +108,7 @@ public class ProcessResource {
             OperatorProcess process = processManager.get(id, all);
             return Response.ok(process).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
@@ -118,8 +120,19 @@ public class ProcessResource {
             OperatorProcess process = processManager.run(id);
             return Response.ok(process).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e).build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
+    @GET
+    @Path("/result/{id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getResult(@PathParam("id") final String id) {
+        try {
+            OperatorProcess process = processManager.getResult(id);
+            return Response.ok(process).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
 }

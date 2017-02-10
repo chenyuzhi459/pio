@@ -1,7 +1,6 @@
 package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
@@ -9,8 +8,6 @@ import io.sugo.pio.engine.search.Constants;
 import io.sugo.pio.engine.search.SearchModelFactory;
 import io.sugo.pio.engine.search.SearchQuery;
 import io.sugo.pio.engine.search.SearchResult;
-import org.ansj.lucene5.AnsjAnalyzer;
-import org.apache.lucene.analysis.Analyzer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;

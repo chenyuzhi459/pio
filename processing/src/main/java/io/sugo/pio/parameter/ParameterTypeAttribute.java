@@ -43,7 +43,7 @@ public class ParameterTypeAttribute extends ParameterTypeString {
 			if (inPort != null) {
 				return inPort.getMetaData();
 			} else {
-				return null;
+				return new MetaData();
 			}
 		}
 

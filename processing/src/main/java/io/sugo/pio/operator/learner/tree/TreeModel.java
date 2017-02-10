@@ -1,10 +1,12 @@
 package io.sugo.pio.operator.learner.tree;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.ExampleSetUtilities;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.learner.SimplePredictionModel;
+import io.sugo.pio.tools.Tools;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -18,7 +20,13 @@ public class TreeModel extends SimplePredictionModel {
 
 	private static final long serialVersionUID = 4368631725370998591L;
 
+	@JsonProperty
 	private Tree root;
+
+	@JsonProperty
+	public String getDescription() {
+		return root.toString(Tools.getWebLineSeparator());
+	}
 
 	public TreeModel(ExampleSet exampleSet, Tree root) {
 		super(exampleSet, ExampleSetUtilities.SetsCompareOption.ALLOW_SUPERSET,

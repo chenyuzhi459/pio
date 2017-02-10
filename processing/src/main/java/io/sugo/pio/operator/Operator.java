@@ -76,6 +76,9 @@ public abstract class Operator implements ParameterHandler, Serializable {
      */
     private final OperatorProgress operatorProgress = new OperatorProgress(this);
 
+    private final Object userDataLock = new Object();
+    private Map<String, UserData<Object>> userData;
+
     public Operator() {
         this.inputPorts = createInputPorts(portOwner);
         this.outputPorts = createOutputPorts(portOwner);
@@ -653,5 +656,28 @@ public abstract class Operator implements ParameterHandler, Serializable {
      */
     public final OperatorProgress getProgress() {
         return operatorProgress;
+    }
+
+    public UserData<Object> getUserData(String key) {
+        synchronized (this.userDataLock) {
+            if (this.userData == null) {
+                return null;
+            } else {
+                return this.userData.get(key);
+            }
+        }
+    }
+
+    public void setUserData(String key, UserData<Object> data) {
+        synchronized (this.userDataLock) {
+            if (this.userData == null) {
+                this.userData = new TreeMap<>();
+            }
+            this.userData.put(key, data);
+        }
+    }
+
+    public IOContainer getResult(){
+        return new IOContainer(new ArrayList<>());
     }
 }
