@@ -7,10 +7,7 @@ import io.sugo.pio.engine.detail.DetailEngineFactory;
 import io.sugo.pio.engine.detail.data.DetailModelData;
 import io.sugo.pio.engine.detail.data.DetailPreparedData;
 import io.sugo.pio.engine.detail.data.DetailTrainingData;
-import io.sugo.pio.engine.training.Algorithm;
-import io.sugo.pio.engine.training.DataSource;
-import io.sugo.pio.engine.training.Model;
-import io.sugo.pio.engine.training.Preparator;
+import io.sugo.pio.engine.training.*;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
@@ -39,13 +36,7 @@ public class DetailTraining extends AbstractTraining {
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         Repository repository = new LocalFileRepository(DetailResource.REPOSITORY_PATH);
         DetailEngineFactory engineFactory = new DetailEngineFactory(eventHose, repository);
-        Preparator<DetailTrainingData, DetailPreparedData> preparator = engineFactory.createPreparator();
-        DataSource<DetailTrainingData> dataSource = engineFactory.createDatasource();
-        DetailTrainingData trainingData = dataSource.readTraining(sc);
-        DetailPreparedData preparedData = preparator.prepare(sc, trainingData);
-        Algorithm<DetailPreparedData, DetailModelData> alg = engineFactory.createAlgorithm();
-        DetailModelData modelData = alg.train(sc, preparedData);
-        Model<DetailModelData> model = engineFactory.createModel();
-        model.save(modelData);
+        Engine engine = engineFactory.createEngine();
+        engine.train(sc);
     }
 }

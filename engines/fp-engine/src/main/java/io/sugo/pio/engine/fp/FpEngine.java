@@ -16,34 +16,36 @@ import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class FpEngineFactory implements EngineFactory<FpTrainingData, FpPreparaData, FpModelData>{
+public class FpEngine extends Engine<FpTrainingData, FpPreparaData, FpModelData> {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
 
-    @JsonCreator
-    public FpEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
-                           @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                           @JsonProperty("repository") Repository repository) {
+    public FpEngine(PropertyHose propertyHose,
+                    BatchEventHose batchEventHose,
+                    Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
     @Override
-    public Engine createEngine() {
-        return new FpEngine(propertyHose, batchEventHose, repository);
+    public DataSource<FpTrainingData> createDatasource() {
+        return new FpDatasource(propertyHose, batchEventHose);
     }
 
-    @JsonProperty
-    public BatchEventHose getBatchEventHose() {
-        return batchEventHose;
+    @Override
+    public Preparator<FpTrainingData, FpPreparaData> createPreparator() {
+        return new FpPreparator();
     }
 
-    @JsonProperty
-    public PropertyHose getPropertyHose() {
-        return propertyHose;
+    @Override
+    public Algorithm<FpPreparaData, FpModelData> createAlgorithm() {
+        return new FpAlgorithm();
     }
 
-
+    @Override
+    public Model<FpModelData> createModel() {
+        return new FpModel(repository);
+    }
 }

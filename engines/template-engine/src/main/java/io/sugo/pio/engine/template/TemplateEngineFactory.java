@@ -3,12 +3,9 @@ package io.sugo.pio.engine.template;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.template.data.TemplateModelData;
-import io.sugo.pio.engine.template.engine.TemplateAlgorithm;
-import io.sugo.pio.engine.template.engine.TemplateModel;
-import io.sugo.pio.engine.template.engine.TemplatePreparator;
+import io.sugo.pio.engine.template.engine.*;
 import io.sugo.pio.engine.template.data.TemplatePreparedData;
 import io.sugo.pio.engine.template.data.TemplateTrainingData;
-import io.sugo.pio.engine.template.engine.TemplateDatasource;
 import io.sugo.pio.engine.training.*;
 
 /**
@@ -22,23 +19,9 @@ public class TemplateEngineFactory implements EngineFactory<TemplateTrainingData
         this.repository = repository;
     }
 
-    @Override
-    public DataSource<TemplateTrainingData> createDatasource() {
-        return new TemplateDatasource(eventHose);
-    }
 
     @Override
-    public Preparator<TemplateTrainingData, TemplatePreparedData> createPreparator() {
-        return new TemplatePreparator();
-    }
-
-    @Override
-    public Algorithm<TemplatePreparedData, TemplateModelData> createAlgorithm() {
-        return new TemplateAlgorithm();
-    }
-
-    @Override
-    public Model<TemplateModelData> createModel() {
-        return new TemplateModel(repository);
+    public Engine createEngine() {
+        return new TemplateEngine(eventHose, repository);
     }
 }

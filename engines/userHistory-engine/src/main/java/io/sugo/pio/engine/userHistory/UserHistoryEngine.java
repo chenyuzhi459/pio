@@ -16,40 +16,38 @@ import io.sugo.pio.engine.userHistory.engine.UserHistoryPreparator;
 
 /**
  */
-public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> {
+public class UserHistoryEngine extends Engine<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
 
 
-    @JsonCreator
-    public UserHistoryEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
-                               @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                               @JsonProperty("repository") Repository repository) {
+    public UserHistoryEngine(PropertyHose propertyHose,
+                             BatchEventHose batchEventHose,
+                             Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
-
-
-    @JsonProperty
-    public BatchEventHose getBatchEventHose() {
-        return batchEventHose;
-    }
-
-    @JsonProperty
-    public PropertyHose getPropertyHose() {
-        return propertyHose;
-    }
-
-    @JsonProperty
-    public Repository getRepository() {
-        return repository;
+    @Override
+    public DataSource<UserHistoryTrainingData> createDatasource() {
+        return new UserHistoryDatasource(propertyHose, batchEventHose);
     }
 
     @Override
-    public Engine createEngine() {
-        return new UserHistoryEngine(propertyHose, batchEventHose, repository);
+    public Preparator<UserHistoryTrainingData, UserHistoryPreparaData> createPreparator() {
+        return new UserHistoryPreparator();
     }
+
+    @Override
+    public Algorithm<UserHistoryPreparaData, UserHistoryModelData> createAlgorithm() {
+        return new UserHistoryAlgorithm();
+    }
+
+    @Override
+    public Model<UserHistoryModelData> createModel() {
+        return new UserHistoryModel(repository);
+    }
+
 }

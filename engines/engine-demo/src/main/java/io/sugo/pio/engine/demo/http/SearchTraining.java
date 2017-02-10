@@ -28,14 +28,7 @@ public class SearchTraining extends AbstractTraining{
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(SearchResource.REPOSITORY_PATH);
         EngineFactory<SearchTrainingData, SearchPreparaData, SearchModelData> engineFactory = new SearchEngineFactory(propHose, eventHose, repository);
-        Preparator<SearchTrainingData, SearchPreparaData> preparator = engineFactory.createPreparator();
-        DataSource<SearchTrainingData> dataSource = engineFactory.createDatasource();
-        SearchTrainingData trainingData = dataSource.readTraining(sc);
-        SearchPreparaData preparedData = preparator.prepare(sc, trainingData);
-        Algorithm<SearchPreparaData, SearchModelData> alg = engineFactory.createAlgorithm();
-        SearchModelData modelData = alg.train(sc, preparedData);
-        Model<SearchModelData> model = engineFactory.createModel();
-
-        model.save(modelData);
+        Engine engine = engineFactory.createEngine();
+        engine.train(sc);
     }
 }

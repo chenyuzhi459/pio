@@ -28,14 +28,7 @@ public class PopularTraining extends AbstractTraining {
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(PopluarResource.REPOSITORY_PATH);
         EngineFactory<PopularTrainingData, PopularPreparaData, PopularModelData> engineFactory = new PopularEngineFactory(propHose, eventHose, repository);
-        Preparator<PopularTrainingData, PopularPreparaData> preparator = engineFactory.createPreparator();
-        DataSource<PopularTrainingData> dataSource = engineFactory.createDatasource();
-        PopularTrainingData trainingData = dataSource.readTraining(sc);
-        PopularPreparaData preparedData = preparator.prepare(sc, trainingData);
-        Algorithm<PopularPreparaData, PopularModelData> alg = engineFactory.createAlgorithm();
-        PopularModelData modelData = alg.train(sc, preparedData);
-        Model<PopularModelData> model = engineFactory.createModel();
-
-        model.save(modelData);
+        Engine engine = engineFactory.createEngine();
+        engine.train(sc);
     }
 }

@@ -28,13 +28,7 @@ public class UserHistoryTraining extends AbstractTraining{
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(UserHistoryResource.REPOSITORY_PATH);
         EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> engineFactory = new UserHistoryEngineFactory(propHose, eventHose, repository);
-        Preparator<UserHistoryTrainingData, UserHistoryPreparaData> preparator = engineFactory.createPreparator();
-        DataSource<UserHistoryTrainingData> dataSource = engineFactory.createDatasource();
-        UserHistoryTrainingData trainingData = dataSource.readTraining(sc);
-        UserHistoryPreparaData preparedData = preparator.prepare(sc, trainingData);
-        Algorithm<UserHistoryPreparaData, UserHistoryModelData> alg = engineFactory.createAlgorithm();
-        UserHistoryModelData modelData = alg.train(sc, preparedData);
-        Model<UserHistoryModelData> model = engineFactory.createModel();
-        model.save(modelData);
+        Engine engine = engineFactory.createEngine();
+        engine.train(sc);
     }
 }

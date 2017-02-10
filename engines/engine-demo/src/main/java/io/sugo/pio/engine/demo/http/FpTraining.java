@@ -29,15 +29,8 @@ public class FpTraining extends AbstractTraining{
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(FpResource.REPOSITORY_PATH);
         EngineFactory<FpTrainingData, FpPreparaData, FpModelData> engineFactory = new FpEngineFactory(propHose, eventHose, repository);
-        Preparator<FpTrainingData, FpPreparaData> preparator = engineFactory.createPreparator();
-        DataSource<FpTrainingData> dataSource = engineFactory.createDatasource();
-        FpTrainingData trainingData = dataSource.readTraining(sc);
-        FpPreparaData preparedData = preparator.prepare(sc, trainingData);
-        Algorithm<FpPreparaData, FpModelData> alg = engineFactory.createAlgorithm();
-        FpModelData modelData = alg.train(sc, preparedData);
-        Model<FpModelData> model = engineFactory.createModel();
-
-        model.save(modelData);
+        Engine engine = engineFactory.createEngine();
+        engine.train(sc);
     }
 }
 

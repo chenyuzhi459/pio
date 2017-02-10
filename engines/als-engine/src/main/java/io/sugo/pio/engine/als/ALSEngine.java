@@ -10,35 +10,37 @@ import io.sugo.pio.engine.als.engine.ALSDModel;
 import io.sugo.pio.engine.als.engine.ALSDataSource;
 import io.sugo.pio.engine.als.engine.ALSPreparator;
 import io.sugo.pio.engine.data.input.BatchEventHose;
-import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class ALSEngineFactory implements EngineFactory<ALSTrainingData, ALSPreparedData, ALSModelData> {
+public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModelData> {
     private final BatchEventHose batchEventHose;
     private final Repository repository;
 
-    @JsonCreator
-    public ALSEngineFactory(@JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                            @JsonProperty("repository") Repository repository) {
+    public ALSEngine(BatchEventHose batchEventHose,
+                     Repository repository) {
         this.batchEventHose = batchEventHose;
         this.repository = repository;
     }
-
-    @JsonProperty
-    public BatchEventHose getBatchEventHose() {
-        return batchEventHose;
-    }
-
-    @JsonProperty
-    public Repository getRepository() {
-        return repository;
+    @Override
+    protected DataSource<ALSTrainingData> createDatasource() {
+        return new ALSDataSource(batchEventHose);
     }
 
     @Override
-    public Engine createEngine() {
-        return new ALSEngine(batchEventHose, repository);
+    protected Preparator<ALSTrainingData, ALSPreparedData> createPreparator() {
+        return new ALSPreparator();
+    }
+
+    @Override
+    protected Algorithm<ALSPreparedData, ALSModelData> createAlgorithm() {
+        return new ALSAlgorithm();
+    }
+
+    @Override
+    protected Model<ALSModelData> createModel() {
+        return new ALSDModel(repository);
     }
 }
