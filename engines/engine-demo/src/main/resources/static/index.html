@@ -1,35 +1,21 @@
 <!DOCTYPE HTML>
 <head>
-<title>Home</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
-<link href="css/slider.css" rel="stylesheet" type="text/css" media="all"/>
-<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script> 
-<script type="text/javascript" src="js/move-top.js"></script>
-<script type="text/javascript" src="js/easing.js"></script>
-<script type="text/javascript" src="js/jquery.nivo.slider.js"></script>
-<script type="text/javascript">
-    $(window).load(function() {
-        $('#slider').nivoSlider();
-    });
-    </script>
-	<style>
-		.elli {
-			overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
-		}
-		#app .grid_1_of_5 img {
-			height: 150px;
-		}
-		#app .grid_1_of_5 {
-			display: inline-block;
-			float: none;
-			width: 150px;
-			margin: 0 10px 10px 0;
-		}
+	<title>Home</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+	<link href="css/slider.css" rel="stylesheet" type="text/css" media="all"/>
+	<link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
+	<link href="css/index.css" rel="stylesheet" type="text/css" media="all"/>
 
-	</style>
+	<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
+	<script type="text/javascript" src="js/move-top.js"></script>
+	<script type="text/javascript" src="js/easing.js"></script>
+	<script type="text/javascript" src="js/jquery.nivo.slider.js"></script>
+	<script type="text/javascript" src="js/vue.min.js"></script>
+	<script type="text/javascript" src="js/index.js"></script>
 </head>
+
 <body>
 	<div id="app">
 	<div class="header">
@@ -56,12 +42,6 @@
 						<a href="index.html"><img src="images/logo.png" alt="" /></a>
 					</div>
 					<div class="header_top_right">
-						<!--<div class="cart">-->
-							<!--<p><span>Cart</span><div id="dd" class="wrapper-dropdown-2"> (empty)-->
-							<!--<ul class="dropdown">-->
-									<!--<li>you have no items in your Shopping cart</li>-->
-							<!--</ul></div></p>-->
-						<!--</div>-->
 						<div class="search_box">
 							<form>
 								<input class="search-keyword" type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}">
@@ -70,33 +50,6 @@
 						</div>
 						<div class="clear"></div>
 					</div>
-						  <script type="text/javascript">
-								function DropDown(el) {
-									this.dd = el;
-									this.initEvents();
-								}
-								DropDown.prototype = {
-									initEvents : function() {
-										var obj = this;
-					
-										obj.dd.on('click', function(event){
-											$(this).toggleClass('active');
-											event.stopPropagation();
-										});	
-									}
-								}
-					
-								$(function() {
-					
-									var dd = new DropDown( $('#dd') );
-					
-									$(document).click(function() {
-										// all dropdowns
-										$('.wrapper-dropdown-2').removeClass('active');
-									});
-					
-								});
-					    </script>
 				</div>
 			 <div class="clear"></div>
   		</div>     
@@ -159,7 +112,7 @@
 						<h3>个性化推荐</h3>
 					</div>
 				</div>
-				<div class="section group">
+				<div class="section group pd1">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in customItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -187,7 +140,7 @@
 						<h3>在线推荐</h3>
 					</div>
 				</div>
-				<div class="section group">
+				<div class="section group pd1">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -211,152 +164,12 @@
 				<p>Copyright &copy; 2016.Sugo All rights reserved.</p>
 		   </div>
         </div>
-	<script type="text/javascript" src="js/vue.min.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() {			
-			$().UItoTop({ easingType: 'easeOutQuart' });
-			
-		});
-
-        $(function () {
-
-            var detailUR = new Vue({
-                el: '#app',
-                data: {
-                    popItems:[],
-					customItems: [],
-					cacheItems: [],
-					onlineItems: [],
-					userId: window.localStorage.getItem("userId") || ''
-                },
-                methods: {
-                    checkOut: function() {
-                    	window.localStorage.setItem("userId", "")
-					},
-
-                    pop: function (category) {
-                        var that = this
-                        $.ajax({
-                            url: '/pio/query/itempop',
-                            beforeSend(req) {
-                                req.setRequestHeader('Content-Type', 'application/json')
-                            },
-                            data: JSON.stringify({
-                                'category': category, 'num': 14, 'type': 'pop_query'
-                            }),
-                            dataType: 'json',
-                            type: 'post',
-                            success(data) {
-								var temp = []
-                                for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdb(data.item_id[m], temp)
-                                }
-                                that.popItems = temp
-                            }
-                        })
-                    },
-
-                    custom: function () {
-                        var that = this
-						if (!that.userId) {
-                            return
-						}
-
-                        $.ajax({
-                            url: '/pio/query/als',
-                            beforeSend(req) {
-                                req.setRequestHeader('Content-Type', 'application/json')
-                            },
-                            data: JSON.stringify({
-                                'user_id': that.userId, 'num': 14, "type":"als_query"
-                            }),
-                            dataType: 'json',
-                            type: 'post',
-                            success(data) {
-                                var temp = []
-                                for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdb(data.item_id[m], temp)
-                                }
-                                that.customItems = temp
-                            }
-                        })
-                    },
-
-                    online: function () {
-                        var that = this
-						if (!that.userId) {
-                            return
-						}
-
-                        $.ajax({
-                            url: '/pio/query/als',
-                            beforeSend(req) {
-                                req.setRequestHeader('Content-Type', 'application/json')
-                            },
-                            data: JSON.stringify({
-                                'user_id': that.userId, 'num': 14, "type":"als_query"
-                            }),
-                            dataType: 'json',
-                            type: 'post',
-                            success(data) {
-                                var temp = []
-                                for (let m = 0; m < data.item_id.length; m++) {
-                                     that.cacheItems.push(data.item_id[m])
-                                }
-                                $.ajax({
-										url: '/pio/query/click/request',
-										beforeSend(req) {
-											req.setRequestHeader('Content-Type', 'application/json')
-										},
-										data: JSON.stringify({
-											'userId': that.userId, "items":that.cacheItems,
-										}),
-										dataType: 'json',
-										type: 'post',
-										success(data) {
-											var temp = []
-											console.log(that.cacheItems)
-											for (let m = 0; m < data.item_id.length; m++) {
-												that.queryOmdb(data.item_id[m], temp)
-											}
-											that.onlineItems = temp
-										}
-							     })
-
-                            }
-                        })
-                    },
-
-                    queryOmdb: function (id, temp) {
-                        $.ajax({
-                            url: '/pio/query/movie/infoByMovId/' + escape(id),
-                            dataType: 'json',
-                            type: 'get',
-                            success(data) {
-                                data.id = id
-                                temp.push(data)
-                            }
-                        })
-                    }
-                }
-            })
-            detailUR.pop("Action")
-            detailUR.custom()
-            detailUR.online()
-        })
 	</script>
     <a href="#" id="toTop"><span id="toTopHover"> </span></a>
-<div style="display:none"><script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script></div>
-</div>
-	<script>
-	$(function() {
-		$('.search-submit').click(function(ev){
-			ev.stopPropagation()
-			ev.preventDefault()
-			location.href = '/search.html?text=' + $('.search-keyword').val()
-		})
-	})
-	</script>
+    <div style="display:none">
+        <script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script></div>
+	</div>
 </body>
 </html>
 

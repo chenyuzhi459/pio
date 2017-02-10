@@ -1,0 +1,35 @@
+.elli {
+    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#app .grid_1_of_5 img {
+    height: 150px;
+}
+
+#app .grid_1_of_5 {
+    display: inline-block;
+    float: none;
+    width: calc((100% - 50px) / 5);
+    margin: 0 10px 10px 0;
+}
+
+.search_box {
+    margin-right: 0;
+}
+
+.header_bottom_right {
+    width: 75%
+}
+
+.section {
+    margin-right: -10px;
+}
+
+.pd1 {
+    padding: 10px;
+}
+

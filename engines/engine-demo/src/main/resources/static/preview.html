@@ -4,9 +4,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
-<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script> 
+<link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
+
+<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
 <script type="text/javascript" src="js/move-top.js"></script>
 <script type="text/javascript" src="js/easing.js"></script>
+<script type="text/javascript" src="js/vue.min.js"></script>
+<script type="text/javascript" src="js/preview.js"></script>
 </head>
 <body>
 	<div id="app">
@@ -33,47 +37,6 @@
 					<div class="logo">
 						<a href="index.html"><img src="images/logo.png" alt="" /></a>
 					</div>
-						<!--<div class="header_top_right">-->
-						  <!--<div class="cart">-->
-						  	   <!--<p><span>Cart</span><div id="dd" class="wrapper-dropdown-2"> (empty)-->
-						  	   	<!--<ul class="dropdown">-->
-										<!--<li>you have no items in your Shopping cart</li>-->
-								<!--</ul></div></p>-->
-						  <!--</div>-->
-							  <!--<div class="search_box">-->
-					     		<!--<form>-->
-					     			<!--<input type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}"><input type="submit" value="">-->
-					     		<!--</form>-->
-					     	<!--</div>-->
-						 <!--<div class="clear"></div>-->
-					<!--</div>-->
-						  <script type="text/javascript">
-								function DropDown(el) {
-									this.dd = el;
-									this.initEvents();
-								}
-								DropDown.prototype = {
-									initEvents : function() {
-										var obj = this;
-					
-										obj.dd.on('click', function(event){
-											$(this).toggleClass('active');
-											event.stopPropagation();
-										});	
-									}
-								}
-					
-								$(function() {
-					
-									var dd = new DropDown( $('#dd') );
-					
-									$(document).click(function() {
-										// all dropdowns
-										$('.wrapper-dropdown-2').removeClass('active');
-									});
-					
-								});
-					    </script>
 			   <div class="clear"></div>
   		    </div>     				
    		</div>
@@ -105,19 +68,6 @@
 						  <!--<li><span>Units in Stock:</span>&nbsp; 566</li>-->
 					    </ul>
 					</div>
-				<!--<div class="share-desc">-->
-					<!--<div class="share">-->
-						<!--<p>Number of units :</p><input class="text_box" type="text">				-->
-					<!--</div>-->
-					<!--<div class="button"><span><a href="#">Add to Cart</a></span></div>					-->
-					<!--<div class="clear"></div>-->
-				<!--</div>-->
-				 <!--<div class="wish-list">-->
-				 	<!--<ul>-->
-				 		<!--<li class="wish"><a href="#">Add to Wishlist</a></li>-->
-				 	    <!--<li class="compare"><a href="#">Add to Compare</a></li>-->
-				 	<!--</ul>-->
-				 <!--</div>-->
 			</div>
 			<div class="clear"></div>
 		  </div>
@@ -182,138 +132,10 @@
 		   </div>			
         </div>
     </div>
-	<script type="text/javascript" src="js/vue.min.js"></script>
-   <script type="text/javascript">
-		$(document).ready(function() {			
-			$().UItoTop({ easingType: 'easeOutQuart' });
-
-            function qs(key) {
-                key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&") // escape RegEx meta chars
-                var match = location.search.match(new RegExp("[?&]" + key + "=([^&]+)(&|$)"))
-                return match && decodeURIComponent(match[1].replace(/\+/g, " "))
-            }
-
-            var detailUR = new Vue({
-                el: '#app',
-                data: {
-                    userId: window.localStorage.getItem("userId") || '',
-                    filmData: {},
-					relatedFilms: [],
-					fpFilms: []
-                },
-                methods: {
-                    checkOut: function() {
-                        window.localStorage.setItem("userId", "")
-                    },
-
-					queryRelated: function(id) {
-                        var that = this
-                        $.ajax({
-                            url: '/pio/query/detail',
-                            beforeSend(req) {
-                                req.setRequestHeader('Content-Type', 'application/json')
-                            },
-                            data: JSON.stringify({
-                                'item_id': id, 'num': 5, 'type': 'detail_query'
-                            }),
-                            dataType: 'json',
-                            type: 'post',
-                            success(data) {
-                                var temp = []
-                                for (let m = 0; m < data.related_item_id.length; m++) {
-                                    that.queryOmdbByMovId(data.related_item_id[m], temp)
-                                }
-                                that.relatedFilms = temp
-                            }
-                        })
-					},
-
-					queryFp: function(id) {
-						var that = this
-						$.ajax({
-                            url: '/pio/query/itemfp',
-                            beforeSend(req) {
-                                req.setRequestHeader('Content-Type', 'application/json')
-                            },
-                            data: JSON.stringify({
-                                'item_id': id, 'num': 8, 'type': 'fp_query'
-                            }),
-                            dataType: 'json',
-                            type: 'post',
-                            success(data) {
-                                var temp = []
-                                for (let m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdbByMovId(data.item_id[m], temp)
-                                }
-                                that.fpFilms = temp
-                            }
-                        })
-					},
-
-					clickPost: function(item_id) {
-						var that = this
-						$.ajax({
-                            url: '/pio/query/click/submit',
-                            beforeSend(req) {
-                                req.setRequestHeader('Content-Type', 'application/json')
-                            },
-                            data: JSON.stringify({
-                                'userId': that.userId, 'itemId': item_id
-                            }),
-                            dataType: 'json',
-                            type: 'post',
-                            success(data) {
-								console.log("click behavior")
-                            }
-                        })
-					},
-
-                    queryOmdbById: function (imdbId) {
-                        var that = this
-                        $.ajax({
-                            url: '/pio/query/movie/infoById/' + imdbId,
-                            dataType: 'json',
-                            type: 'get',
-                            success(data) {
-                                that.filmData = data
-                            }
-                        })
-                    },
-
-                    getFilmData: function (id) {
-                        var that = this
-                        $.ajax({
-                            url: '/pio/query/movie/infoByMovId/' + id,
-                            dataType: 'json',
-                            type: 'get',
-                            success(data) {
-                                that.filmData = data
-                            }
-                        })
-                    },
-
-                    queryOmdbByMovId: function (id, temp) {
-                        $.ajax({
-                            url: '/pio/query/movie/infoByMovId/' + escape(id),
-                            dataType: 'json',
-                            type: 'get',
-                            success(data) {
-                                data.id = id
-                                temp.push(data)
-                            }
-                        })
-                    }
-                }
-            })
-
-			detailUR.getFilmData(qs("id"))
-            detailUR.queryRelated(qs("id"))
-            detailUR.clickPost(qs("id"))
-            detailUR.queryFp(qs("id"))
-		});
-	</script>
     <a href="#" id="toTop"><span id="toTopHover"> </span></a>
-<div style="display:none"><script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script></div>
+    <div style="display:none">
+		<script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script>
+	</div>
 </div>
 </body>
 </html>
