@@ -1,7 +1,5 @@
 package io.sugo.pio.engine.fp;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
@@ -24,23 +22,24 @@ public class FpEngine extends Engine<FpTrainingData, FpPreparaData, FpModelData>
     public FpEngine(PropertyHose propertyHose,
                     BatchEventHose batchEventHose,
                     Repository repository) {
+        super(null);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
     @Override
-    public DataSource<FpTrainingData> createDatasource() {
+    public DataSource<FpTrainingData> createDatasource(Params params) {
         return new FpDatasource(propertyHose, batchEventHose);
     }
 
     @Override
-    public Preparator<FpTrainingData, FpPreparaData> createPreparator() {
+    public Preparator<FpTrainingData, FpPreparaData> createPreparator(Params params) {
         return new FpPreparator();
     }
 
     @Override
-    public Algorithm<FpPreparaData, FpModelData> createAlgorithm() {
+    public Algorithm<FpPreparaData, FpModelData> createAlgorithm(Params params) {
         return new FpAlgorithm();
     }
 

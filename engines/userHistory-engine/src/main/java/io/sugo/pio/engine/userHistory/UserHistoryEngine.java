@@ -25,23 +25,24 @@ public class UserHistoryEngine extends Engine<UserHistoryTrainingData, UserHisto
     public UserHistoryEngine(PropertyHose propertyHose,
                              BatchEventHose batchEventHose,
                              Repository repository) {
+        super(null);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
     @Override
-    public DataSource<UserHistoryTrainingData> createDatasource() {
+    public DataSource<UserHistoryTrainingData> createDatasource(Params params) {
         return new UserHistoryDatasource(propertyHose, batchEventHose);
     }
 
     @Override
-    public Preparator<UserHistoryTrainingData, UserHistoryPreparaData> createPreparator() {
+    public Preparator<UserHistoryTrainingData, UserHistoryPreparaData> createPreparator(Params params) {
         return new UserHistoryPreparator();
     }
 
     @Override
-    public Algorithm<UserHistoryPreparaData, UserHistoryModelData> createAlgorithm() {
+    public Algorithm<UserHistoryPreparaData, UserHistoryModelData> createAlgorithm(Params params) {
         return new UserHistoryAlgorithm();
     }
 

@@ -7,10 +7,7 @@ import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.als.data.ALSModelData;
 import io.sugo.pio.engine.als.data.ALSPreparedData;
 import io.sugo.pio.engine.als.data.ALSTrainingData;
-import io.sugo.pio.engine.training.Algorithm;
-import io.sugo.pio.engine.training.DataSource;
-import io.sugo.pio.engine.training.Model;
-import io.sugo.pio.engine.training.Preparator;
+import io.sugo.pio.engine.training.*;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
@@ -28,13 +25,7 @@ public class ALSTraining extends AbstractTraining {
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         Repository repository = new LocalFileRepository(ALSResource.REPOSITORY_PATH);
         ALSEngineFactory engineFactory = new ALSEngineFactory(eventHose, repository);
-        Preparator<ALSTrainingData, ALSPreparedData> preparator = engineFactory.createPreparator();
-        DataSource<ALSTrainingData> dataSource = engineFactory.createDatasource();
-        ALSTrainingData trainingData = dataSource.readTraining(sc);
-        ALSPreparedData preparedData = preparator.prepare(sc, trainingData);
-        Algorithm<ALSPreparedData, ALSModelData> alg = engineFactory.createAlgorithm();
-        ALSModelData modelData = alg.train(sc, preparedData);
-        Model<ALSModelData> model = engineFactory.createModel();
-        model.save(modelData);
+        Engine engine = engineFactory.createEngine();
+        engine.train(sc);
     }
 }

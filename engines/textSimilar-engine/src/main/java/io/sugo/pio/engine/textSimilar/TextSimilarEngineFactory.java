@@ -1,15 +1,13 @@
 package io.sugo.pio.engine.textSimilar;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.textSimilar.data.TextSimilarModelData;
 import io.sugo.pio.engine.textSimilar.data.TextSimilarPreparaData;
 import io.sugo.pio.engine.textSimilar.data.TextSimilarTrainingData;
-import io.sugo.pio.engine.textSimilar.engine.TextSimilarAlgorithm;
-import io.sugo.pio.engine.textSimilar.engine.TextSimilarDatasource;
-import io.sugo.pio.engine.textSimilar.engine.TextSimilarModel;
-import io.sugo.pio.engine.textSimilar.engine.TextSimilarPreparator;
 import io.sugo.pio.engine.training.*;
 
 /**
@@ -19,31 +17,31 @@ public class TextSimilarEngineFactory implements EngineFactory<TextSimilarTraini
     private final PropertyHose propertyHose;
     private final Repository repository;
 
-    public TextSimilarEngineFactory(PropertyHose propertyHose,
-                                    BatchEventHose batchEventHose,
-                                    Repository repository) {
+    @JsonCreator
+    public TextSimilarEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
+                           @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                           @JsonProperty("repository") Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
-
     @Override
-    public DataSource<TextSimilarTrainingData> createDatasource() {
-        return new TextSimilarDatasource(propertyHose, batchEventHose);
+    public Engine createEngine() {
+        return new TextSimilarEngine(propertyHose, batchEventHose, repository);
     }
 
-    @Override
-    public Preparator<TextSimilarTrainingData, TextSimilarPreparaData> createPreparator() {
-        return new TextSimilarPreparator();
+    @JsonProperty
+    public BatchEventHose getBatchEventHose() {
+        return batchEventHose;
     }
 
-    @Override
-    public Algorithm<TextSimilarPreparaData, TextSimilarModelData> createAlgorithm() {
-        return new TextSimilarAlgorithm();
+    @JsonProperty
+    public PropertyHose getPropertyHose() {
+        return propertyHose;
     }
 
-    @Override
-    public Model<TextSimilarModelData> createModel() {
-        return new TextSimilarModel(repository);
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 }

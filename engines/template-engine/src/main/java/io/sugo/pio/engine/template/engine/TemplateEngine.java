@@ -14,22 +14,23 @@ public class TemplateEngine extends Engine<TemplateTrainingData, TemplatePrepare
     private final Repository repository;
 
     public TemplateEngine(BatchEventHose eventHose, Repository repository) {
+        super(null);
         this.eventHose = eventHose;
         this.repository = repository;
     }
 
     @Override
-    public DataSource<TemplateTrainingData> createDatasource() {
+    public DataSource<TemplateTrainingData> createDatasource(Params params) {
         return new TemplateDatasource(eventHose);
     }
 
     @Override
-    public Preparator<TemplateTrainingData, TemplatePreparedData> createPreparator() {
+    public Preparator<TemplateTrainingData, TemplatePreparedData> createPreparator(Params params) {
         return new TemplatePreparator();
     }
 
     @Override
-    public Algorithm<TemplatePreparedData, TemplateModelData> createAlgorithm() {
+    public Algorithm<TemplatePreparedData, TemplateModelData> createAlgorithm(Params params) {
         return new TemplateAlgorithm();
     }
 

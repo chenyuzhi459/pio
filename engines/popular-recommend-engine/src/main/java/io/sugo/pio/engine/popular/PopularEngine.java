@@ -23,23 +23,24 @@ public class PopularEngine extends Engine<PopularTrainingData, PopularPreparaDat
     public PopularEngine(PropertyHose propertyHose,
                          BatchEventHose batchEventHose,
                          Repository repository) {
+        super(null);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
     @Override
-    public DataSource<PopularTrainingData> createDatasource() {
+    public DataSource<PopularTrainingData> createDatasource(Params params) {
         return new PopularDatasource(propertyHose, batchEventHose);
     }
 
     @Override
-    public Preparator<PopularTrainingData, PopularPreparaData> createPreparator() {
+    public Preparator<PopularTrainingData, PopularPreparaData> createPreparator(Params params) {
         return new PopularPreparator();
     }
 
     @Override
-    public Algorithm<PopularPreparaData, PopularModelData> createAlgorithm() {
+    public Algorithm<PopularPreparaData, PopularModelData> createAlgorithm(Params params) {
         return new PopularAlgorithm();
     }
 
