@@ -18,14 +18,18 @@ public class FpEngine extends Engine<FpTrainingData, FpPreparaData, FpModelData>
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
+    private final FpEngineParams fpEngineParams;
 
     public FpEngine(PropertyHose propertyHose,
                     BatchEventHose batchEventHose,
-                    Repository repository) {
-        super(null);
+                    Repository repository,
+                    FpEngineParams fpEngineParams) {
+        super(fpEngineParams);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
+        this.fpEngineParams = fpEngineParams;
+
     }
 
     @Override

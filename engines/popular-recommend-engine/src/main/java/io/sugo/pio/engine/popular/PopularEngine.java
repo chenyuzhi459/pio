@@ -19,14 +19,17 @@ public class PopularEngine extends Engine<PopularTrainingData, PopularPreparaDat
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
+    private final PopEngineParams popEngineParams;
 
     public PopularEngine(PropertyHose propertyHose,
                          BatchEventHose batchEventHose,
-                         Repository repository) {
-        super(null);
+                         Repository repository,
+                         PopEngineParams popEngineParams) {
+        super(popEngineParams);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
+        this.popEngineParams = popEngineParams;
     }
 
     @Override

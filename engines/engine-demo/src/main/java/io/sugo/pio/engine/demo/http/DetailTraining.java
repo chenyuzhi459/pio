@@ -4,6 +4,7 @@ import io.sugo.pio.engine.demo.Constants;
 import io.sugo.pio.engine.demo.FileUtil;
 import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.detail.DetailEngineFactory;
+import io.sugo.pio.engine.detail.DetailEngineParams;
 import io.sugo.pio.engine.training.*;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
@@ -32,7 +33,8 @@ public class DetailTraining extends AbstractTraining {
         FileUtil.deleteDirectory(new File(DetailResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         Repository repository = new LocalFileRepository(DetailResource.REPOSITORY_PATH);
-        DetailEngineFactory engineFactory = new DetailEngineFactory(eventHose, repository);
+        DetailEngineParams detailEngineParams = new DetailEngineParams();
+        DetailEngineFactory engineFactory = new DetailEngineFactory(eventHose, repository, detailEngineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }
