@@ -1,6 +1,7 @@
 package io.sugo.pio.engine.demo.http;
 
 import io.sugo.pio.engine.als.ALSEngineFactory;
+import io.sugo.pio.engine.als.ALSEngineParams;
 import io.sugo.pio.engine.demo.Constants;
 import io.sugo.pio.engine.demo.FileUtil;
 import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
@@ -24,7 +25,8 @@ public class ALSTraining extends AbstractTraining {
         FileUtil.deleteDirectory(new File(ALSResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         Repository repository = new LocalFileRepository(ALSResource.REPOSITORY_PATH);
-        ALSEngineFactory engineFactory = new ALSEngineFactory(eventHose, repository);
+        ALSEngineParams engineParams = new ALSEngineParams(1);
+        ALSEngineFactory engineFactory = new ALSEngineFactory(eventHose, repository, engineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }

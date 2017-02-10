@@ -1,7 +1,5 @@
 package io.sugo.pio.engine.als;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.als.data.ALSModelData;
 import io.sugo.pio.engine.als.data.ALSPreparedData;
 import io.sugo.pio.engine.als.data.ALSTrainingData;

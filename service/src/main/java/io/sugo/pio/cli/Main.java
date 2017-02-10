@@ -35,10 +35,12 @@ public class Main {
                         CreateTables.class
                 );
 
-        builder.withGroup("train")
-                .withDescription("Train engine for pio")
+        builder.withGroup("engine")
+                .withDescription("Engine commands for pio")
                 .withDefaultCommand(Help.class)
-                .withCommands(CliTrainer.class);
+                .withCommands(
+                        CliTrainer.class,
+                        CliDeployer.class);
 
         builder.withGroup("internal")
                 .withDescription("Processes that pio runs \"internally\", you should rarely use these directly")
