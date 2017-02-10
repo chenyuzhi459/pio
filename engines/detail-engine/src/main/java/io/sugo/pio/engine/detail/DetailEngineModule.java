@@ -16,7 +16,7 @@ public class DetailEngineModule implements EngineModule {
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
                 new SimpleModule(DetailEngineModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(DetailEngineFactory.class, "detail_factory"),
+                        .registerSubtypes(new NamedType(DetailTrainingConfig.class, "detail_config"),
                                 new NamedType(DetailQuery.class, "detail_query"),
                                 new NamedType(DetailModelFactory.class, "detail_model")));
     }

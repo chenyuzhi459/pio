@@ -1,19 +1,19 @@
 package io.sugo.pio.engine;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.*;
 import io.sugo.pio.engine.training.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
  */
 public class TrainingWorkFlow {
     public static void main(String[] args) throws IOException {
-        TrainingObjectMapper mapper = new TrainingObjectMapper();
+        EngineObjectMapper mapper = new EngineObjectMapper();
         ServiceLoader<EngineModule> engineModules = ServiceLoader
                 .load(EngineModule.class);
 
@@ -31,52 +31,26 @@ public class TrainingWorkFlow {
             }
         }
 
-        if (args.length <= 1) {
+        if (args.length < 1) {
             System.exit(1);
         }
 
-        String trainingConfigStr = args[1];
+        String trainingConfigStr = args[0];
         TrainingConfig trainingConfig = mapper.readValue(trainingConfigStr, TrainingConfig.class);
-        EngineFactory engineFactory = trainingConfig.getEngineFactory();
-        DataSource dataSource = engineFactory.createDatasource();
-        Preparator preparator = engineFactory.createPreparator();
-        Model model = engineFactory.createModel();
-        Algorithm alg = engineFactory.createAlgorithm();
         SparkConf sparkConf = new SparkConf();
+        Map<String, String> context = trainingConfig.getSparkConfSettings();
+        for(Map.Entry<String, String> entry: context.entrySet()) {
+            sparkConf.set(entry.getKey(), entry.getValue());
+        }
+
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
-        Object trainingData = dataSource.readTraining(sc);
-        Object preparedData = preparator.prepare(sc, trainingData);
-        Object modelData = alg.train(sc, preparedData);
-        model.save(modelData);
-    }
-
-    private static class TrainingObjectMapper extends ObjectMapper {
-        public TrainingObjectMapper()
-        {
-            this((JsonFactory)null);
+        SparkContextSettings sparkContextSettings = trainingConfig.getSparkContextSettings();
+        if (null != sparkContextSettings.getCheckPointDir()) {
+            sc.setCheckpointDir(sparkContextSettings.getCheckPointDir());
         }
 
-        public TrainingObjectMapper(TrainingObjectMapper mapper)
-        {
-            super(mapper);
-        }
-
-        public TrainingObjectMapper(JsonFactory factory)
-        {
-            super(factory);
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            configure(MapperFeature.AUTO_DETECT_GETTERS, false);
-            configure(MapperFeature.AUTO_DETECT_FIELDS, false);
-            configure(MapperFeature.AUTO_DETECT_IS_GETTERS, false);
-            configure(MapperFeature.AUTO_DETECT_SETTERS, false);
-            configure(MapperFeature.ALLOW_FINAL_FIELDS_AS_MUTATORS, false);
-            configure(SerializationFeature.INDENT_OUTPUT, false);
-        }
-
-        @Override
-        public ObjectMapper copy()
-        {
-            return new TrainingObjectMapper(this);
-        }
+        EngineFactory engineFactory = trainingConfig.getEngineFactory();
+        Engine engine = engineFactory.createEngine();
+        engine.train(sc);
     }
 }

@@ -309,7 +309,7 @@
 											req.setRequestHeader('Content-Type', 'application/json')
 										},
 										data: JSON.stringify({
-											'userId': "1", "items":that.cacheItems,
+											'userId': that.userId, "items":that.cacheItems,
 										}),
 										dataType: 'json',
 										type: 'post',

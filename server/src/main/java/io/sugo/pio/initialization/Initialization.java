@@ -22,6 +22,7 @@ import io.sugo.pio.guice.http.HttpClientModule;
 import io.sugo.pio.metadata.storage.derby.DerbyMetadataStoragePioModule;
 import io.sugo.pio.server.initialization.jetty.JettyServerModule;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.aether.artifact.DefaultArtifact;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -240,7 +241,7 @@ public class Initialization {
                 if (!extensionDir.isDirectory()) {
                     throw new ISE(
                             String.format(
-                                    "Extension [%s] specified in \"druid.extensions.loadList\" didn't exist!?",
+                                    "Extension [%s] specified in \"pio.extensions.loadList\" didn't exist!?",
                                     extensionDir.getAbsolutePath()
                             )
                     );
@@ -283,7 +284,7 @@ public class Initialization {
                 if (!extensionDir.isDirectory()) {
                     throw new ISE(
                             String.format(
-                                    "Extension [%s] specified in \"druid.extensions.loadList\" didn't exist!?",
+                                    "Extension [%s] specified in \"pio.extensions.loadList\" didn't exist!?",
                                     extensionDir.getAbsolutePath()
                             )
                     );
@@ -317,6 +318,75 @@ public class Initialization {
         File[] extensionsToLoad = rootExtensionsDir.listFiles();
         return extensionsToLoad == null ? new File[]{} : extensionsToLoad;
     }
+
+    /**
+     * Find all the hadoop dependencies that should be loaded by druid
+     *
+     * @param hadoopDependencyCoordinates e.g.["org.apache.hadoop:hadoop-client:2.3.0"]
+     * @param extensionsConfig            ExtensionsConfig configured by druid.extensions.xxx
+     *
+     * @return an array of hadoop dependency files that will be loaded by druid process
+     */
+    public static File[] getHadoopFilesToLoad(
+            List<String> hadoopDependencyCoordinates,
+            ExtensionsConfig extensionsConfig
+    )
+    {
+        final File rootSparkDependenciesDir = new File(extensionsConfig.getHadoopDependenciesDir());
+        if (rootSparkDependenciesDir.exists() && !rootSparkDependenciesDir.isDirectory()) {
+            throw new ISE("Root Spark dependencies directory [%s] is not a directory!?", rootSparkDependenciesDir);
+        }
+        final File[] hadoopDependenciesToLoad = new File[hadoopDependencyCoordinates.size()];
+        int i = 0;
+        for (final String coordinate : hadoopDependencyCoordinates) {
+            final DefaultArtifact artifact = new DefaultArtifact(coordinate);
+            final File hadoopDependencyDir = new File(rootSparkDependenciesDir, artifact.getArtifactId());
+            final File versionDir = new File(hadoopDependencyDir, artifact.getVersion());
+            // find the hadoop dependency with the version specified in coordinate
+            if (!hadoopDependencyDir.isDirectory() || !versionDir.isDirectory()) {
+                throw new ISE(
+                        String.format("Spark dependency [%s] didn't exist!?", versionDir.getAbsolutePath())
+                );
+            }
+            hadoopDependenciesToLoad[i++] = versionDir;
+        }
+        return hadoopDependenciesToLoad;
+    }
+
+    /**
+     * Find all the hadoop dependencies that should be loaded by druid
+     *
+     * @param sparkDependencyCoordinates e.g.["org.apache.hadoop:hadoop-client:2.3.0"]
+     * @param extensionsConfig            ExtensionsConfig configured by druid.extensions.xxx
+     *
+     * @return an array of hadoop dependency files that will be loaded by druid process
+     */
+    public static File[] getSparkFilesToLoad(
+            List<String> sparkDependencyCoordinates,
+            ExtensionsConfig extensionsConfig
+    )
+    {
+        final File rootSparkDependenciesDir = new File(extensionsConfig.getSparkDependenciesDir());
+        if (rootSparkDependenciesDir.exists() && !rootSparkDependenciesDir.isDirectory()) {
+            throw new ISE("Root Spark dependencies directory [%s] is not a directory!?", rootSparkDependenciesDir);
+        }
+        final File[] sparkDependenciesToLoad = new File[sparkDependencyCoordinates.size()];
+        int i = 0;
+        for (final String coordinate : sparkDependencyCoordinates) {
+            final DefaultArtifact artifact = new DefaultArtifact(coordinate);
+            final File sparkDependencyDir = new File(rootSparkDependenciesDir, artifact.getArtifactId());
+            final File versionDir = new File(sparkDependencyDir, artifact.getVersion());
+            // find the hadoop dependency with the version specified in coordinate
+            if (!sparkDependencyDir.isDirectory() || !versionDir.isDirectory()) {
+                throw new ISE(
+                        String.format("Spark dependency [%s] didn't exist!?", versionDir.getAbsolutePath())
+                );
+            }
+            sparkDependenciesToLoad[i++] = versionDir;
+        }
+        return sparkDependenciesToLoad;
+    }
+
 
     /**
      * @param extension The File instance of the extension we want to load

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.prediction.PredictionQueryObject;
 
 public class ALSQuery implements PredictionQueryObject {
-//public class ALSQuery {
     private String user_id;
     private String num;
 

@@ -15,6 +15,7 @@ public class RepositoryDirectory extends BaseDirectory {
     public RepositoryDirectory(Repository repository) {
         super(RepositoryLockFactory.INSTANCE);
         this.repository = repository;
+        repository.init();
     }
 
     @Override

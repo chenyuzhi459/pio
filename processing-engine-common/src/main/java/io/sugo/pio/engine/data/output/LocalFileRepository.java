@@ -24,6 +24,11 @@ public class LocalFileRepository implements Repository {
     }
 
     @Override
+    public void init() {
+
+    }
+
+    @Override
     public OutputStream openOutput(String name) {
         try {
             return new FileOutputStream(new File(path, name));

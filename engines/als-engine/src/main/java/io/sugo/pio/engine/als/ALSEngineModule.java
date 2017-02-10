@@ -16,7 +16,7 @@ public class ALSEngineModule implements EngineModule {
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
                 new SimpleModule(ALSEngineModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(ALSEngineFactory.class, "als_factory"),
+                        .registerSubtypes(new NamedType(ALSTrainingConfig.class, "als_config"),
                                 new NamedType(ALSQuery.class, "als_query"),
                                 new NamedType(ALSModelFactory.class, "als_model")));
     }

@@ -22,32 +22,17 @@ public class FpEngineFactory implements EngineFactory<FpTrainingData, FpPreparaD
     private final Repository repository;
 
     @JsonCreator
-    public FpEngineFactory(@JsonProperty PropertyHose propertyHose,
-                           @JsonProperty BatchEventHose batchEventHose,
-                           @JsonProperty Repository repository) {
+    public FpEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
+                           @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                           @JsonProperty("repository") Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
     @Override
-    public DataSource<FpTrainingData> createDatasource() {
-        return new FpDatasource(propertyHose, batchEventHose);
-    }
-
-    @Override
-    public Preparator<FpTrainingData, FpPreparaData> createPreparator() {
-        return new FpPreparator();
-    }
-
-    @Override
-    public Algorithm<FpPreparaData, FpModelData> createAlgorithm() {
-        return new FpAlgorithm();
-    }
-
-    @Override
-    public Model<FpModelData> createModel() {
-        return new FpModel(repository);
+    public Engine createEngine() {
+        return new FpEngine(propertyHose, batchEventHose, repository);
     }
 
     @JsonProperty
@@ -59,4 +44,6 @@ public class FpEngineFactory implements EngineFactory<FpTrainingData, FpPreparaD
     public PropertyHose getPropertyHose() {
         return propertyHose;
     }
+
+
 }

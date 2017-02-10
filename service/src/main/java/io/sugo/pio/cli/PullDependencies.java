@@ -154,6 +154,19 @@ public class PullDependencies implements Runnable
   public boolean noDefaultHadoop = false;
 
   @Option(
+          name = {"-s", "--spark-coordinate"},
+          title = "spark coordinate",
+          description = "Spark dependency to pull down, followed by a maven coordinate, e.g. org.apache.hadoop:hadoop-client:2.4.0",
+          required = false)
+  public List<String> sparkCoordinates = Lists.newArrayList();
+
+  @Option(
+          name = "--no-default-spark",
+          description = "Don't pull down the default spark coordinate, i.e., org.apache.hadoop:hadoop-client:2.3.0. If `-s` option is supplied, then default hadoop coordinate will not be downloaded.",
+          required = false)
+  public boolean noDefaultSpark = false;
+
+  @Option(
       name = "--clean",
       title = "Remove exisiting extension and hadoop dependencies directories before pulling down dependencies.",
       required = false)
@@ -172,7 +185,7 @@ public class PullDependencies implements Runnable
       required = false
   )
   List<String> remoteRepositories = Lists.newArrayList(
-      "https://repo1.maven.org/maven2/",
+      "http://central.maven.org/maven2/",
       "https://metamx.artifactoryonline.com/metamx/pub-libs-releases-local"
   );
 
@@ -203,6 +216,7 @@ public class PullDependencies implements Runnable
 
     final File extensionsDir = new File(extensionsConfig.getDirectory());
     final File hadoopDependenciesDir = new File(extensionsConfig.getHadoopDependenciesDir());
+    final File sparkDependenciesDir = new File(extensionsConfig.getSparkDependenciesDir());
     final File enginesDir = new File(enginesConfig.getEnginesDirectory());
     final File engineExtensionsDir = new File(enginesConfig.getExtensionsDirectory());
 
@@ -210,6 +224,7 @@ public class PullDependencies implements Runnable
       try {
         FileUtils.deleteDirectory(extensionsDir);
         FileUtils.deleteDirectory(hadoopDependenciesDir);
+        FileUtils.deleteDirectory(sparkDependenciesDir);
         FileUtils.deleteDirectory(enginesDir);
         FileUtils.deleteDirectory(engineExtensionsDir);
       }
@@ -221,6 +236,7 @@ public class PullDependencies implements Runnable
 
     createRootExtensionsDirectory(extensionsDir);
     createRootExtensionsDirectory(hadoopDependenciesDir);
+    createRootExtensionsDirectory(sparkDependenciesDir);
     createRootExtensionsDirectory(enginesDir);
     createRootExtensionsDirectory(engineExtensionsDir);
 
@@ -282,6 +298,27 @@ public class PullDependencies implements Runnable
         downloadExtension(versionedArtifact, currExtensionDir);
       }
       log.info("Finish downloading dependencies for hadoop extension coordinates: [%s]", hadoopCoordinates);
+
+      if (!noDefaultSpark && sparkCoordinates.isEmpty()) {
+        sparkCoordinates.addAll(ImmutableList.of(
+                "org.apache.spark:spark-yarn_2.11:2.1.0"
+        ));
+      }
+
+      log.info("Start downloading dependencies for spark extension coordinates: [%s]", sparkCoordinates);
+      for (final String sparkCoordinate : sparkCoordinates) {
+        final Artifact versionedArtifact = getArtifact(sparkCoordinate);
+
+        File currExtensionDir = new File(sparkDependenciesDir, versionedArtifact.getArtifactId());
+        createExtensionDirectory(sparkCoordinate, currExtensionDir);
+
+        // add a version folder for hadoop dependency directory
+        currExtensionDir = new File(currExtensionDir, versionedArtifact.getVersion());
+        createExtensionDirectory(sparkCoordinate, currExtensionDir);
+
+        downloadExtension(versionedArtifact, currExtensionDir);
+      }
+      log.info("Finish downloading dependencies for spark extension coordinates: [%s]", sparkCoordinates);
     }
     catch (Exception e) {
       throw Throwables.propagate(e);

@@ -16,12 +16,12 @@ public class HdfsExtensionModule implements EngineExtensionModule{
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
                 new SimpleModule(HdfsExtensionModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(HdfsRepository.class, "hdfs")
+                        .registerSubtypes(new NamedType(HdfsRepository.class, "hdfs"),
+                                new NamedType(HdfsFileEventHose.class, "hdfsFile")
                         ));
     }
 
     @Override
     public void configure(Binder binder) {
-
     }
 }

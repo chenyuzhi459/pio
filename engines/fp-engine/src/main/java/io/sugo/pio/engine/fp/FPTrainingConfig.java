@@ -8,7 +8,7 @@ import io.sugo.pio.engine.training.TrainingConfig;
  */
 public class FPTrainingConfig extends TrainingConfig<FpEngineFactory> {
     @JsonCreator
-    public FPTrainingConfig(@JsonProperty FpEngineFactory engineFactory) {
+    public FPTrainingConfig(@JsonProperty("engineFactory") FpEngineFactory engineFactory) {
         super(engineFactory);
     }
 }

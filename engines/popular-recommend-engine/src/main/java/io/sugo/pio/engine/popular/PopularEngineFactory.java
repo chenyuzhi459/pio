@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.popular;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
@@ -19,31 +21,33 @@ public class PopularEngineFactory implements EngineFactory<PopularTrainingData, 
     private final PropertyHose propertyHose;
     private final Repository repository;
 
-    public PopularEngineFactory(PropertyHose propertyHose,
-                                BatchEventHose batchEventHose,
-                                Repository repository) {
+    @JsonCreator
+    public PopularEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
+                           @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                           @JsonProperty("repository") Repository repository) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
     }
 
-    @Override
-    public DataSource<PopularTrainingData> createDatasource() {
-        return new PopularDatasource(propertyHose, batchEventHose);
-    }
 
     @Override
-    public Preparator<PopularTrainingData, PopularPreparaData> createPreparator() {
-        return new PopularPreparator();
+    public Engine createEngine() {
+        return new PopularEngine(propertyHose, batchEventHose, repository);
     }
 
-    @Override
-    public Algorithm<PopularPreparaData, PopularModelData> createAlgorithm() {
-        return new PopularAlgorithm();
+    @JsonProperty
+    public BatchEventHose getBatchEventHose() {
+        return batchEventHose;
     }
 
-    @Override
-    public Model<PopularModelData> createModel() {
-        return new PopularModel(repository);
+    @JsonProperty
+    public PropertyHose getPropertyHose() {
+        return propertyHose;
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 }

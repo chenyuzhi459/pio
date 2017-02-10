@@ -16,7 +16,7 @@ public class UserHistoryEngineModule implements EngineModule {
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
                 new SimpleModule(UserHistoryEngineModule.class.getSimpleName())
-                        .registerSubtypes(new NamedType(UserHistoryEngineFactory.class, "userHistory_factory"),
+                        .registerSubtypes(new NamedType(UserHistoryTrainingConfig.class, "userHistory_config"),
                                 new NamedType(UserHistoryQuery.class, "userHistory_query"),
                                 new NamedType(UserHistoryModelFactory.class, "userHistory_model")));
     }

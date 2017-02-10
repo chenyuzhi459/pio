@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.detail;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
@@ -18,29 +20,26 @@ public class DetailEngineFactory implements EngineFactory<DetailTrainingData, De
     private final BatchEventHose batchEventHose;
     private final Repository repository;
 
-    public DetailEngineFactory(BatchEventHose batchEventHose, Repository repository) {
+    @JsonCreator
+    public DetailEngineFactory(@JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                               @JsonProperty("repository") Repository repository) {
         this.batchEventHose = batchEventHose;
         this.repository = repository;
     }
 
-    @Override
-    public DataSource<DetailTrainingData> createDatasource() {
-        return new DetailDataSource(batchEventHose);
+    @JsonProperty
+    public BatchEventHose getBatchEventHose() {
+        return batchEventHose;
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 
     @Override
-    public Preparator<DetailTrainingData, DetailPreparedData> createPreparator() {
-        return new DetailPreparator();
-    }
-
-    @Override
-    public Algorithm<DetailPreparedData, DetailModelData> createAlgorithm() {
-        return new DetailAlgorithm();
-    }
-
-    @Override
-    public Model<DetailModelData> createModel() {
-        return new DetailModel(repository);
+    public Engine createEngine() {
+        return new DetailEngine(batchEventHose, repository);
     }
 }
 
