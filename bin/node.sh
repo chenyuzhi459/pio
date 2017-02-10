@@ -36,7 +36,7 @@ case $startStop in
       fi
     fi
 
-    nohup java `cat conf/jvm.config | xargs` -cp conf/:conf/$nodeType:lib/* io.sugo.pio.cli.Main $cmdGroup $nodeType $1 &
+    nohup java `cat conf/jvm.config | xargs` -cp conf/:conf/$nodeType:lib/*:extlibs/* io.sugo.pio.cli.Main $cmdGroup $nodeType $1 &
     nodeType_PID=$!
     echo $nodeType_PID > $pid
     echo "Started $nodeType node ($nodeType_PID)"

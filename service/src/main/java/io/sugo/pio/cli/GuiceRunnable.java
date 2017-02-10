@@ -46,6 +46,7 @@ public abstract class GuiceRunnable implements Runnable {
             }
             catch (Throwable t) {
                 log.error(t, "Error when starting up.  Failing.");
+                log.error("Lifecycle:[%s] start error", lifecycle.getClass().getName());
                 System.exit(1);
             }
 

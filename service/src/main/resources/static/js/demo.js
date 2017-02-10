@@ -1,5 +1,6 @@
 $(function(){
-var hostUrl='http://192.168.0.110:8080';
+var hostUrl='http://192.168.0.211:6060';
+hostUrl='';
 
 var isFirst = true;
 function getAllProcess(){

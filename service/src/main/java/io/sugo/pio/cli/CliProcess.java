@@ -23,7 +23,7 @@ import java.util.List;
         description = "Runs a pio server"
 )
 public class CliProcess extends ServerRunnable {
-    private static final Logger log = new Logger(CliMiddleManager.class);
+    private static final Logger log = new Logger(CliProcess.class);
 
     public CliProcess()
     {
@@ -39,7 +39,7 @@ public class CliProcess extends ServerRunnable {
                         binder.bindConstant()
                                 .annotatedWith(Names.named("serviceName"))
                                 .to("pio/process");
-                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(8080);
+                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(6060);
 
                         Jerseys.addResource(binder, ProcessResource.class);
                         Jerseys.addResource(binder, OperatorResource.class);

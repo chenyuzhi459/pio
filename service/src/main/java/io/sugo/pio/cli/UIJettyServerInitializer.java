@@ -28,8 +28,8 @@ public class UIJettyServerInitializer implements JettyServerInitializer {
         root.setBaseResource(
                 new ResourceCollection(
                         new String[]{
-//                                this.getClass().getClassLoader().getResource("static").toExternalForm(),
-                                "/work/pio/src/sugo-pio/service/src/main/resources/static"
+                                this.getClass().getClassLoader().getResource("static").toExternalForm()
+//                                "/work/pio/src/sugo-pio/service/src/main/resources/static"
                         }
                 )
         );
