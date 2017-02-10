@@ -10,6 +10,7 @@ import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.training.*;
 import io.sugo.pio.engine.userHistory.UserHistoryEngineFactory;
+import io.sugo.pio.engine.userHistory.UserHistoryEngineParams;
 import io.sugo.pio.engine.userHistory.data.UserHistoryModelData;
 import io.sugo.pio.engine.userHistory.data.UserHistoryPreparaData;
 import io.sugo.pio.engine.userHistory.data.UserHistoryTrainingData;
@@ -27,7 +28,8 @@ public class UserHistoryTraining extends AbstractTraining{
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(UserHistoryResource.REPOSITORY_PATH);
-        EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> engineFactory = new UserHistoryEngineFactory(propHose, eventHose, repository);
+        UserHistoryEngineParams userHistoryEngineParams = new UserHistoryEngineParams();
+        EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> engineFactory = new UserHistoryEngineFactory(propHose, eventHose, repository, userHistoryEngineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }

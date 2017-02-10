@@ -19,5 +19,4 @@ class ALSDataSource(batchEventHose: BatchEventHose) extends DataSource[ALSTraini
     ALSTrainingData(trainingData)
   }
 
-
 }

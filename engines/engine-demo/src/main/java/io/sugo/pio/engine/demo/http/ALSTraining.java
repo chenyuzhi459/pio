@@ -25,8 +25,8 @@ public class ALSTraining extends AbstractTraining {
         FileUtil.deleteDirectory(new File(ALSResource.REPOSITORY_PATH));
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         Repository repository = new LocalFileRepository(ALSResource.REPOSITORY_PATH);
-        ALSEngineParams engineParams = new ALSEngineParams(1);
-        ALSEngineFactory engineFactory = new ALSEngineFactory(eventHose, repository, engineParams);
+        ALSEngineParams alsEngineParams = new ALSEngineParams(5,10);
+        ALSEngineFactory engineFactory = new ALSEngineFactory(eventHose, repository, alsEngineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }

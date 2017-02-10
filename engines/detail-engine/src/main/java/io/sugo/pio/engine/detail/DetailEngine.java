@@ -18,13 +18,16 @@ import io.sugo.pio.engine.training.*;
 public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData, DetailModelData> {
     private final BatchEventHose batchEventHose;
     private final Repository repository;
+    private final DetailEngineParams detailEngineParams;
 
     @JsonCreator
-    public DetailEngine(@JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                               @JsonProperty("repository") Repository repository) {
-        super(null);
+    public DetailEngine( BatchEventHose batchEventHose,
+                          Repository repository,
+                          DetailEngineParams detailEngineParams) {
+        super(detailEngineParams);
         this.batchEventHose = batchEventHose;
         this.repository = repository;
+        this.detailEngineParams = detailEngineParams;
     }
     @Override
     protected DataSource<DetailTrainingData> createDatasource(Params params) {

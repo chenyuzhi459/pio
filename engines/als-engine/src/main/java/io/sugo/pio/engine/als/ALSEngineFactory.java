@@ -5,12 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.als.data.ALSModelData;
 import io.sugo.pio.engine.als.data.ALSPreparedData;
 import io.sugo.pio.engine.als.data.ALSTrainingData;
-import io.sugo.pio.engine.als.engine.ALSAlgorithm;
-import io.sugo.pio.engine.als.engine.ALSDModel;
-import io.sugo.pio.engine.als.engine.ALSDataSource;
-import io.sugo.pio.engine.als.engine.ALSPreparator;
 import io.sugo.pio.engine.data.input.BatchEventHose;
-import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.training.*;
 

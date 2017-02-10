@@ -9,10 +9,6 @@ import io.sugo.pio.engine.training.*;
 import io.sugo.pio.engine.userHistory.data.UserHistoryModelData;
 import io.sugo.pio.engine.userHistory.data.UserHistoryPreparaData;
 import io.sugo.pio.engine.userHistory.data.UserHistoryTrainingData;
-import io.sugo.pio.engine.userHistory.engine.UserHistoryAlgorithm;
-import io.sugo.pio.engine.userHistory.engine.UserHistoryDatasource;
-import io.sugo.pio.engine.userHistory.engine.UserHistoryModel;
-import io.sugo.pio.engine.userHistory.engine.UserHistoryPreparator;
 
 /**
  */
@@ -20,18 +16,19 @@ public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTraini
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
+    private final UserHistoryEngineParams userHistoryEngineParams;
 
 
     @JsonCreator
     public UserHistoryEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
-                               @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                               @JsonProperty("repository") Repository repository) {
+                                    @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
+                                    @JsonProperty("repository") Repository repository,
+                                    @JsonProperty("engineParams") UserHistoryEngineParams engineParams) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
+        this.userHistoryEngineParams = engineParams;
     }
-
-
 
     @JsonProperty
     public BatchEventHose getBatchEventHose() {
@@ -48,8 +45,13 @@ public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTraini
         return repository;
     }
 
+    @JsonProperty
+    public UserHistoryEngineParams getUserHistoryEngineParams() {
+        return userHistoryEngineParams;
+    }
+
     @Override
     public Engine createEngine() {
-        return new UserHistoryEngine(propertyHose, batchEventHose, repository);
+        return new UserHistoryEngine(propertyHose, batchEventHose, repository, userHistoryEngineParams);
     }
 }

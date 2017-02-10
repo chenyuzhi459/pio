@@ -20,15 +20,18 @@ public class UserHistoryEngine extends Engine<UserHistoryTrainingData, UserHisto
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
+    private final UserHistoryEngineParams userHistoryEngineParams;
 
 
     public UserHistoryEngine(PropertyHose propertyHose,
                              BatchEventHose batchEventHose,
-                             Repository repository) {
-        super(null);
+                             Repository repository,
+                             UserHistoryEngineParams userHistoryEngineParams) {
+        super(userHistoryEngineParams);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
+        this.userHistoryEngineParams = userHistoryEngineParams;
     }
 
     @Override

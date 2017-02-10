@@ -10,6 +10,7 @@ import io.sugo.pio.engine.demo.FileUtil;
 import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.fp.FpEngineFactory;
+import io.sugo.pio.engine.fp.FpEngineParams;
 import io.sugo.pio.engine.fp.data.FpModelData;
 import io.sugo.pio.engine.fp.data.FpPreparaData;
 import io.sugo.pio.engine.fp.data.FpTrainingData;
@@ -28,7 +29,8 @@ public class FpTraining extends AbstractTraining{
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(FpResource.REPOSITORY_PATH);
-        EngineFactory<FpTrainingData, FpPreparaData, FpModelData> engineFactory = new FpEngineFactory(propHose, eventHose, repository);
+        FpEngineParams fpEngineParams = new FpEngineParams();
+        EngineFactory<FpTrainingData, FpPreparaData, FpModelData> engineFactory = new FpEngineFactory(propHose, eventHose, repository, fpEngineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }

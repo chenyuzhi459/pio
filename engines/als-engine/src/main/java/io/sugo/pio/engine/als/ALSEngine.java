@@ -16,6 +16,7 @@ import io.sugo.pio.engine.training.*;
 public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModelData> {
     private final BatchEventHose batchEventHose;
     private final Repository repository;
+    private final ALSEngineParams alsEngineParams;
 
     public ALSEngine(BatchEventHose batchEventHose,
                      Repository repository,
@@ -23,6 +24,7 @@ public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModel
         super(alsEngineParams);
         this.batchEventHose = batchEventHose;
         this.repository = repository;
+        this.alsEngineParams = alsEngineParams;
     }
     @Override
     protected DataSource<ALSTrainingData> createDatasource(Params params) {
@@ -36,7 +38,7 @@ public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModel
 
     @Override
     protected Algorithm<ALSPreparedData, ALSModelData> createAlgorithm(Params params) {
-        return new ALSAlgorithm();
+        return new ALSAlgorithm(alsEngineParams.getAlgorithmParams());
     }
 
     @Override

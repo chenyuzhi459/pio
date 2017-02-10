@@ -18,14 +18,17 @@ public class SearchEngine extends Engine<SearchTrainingData, SearchPreparaData, 
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
+    private final SearchEngineParams searchEngineParams;
 
     public SearchEngine(PropertyHose propertyHose,
                         BatchEventHose batchEventHose,
-                        Repository repository) {
-        super(null);
+                        Repository repository,
+                        SearchEngineParams searchEngineParams) {
+        super(searchEngineParams);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
+        this.searchEngineParams = searchEngineParams;
     }
 
     @Override

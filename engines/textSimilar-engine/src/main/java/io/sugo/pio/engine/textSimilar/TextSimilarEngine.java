@@ -18,14 +18,17 @@ public class TextSimilarEngine extends Engine<TextSimilarTrainingData, TextSimil
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
+    private final TextSimilarEngineParams textSimilarEngineParams;
 
     public TextSimilarEngine(PropertyHose propertyHose,
-                                    BatchEventHose batchEventHose,
-                                    Repository repository) {
-        super(null);
+                             BatchEventHose batchEventHose,
+                             Repository repository,
+                             TextSimilarEngineParams textSimilarEngineParams) {
+        super(textSimilarEngineParams);
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
+        this.textSimilarEngineParams = textSimilarEngineParams;
     }
 
     @Override

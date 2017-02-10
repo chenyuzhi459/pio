@@ -4,6 +4,7 @@ import io.sugo.pio.engine.demo.Constants;
 import io.sugo.pio.engine.demo.FileUtil;
 import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.demo.data.MoviePropertyHose;
+import io.sugo.pio.engine.popular.PopEngineParams;
 import io.sugo.pio.engine.popular.PopularEngineFactory;
 import io.sugo.pio.engine.popular.data.PopularModelData;
 import io.sugo.pio.engine.popular.data.PopularPreparaData;
@@ -27,7 +28,8 @@ public class PopularTraining extends AbstractTraining {
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(PopluarResource.REPOSITORY_PATH);
-        EngineFactory<PopularTrainingData, PopularPreparaData, PopularModelData> engineFactory = new PopularEngineFactory(propHose, eventHose, repository);
+        PopEngineParams popEngineParams = new PopEngineParams();
+        EngineFactory<PopularTrainingData, PopularPreparaData, PopularModelData> engineFactory = new PopularEngineFactory(propHose, eventHose, repository, popEngineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }
