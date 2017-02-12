@@ -51,6 +51,6 @@ public class EvaluationWorkFlow {
 
         EngineFactory engineFactory = trainingConfig.getEngineFactory();
         Engine engine = engineFactory.createEngine();
-        engine.train(sc);
+        engine.eval(sc);
     }
 }
