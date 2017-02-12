@@ -141,19 +141,6 @@ public class PullDependencies implements Runnable
   public List<String> engineExtensionCoordinates = Lists.newArrayList();
 
   @Option(
-      name = {"-h", "--hadoop-coordinate"},
-      title = "hadoop coordinate",
-      description = "Hadoop dependency to pull down, followed by a maven coordinate, e.g. org.apache.hadoop:hadoop-client:2.4.0",
-      required = false)
-  public List<String> hadoopCoordinates = Lists.newArrayList();
-
-  @Option(
-      name = "--no-default-hadoop",
-      description = "Don't pull down the default hadoop coordinate, i.e., org.apache.hadoop:hadoop-client:2.3.0. If `-h` option is supplied, then default hadoop coordinate will not be downloaded.",
-      required = false)
-  public boolean noDefaultHadoop = false;
-
-  @Option(
           name = {"-s", "--spark-coordinate"},
           title = "spark coordinate",
           description = "Spark dependency to pull down, followed by a maven coordinate, e.g. org.apache.hadoop:hadoop-client:2.4.0",
@@ -215,7 +202,6 @@ public class PullDependencies implements Runnable
     }
 
     final File extensionsDir = new File(extensionsConfig.getDirectory());
-    final File hadoopDependenciesDir = new File(extensionsConfig.getHadoopDependenciesDir());
     final File sparkDependenciesDir = new File(extensionsConfig.getSparkDependenciesDir());
     final File enginesDir = new File(enginesConfig.getEnginesDirectory());
     final File engineExtensionsDir = new File(enginesConfig.getExtensionsDirectory());
@@ -223,7 +209,6 @@ public class PullDependencies implements Runnable
     if (clean) {
       try {
         FileUtils.deleteDirectory(extensionsDir);
-        FileUtils.deleteDirectory(hadoopDependenciesDir);
         FileUtils.deleteDirectory(sparkDependenciesDir);
         FileUtils.deleteDirectory(enginesDir);
         FileUtils.deleteDirectory(engineExtensionsDir);
@@ -235,7 +220,6 @@ public class PullDependencies implements Runnable
     }
 
     createRootExtensionsDirectory(extensionsDir);
-    createRootExtensionsDirectory(hadoopDependenciesDir);
     createRootExtensionsDirectory(sparkDependenciesDir);
     createRootExtensionsDirectory(enginesDir);
     createRootExtensionsDirectory(engineExtensionsDir);
@@ -277,27 +261,6 @@ public class PullDependencies implements Runnable
         downloadExtension(versionedArtifact, currEngineDir);
       }
       log.info("Finish downloading dependencies for engine extension coordinates: [%s]", engineExtensionCoordinates);
-
-      if (!noDefaultHadoop && hadoopCoordinates.isEmpty()) {
-        hadoopCoordinates.addAll(ImmutableList.of(
-                "org.apache.hadoop:hadoop-client:2.3.0"
-        ));
-      }
-
-      log.info("Start downloading dependencies for hadoop extension coordinates: [%s]", hadoopCoordinates);
-      for (final String hadoopCoordinate : hadoopCoordinates) {
-        final Artifact versionedArtifact = getArtifact(hadoopCoordinate);
-
-        File currExtensionDir = new File(hadoopDependenciesDir, versionedArtifact.getArtifactId());
-        createExtensionDirectory(hadoopCoordinate, currExtensionDir);
-
-        // add a version folder for hadoop dependency directory
-        currExtensionDir = new File(currExtensionDir, versionedArtifact.getVersion());
-        createExtensionDirectory(hadoopCoordinate, currExtensionDir);
-
-        downloadExtension(versionedArtifact, currExtensionDir);
-      }
-      log.info("Finish downloading dependencies for hadoop extension coordinates: [%s]", hadoopCoordinates);
 
       if (!noDefaultSpark && sparkCoordinates.isEmpty()) {
         sparkCoordinates.addAll(ImmutableList.of(

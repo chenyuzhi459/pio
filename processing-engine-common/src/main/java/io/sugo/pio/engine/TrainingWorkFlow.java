@@ -39,14 +39,18 @@ public class TrainingWorkFlow {
         TrainingConfig trainingConfig = mapper.readValue(trainingConfigStr, TrainingConfig.class);
         SparkConf sparkConf = new SparkConf();
         Map<String, String> context = trainingConfig.getSparkConfSettings();
-        for(Map.Entry<String, String> entry: context.entrySet()) {
-            sparkConf.set(entry.getKey(), entry.getValue());
+        if (null != context) {
+            for(Map.Entry<String, String> entry: context.entrySet()) {
+                sparkConf.set(entry.getKey(), entry.getValue());
+            }
         }
 
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         SparkContextSettings sparkContextSettings = trainingConfig.getSparkContextSettings();
-        if (null != sparkContextSettings.getCheckPointDir()) {
-            sc.setCheckpointDir(sparkContextSettings.getCheckPointDir());
+        if (null != sparkContextSettings) {
+            if (null != sparkContextSettings.getCheckPointDir()) {
+                sc.setCheckpointDir(sparkContextSettings.getCheckPointDir());
+            }
         }
 
         EngineFactory engineFactory = trainingConfig.getEngineFactory();

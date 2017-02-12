@@ -36,9 +36,6 @@ public class ExtensionsConfig
   private String directory = "extensions";
 
   @JsonProperty
-  private String hadoopDependenciesDir = "hadoop-dependencies";
-
-  @JsonProperty
   private String sparkDependenciesDir = "spark-dependencies";
 
   @JsonProperty
@@ -58,11 +55,6 @@ public class ExtensionsConfig
   public List<String> getLoadList()
   {
     return loadList;
-  }
-
-  public String getHadoopDependenciesDir()
-  {
-    return hadoopDependenciesDir;
   }
 
   public String getSparkDependenciesDir() {

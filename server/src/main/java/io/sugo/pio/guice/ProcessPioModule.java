@@ -1,9 +1,17 @@
 package io.sugo.pio.guice;
 
 import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import io.sugo.pio.initialization.PioModule;
+import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import io.sugo.pio.operator.learner.functions.LogisticRegression;
+import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
+import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
+import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
+import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
 import io.sugo.pio.server.process.ProcessManager;
 import io.sugo.pio.server.process.ProcessManagerConfig;
 
@@ -15,11 +23,15 @@ public class ProcessPioModule implements PioModule {
     @Override
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(
-//                new SimpleModule(ProcessingPioModule.class.getSimpleName())
-//                        .registerSubtypes(new NamedType(FileReader.class, "csv_reader"),
-//                                new NamedType(FileModifier.class, "csv_modifier"),
-//                                new NamedType(FileWriter.class, "csv_writer")
-//                        )
+                new SimpleModule(ProcessPioModule.class.getSimpleName())
+                        .registerSubtypes(
+                                new NamedType(DatabaseDataReader.class, "db_data_reader"),
+                                new NamedType(AttributeFilter.class, "attribute_filter"),
+                                new NamedType(ExampleFilter.class, "example_filter"),
+                                new NamedType(ChangeAttributeRole.class, "change_attribute_role"),
+                                new NamedType(ParallelDecisionTreeLearner.class, "decision_tree_learner"),
+                                new NamedType(LogisticRegression.class, "logistic_regression")
+                        )
         );
     }
 
@@ -27,7 +39,6 @@ public class ProcessPioModule implements PioModule {
     public void configure(Binder binder) {
         JsonConfigProvider.bind(binder, "pio.process", ProcessManagerConfig.class);
         LifecycleModule.register(binder, ProcessManager.class);
-//        binder.bind(CSVReader.class).in(LazySingleton.class);
     }
 
 }

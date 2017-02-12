@@ -68,7 +68,6 @@
                                 <classpath/>
                                 <argument>-Dpio.extensions.loadList=[]</argument>
                                 <argument>-Dpio.extensions.directory=${project.build.directory}/extensions</argument>
-                                <argument>-Dpio.extensions.hadoopDependenciesDir=${project.build.directory}/hadoop-dependencies</argument>
                                 <argument>-Dpio.extensions.sparkDependenciesDir=${project.build.directory}/spark-dependencies</argument>
                                 <argument>-Dpio.engines.loadList=[]</argument>
                                 <argument>-Dpio.engines.enginesDirectory=${project.build.directory}/engines</argument>
@@ -101,9 +100,6 @@
                                 <argument>io.sugo.pio.engine-extensions:druid-extensions</argument>
                                 <argument>-ee</argument>
                                 <argument>io.sugo.pio.engine-extensions:hdfs-extensions</argument>
-                                <argument>--no-default-hadoop</argument>
-                                <argument>-h</argument>
-                                <argument>org.apache.hadoop:hadoop-client:${hadoop.version}</argument>
                                 <argument>--no-default-spark</argument>
                                 <argument>-s</argument>
                                 <argument>org.apache.spark:spark-yarn_2.11:${spark.version}</argument>

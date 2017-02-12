@@ -1,5 +1,6 @@
 package io.sugo.pio.engine.training;
 
+import com.google.common.base.Preconditions;
 import org.apache.spark.api.java.JavaSparkContext;
 
 /**
@@ -8,6 +9,8 @@ public abstract class Engine<TD, PD, MD> {
     private final EngineParams engineParams;
 
     public Engine(EngineParams engineParams) {
+        Preconditions.checkNotNull(engineParams, "EngineParams should not be null");
+
         this.engineParams = engineParams;
     }
 

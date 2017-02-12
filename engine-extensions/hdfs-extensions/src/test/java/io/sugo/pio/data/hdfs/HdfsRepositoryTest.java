@@ -37,12 +37,4 @@ public class HdfsRepositoryTest {
         }
     }
 
-    @Test
-    public void testWriteFile() {
-        HdfsRepository repository = new HdfsRepository("/", conf);
-        String testFile = "test.txt";
-        repository.create(testFile);
-        String[] files = repository.listAll();
-        assert null != files && files.length == 1;
-    }
 }
