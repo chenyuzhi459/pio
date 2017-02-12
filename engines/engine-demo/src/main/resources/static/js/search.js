@@ -12,6 +12,7 @@ $(document).ready(function() {
         data: {
             searchItems: [],
             userSearchItems: [],
+            onlineItems: [],
             userId: window.localStorage.getItem("userId") || ''
         },
         methods: {
@@ -19,7 +20,7 @@ $(document).ready(function() {
                 window.localStorage.setItem("userId", "")
             },
             search: function (text) {
-                var that = this
+                var this0 = this
                 $.ajax({
                     url: '/pio/query/itemSearch',
                     beforeSend: function(req) {
@@ -29,53 +30,106 @@ $(document).ready(function() {
                         'item_name': text, 'num': 30, 'type': 'search_query'
                     }),
                     dataType: 'json',
-                    type: 'post',
-                    success: function(data) {
-                        var temp = []
-                        for (var m = 0; m < data.item_id.length; m++) {
-                            that.queryOmdb(data.item_id[m], temp)
-                        }
-                        that.searchItems = temp
-                    }
+                    type: 'post'
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $.when.apply(null, defs).then(function () {
+                        this0.searchItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
+                        })
+
+                        var dtd = $.Deferred();
+                        this0.$nextTick(function () { dtd.resolve(); })
+                        return dtd
+                    })
                 })
             },
 
             userSearch: function (text) {
-                var that = this
+                var this0 = this
+                if (!this0.userId) {
+                    return
+                }
+
                 $.ajax({
                     url: '/pio/query/userSearch',
                     beforeSend: function(req) {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'user_id': that.userId, 'item_name': text, 'num': 8, 'type': 'userHistory_query'
+                        'user_id': this0.userId, 'item_name': text, 'num': 8, 'type': 'userHistory_query'
                     }),
                     dataType: 'json',
-                    type: 'post',
-                    success: function(data) {
-                        var temp = []
-                        for (var m = 0; m < data.item_id.length; m++) {
-                            that.queryOmdb(data.item_id[m], temp)
-                        }
-                        that.userSearchItems = temp
-                    }
+                    type: 'post'
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $.when.apply(null, defs).then(function () {
+                        this0.userSearchItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
+                        })
+
+                        var dtd = $.Deferred();
+                        this0.$nextTick(function () { dtd.resolve(); })
+                        return dtd
+                    })
                 })
             },
 
-            queryOmdb: function (id, temp) {
-                $.ajax({
-                    url: '/pio/query/movie/infoByMovId/' + escape(id),
+            online: function () {
+                var this0 = this
+                if (!this0.userId) {
+                    return
+                }
+
+                return $.ajax({
+                    url: '/pio/query/als',
+                    beforeSend: function(req) {
+                        req.setRequestHeader('Content-Type', 'application/json')
+                    },
+                    data: JSON.stringify({
+                        'user_id': this0.userId, 'num': 5, "type":"als_query"
+                    }),
                     dataType: 'json',
-                    type: 'get',
-                    success: function(data) {
-                        data.id = id
-                        temp.push(data)
-                    }
+                    type: 'post'
+                }).then(function (data) {
+                    var cacheItems = data.item_id
+                    return $.ajax({
+                        url: '/pio/query/click/request',
+                        beforeSend: function(req) {
+                            req.setRequestHeader('Content-Type', 'application/json')
+                        },
+                        data: JSON.stringify({
+                            'userId': this0.userId, "items": cacheItems
+                        }),
+                        dataType: 'json',
+                        type: 'post'
+                    })
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $.when.apply(null, defs).then(function () {
+                        this0.onlineItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
+                        })
+
+                        var dtd = $.Deferred();
+                        this0.$nextTick(function () { dtd.resolve(); })
+                        return dtd
+                    })
+                })
+            },
+
+            queryMovieInfo: function (id) {
+                return $.ajax({
+                    url: '/pio/query/movie/infoByMovId/' + id,
+                    dataType: 'json',
+                    type: 'get'
                 })
             }
         }
     })
     detailUR.search(qs("text"))
     detailUR.userSearch(qs("text"))
+    detailUR.online()
+
 });
 

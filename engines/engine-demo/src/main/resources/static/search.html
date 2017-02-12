@@ -10,6 +10,7 @@
     <script type="text/javascript" src="js/move-top.js"></script>
     <script type="text/javascript" src="js/easing.js"></script>
     <script type="text/javascript" src="js/vue.min.js"></script>
+    <script type="text/javascript" src="js/lodash.min.js"></script>
     <script type="text/javascript" src="js/search.js"></script>
 </head>
 
@@ -74,10 +75,14 @@
                 <div class="content">
                     <div class="content_bottom">
                         <div class="heading">
-                            <h3>猜你喜欢</h3>
+                            <h3 class="itblock">猜你喜欢</h3>
+                            <span class="font14 ibblock mg1l">根据你的历史行为推荐的电影</span>
                         </div>
                     </div>
-                    <div class="section pd1 mg-1r group">
+
+                    <div v-if="!userId" class="color999 aligncenter pd3">请先登录</div>
+
+                    <div v-else-if="userSearchItems.length" class="section pd1 mg-1r group">
                         <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in userSearchItems">
                             <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
                             <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -92,6 +97,42 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="color999 aligncenter pd3" v-else>暂无推荐</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="wrap">
+                <div class="content">
+                    <div class="content_bottom">
+                        <div class="heading">
+                            <h3 class="itblock">实时推荐</h3>
+                            <span class="font14 ibblock mg1l">根据你浏览记录实时推荐的电影</span>
+                        </div>
+                    </div>
+
+                    <div v-if="!userId" class="color999 aligncenter pd3">请先登录</div>
+
+                    <div v-else-if="onlineItems.length" class="section mg-1r group pd1">
+                        <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
+                            <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
+                            <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
+                            <div class="price-details">
+                                <div class="price-number">
+                                    <p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
+                                </div>
+                                <div class="add-cart">
+                                    <h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="color999 aligncenter pd3" v-else>暂无推荐</div>
+
                 </div>
             </div>
         </div>

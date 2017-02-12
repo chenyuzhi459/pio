@@ -92,7 +92,10 @@
 						<span class="font14 ibblock mg1l">根据你的历史行为推荐的电影</span>
 					</div>
 				</div>
-				<div v-if="userId" class="section mg-1r group pd1">
+
+				<div class="color999 aligncenter pd3" v-if="!userId">请先登录</div>
+
+				<div v-else-if="customItems.length" class="section mg-1r group pd1">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in customItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -108,8 +111,7 @@
 					</div>
 				</div>
 
-				<div class="color999 aligncenter pd3" v-else-if="!onlineItems.length">暂无推荐</div>
-				<div class="color999 aligncenter pd3" v-else>请先登录</div>
+				<div class="color999 aligncenter pd3" v-else>暂无推荐</div>
 
 			</div>
 		</div>
@@ -126,7 +128,9 @@
 					</div>
 				</div>
 
-				<div v-if="userId" class="section mg-1r group pd1">
+				<div v-if="!userId" class="color999 aligncenter pd3" v-else>请先登录</div>
+
+				<div v-else-if="onlineItems.length" class="section mg-1r group pd1">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -142,8 +146,7 @@
 					</div>
 				</div>
 
-				<div class="color999 aligncenter pd3" v-else-if="!onlineItems.length">暂无推荐</div>
-				<div class="color999 aligncenter pd3" v-else>请先登录</div>
+				<div class="color999 aligncenter pd3" v-else>暂无推荐</div>
 
 			</div>
 		</div>
