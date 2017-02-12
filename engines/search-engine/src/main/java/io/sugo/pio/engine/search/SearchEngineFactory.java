@@ -12,11 +12,11 @@ import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class SearchEngineFactory implements EngineFactory<SearchTrainingData, SearchPreparaData, SearchModelData> {
+public class SearchEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
-    private final SearchEngineParams searchEngineParams;
+    private final SearchEngineParams engineParams;
 
     @JsonCreator
     public SearchEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
@@ -26,12 +26,12 @@ public class SearchEngineFactory implements EngineFactory<SearchTrainingData, Se
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
-        this.searchEngineParams = engineParams;
+        this.engineParams = engineParams;
     }
 
     @Override
     public Engine createEngine() {
-        return new SearchEngine(propertyHose, batchEventHose, repository, searchEngineParams);
+        return new SearchEngine(propertyHose, batchEventHose, repository, engineParams);
     }
 
     @JsonProperty
@@ -50,7 +50,7 @@ public class SearchEngineFactory implements EngineFactory<SearchTrainingData, Se
     }
 
     @JsonProperty
-    public SearchEngineParams getSearchEngineParams() {
-        return searchEngineParams;
+    public SearchEngineParams getEngineParams() {
+        return engineParams;
     }
 }

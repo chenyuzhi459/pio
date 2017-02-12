@@ -12,11 +12,11 @@ import io.sugo.pio.engine.userHistory.data.UserHistoryTrainingData;
 
 /**
  */
-public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> {
+public class UserHistoryEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
-    private final UserHistoryEngineParams userHistoryEngineParams;
+    private final UserHistoryEngineParams engineParams;
 
 
     @JsonCreator
@@ -27,7 +27,7 @@ public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTraini
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
-        this.userHistoryEngineParams = engineParams;
+        this.engineParams = engineParams;
     }
 
     @JsonProperty
@@ -46,12 +46,12 @@ public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTraini
     }
 
     @JsonProperty
-    public UserHistoryEngineParams getUserHistoryEngineParams() {
-        return userHistoryEngineParams;
+    public UserHistoryEngineParams getEngineParams() {
+        return engineParams;
     }
 
     @Override
     public Engine createEngine() {
-        return new UserHistoryEngine(propertyHose, batchEventHose, repository, userHistoryEngineParams);
+        return new UserHistoryEngine(propertyHose, batchEventHose, repository, engineParams);
     }
 }

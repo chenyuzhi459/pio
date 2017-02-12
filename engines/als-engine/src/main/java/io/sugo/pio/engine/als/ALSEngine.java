@@ -3,17 +3,17 @@ package io.sugo.pio.engine.als;
 import io.sugo.pio.engine.als.data.ALSModelData;
 import io.sugo.pio.engine.als.data.ALSPreparedData;
 import io.sugo.pio.engine.als.data.ALSTrainingData;
-import io.sugo.pio.engine.als.engine.ALSAlgorithm;
-import io.sugo.pio.engine.als.engine.ALSDModel;
-import io.sugo.pio.engine.als.engine.ALSDataSource;
-import io.sugo.pio.engine.als.engine.ALSPreparator;
+import io.sugo.pio.engine.als.engine.*;
+import io.sugo.pio.engine.als.eval.ALSEvalActualResult;
+import io.sugo.pio.engine.als.eval.ALSEvalIndicators;
+import io.sugo.pio.engine.als.eval.ALSEvalQuery;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModelData> {
+public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModelData, ALSEvalQuery, ALSEvalActualResult, ALSEvalIndicators> {
     private final BatchEventHose batchEventHose;
     private final Repository repository;
     private final ALSEngineParams alsEngineParams;
@@ -27,7 +27,7 @@ public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModel
         this.alsEngineParams = alsEngineParams;
     }
     @Override
-    protected DataSource<ALSTrainingData> createDatasource(Params params) {
+    protected DataSource<ALSTrainingData, ALSEvalQuery, ALSEvalActualResult> createDatasource(Params params) {
         return new ALSDataSource(batchEventHose);
     }
 
@@ -44,5 +44,10 @@ public class ALSEngine extends Engine<ALSTrainingData, ALSPreparedData, ALSModel
     @Override
     protected Model<ALSModelData> createModel() {
         return new ALSDModel(repository);
+    }
+
+    @Override
+    protected Evalution<ALSModelData, ALSEvalQuery, ALSEvalActualResult, ALSEvalIndicators> createEval() {
+        return new ALSEvalution();
     }
 }

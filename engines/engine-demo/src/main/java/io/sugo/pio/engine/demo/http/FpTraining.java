@@ -1,6 +1,5 @@
 package io.sugo.pio.engine.demo.http;
 
-import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.input.BatchEventHose;
 import io.sugo.pio.engine.data.input.PropertyHose;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
@@ -11,9 +10,6 @@ import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.fp.FpEngineFactory;
 import io.sugo.pio.engine.fp.FpEngineParams;
-import io.sugo.pio.engine.fp.data.FpModelData;
-import io.sugo.pio.engine.fp.data.FpPreparaData;
-import io.sugo.pio.engine.fp.data.FpTrainingData;
 import io.sugo.pio.engine.training.*;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -30,7 +26,7 @@ public class FpTraining extends AbstractTraining{
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(FpResource.REPOSITORY_PATH);
         FpEngineParams fpEngineParams = new FpEngineParams();
-        EngineFactory<FpTrainingData, FpPreparaData, FpModelData> engineFactory = new FpEngineFactory(propHose, eventHose, repository, fpEngineParams);
+        EngineFactory engineFactory = new FpEngineFactory(propHose, eventHose, repository, fpEngineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }

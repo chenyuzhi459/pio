@@ -322,40 +322,6 @@ public class Initialization {
     /**
      * Find all the hadoop dependencies that should be loaded by druid
      *
-     * @param hadoopDependencyCoordinates e.g.["org.apache.hadoop:hadoop-client:2.3.0"]
-     * @param extensionsConfig            ExtensionsConfig configured by druid.extensions.xxx
-     *
-     * @return an array of hadoop dependency files that will be loaded by druid process
-     */
-    public static File[] getHadoopFilesToLoad(
-            List<String> hadoopDependencyCoordinates,
-            ExtensionsConfig extensionsConfig
-    )
-    {
-        final File rootSparkDependenciesDir = new File(extensionsConfig.getHadoopDependenciesDir());
-        if (rootSparkDependenciesDir.exists() && !rootSparkDependenciesDir.isDirectory()) {
-            throw new ISE("Root Spark dependencies directory [%s] is not a directory!?", rootSparkDependenciesDir);
-        }
-        final File[] hadoopDependenciesToLoad = new File[hadoopDependencyCoordinates.size()];
-        int i = 0;
-        for (final String coordinate : hadoopDependencyCoordinates) {
-            final DefaultArtifact artifact = new DefaultArtifact(coordinate);
-            final File hadoopDependencyDir = new File(rootSparkDependenciesDir, artifact.getArtifactId());
-            final File versionDir = new File(hadoopDependencyDir, artifact.getVersion());
-            // find the hadoop dependency with the version specified in coordinate
-            if (!hadoopDependencyDir.isDirectory() || !versionDir.isDirectory()) {
-                throw new ISE(
-                        String.format("Spark dependency [%s] didn't exist!?", versionDir.getAbsolutePath())
-                );
-            }
-            hadoopDependenciesToLoad[i++] = versionDir;
-        }
-        return hadoopDependenciesToLoad;
-    }
-
-    /**
-     * Find all the hadoop dependencies that should be loaded by druid
-     *
      * @param sparkDependencyCoordinates e.g.["org.apache.hadoop:hadoop-client:2.3.0"]
      * @param extensionsConfig            ExtensionsConfig configured by druid.extensions.xxx
      *
@@ -428,9 +394,9 @@ public class Initialization {
                 new ServerViewModule(),
                 new MetadataConfigModule(),
                 new DerbyMetadataStoragePioModule(),
-                new ProcessPioModule(),
-                new ProcessingPioModule(),
-                new JacksonConfigManagerModule()
+//                new ProcessPioModule(),
+                new JacksonConfigManagerModule(),
+                new TaskServiceDiscoveryModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);
@@ -485,6 +451,9 @@ public class Initialization {
             } else if (input instanceof EngineModule) {
                 baseInjector.injectMembers(input);
                 modules.add(registerJacksonModules(((EngineModule) input)));
+            } else if (input instanceof EngineExtensionModule) {
+                baseInjector.injectMembers(input);
+                modules.add(registerJacksonModules(((EngineExtensionModule) input)));
             } else if (input instanceof Module) {
                 baseInjector.injectMembers(input);
                 modules.add((Module) input);
@@ -518,6 +487,14 @@ public class Initialization {
         }
 
         private EngineModule registerJacksonModules(EngineModule module)
+        {
+            for (com.fasterxml.jackson.databind.Module jacksonModule : module.getJacksonModules()) {
+                jsonMapper.registerModule(jacksonModule);
+            }
+            return module;
+        }
+
+        private EngineExtensionModule registerJacksonModules(EngineExtensionModule module)
         {
             for (com.fasterxml.jackson.databind.Module jacksonModule : module.getJacksonModules()) {
                 jsonMapper.registerModule(jacksonModule);

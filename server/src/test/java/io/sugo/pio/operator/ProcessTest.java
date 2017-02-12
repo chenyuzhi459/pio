@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.OperatorProcess;
-import io.sugo.pio.guice.ProcessingPioModule;
+import io.sugo.pio.guice.ProcessPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
@@ -25,7 +25,7 @@ public class ProcessTest {
 
     static {
 
-        ProcessingPioModule module = new ProcessingPioModule();
+        ProcessPioModule module = new ProcessPioModule();
         for (Module m : module.getJacksonModules()) {
             jsonMapper.registerModule(m);
         }

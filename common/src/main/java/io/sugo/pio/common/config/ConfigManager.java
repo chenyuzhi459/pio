@@ -78,8 +78,6 @@ public class ConfigManager
         return;
       }
 
-      I18N.loadLanguageResource();
-
       poller = new PollingCallable();
       ScheduledExecutors.scheduleWithFixedDelay(
           exec, new Duration(0), config.get().getPollDuration().toStandardDuration(), poller

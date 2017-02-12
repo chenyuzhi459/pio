@@ -15,6 +15,7 @@ import java.io.IOException;
 public class DemoServer {
     public static void main(String[] args) throws Exception {
         train();
+        eval();
         startServer();
     }
 
@@ -33,6 +34,11 @@ public class DemoServer {
         userHistoryTraining.train();
         TextSimilarTraining textSimilarTraining = new TextSimilarTraining();
         textSimilarTraining.train();
+    }
+
+    private static void eval() throws IOException {
+        ALSEval alsEval = new ALSEval();
+        alsEval.eval();
     }
 
     private static void startServer() throws Exception {

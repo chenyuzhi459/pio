@@ -13,10 +13,13 @@ import io.sugo.pio.engine.userHistory.engine.UserHistoryAlgorithm;
 import io.sugo.pio.engine.userHistory.engine.UserHistoryDatasource;
 import io.sugo.pio.engine.userHistory.engine.UserHistoryModel;
 import io.sugo.pio.engine.userHistory.engine.UserHistoryPreparator;
+import io.sugo.pio.engine.userHistory.eval.UserHistoryEvalActualResult;
+import io.sugo.pio.engine.userHistory.eval.UserHistoryEvalIndicators;
+import io.sugo.pio.engine.userHistory.eval.UserHistoryEvalQuery;
 
 /**
  */
-public class UserHistoryEngine extends Engine<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> {
+public class UserHistoryEngine extends Engine<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData, UserHistoryEvalQuery, UserHistoryEvalActualResult, UserHistoryEvalIndicators> {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
@@ -35,7 +38,7 @@ public class UserHistoryEngine extends Engine<UserHistoryTrainingData, UserHisto
     }
 
     @Override
-    public DataSource<UserHistoryTrainingData> createDatasource(Params params) {
+    public DataSource<UserHistoryTrainingData, UserHistoryEvalQuery, UserHistoryEvalActualResult> createDatasource(Params params) {
         return new UserHistoryDatasource(propertyHose, batchEventHose);
     }
 
@@ -52,6 +55,11 @@ public class UserHistoryEngine extends Engine<UserHistoryTrainingData, UserHisto
     @Override
     public Model<UserHistoryModelData> createModel() {
         return new UserHistoryModel(repository);
+    }
+
+    @Override
+    protected Evalution<UserHistoryModelData, UserHistoryEvalQuery, UserHistoryEvalActualResult, UserHistoryEvalIndicators> createEval() {
+        return null;
     }
 
 }

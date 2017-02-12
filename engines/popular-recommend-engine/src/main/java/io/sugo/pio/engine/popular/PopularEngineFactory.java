@@ -12,11 +12,11 @@ import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class PopularEngineFactory implements EngineFactory<PopularTrainingData, PopularPreparaData, PopularModelData> {
+public class PopularEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
-    private final PopEngineParams popEngineParams;
+    private final PopEngineParams engineParams;
 
     @JsonCreator
     public PopularEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
@@ -26,13 +26,13 @@ public class PopularEngineFactory implements EngineFactory<PopularTrainingData, 
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
-        this.popEngineParams = engineParams;
+        this.engineParams = engineParams;
     }
 
 
     @Override
     public Engine createEngine() {
-        return new PopularEngine(propertyHose, batchEventHose, repository, popEngineParams);
+        return new PopularEngine(propertyHose, batchEventHose, repository, engineParams);
     }
 
     @JsonProperty
@@ -46,8 +46,8 @@ public class PopularEngineFactory implements EngineFactory<PopularTrainingData, 
     }
 
     @JsonProperty
-    public PopEngineParams getPopEngineParams() {
-        return popEngineParams;
+    public PopEngineParams getEngineParams() {
+        return engineParams;
     }
 
     @JsonProperty
