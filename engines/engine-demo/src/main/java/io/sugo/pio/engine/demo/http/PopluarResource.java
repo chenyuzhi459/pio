@@ -33,10 +33,9 @@ public class PopluarResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             PopQuery query = jsonMapper.readValue(in, PopQuery.class);
-            PopularModelFactory popularModelFactory = new PopularModelFactory();
             Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-
-            PopResult popResult = popularModelFactory.loadModel(repository).predict(query);
+            PopularModelFactory popularModelFactory = new PopularModelFactory(repository);
+            PopResult popResult = popularModelFactory.loadModel().predict(query);
             List<String> itemIds = popResult.getItems();
             Map<String , List<String>> res = new HashMap<>();
             res.put(Constants.ITEM_ID(), itemIds);
