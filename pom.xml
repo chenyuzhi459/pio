@@ -34,7 +34,6 @@
         <module>engine-extensions/druid-extensions</module>
         <module>engine-extensions/jdbc-extensions</module>
 
-        <module>engines/template-engine</module>
         <module>engines/popular-recommend-engine</module>
         <module>engines/detail-engine</module>
         <module>engines/als-engine</module>
