@@ -1,14 +1,16 @@
 <!DOCTYPE HTML>
 <head>
-	<title>Home</title>
+	<title>首页</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
-	<link href="css/slider.css" rel="stylesheet" type="text/css" media="all"/>
+	<link href="css/nivo-slider.css" rel="stylesheet" type="text/css" media="all"/>
+	<link href="slide-default-theme/default.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/index.css" rel="stylesheet" type="text/css" media="all"/>
 
-	<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
+	<script type="text/javascript" src="js/lodash.min.js"></script>
+	<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="js/move-top.js"></script>
 	<script type="text/javascript" src="js/easing.js"></script>
 	<script type="text/javascript" src="js/jquery.nivo.slider.js"></script>
@@ -17,9 +19,9 @@
 </head>
 
 <body>
-	<div id="app">
+<div id="app">
 	<div class="header">
-		 <div class="headertop_desc">
+		<div class="headertop_desc">
 			<div class="wrap">
 				<div class="nav_list">
 					<ul>
@@ -28,91 +30,69 @@
 				</div>
 				<div class="account_desc">
 					<ul>
-						<li v-if="userId"><a href="#">{{userId}}</a></li>
+						<li v-if="userId"><a href="javascript:">{{userId}}</a></li>
 						<li v-else><a href="contact.html">Login</a></li>
-						<li><a href="index.html" v-on:click="checkOut">Checkout</a></li>
+						<li><a href="index.html" @click="checkOut">Checkout</a></li>
 					</ul>
 				</div>
 				<div class="clear"></div>
 			</div>
-	  	</div>
-  	  		<div class="wrap">
-				<div class="header_top">
-					<div class="logo">
-						<a href="index.html"><img src="images/logo.png" alt="" /></a>
-					</div>
-					<div class="header_top_right">
-						<div class="search_box">
-							<form>
-								<input class="search-keyword" type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}">
-								<input class="search-submit" type="submit" value="" >
-							</form>
-						</div>
-						<div class="clear"></div>
-					</div>
+		</div>
+		<div class="wrap">
+			<div class="header_top">
+				<div class="logo">
+					<a href="index.html"><img src="images/logo.png" alt="" /></a>
 				</div>
-			 <div class="clear"></div>
-  		</div>     
-				<div class="header_bottom">
-					<div class="header_bottom_left">				
-						<div class="categories">
-						   <ul>
-						  	   <h3>流行推荐</h3>
-								   <li><a href="#" v-on:click="pop('Action')">Action</a></li>
-								   <li><a href="#" v-on:click="pop('Adventure')">Adventure</a></li>
-								   <li><a href="#" v-on:click="pop('Animation')">Animation</a></li>
-								   <li><a href="#" v-on:click="pop('Children\'s')">Children's</a></li>
-								   <li><a href="#" v-on:click="pop('Comedy')">Comedy</a></li>
-							       <li><a href="#" v-on:click="pop('Crime')">Crime</a></li>
-							       <li><a href="#" v-on:click="pop('Documentary')">Documentary</a></li>
-							       <li><a href="#" v-on:click="pop('Drama')">Drama</a></li>
-							       <li><a href="#" v-on:click="pop('Fantasy')">Fantasy</a></li>
-							       <li><a href="#" v-on:click="pop('Film-Noir')">Film-Noir</a></li>
-							       <li><a href="#" v-on:click="pop('Horror')">Horror</a></li>
-								   <li><a href="#" v-on:click="pop('Musical')">Musical</a></li>
-								   <li><a href="#" v-on:click="pop('Mystery')">Mystery</a></li>
-								   <li><a href="#" v-on:click="pop('Romance')">Romance</a></li>
-								   <li><a href="#" v-on:click="pop('Sci-Fi')">Sci-Fi</a></li>
-								   <li><a href="#" v-on:click="pop('Thriller')">Thriller</a></li>
-								   <li><a href="#" v-on:click="pop('War')">War</a></li>
-								   <li><a href="#" v-on:click="pop('Western')">Western</a></li>
-						  	 </ul>
-						</div>					
-		  	         </div>
-						    <div class="header_bottom_right">
-						 	    <!------ Slider ------------>
-								<div class="section group">
-									<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in popItems">
-										<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
-										<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
-										<div class="price-details">
-											<div class="price-number">
-												<p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
-											</div>
-											<div class="add-cart">
-												<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
-											</div>
-											<div class="clear"></div>
-										</div>
-
-									</div>
-								</div>
-
-						<!------End Slider ------------>
-			         </div>
-			     <div class="clear"></div>
+				<div class="header_top_right">
+					<div class="search_box">
+						<form>
+							<input class="search-keyword" type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}">
+							<input class="search-submit" type="submit" value="" >
+						</form>
+					</div>
+					<div class="clear"></div>
+				</div>
 			</div>
-   </div>
-   <!------------End Header ------------>
+			<div class="clear"></div>
+		</div>
+		<div class="header_bottom">
+			<div class="header_bottom_left">
+				<div class="categories">
+					<ul>
+						<h3>电影分类</h3>
+						<li v-for="ca in categories">
+							<a :href="'category.html?category=' + ca">{{ca}}</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="header_bottom_right theme-default">
+				<!------ Slider ------------>
+				<div id="slider" class="nivoSlider">
+					<a
+							:href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"
+							v-for="(item, index) in popItems"
+					>
+						<img :src="item.Poster" :alt="item.Title" :title="item.Title" />
+					</a>
+				</div>
+
+				<!------End Slider ------------>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+	<!------------End Header ------------>
 	<div class="main">
 		<div class="wrap">
 			<div class="content">
 				<div class="content_bottom">
 					<div class="heading">
-						<h3>个性化推荐</h3>
+						<h3 class="itblock">猜你喜欢</h3>
+						<span class="font14 ibblock mg1l">根据你的历史行为推荐的电影</span>
 					</div>
 				</div>
-				<div class="section group pd1">
+				<div v-if="userId" class="section mg-1r group pd1">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in customItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -127,6 +107,10 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="color999 aligncenter pd3" v-else-if="!onlineItems.length">暂无推荐</div>
+				<div class="color999 aligncenter pd3" v-else>请先登录</div>
+
 			</div>
 		</div>
 	</div>
@@ -137,10 +121,12 @@
 			<div class="content">
 				<div class="content_bottom">
 					<div class="heading">
-						<h3>在线推荐</h3>
+						<h3 class="itblock">实时推荐</h3>
+						<span class="font14 ibblock mg1l">根据你浏览记录实时推荐的电影</span>
 					</div>
 				</div>
-				<div class="section group pd1">
+
+				<div v-if="userId" class="section mg-1r group pd1">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -155,21 +141,26 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="color999 aligncenter pd3" v-else-if="!onlineItems.length">暂无推荐</div>
+				<div class="color999 aligncenter pd3" v-else>请先登录</div>
+
 			</div>
 		</div>
 	</div>
 
-   <div class="footer">
-			 <div class="copy_right">
-				<p>Copyright &copy; 2016.Sugo All rights reserved.</p>
-		   </div>
-        </div>
+	<div class="footer">
+		<div class="copy_right">
+			<p>Copyright &copy; 2016.Sugo All rights reserved.</p>
+		</div>
+	</div>
 	<script type="text/javascript">
 	</script>
-    <a href="#" id="toTop"><span id="toTopHover"> </span></a>
-    <div style="display:none">
-        <script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script></div>
-	</div>
+	<a href="#" id="toTop"><span id="toTopHover"> </span></a>
+</div>
+<div class="hidden">
+	<script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script>
+</div>
 </body>
 </html>
 

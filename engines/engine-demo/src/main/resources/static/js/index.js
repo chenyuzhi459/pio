@@ -1,15 +1,15 @@
-
 $(function() {
-    $('#slider').nivoSlider();
-
     $().UItoTop({ easingType: 'easeOutQuart' });
 
     var detailUR = new Vue({
         el: '#app',
         data: {
+            categories: [
+                "Action", "Adventure", "Animation", "Children's", "Comedy", "Crime", "Documentary", "Drama", "Fantasy",
+                "Film-Noir", "Horror", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"
+            ],
             popItems:[],
             customItems: [],
-            cacheItems: [],
             onlineItems: [],
             userId: window.localStorage.getItem("userId") || ''
         },
@@ -19,112 +19,114 @@ $(function() {
             },
 
             pop: function (category) {
-                var that = this
-                $.ajax({
+                var this0 = this
+                return $.ajax({
                     url: '/pio/query/itempop',
                     beforeSend: function(req) {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'category': category, 'num': 14, 'type': 'pop_query'
+                        'category': category, 'num': 5, 'type': 'pop_query'
                     }),
                     dataType: 'json',
-                    type: 'post',
-                    success: function(data) {
-                        var temp = []
-                        for (var m = 0; m < data.item_id.length; m++) {
-                            that.queryOmdb(data.item_id[m], temp)
-                        }
-                        that.popItems = temp
-                    }
+                    type: 'post'
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $.when.apply(null, defs).then(function () {
+                        this0.popItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
+                        })
+
+                        var dtd = $.Deferred();
+                        this0.$nextTick(function () { dtd.resolve(); })
+                        return dtd
+                    })
                 })
             },
 
             custom: function () {
-                var that = this
-                if (!that.userId) {
+                var this0 = this
+                if (!this0.userId) {
                     return
                 }
 
-                $.ajax({
+                return $.ajax({
                     url: '/pio/query/als',
                     beforeSend: function(req) {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'user_id': that.userId, 'num': 14, "type":"als_query"
+                        'user_id': this0.userId, 'num': 5, "type":"als_query"
                     }),
                     dataType: 'json',
-                    type: 'post',
-                    success: function(data) {
-                        var temp = []
-                        for (var m = 0; m < data.item_id.length; m++) {
-                            that.queryOmdb(data.item_id[m], temp)
-                        }
-                        that.customItems = temp
-                    }
+                    type: 'post'
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $.when.apply(null, defs).then(function () {
+                        this0.customItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
+                        })
+
+                        var dtd = $.Deferred();
+                        this0.$nextTick(function () { dtd.resolve(); })
+                        return dtd
+                    })
                 })
             },
 
             online: function () {
-                var that = this
-                if (!that.userId) {
+                var this0 = this
+                if (!this0.userId) {
                     return
                 }
 
-                $.ajax({
+                return $.ajax({
                     url: '/pio/query/als',
                     beforeSend: function(req) {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'user_id': that.userId, 'num': 14, "type":"als_query"
+                        'user_id': this0.userId, 'num': 5, "type":"als_query"
                     }),
                     dataType: 'json',
-                    type: 'post',
-                    success: function(data) {
-                        var temp = []
-                        for (var m = 0; m < data.item_id.length; m++) {
-                            that.cacheItems.push(data.item_id[m])
-                        }
-                        $.ajax({
-                            url: '/pio/query/click/request',
-                            beforeSend: function(req) {
-                                req.setRequestHeader('Content-Type', 'application/json')
-                            },
-                            data: JSON.stringify({
-                                'userId': that.userId, "items":that.cacheItems,
-                            }),
-                            dataType: 'json',
-                            type: 'post',
-                            success: function(data) {
-                                var temp = []
-                                console.log(that.cacheItems)
-                                for (var m = 0; m < data.item_id.length; m++) {
-                                    that.queryOmdb(data.item_id[m], temp)
-                                }
-                                that.onlineItems = temp
-                            }
+                    type: 'post'
+                }).then(function (data) {
+                    var cacheItems = data.item_id
+                    return $.ajax({
+                        url: '/pio/query/click/request',
+                        beforeSend: function(req) {
+                            req.setRequestHeader('Content-Type', 'application/json')
+                        },
+                        data: JSON.stringify({
+                            'userId': this0.userId, "items": cacheItems
+                        }),
+                        dataType: 'json',
+                        type: 'post'
+                    })
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $.when.apply(null, defs).then(function () {
+                        this0.onlineItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
                         })
 
-                    }
+                        var dtd = $.Deferred();
+                        this0.$nextTick(function () { dtd.resolve(); })
+                        return dtd
+                    })
                 })
             },
 
-            queryOmdb: function (id, temp) {
-                $.ajax({
-                    url: '/pio/query/movie/infoByMovId/' + escape(id),
+            queryMovieInfo: function (id) {
+                return $.ajax({
+                    url: '/pio/query/movie/infoByMovId/' + id,
                     dataType: 'json',
-                    type: 'get',
-                    success: function(data) {
-                        data.id = id
-                        temp.push(data)
-                    }
+                    type: 'get'
                 })
             }
         }
     })
-    detailUR.pop("Action")
+    detailUR.pop("Action").then(function() { $('#slider').nivoSlider() })
     detailUR.custom()
     detailUR.online()
 
