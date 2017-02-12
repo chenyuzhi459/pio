@@ -1,0 +1,12 @@
+{
+  "type":"model",
+  "id":"model1",
+  "modelId":"model1",
+  "modelFactory":{
+    "type": "als_model"
+  },
+  "repository": {
+    "type": "hdfs",
+    "path": "hdfs://sugo/user/yaotc/"
+  }
+}
