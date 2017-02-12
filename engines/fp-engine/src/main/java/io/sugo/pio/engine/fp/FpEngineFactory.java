@@ -8,31 +8,30 @@ import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.fp.data.FpModelData;
 import io.sugo.pio.engine.fp.data.FpPreparaData;
 import io.sugo.pio.engine.fp.data.FpTrainingData;
-import io.sugo.pio.engine.fp.engine.FpAlgorithm;
-import io.sugo.pio.engine.fp.engine.FpDatasource;
-import io.sugo.pio.engine.fp.engine.FpModel;
-import io.sugo.pio.engine.fp.engine.FpPreparator;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class FpEngineFactory implements EngineFactory<FpTrainingData, FpPreparaData, FpModelData>{
+public class FpEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
+    private final FpEngineParams engineParams;
 
     @JsonCreator
     public FpEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
                            @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                           @JsonProperty("repository") Repository repository) {
+                           @JsonProperty("repository") Repository repository,
+                           @JsonProperty("engineParams") FpEngineParams engineParams) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
+        this.engineParams = engineParams;
     }
 
     @Override
     public Engine createEngine() {
-        return new FpEngine(propertyHose, batchEventHose, repository);
+        return new FpEngine(propertyHose, batchEventHose, repository, engineParams);
     }
 
     @JsonProperty
@@ -45,5 +44,14 @@ public class FpEngineFactory implements EngineFactory<FpTrainingData, FpPreparaD
         return propertyHose;
     }
 
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
+    }
+
+    @JsonProperty
+    public FpEngineParams getEngineParams() {
+        return engineParams;
+    }
 
 }

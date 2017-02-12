@@ -60,6 +60,14 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
 
+        <fileSet>
+            <directory>../extlibs</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <outputDirectory>extlibs</outputDirectory>
+        </fileSet>
+
     </fileSets>
     <dependencySets>
         <dependencySet>

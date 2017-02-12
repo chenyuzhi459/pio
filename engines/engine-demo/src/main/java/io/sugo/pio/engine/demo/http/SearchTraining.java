@@ -9,9 +9,7 @@ import io.sugo.pio.engine.demo.FileUtil;
 import io.sugo.pio.engine.demo.data.MovieBatchEventHose;
 import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.search.SearchEngineFactory;
-import io.sugo.pio.engine.search.data.SearchModelData;
-import io.sugo.pio.engine.search.data.SearchPreparaData;
-import io.sugo.pio.engine.search.data.SearchTrainingData;
+import io.sugo.pio.engine.search.SearchEngineParams;
 import io.sugo.pio.engine.training.*;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -27,7 +25,8 @@ public class SearchTraining extends AbstractTraining{
         BatchEventHose eventHose = new MovieBatchEventHose(Constants.DATA_PATH, Constants.DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(SearchResource.REPOSITORY_PATH);
-        EngineFactory<SearchTrainingData, SearchPreparaData, SearchModelData> engineFactory = new SearchEngineFactory(propHose, eventHose, repository);
+        SearchEngineParams searchEngineParams = new SearchEngineParams();
+        EngineFactory engineFactory = new SearchEngineFactory(propHose, eventHose, repository, searchEngineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }

@@ -2,6 +2,6 @@ package io.sugo.pio.engine.training;
 
 /**
  */
-public interface EngineFactory<TD, PD, MD> {
+public interface EngineFactory {
     Engine createEngine();
 }

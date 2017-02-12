@@ -11,23 +11,29 @@ import io.sugo.pio.engine.detail.engine.DetailAlgorithm;
 import io.sugo.pio.engine.detail.engine.DetailDataSource;
 import io.sugo.pio.engine.detail.engine.DetailModel;
 import io.sugo.pio.engine.detail.engine.DetailPreparator;
+import io.sugo.pio.engine.detail.eval.DetailEvalActualResult;
+import io.sugo.pio.engine.detail.eval.DetailEvalIndicators;
+import io.sugo.pio.engine.detail.eval.DetailEvalQuery;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData, DetailModelData> {
+public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData, DetailModelData, DetailEvalQuery, DetailEvalActualResult, DetailEvalIndicators> {
     private final BatchEventHose batchEventHose;
     private final Repository repository;
+    private final DetailEngineParams detailEngineParams;
 
     @JsonCreator
-    public DetailEngine(@JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                               @JsonProperty("repository") Repository repository) {
-        super(null);
+    public DetailEngine( BatchEventHose batchEventHose,
+                          Repository repository,
+                          DetailEngineParams detailEngineParams) {
+        super(detailEngineParams);
         this.batchEventHose = batchEventHose;
         this.repository = repository;
+        this.detailEngineParams = detailEngineParams;
     }
     @Override
-    protected DataSource<DetailTrainingData> createDatasource(Params params) {
+    protected DataSource<DetailTrainingData, DetailEvalQuery, DetailEvalActualResult> createDatasource(Params params) {
         return new DetailDataSource(batchEventHose);
     }
 
@@ -44,5 +50,10 @@ public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData,
     @Override
     protected Model<DetailModelData> createModel() {
         return new DetailModel(repository);
+    }
+
+    @Override
+    protected Evalution<DetailModelData, DetailEvalQuery, DetailEvalActualResult, DetailEvalIndicators> createEval() {
+        return null;
     }
 }

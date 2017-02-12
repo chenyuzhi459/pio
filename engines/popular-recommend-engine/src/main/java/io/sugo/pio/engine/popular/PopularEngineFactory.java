@@ -8,32 +8,31 @@ import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.popular.data.PopularModelData;
 import io.sugo.pio.engine.popular.data.PopularPreparaData;
 import io.sugo.pio.engine.popular.data.PopularTrainingData;
-import io.sugo.pio.engine.popular.engine.PopularAlgorithm;
-import io.sugo.pio.engine.popular.engine.PopularDatasource;
-import io.sugo.pio.engine.popular.engine.PopularModel;
-import io.sugo.pio.engine.popular.engine.PopularPreparator;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class PopularEngineFactory implements EngineFactory<PopularTrainingData, PopularPreparaData, PopularModelData> {
+public class PopularEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
+    private final PopEngineParams popEngineParams;
 
     @JsonCreator
     public PopularEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
                            @JsonProperty("batchEventHose") BatchEventHose batchEventHose,
-                           @JsonProperty("repository") Repository repository) {
+                           @JsonProperty("repository") Repository repository,
+                           @JsonProperty("engineParams") PopEngineParams engineParams) {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
+        this.popEngineParams = engineParams;
     }
 
 
     @Override
     public Engine createEngine() {
-        return new PopularEngine(propertyHose, batchEventHose, repository);
+        return new PopularEngine(propertyHose, batchEventHose, repository, popEngineParams);
     }
 
     @JsonProperty
@@ -44,6 +43,11 @@ public class PopularEngineFactory implements EngineFactory<PopularTrainingData, 
     @JsonProperty
     public PropertyHose getPropertyHose() {
         return propertyHose;
+    }
+
+    @JsonProperty
+    public PopEngineParams getPopEngineParams() {
+        return popEngineParams;
     }
 
     @JsonProperty

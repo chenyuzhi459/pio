@@ -8,9 +8,7 @@ import io.sugo.pio.engine.demo.Constants;
 import io.sugo.pio.engine.demo.data.HtcBatchEventHose;
 import io.sugo.pio.engine.demo.data.MoviePropertyHose;
 import io.sugo.pio.engine.textSimilar.TextSimilarEngineFactory;
-import io.sugo.pio.engine.textSimilar.data.TextSimilarModelData;
-import io.sugo.pio.engine.textSimilar.data.TextSimilarPreparaData;
-import io.sugo.pio.engine.textSimilar.data.TextSimilarTrainingData;
+import io.sugo.pio.engine.textSimilar.TextSimilarEngineParams;
 import io.sugo.pio.engine.training.*;
 import io.sugo.pio.engine.demo.FileUtil;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -27,7 +25,8 @@ public class TextSimilarTraining extends AbstractTraining{
         BatchEventHose eventHose = new HtcBatchEventHose(Constants.HTC_DATA_PATH, Constants.HTC_DATA_SEPERATOR);
         PropertyHose propHose = new MoviePropertyHose(Constants.ITEM_PATH, Constants.ITEM_SEPERATOR, Constants.ITEM_GENS);
         Repository repository = new LocalFileRepository(TextSimilarResource.REPOSITORY_PATH);
-        EngineFactory<TextSimilarTrainingData, TextSimilarPreparaData, TextSimilarModelData> engineFactory = new TextSimilarEngineFactory(propHose, eventHose, repository);
+        TextSimilarEngineParams textSimilarEngineParams = new TextSimilarEngineParams();
+        EngineFactory engineFactory = new TextSimilarEngineFactory(propHose, eventHose, repository, textSimilarEngineParams);
         Engine engine = engineFactory.createEngine();
         engine.train(sc);
     }
