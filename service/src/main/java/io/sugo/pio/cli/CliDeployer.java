@@ -27,8 +27,8 @@ import java.util.List;
 public class CliDeployer extends GuiceRunnable {
     private static final Logger log = new Logger(CliDeployer.class);
 
-    @Arguments(description = "deploySpec.json", required = true)
-    private String deploySpec;
+    @Arguments(description = "deploymentSpec.json", required = true)
+    private String deploymentSpec;
 
     @Inject
     private ObjectMapper objectMapper;
@@ -41,7 +41,7 @@ public class CliDeployer extends GuiceRunnable {
     public void run() {
         Injector injector = makeInjector();
         try {
-            File file = new File(deploySpec);
+            File file = new File(deploymentSpec);
             if (!file.exists()) {
                 log.error("Could not find the json file");
                 System.exit(1);

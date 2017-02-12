@@ -7,4 +7,4 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-sh ./bin/node.sh train trainer start $1
+sh ./bin/node.sh engine trainer start $1
