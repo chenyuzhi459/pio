@@ -16,7 +16,7 @@ public class TextSimilarEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
-    private final TextSimilarEngineParams textSimilarEngineParams;
+    private final TextSimilarEngineParams engineParams;
 
     @JsonCreator
     public TextSimilarEngineFactory(@JsonProperty("propertyHose") PropertyHose propertyHose,
@@ -26,11 +26,11 @@ public class TextSimilarEngineFactory implements EngineFactory {
         this.batchEventHose = batchEventHose;
         this.propertyHose = propertyHose;
         this.repository = repository;
-        this.textSimilarEngineParams = engineParams;
+        this.engineParams = engineParams;
     }
     @Override
     public Engine createEngine() {
-        return new TextSimilarEngine(propertyHose, batchEventHose, repository, textSimilarEngineParams);
+        return new TextSimilarEngine(propertyHose, batchEventHose, repository, engineParams);
     }
 
     @JsonProperty
@@ -49,7 +49,7 @@ public class TextSimilarEngineFactory implements EngineFactory {
     }
 
     @JsonProperty
-    public TextSimilarEngineParams getTextSimilarEngineParams() {
-        return textSimilarEngineParams;
+    public TextSimilarEngineParams getEngineParams() {
+        return engineParams;
     }
 }

@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple3;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -47,8 +46,7 @@ public abstract class Engine<TD, PD, MD, EQ, EAR, IND> {
         Evalution<MD, EQ, EAR, IND> evalution = createEval();
         List<Tuple3<TD, EQ, EAR>> evalDataList = dataSource.readEval(sc);
 
-        for(Iterator<Tuple3<TD, EQ, EAR>> ite = evalDataList.iterator(); ite.hasNext();) {
-            Tuple3<TD, EQ, EAR> evalData = ite.next();
+        for(Tuple3<TD, EQ, EAR> evalData: evalDataList) {
             TD trainingData = evalData._1();
             EQ evalQuery = evalData._2();
             EAR evalActualResult = evalData._3();
