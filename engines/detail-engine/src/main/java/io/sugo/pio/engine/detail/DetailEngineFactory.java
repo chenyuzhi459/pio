@@ -11,7 +11,7 @@ import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class DetailEngineFactory implements EngineFactory<DetailTrainingData, DetailPreparedData, DetailModelData> {
+public class DetailEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final Repository repository;
     private final DetailEngineParams engineParams;

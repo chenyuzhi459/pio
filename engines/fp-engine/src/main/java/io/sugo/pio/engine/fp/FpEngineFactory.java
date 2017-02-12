@@ -12,7 +12,7 @@ import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class FpEngineFactory implements EngineFactory<FpTrainingData, FpPreparaData, FpModelData>{
+public class FpEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;

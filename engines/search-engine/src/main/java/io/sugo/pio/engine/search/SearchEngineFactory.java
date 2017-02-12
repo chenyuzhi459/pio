@@ -12,7 +12,7 @@ import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class SearchEngineFactory implements EngineFactory<SearchTrainingData, SearchPreparaData, SearchModelData> {
+public class SearchEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;

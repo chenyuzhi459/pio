@@ -12,7 +12,7 @@ import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class TextSimilarEngineFactory implements EngineFactory<TextSimilarTrainingData, TextSimilarPreparaData, TextSimilarModelData> {
+public class TextSimilarEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;

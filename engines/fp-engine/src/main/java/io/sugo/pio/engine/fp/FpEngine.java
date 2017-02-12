@@ -10,11 +10,14 @@ import io.sugo.pio.engine.fp.engine.FpAlgorithm;
 import io.sugo.pio.engine.fp.engine.FpDatasource;
 import io.sugo.pio.engine.fp.engine.FpModel;
 import io.sugo.pio.engine.fp.engine.FpPreparator;
+import io.sugo.pio.engine.fp.eval.FpEvalActualResult;
+import io.sugo.pio.engine.fp.eval.FpEvalIndicators;
+import io.sugo.pio.engine.fp.eval.FpEvalQuery;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class FpEngine extends Engine<FpTrainingData, FpPreparaData, FpModelData> {
+public class FpEngine extends Engine<FpTrainingData, FpPreparaData, FpModelData, FpEvalQuery, FpEvalActualResult, FpEvalIndicators> {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
@@ -33,7 +36,7 @@ public class FpEngine extends Engine<FpTrainingData, FpPreparaData, FpModelData>
     }
 
     @Override
-    public DataSource<FpTrainingData> createDatasource(Params params) {
+    public DataSource<FpTrainingData, FpEvalQuery, FpEvalActualResult> createDatasource(Params params) {
         return new FpDatasource(propertyHose, batchEventHose);
     }
 
@@ -50,5 +53,10 @@ public class FpEngine extends Engine<FpTrainingData, FpPreparaData, FpModelData>
     @Override
     public Model<FpModelData> createModel() {
         return new FpModel(repository);
+    }
+
+    @Override
+    protected Evalution<FpModelData, FpEvalQuery, FpEvalActualResult, FpEvalIndicators> createEval() {
+        return null;
     }
 }

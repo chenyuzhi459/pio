@@ -11,11 +11,14 @@ import io.sugo.pio.engine.detail.engine.DetailAlgorithm;
 import io.sugo.pio.engine.detail.engine.DetailDataSource;
 import io.sugo.pio.engine.detail.engine.DetailModel;
 import io.sugo.pio.engine.detail.engine.DetailPreparator;
+import io.sugo.pio.engine.detail.eval.DetailEvalActualResult;
+import io.sugo.pio.engine.detail.eval.DetailEvalIndicators;
+import io.sugo.pio.engine.detail.eval.DetailEvalQuery;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData, DetailModelData> {
+public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData, DetailModelData, DetailEvalQuery, DetailEvalActualResult, DetailEvalIndicators> {
     private final BatchEventHose batchEventHose;
     private final Repository repository;
     private final DetailEngineParams detailEngineParams;
@@ -30,7 +33,7 @@ public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData,
         this.detailEngineParams = detailEngineParams;
     }
     @Override
-    protected DataSource<DetailTrainingData> createDatasource(Params params) {
+    protected DataSource<DetailTrainingData, DetailEvalQuery, DetailEvalActualResult> createDatasource(Params params) {
         return new DetailDataSource(batchEventHose);
     }
 
@@ -47,5 +50,10 @@ public class DetailEngine extends Engine<DetailTrainingData, DetailPreparedData,
     @Override
     protected Model<DetailModelData> createModel() {
         return new DetailModel(repository);
+    }
+
+    @Override
+    protected Evalution<DetailModelData, DetailEvalQuery, DetailEvalActualResult, DetailEvalIndicators> createEval() {
+        return null;
     }
 }

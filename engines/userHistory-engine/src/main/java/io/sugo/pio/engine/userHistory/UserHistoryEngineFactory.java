@@ -12,7 +12,7 @@ import io.sugo.pio.engine.userHistory.data.UserHistoryTrainingData;
 
 /**
  */
-public class UserHistoryEngineFactory implements EngineFactory<UserHistoryTrainingData, UserHistoryPreparaData, UserHistoryModelData> {
+public class UserHistoryEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;

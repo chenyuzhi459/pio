@@ -10,11 +10,14 @@ import io.sugo.pio.engine.search.engine.SearchAlgorithm;
 import io.sugo.pio.engine.search.engine.SearchDatasource;
 import io.sugo.pio.engine.search.engine.SearchModel;
 import io.sugo.pio.engine.search.engine.SearchPreparator;
+import io.sugo.pio.engine.search.eval.SearchEvalActualResult;
+import io.sugo.pio.engine.search.eval.SearchEvalIndicators;
+import io.sugo.pio.engine.search.eval.SearchEvalQuery;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class SearchEngine extends Engine<SearchTrainingData, SearchPreparaData, SearchModelData> {
+public class SearchEngine extends Engine<SearchTrainingData, SearchPreparaData, SearchModelData, SearchEvalQuery, SearchEvalActualResult, SearchEvalIndicators> {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
@@ -32,7 +35,7 @@ public class SearchEngine extends Engine<SearchTrainingData, SearchPreparaData, 
     }
 
     @Override
-    public DataSource<SearchTrainingData> createDatasource(Params params) {
+    public DataSource<SearchTrainingData, SearchEvalQuery, SearchEvalActualResult> createDatasource(Params params) {
         return new SearchDatasource(propertyHose, batchEventHose);
     }
 
@@ -51,5 +54,9 @@ public class SearchEngine extends Engine<SearchTrainingData, SearchPreparaData, 
         return new SearchModel(repository);
     }
 
+    @Override
+    protected Evalution<SearchModelData, SearchEvalQuery, SearchEvalActualResult, SearchEvalIndicators> createEval() {
+        return null;
+    }
 
 }

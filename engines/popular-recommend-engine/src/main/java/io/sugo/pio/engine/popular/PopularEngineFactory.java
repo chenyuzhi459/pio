@@ -12,7 +12,7 @@ import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class PopularEngineFactory implements EngineFactory<PopularTrainingData, PopularPreparaData, PopularModelData> {
+public class PopularEngineFactory implements EngineFactory {
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;

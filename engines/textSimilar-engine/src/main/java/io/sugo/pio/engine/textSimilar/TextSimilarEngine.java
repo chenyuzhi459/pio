@@ -10,11 +10,14 @@ import io.sugo.pio.engine.textSimilar.engine.TextSimilarAlgorithm;
 import io.sugo.pio.engine.textSimilar.engine.TextSimilarDatasource;
 import io.sugo.pio.engine.textSimilar.engine.TextSimilarModel;
 import io.sugo.pio.engine.textSimilar.engine.TextSimilarPreparator;
+import io.sugo.pio.engine.textSimilar.eval.TextSimilarEvalActualResult;
+import io.sugo.pio.engine.textSimilar.eval.TextSimilarEvalIndicators;
+import io.sugo.pio.engine.textSimilar.eval.TextSimilarEvalQuery;
 import io.sugo.pio.engine.training.*;
 
 /**
  */
-public class TextSimilarEngine extends Engine<TextSimilarTrainingData, TextSimilarPreparaData, TextSimilarModelData>{
+public class TextSimilarEngine extends Engine<TextSimilarTrainingData, TextSimilarPreparaData, TextSimilarModelData, TextSimilarEvalQuery, TextSimilarEvalActualResult, TextSimilarEvalIndicators>{
     private final BatchEventHose batchEventHose;
     private final PropertyHose propertyHose;
     private final Repository repository;
@@ -32,7 +35,7 @@ public class TextSimilarEngine extends Engine<TextSimilarTrainingData, TextSimil
     }
 
     @Override
-    protected DataSource<TextSimilarTrainingData> createDatasource(Params params) {
+    protected DataSource<TextSimilarTrainingData, TextSimilarEvalQuery, TextSimilarEvalActualResult> createDatasource(Params params) {
         return new TextSimilarDatasource(propertyHose, batchEventHose);
     }
 
@@ -49,5 +52,10 @@ public class TextSimilarEngine extends Engine<TextSimilarTrainingData, TextSimil
     @Override
     protected Model<TextSimilarModelData> createModel() {
         return new TextSimilarModel(repository);
+    }
+
+    @Override
+    protected Evalution<TextSimilarModelData, TextSimilarEvalQuery, TextSimilarEvalActualResult, TextSimilarEvalIndicators> createEval() {
+        return null;
     }
 }

@@ -1,17 +1,19 @@
 package io.sugo.pio.engine.fp.engine
 
+import java.util
 import java.util.Date
 
 import io.sugo.pio.engine.data.input.{BatchEventHose, PropertyHose}
 import io.sugo.pio.engine.fp.Constants
 import io.sugo.pio.engine.fp.data.FpTrainingData
+import io.sugo.pio.engine.fp.eval.{FpEvalActualResult, FpEvalQuery}
 import io.sugo.pio.engine.training.DataSource
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.rdd.RDD
 
 import scala.collection.JavaConverters._
 
-class FpDatasource(propertyHose: PropertyHose, batchEventHose: BatchEventHose) extends DataSource[FpTrainingData]{
+class FpDatasource(propertyHose: PropertyHose, batchEventHose: BatchEventHose) extends DataSource[FpTrainingData, FpEvalQuery, FpEvalActualResult]{
 
   override def readTraining(sc: JavaSparkContext): FpTrainingData = {
     val minEffectRate = 4.0
@@ -49,6 +51,10 @@ class FpDatasource(propertyHose: PropertyHose, batchEventHose: BatchEventHose) e
       .filter( s => (s._2.size <=maxNumRate) && (s._2.size >= minNumRate) )
       .map(s => s._2.toArray)
     sessionRDD
+  }
+
+  override def readEval(sc: JavaSparkContext): util.List[(FpTrainingData, FpEvalQuery, FpEvalActualResult)] = {
+    null
   }
 }
 
