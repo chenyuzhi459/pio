@@ -3,10 +3,12 @@ package io.sugo.pio.recommend.bean;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import io.sugo.pio.server.utils.StringUtil;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RecInstance implements Serializable {
     @JsonProperty
@@ -14,15 +16,21 @@ public class RecInstance implements Serializable {
     @JsonProperty
     private String name;
     @JsonProperty
-    private int num;
+    private int num = 10;
     @JsonProperty
     private String owner;
     @JsonProperty
     private DateTime createTime;
     @JsonProperty
+    private DateTime updateTime;
+    @JsonProperty
     private Boolean enabled = false;
 
-    private List<RecStrategy> recStrategyList;
+    private Map<String, RecStrategy> recStrategys;
+
+    public RecInstance(){
+
+    }
 
     @JsonCreator
     public RecInstance(
@@ -32,6 +40,7 @@ public class RecInstance implements Serializable {
             @JsonProperty("owner") String owner,
             @JsonProperty("enabled") Boolean enabled
     ) {
+        Preconditions.checkNotNull(id, "Must specify uuid");
         Preconditions.checkNotNull(name, "Must specify name");
         Preconditions.checkNotNull(num, "Must specify num");
         this.id = id;
@@ -42,6 +51,9 @@ public class RecInstance implements Serializable {
     }
 
     public String getId() {
+        if (StringUtil.isEmpty(id)) {
+            id = StringUtil.generateUid();
+        }
         return id;
     }
 
@@ -74,11 +86,22 @@ public class RecInstance implements Serializable {
     }
 
     public DateTime getCreateTime() {
+        if (createTime == null) {
+            createTime = new DateTime();
+        }
         return createTime;
     }
 
     public void setCreateTime(DateTime createTime) {
         this.createTime = createTime;
+    }
+
+    public DateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(DateTime updateTime) {
+        this.updateTime = updateTime;
     }
 
     public Boolean getEnabled() {
@@ -87,5 +110,28 @@ public class RecInstance implements Serializable {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Map<String, RecStrategy> getRecStrategys() {
+        return recStrategys;
+    }
+
+    public void setRecStrategys(Map<String, RecStrategy> recStrategys) {
+        this.recStrategys = recStrategys;
+    }
+
+    public void addRecStrategy(RecStrategy recStrategy){
+        if(this.recStrategys == null){
+            this.recStrategys = new ConcurrentHashMap<>();
+        }
+        this.recStrategys.put(recStrategy.getId(), recStrategy);
+    }
+
+    public RecStrategy getRecStrategy(String strategyId) {
+        return this.recStrategys.get(strategyId);
+    }
+
+    public RecStrategy deleteStrategy(String strategyId) {
+        return this.recStrategys.remove(strategyId);
     }
 }

@@ -9,12 +9,13 @@ import com.google.inject.Inject;
 import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
 import com.metamx.common.logger.Logger;
-import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.guice.annotations.Json;
-import io.sugo.pio.operator.ProcessRootOperator;
-import io.sugo.pio.operator.Status;
-import io.sugo.pio.ports.Connection;
+import io.sugo.pio.recommend.bean.PageInfo;
+import io.sugo.pio.recommend.bean.RecInstance;
+import io.sugo.pio.recommend.bean.RecInstanceCriteria;
+import io.sugo.pio.recommend.bean.RecStrategy;
+import io.sugo.pio.server.utils.StringUtil;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.tweak.HandleCallback;
@@ -23,10 +24,10 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @ManageLifecycle
 public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager {
@@ -37,6 +38,8 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
     private final SQLMetadataConnector connector;
 
     private final IDBI dbi;
+
+    private final static String ALL_FIELDS = "id, name, num, owner, create_date, update_date, enabled, strategies";
 
     @Inject
     public SQLMetadataRecInstanceManager(
@@ -52,7 +55,7 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
 
     @LifecycleStart
     public void start() {
-        connector.createOperatorProcessTable();
+        connector.createRecommendInstanceTable();
     }
 
     @LifecycleStop
@@ -60,62 +63,40 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
     }
 
     @Override
-    public OperatorProcess get(String id) {
-        return get(id, true);
-    }
-
-    @Override
-    public OperatorProcess get(String id, boolean includeDelete) {
+    public RecInstance get(String id) {
         return dbi.withHandle(
-                new HandleCallback<OperatorProcess>() {
+                new HandleCallback<RecInstance>() {
                     @Override
-                    public OperatorProcess withHandle(Handle handle) throws Exception {
+                    public RecInstance withHandle(Handle handle) throws Exception {
 
                         StringBuilder builder = new StringBuilder();
-                        builder.append("SELECT id, name, description, status, created_date, update_date, operators, connections ")
+                        builder.append("SELECT " + ALL_FIELDS)
                                 .append(" FROM %1$s ")
                                 .append(" WHERE id = :id ");
-                        if (!includeDelete) {
-                            builder.append(" AND status != :status");
-                        }
                         builder.append(" ORDER BY id DESC LIMIT 1 OFFSET 0");
                         Query<Map<String, Object>> query = handle.createQuery(
-                                String.format(builder.toString(), getOperatorProcessTable())
+                                String.format(builder.toString(), getTableName())
                         ).bind("id", id);
-                        if (!includeDelete) {
-                            query.bind("status", Status.DELETED);
-                        }
 
-                        return query.map(new ResultSetMapper<OperatorProcess>() {
+                        return query.map(new ResultSetMapper<RecInstance>() {
 
                             @Override
-                            public OperatorProcess map(int index, ResultSet r, StatementContext ctx) throws SQLException {
+                            public RecInstance map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                                 try {
-                                    String id = r.getString("id");
-                                    String name = r.getString("name");
-                                    String description = r.getString("description");
-                                    Status status = Status.valueOf(r.getString("status"));
-                                    DateTime createTime = new DateTime(r.getString("created_date"));
-                                    DateTime updateTime = new DateTime(r.getString("update_date"));
-                                    ProcessRootOperator root = jsonMapper.readValue(
-                                            r.getBytes("operators"), new TypeReference<ProcessRootOperator>() {
+                                    RecInstance entry = new RecInstance();
+                                    entry.setId(r.getString("id"));
+                                    entry.setName(r.getString("name"));
+                                    entry.setNum(r.getInt("num"));
+                                    entry.setOwner(r.getString("owner"));
+                                    entry.setCreateTime(new DateTime(r.getTimestamp("create_date")));
+                                    entry.setUpdateTime(new DateTime(r.getTimestamp("update_date")));
+                                    entry.setEnabled(r.getBoolean("enabled"));
+                                    byte[] cBytes = r.getBytes("strategies");
+                                    Map<String, RecStrategy> strategies = jsonMapper.readValue(cBytes,
+                                            new TypeReference<Map<String, RecStrategy>>() {
                                             });
-
-                                    OperatorProcess process = new OperatorProcess(name, root);
-                                    process.setId(id);
-                                    byte[] cBytes = r.getBytes("connections");
-                                    if (cBytes != null && cBytes.length > 0) {
-                                        Set<Connection> connections = jsonMapper.readValue(
-                                                r.getBytes("connections"), new TypeReference<Set<Connection>>() {
-                                                }
-                                        );
-                                        process.setConnections(connections);
-                                    }
-                                    process.setDescription(description);
-                                    process.setStatus(status);
-                                    process.setCreateTime(createTime);
-                                    process.setUpdateTime(updateTime);
-                                    return process;
+                                    entry.setRecStrategys(strategies);
+                                    return entry;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
                                 }
@@ -126,64 +107,84 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
     }
 
     @Override
-    public List<OperatorProcess> getAll(boolean includeDelete) {
+    public List<RecInstance> getAll(RecInstanceCriteria criteria) {
         return dbi.withHandle(
-                new HandleCallback<List<OperatorProcess>>() {
+                new HandleCallback<List<RecInstance>>() {
                     @Override
-                    public List<OperatorProcess> withHandle(Handle handle) throws Exception {
+                    public List<RecInstance> withHandle(Handle handle) throws Exception {
 
                         StringBuilder builder = new StringBuilder();
-                        builder.append("SELECT id, name, description, status, created_date, update_date, operators, connections ")
+                        builder.append("SELECT id, name, num, owner, create_date, update_date, enabled ")
                                 .append(" FROM %1$s ")
                                 .append(" WHERE 1 = 1 ");
-                        if (!includeDelete) {
-                            builder.append(" AND status != :status");
+                        if (StringUtil.isNotEmpty(criteria.getName())) {
+                            builder.append(" AND name like :name");
                         }
-                        builder.append(" ORDER BY created_date DESC");
-                        Query<Map<String, Object>> query = handle.createQuery(
-                                String.format(builder.toString(), getOperatorProcessTable())
-                        );
-                        if (!includeDelete) {
-                            query.bind("status", Status.DELETED);
+                        if (StringUtil.isNotEmpty(criteria.getOwner())) {
+                            builder.append(" AND owner like :owner");
+                        }
+                        if (criteria.getEnabled() != null) {
+                            builder.append(" AND enabled=:enabled");
+                        }
+                        if (criteria.getCreateTimeStart() != null) {
+                            builder.append(" AND create_date>=:create_date_start");
+                        }
+                        if (criteria.getCreateTimeEnd() != null) {
+                            builder.append(" AND create_date<=:create_date_end");
+                        }
+                        builder.append(" ORDER BY create_date DESC");
+                        PageInfo page = criteria.getPageInfo();
+                        if (page != null) {
+                            builder.append(String.format(" LIMIT %d OFFSET %d", page.getPageSize(), page.getPageOffset()));
                         }
 
-                        return query.map(new ResultSetMapper<OperatorProcess>() {
+                        Query<Map<String, Object>> query = handle.createQuery(
+                                String.format(builder.toString(), getTableName())
+                        );
+
+                        if (StringUtil.isNotEmpty(criteria.getName())) {
+                            query.bind("name", "%" + criteria.getName().trim() + "%");
+                        }
+                        if (StringUtil.isNotEmpty(criteria.getOwner())) {
+                            query.bind("owner", "%" + criteria.getOwner().trim() + "%");
+                        }
+                        if (criteria.getEnabled() != null) {
+                            query.bind("enabled", criteria.getEnabled());
+                        }
+                        if (criteria.getCreateTimeStart() != null) {
+                            query.bind("create_date_start", criteria.getCreateTimeStart());
+                        }
+                        if (criteria.getCreateTimeEnd() != null) {
+                            query.bind("create_date_end", criteria.getCreateTimeEnd());
+                        }
+
+                        return query.map(new ResultSetMapper<RecInstance>() {
                             @Override
-                            public OperatorProcess map(int index, ResultSet r, StatementContext ctx) throws SQLException {
+                            public RecInstance map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                                 try {
-                                    String id = r.getString("id");
-                                    String name = r.getString("name");
-                                    String description = r.getString("description");
-                                    Status status = Status.valueOf(r.getString("status"));
-                                    DateTime createTime = new DateTime(r.getString("created_date"));
-                                    DateTime updateTime = new DateTime(r.getString("update_date"));
-                                    ProcessRootOperator root = jsonMapper.readValue(
-                                            r.getBytes("operators"), new TypeReference<ProcessRootOperator>() {
+                                    RecInstance entry = new RecInstance();
+                                    entry.setId(r.getString("id"));
+                                    entry.setName(r.getString("name"));
+                                    entry.setNum(r.getInt("num"));
+                                    entry.setOwner(r.getString("owner"));
+                                    entry.setCreateTime(new DateTime(r.getTimestamp("create_date")));
+                                    entry.setUpdateTime(new DateTime(r.getTimestamp("update_date")));
+                                    entry.setEnabled(r.getBoolean("enabled"));
+                                    byte[] cBytes = r.getBytes("strategies");
+                                    Map<String, RecStrategy> strategies = jsonMapper.readValue(cBytes,
+                                            new TypeReference<Map<String, RecStrategy>>() {
                                             });
-                                    OperatorProcess process = new OperatorProcess(name, root);
-                                    process.setId(id);
-                                    byte[] cBytes = r.getBytes("connections");
-                                    if (cBytes != null & cBytes.length > 0) {
-                                        Set<Connection> connections = jsonMapper.readValue(
-                                                r.getBytes("connections"), new TypeReference<Set<Connection>>() {
-                                                }
-                                        );
-                                        process.setConnections(connections);
-                                    }
-                                    process.setDescription(description);
-                                    process.setStatus(status);
-                                    process.setCreateTime(createTime);
-                                    process.setUpdateTime(updateTime);
-                                    return process;
+                                    entry.setRecStrategys(strategies);
+                                    return entry;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
                                 }
                             }
-                        }).fold(Lists.newArrayList(), new Folder3<ArrayList<OperatorProcess>, OperatorProcess>() {
+                        }).fold(Lists.newArrayList(), new Folder3<ArrayList<RecInstance>, RecInstance>() {
                             @Override
-                            public ArrayList<OperatorProcess> fold(
-                                    ArrayList<OperatorProcess> retVal,
-                                    OperatorProcess rs,
+                            public ArrayList<RecInstance> fold(
+                                    ArrayList<RecInstance> retVal,
+                                    RecInstance rs,
                                     FoldController control,
                                     StatementContext ctx
                             ) throws SQLException {
@@ -195,13 +196,12 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
                                 }
                             }
                         });
-
                     }
                 });
     }
 
     @Override
-    public void insert(final OperatorProcess process) {
+    public void insert(final RecInstance entry) {
         try {
             dbi.withHandle(
                     new HandleCallback<Void>() {
@@ -209,61 +209,70 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(
                                     String.format(
-                                            "INSERT INTO %s (id, name, description, status, created_date, update_date, operators, connections) " +
-                                                    " VALUES (:id, :name, :description, :status, :created_date, :update_date, :operators, :connections)",
-                                            getOperatorProcessTable()
+                                            "INSERT INTO %s (" + ALL_FIELDS + ") " +
+                                                    " VALUES (:id, :name, :num, :owner, :create_date, :update_date, :enabled, :strategies)",
+                                            getTableName()
                                     )
                             )
-                                    .bind("id", process.getId())
-                                    .bind("name", process.getName())
-                                    .bind("description", process.getDescription())
-                                    .bind("status", process.getStatus().name())
-                                    .bind("created_date", process.getCreateTime())
-                                    .bind("update_date", process.getUpdateTime())
-                                    .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
-                                    .bind("connections", jsonMapper.writeValueAsBytes(process.getConnections()))
+                                    .bind("id", entry.getId())
+                                    .bind("name", entry.getName())
+                                    .bind("num", entry.getNum())
+                                    .bind("owner", entry.getOwner())
+                                    .bind("create_date", new Timestamp(entry.getCreateTime().getMillis()))
+                                    .bind("update_date", new Timestamp(entry.getUpdateTime().getMillis()))
+                                    .bind("enabled", entry.getEnabled())
+                                    .bind("strategies", jsonMapper.writeValueAsBytes(entry.getRecStrategys()))
                                     .execute();
                             return null;
                         }
                     }
             );
         } catch (Exception e) {
-            log.error(e, "Exception insert process %s[%s]", process.getName(), process.getId());
+            log.error(e, "Exception insert Recommend Instance %s[%s]", entry.getName(), entry.getId());
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public boolean update(final OperatorProcess process) {
+    public boolean update(final RecInstance entry) {
         try {
             dbi.withHandle(
                     new HandleCallback<Void>() {
                         @Override
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(
-                                    String.format("UPDATE %s SET name=:name, description=:description, status=:status, update_date=:update_date, operators = :operators, connections=:connections WHERE id = :id",
-                                            getOperatorProcessTable())
+                                    String.format("UPDATE %s SET name=:name, num=:num, owner=:owner, update_date=:update_date, enabled = :enabled, strategies=:strategies WHERE id = :id",
+                                            getTableName())
                             )
-                                    .bind("id", process.getId())
-                                    .bind("name", process.getName())
-                                    .bind("description", process.getDescription())
-                                    .bind("status", process.getStatus().name())
-                                    .bind("update_date", process.getUpdateTime().toString())
-                                    .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
-                                    .bind("connections", jsonMapper.writeValueAsBytes(process.getConnections()))
+                                    .bind("id", entry.getId())
+                                    .bind("name", entry.getName())
+                                    .bind("num", entry.getNum())
+                                    .bind("owner", entry.getOwner())
+                                    .bind("update_date", new Timestamp(entry.getUpdateTime().getMillis()))
+                                    .bind("enabled", entry.getEnabled())
+                                    .bind("strategies", jsonMapper.writeValueAsBytes(entry.getRecStrategys()))
                                     .execute();
+                            handle.commit();
                             return null;
                         }
                     }
             );
         } catch (Exception e) {
-            log.error(e, "Exception update process [%s] status %s", process.getId(), process.getStatus());
+            log.error(e, "Exception update RecInstance %s[%s]", entry.getName(), entry.getId());
             return false;
         }
         return true;
     }
 
-    private String getOperatorProcessTable() {
+    public void delete(String id) {
+        try {
+            dbi.open().execute("DELETE FROM %s WHERE id=%s", getTableName(), id);
+        } catch (Exception e) {
+            log.error(e, "Exception delete RecInstance with id [%s]", id);
+        }
+    }
+
+    private String getTableName() {
         return dbTables.get().getOperatorProcessTable();
     }
 }

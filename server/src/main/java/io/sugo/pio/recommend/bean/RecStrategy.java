@@ -3,6 +3,8 @@ package io.sugo.pio.recommend.bean;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import io.sugo.pio.server.utils.StringUtil;
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,9 +21,13 @@ public class RecStrategy implements Serializable {
     @JsonProperty
     private Boolean asc = false;
     @JsonProperty
-    private float percent;
-
-    private RecInstance recInstance;
+    private Integer percent;
+    @JsonProperty
+    private int startPos;
+    @JsonProperty
+    private int endPos;
+    @JsonProperty
+    private DateTime createTime;
 
     @JsonCreator
     public RecStrategy(
@@ -30,8 +36,9 @@ public class RecStrategy implements Serializable {
             @JsonProperty("types") List<String> types,
             @JsonProperty("orderField") String orderField,
             @JsonProperty("asc") Boolean asc,
-            @JsonProperty("percent") Float percent
+            @JsonProperty("percent") Integer percent
     ) {
+        Preconditions.checkNotNull(id, "Must specify uuid");
         Preconditions.checkNotNull(name, "Must specify name");
         Preconditions.checkArgument(types != null && types.isEmpty(), "Must specify types");
         Preconditions.checkNotNull(orderField, "Must specify orderField");
@@ -45,6 +52,9 @@ public class RecStrategy implements Serializable {
     }
 
     public String getId() {
+        if (StringUtil.isEmpty(id)) {
+            id = StringUtil.generateUid();
+        }
         return id;
     }
 
@@ -84,19 +94,51 @@ public class RecStrategy implements Serializable {
         this.asc = asc;
     }
 
-    public float getPercent() {
+    public Integer getPercent() {
         return percent;
     }
 
-    public void setPercent(float percent) {
+    public void setPercent(Integer percent) {
         this.percent = percent;
     }
 
-    public RecInstance getRecInstance() {
-        return recInstance;
+    public void setPercent(Integer percent, int startPos) {
+        this.percent = percent;
+        this.startPos = startPos;
+        this.endPos = startPos + percent - 1;
     }
 
-    public void setRecInstance(RecInstance recInstance) {
-        this.recInstance = recInstance;
+    public int getStartPos() {
+        return startPos;
+    }
+
+    public void setStartPos(int startPos) {
+        this.startPos = startPos;
+    }
+
+    public int getEndPos() {
+        return endPos;
+    }
+
+    public void setEndPos(int endPos) {
+        this.endPos = endPos;
+    }
+
+    public DateTime getCreateTime() {
+        if (createTime == null) {
+            createTime = new DateTime();
+        }
+        return createTime;
+    }
+
+    public void setCreateTime(DateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public boolean match(int index) {
+        if (index < startPos || index > endPos) {
+            return false;
+        }
+        return true;
     }
 }

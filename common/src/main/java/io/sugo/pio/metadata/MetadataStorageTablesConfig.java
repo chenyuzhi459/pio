@@ -25,6 +25,9 @@ public class MetadataStorageTablesConfig {
     @JsonProperty("operator_processes")
     private String operatorProcessTable;
 
+    @JsonProperty("recommend_instance")
+    private String recommendInstanceTable;
+
     private final Map<String, String> entryTables = Maps.newHashMap();
 
     @JsonCreator
@@ -36,6 +39,7 @@ public class MetadataStorageTablesConfig {
     ) {
         this.base = (base == null) ? DEFAULT_BASE : base;
         this.operatorProcessTable = makeTableName(operatorProcessTable, "operator_processes");
+        this.recommendInstanceTable = makeTableName(recommendInstanceTable, "recommend_instances");
 
         this.configTable = makeTableName(configTable, "config");
 
@@ -57,6 +61,10 @@ public class MetadataStorageTablesConfig {
 
     public String getOperatorProcessTable() {
         return operatorProcessTable;
+    }
+
+    public String getRecommendInstanceTable() {
+        return recommendInstanceTable;
     }
 
     public String getConfigTable()

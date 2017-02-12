@@ -282,13 +282,13 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                 ImmutableList.of(
                         String.format(
                                 "CREATE TABLE %1$s (\n"
-                                        + "  id VARCHAR(255) NOT NULL,\n"
+                                        + "  id VARCHAR(50) NOT NULL,\n"
                                         + "  name VARCHAR(50) NOT NULL,\n"
                                         + "  description VARCHAR(250),\n"
                                         + "  status VARCHAR(20) NOT NULL,\n"
                                         + "  created_date VARCHAR(50) NOT NULL,\n"
                                         + "  update_date VARCHAR(50) NOT NULL,\n"
-                                        + "  operators %2$s NOT NULL,\n"
+                                        + "  operators %2$s,\n"
                                         + "  connections %3$s,\n"
                                         + "  PRIMARY KEY (id)\n"
                                         + ")",
@@ -303,6 +303,37 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     {
         if (config.get().isCreateTables()) {
             createOperatorProcessTable(tablesConfigSupplier.get().getOperatorProcessTable());
+        }
+    }
+
+    public void createRecommendInstanceTable(final String tableName)
+    {
+        createTable(
+                tableName,
+                ImmutableList.of(
+                        String.format(
+                                "CREATE TABLE %1$s (\n"
+                                        + "  id VARCHAR(50) NOT NULL,\n"
+                                        + "  name VARCHAR(50) NOT NULL,\n"
+                                        + "  num int4,\n"
+                                        + "  owner VARCHAR(50),\n"
+                                        + "  create_date timestamp(0) without time zone,\n"
+                                        + "  update_date timestamp(0) without time zone,\n"
+                                        + "  enabled enabled,\n"
+                                        + "  strategies %2$s,\n"
+                                        + "  PRIMARY KEY (id)\n"
+                                        + ")",
+                                tableName, getPayloadType()
+                        )
+                )
+        );
+    }
+
+    @Override
+    public void createRecommendInstanceTable()
+    {
+        if (config.get().isCreateTables()) {
+            createRecommendInstanceTable(tablesConfigSupplier.get().getRecommendInstanceTable());
         }
     }
 

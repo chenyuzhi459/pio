@@ -10,7 +10,7 @@ import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.recommend.RecommendManager;
-import io.sugo.pio.recommend.manage.http.RecInstanceResource;
+import io.sugo.pio.recommend.manage.http.RecManageResource;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import org.eclipse.jetty.server.Server;
 
@@ -39,7 +39,7 @@ public class CliProxy extends ServerRunnable {
                         binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.PROXY_PORT);
                         LifecycleModule.register(binder, RecommendManager.class);
 
-                        Jerseys.addResource(binder, RecInstanceResource.class);
+                        Jerseys.addResource(binder, RecManageResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);

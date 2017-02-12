@@ -1,6 +1,7 @@
 package io.sugo.pio.metadata;
 
-import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.recommend.bean.RecInstance;
+import io.sugo.pio.recommend.bean.RecInstanceCriteria;
 
 import java.util.List;
 
@@ -10,10 +11,11 @@ public interface MetadataRecInstanceManager
 
   void stop();
 
-  OperatorProcess get(String id);
-  OperatorProcess get(String id, boolean includeDelete);
-  void insert(OperatorProcess spec);
-  boolean update(OperatorProcess pi);
+  RecInstance get(String id);
+  void insert(RecInstance recInstance);
+  boolean update(RecInstance entry);
 
-  List<OperatorProcess> getAll(boolean includeDelete);
+  List<RecInstance> getAll(RecInstanceCriteria criteria);
+
+  void delete(String id);
 }
