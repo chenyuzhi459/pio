@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.textSimilar;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.prediction.ModelFactory;
@@ -18,13 +20,25 @@ import java.util.Map;
 /**
  */
 public class TextSimilarModelFactory implements ModelFactory<TextSimilarResult> {
+    private final Repository repository;
+
+    @JsonCreator
+    public TextSimilarModelFactory(@JsonProperty("repository") Repository repository) {
+        this.repository = repository;
+    }
+
     @Override
-    public PredictionModel<TextSimilarResult> loadModel(Repository repository) {
+    public PredictionModel<TextSimilarResult> loadModel() {
         try{
             return new TextSimilarPredictionModel(new QueryableModelData(repository));
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 
     static class TextSimilarPredictionModel implements PredictionModel<TextSimilarResult>{

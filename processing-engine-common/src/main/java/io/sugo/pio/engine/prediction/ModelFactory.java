@@ -7,5 +7,5 @@ import io.sugo.pio.engine.data.output.Repository;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public interface ModelFactory<R> {
-    PredictionModel<R> loadModel(Repository repository);
+    PredictionModel<R> loadModel();
 }

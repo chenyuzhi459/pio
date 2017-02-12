@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.detail;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.prediction.ModelFactory;
@@ -13,13 +15,25 @@ import java.util.*;
 /**
  */
 public class DetailModelFactory implements ModelFactory<DetailResult>{
+    private final Repository repository;
+
+    @JsonCreator
+    public DetailModelFactory(@JsonProperty("repository") Repository repository) {
+        this.repository = repository;
+    }
+
     @Override
-    public PredictionModel<DetailResult> loadModel(Repository repository) {
+    public PredictionModel<DetailResult> loadModel() {
         try {
             return new DetailPredictionModel(new QueryableModelData(repository));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 
     static class DetailPredictionModel implements PredictionModel<DetailResult> {
