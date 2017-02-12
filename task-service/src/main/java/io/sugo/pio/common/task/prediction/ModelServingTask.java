@@ -24,30 +24,24 @@ import java.util.Map;
 
 /**
  */
-public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
+public class ModelServingTask extends AbstractTask<PredictionQueryObject> {
     private final ModelFactory modelFactory;
     private final String modelId;
 
-    private PredictionModel<R> model;
+    private PredictionModel model;
 
     @JsonIgnore
     private final Object handoffCondition = new Object();
-
-    @JsonIgnore
-    private final ObjectMapper jsonMapper;
 
     @JsonCreator
     public ModelServingTask(
             @JsonProperty("id") String id,
             @JsonProperty("modelId") String modelId,
             @JsonProperty("context") Map<String, Object> context,
-            @JacksonInject ObjectMapper jsonMapper,
-            @JsonProperty("modelFactory") ModelFactory<R> modelFactory) {
+            @JsonProperty("modelFactory") ModelFactory modelFactory) {
         super(id, context);
         this.modelId = modelId;
         this.modelFactory = modelFactory;
-
-        this.jsonMapper = Preconditions.checkNotNull(jsonMapper, "null ObjectMappper");
     }
 
     @Override
@@ -57,12 +51,7 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
 
     @Override
     public TaskStatus run(TaskToolbox toolbox) throws Exception {
-        final ClassLoader loader = buildClassLoader(toolbox);
-        model = invokeForeignLoader("io.sugo.pio.common.task.prediction.ModelServingTask$ModelLoading",
-                new String[]{
-                    jsonMapper.writeValueAsString(modelFactory)
-                },
-                loader);
+        model = modelFactory.loadModel();
 
         DataServerAnnouncer announcer =  toolbox.getSegmentAnnouncer();
         announcer.announce(modelId);
@@ -84,7 +73,7 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
     }
 
     @Override
-    public QueryRunner<PredictionQueryObject, R> getQueryRunner()
+    public QueryRunner<PredictionQueryObject, Object> getQueryRunner()
     {
         return new PredictQueryRunner(model);
     }
@@ -97,50 +86,19 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
         }
     }
 
-    class PredictQueryRunner implements QueryRunner<PredictionQueryObject, R> {
-        private final PredictionModel<R> predictionModel;
+    class PredictQueryRunner implements QueryRunner<PredictionQueryObject, Object> {
+        private final PredictionModel predictionModel;
 
-        PredictQueryRunner(PredictionModel<R> predictionModel) {
+        PredictQueryRunner(PredictionModel predictionModel) {
             this.predictionModel = predictionModel;
         }
 
         @Override
-        public R run(Query<PredictionQueryObject> query, Map<String, Object> responseContext) {
+        public Object run(Query<PredictionQueryObject> query, Map<String, Object> responseContext) {
             if (null != predictionModel) {
                 return predictionModel.predict(query.getQueryObject());
             }
             return null;
-        }
-    }
-
-    private static <InputType, OutputType> OutputType invokeForeignLoader(
-            final String clazzName,
-            final InputType input,
-            final ClassLoader loader
-    )
-    {
-        final ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(loader);
-            final Class<?> clazz = loader.loadClass(clazzName);
-            final Method method = clazz.getMethod("load", input.getClass());
-            return (OutputType) method.invoke(null, input);
-        }
-        catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException e) {
-            throw Throwables.propagate(e);
-        }
-        finally {
-            Thread.currentThread().setContextClassLoader(oldLoader);
-        }
-    }
-
-    public static class ModelLoading {
-        public static PredictionModel load(String[] args) throws Exception
-        {
-            String modelFactoryJson = args[0];
-            ObjectMapper objectMapper = ModelServingTaskConfig.JSON_MAPPER;
-            ModelFactory modelFactory = objectMapper.readValue(modelFactoryJson, ModelFactory.class);
-            return modelFactory.loadModel();
         }
     }
 }

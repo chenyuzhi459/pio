@@ -29,20 +29,6 @@ import java.util.Map;
 /**
  */
 public abstract class AbstractTask<Q> implements Task<Q> {
-    private final List<String> finalSparkDependencyCoordinates = ImmutableList.of(
-            "org.apache.spark:spark-yarn_2.11:2.0.2"
-    );
-
-    private static final EnginesConfig enginesConfig;
-    private static final ExtensionsConfig extensionsConfig;
-
-    final static Injector injector = GuiceInjectors.makeStartupInjector();
-
-    static {
-        enginesConfig = injector.getInstance(EnginesConfig.class);
-        extensionsConfig = injector.getInstance(ExtensionsConfig.class);
-    }
-
     @JsonIgnore
     private final String id;
 
@@ -66,45 +52,6 @@ public abstract class AbstractTask<Q> implements Task<Q> {
         this.taskResource = taskResource == null ? new TaskResource(id, 1) : taskResource;
         this.context = context;
     }
-
-    protected ClassLoader buildClassLoader(final TaskToolbox toolbox) throws MalformedURLException
-    {
-        final List<URL> engineURLs = Lists.newArrayList();
-        for (final File engineFile : Initialization.getEngineFilesToLoad(enginesConfig)) {
-            final ClassLoader extensionLoader = Initialization.getClassLoaderForExtension(engineFile);
-            engineURLs.addAll(Arrays.asList(((URLClassLoader) extensionLoader).getURLs()));
-        }
-
-        final List<URL> extensionURLs = Lists.newArrayList();
-        for (final File extension : Initialization.getEngineExtensionFilesToLoad(enginesConfig)) {
-            final ClassLoader extensionLoader = Initialization.getClassLoaderForExtension(extension);
-            extensionURLs.addAll(Arrays.asList(((URLClassLoader) extensionLoader).getURLs()));
-        }
-
-        final List<URL> jobUrls = Lists.newArrayList();
-        jobUrls.addAll(engineURLs);
-        jobUrls.addAll(extensionURLs);
-        System.setProperty("pio.spark.internal.classpath", Joiner.on(File.pathSeparator).join(jobUrls));
-
-        final List<URL> nonHadoopURLs = Lists.newArrayList();
-        nonHadoopURLs.addAll(Arrays.asList(((URLClassLoader) AbstractTask.class.getClassLoader()).getURLs()));
-
-        final List<URL> driverURLs = Lists.newArrayList();
-        driverURLs.addAll(nonHadoopURLs);
-        // put spark dependencies last to avoid jets3t & apache.httpcore version conflicts
-        for (final File dependency :
-                Initialization.getSparkFilesToLoad(
-                        finalSparkDependencyCoordinates,
-                        extensionsConfig
-                )) {
-            final ClassLoader sparkLoader = Initialization.getClassLoaderForExtension(dependency);
-            driverURLs.addAll(Arrays.asList(((URLClassLoader) sparkLoader).getURLs()));
-        }
-
-        final URLClassLoader loader = new URLClassLoader(driverURLs.toArray(new URL[driverURLs.size()]), null);
-        return loader;
-    }
-
 
     @JsonProperty
     @Override

@@ -1,8 +1,11 @@
 package io.sugo.pio.cli;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -13,6 +16,7 @@ import io.airlift.airline.Command;
 import io.sugo.pio.common.TaskToolboxFactory;
 import io.sugo.pio.common.config.TaskConfig;
 import io.sugo.pio.guice.*;
+import io.sugo.pio.initialization.Initialization;
 import io.sugo.pio.overlord.TaskRunner;
 import io.sugo.pio.overlord.ThreadPoolTaskRunner;
 import io.sugo.pio.query.QueryWalker;
@@ -23,6 +27,10 @@ import io.sugo.pio.worker.executor.ExecutorLifecycleConfig;
 import org.eclipse.jetty.server.Server;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,78 +40,75 @@ import java.util.List;
         description = "Runs a Peon, this is an individual forked \"task\" used as part of the indexing service. "
                 + "This should rarely, if ever, be used directly."
 )
-public class CliPeon extends GuiceRunnable {
+public class CliPeon implements Runnable {
+    private static final Logger log = new Logger(CliPeon.class);
+
+    private final List<String> finalSparkDependencyCoordinates = ImmutableList.of(
+            "org.apache.spark:spark-yarn_2.11:2.0.2"
+    );
+
     @Arguments(description = "task.json status.json", required = true)
     public List<String> taskAndStatusFile;
 
-    private static final Logger log = new Logger(CliPeon.class);
+    @Inject
+    private ExtensionsConfig extensionsConfig = null;
 
-    public CliPeon()
-    {
-        super(log);
-    }
-
-    @Override
-    protected List<? extends Module> getModules() {
-        return ImmutableList.<Module>of(
-                new Module() {
-                    @Override
-                    public void configure(Binder binder) {
-                        binder.bindConstant().annotatedWith(Names.named("serviceName")).to("pio/peon");
-                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(-1);
-
-                        binder.bind(TaskToolboxFactory.class).in(LazySingleton.class);
-
-                        JsonConfigProvider.bind(binder, "pio.task", TaskConfig.class);
-
-                        binder.bind(ExecutorLifecycle.class).in(ManageLifecycle.class);
-                        LifecycleModule.register(binder, ExecutorLifecycle.class);
-                        binder.bind(ExecutorLifecycleConfig.class).toInstance(
-                                new ExecutorLifecycleConfig()
-                                        .setTaskFile(new File(taskAndStatusFile.get(0)))
-                                        .setStatusFile(new File(taskAndStatusFile.get(1)))
-                        );
-
-                        binder.bind(TaskRunner.class).to(ThreadPoolTaskRunner.class);
-                        binder.bind(QueryWalker.class).to(ThreadPoolTaskRunner.class);
-                        binder.bind(ThreadPoolTaskRunner.class).in(ManageLifecycle.class);
-
-                        binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class);
-                        Jerseys.addResource(binder, QueryResource.class);
-                        LifecycleModule.register(binder, QueryResource.class);
-                        LifecycleModule.register(binder, Server.class);
-                    }
-                });
-    }
+    @Inject
+    private EnginesConfig enginesConfig = null;
 
     @Override
     public void run() {
         try {
-            Injector injector = makeInjector();
-            try {
-                final Lifecycle lifecycle = initLifecycle(injector);
-                final Thread hook = new Thread(
-                        new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                lifecycle.stop();
-                            }
-                        }
-                );
-                Runtime.getRuntime().addShutdownHook(hook);
-                injector.getInstance(ExecutorLifecycle.class).join();
-                // Explicitly call lifecycle stop, dont rely on shutdown hook.
-                lifecycle.stop();
-                Runtime.getRuntime().removeShutdownHook(hook);
+
+            final List<URL> engineURLs = Lists.newArrayList();
+            for (final File engineFile : Initialization.getEngineFilesToLoad(enginesConfig)) {
+                final ClassLoader extensionLoader = Initialization.getClassLoaderForExtension(engineFile);
+                engineURLs.addAll(Arrays.asList(((URLClassLoader) extensionLoader).getURLs()));
             }
-            catch (Throwable t) {
-                System.exit(1);
+
+            final List<URL> extensionURLs = Lists.newArrayList();
+            for (final File extension : Initialization.getEngineExtensionFilesToLoad(enginesConfig)) {
+                final ClassLoader extensionLoader = Initialization.getClassLoaderForExtension(extension);
+                extensionURLs.addAll(Arrays.asList(((URLClassLoader) extensionLoader).getURLs()));
             }
-        }
-        catch (Exception e) {
-            throw Throwables.propagate(e);
+
+            final List<URL> jobUrls = Lists.newArrayList();
+            jobUrls.addAll(engineURLs);
+            jobUrls.addAll(extensionURLs);
+            System.setProperty("pio.spark.internal.classpath", Joiner.on(File.pathSeparator).join(jobUrls));
+
+            final List<URL> nonHadoopURLs = Lists.newArrayList();
+            nonHadoopURLs.addAll(Arrays.asList(((URLClassLoader) CliTrainer.class.getClassLoader()).getURLs()));
+
+            final List<URL> driverURLs = Lists.newArrayList();
+            driverURLs.addAll(nonHadoopURLs);
+            // put spark dependencies last to avoid jets3t & apache.httpcore version conflicts
+            for (final File dependency :
+                    Initialization.getSparkFilesToLoad(
+                            finalSparkDependencyCoordinates,
+                            extensionsConfig
+                    )) {
+                final ClassLoader sparkLoader = Initialization.getClassLoaderForExtension(dependency);
+                driverURLs.addAll(Arrays.asList(((URLClassLoader) sparkLoader).getURLs()));
+            }
+
+            final URLClassLoader loader = new URLClassLoader(driverURLs.toArray(new URL[driverURLs.size()]), null);
+            Thread.currentThread().setContextClassLoader(loader);
+
+            final Class<?> mainClass = loader.loadClass(Main.class.getName());
+            final Method mainMethod = mainClass.getMethod("main", String[].class);
+
+            String[] args = new String[]{
+                    "internal",
+                    "internal-peon",
+                    taskAndStatusFile.get(0),
+                    taskAndStatusFile.get(1)
+            };
+            mainMethod.invoke(null, new Object[]{args});
+
+        } catch (Exception e) {
+            log.error(e, "failure!!!!");
+            System.exit(1);
         }
     }
 }
