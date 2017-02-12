@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="js/move-top.js"></script>
 	<script type="text/javascript" src="js/easing.js"></script>
 	<script type="text/javascript" src="js/vue.min.js"></script>
+	<script type="text/javascript" src="js/lodash.min.js"></script>
 	<script type="text/javascript" src="js/category.js"></script>
 </head>
 
@@ -63,10 +64,18 @@
 				</div>
 			</div>
 			<div class="header_bottom_right">
-				<div class="content_top mg1b">热门推荐</div>
+				<div class="content_top mg1b">
+					<d3 class="itblock">热门推荐</d3>
+					<span :class="['mg1l font14 ibblock pointer border pd1l pd1r', {'color-orange': popItemsSortCol === 'imdbRating' && popItemsSortDirect === 'desc'}]"
+						  @click="setPopItemsSortConfig('imdbRating', 'desc')"
+					>评分⬇️</span>
+					<span :class="['mg1l font14 ibblock pointer border pd1l pd1r', {'color-orange': popItemsSortCol === 'Released' && popItemsSortDirect === 'desc'}]"
+						  @click="setPopItemsSortConfig('Released', 'desc')"
+					>发布时间⬇️</span>
+				</div>
 				<!------ Slider ------------>
 				<div class="section mg-1r group">
-					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in popItems">
+					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in popItemsSorted">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">
 							<img :src="item.Poster" alt=""  />
 						</a>

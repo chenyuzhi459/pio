@@ -87,3 +87,9 @@
 .aligncenter { text-align: center; }
 
 .font14 { font-size: 14px }
+
+.color-orange { color: orangered; }
+
+.pointer { cursor: pointer; }
+
+.border { border: 1px solid gray }

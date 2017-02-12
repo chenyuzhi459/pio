@@ -16,11 +16,27 @@ $(function() {
             ],
             popItems:[],
             cacheItems: [],
-            userId: window.localStorage.getItem("userId") || ''
+            userId: window.localStorage.getItem("userId") || '',
+            popItemsSortCol: 'imdbRating',
+            popItemsSortDirect: 'desc'
+        },
+        computed: {
+            popItemsSorted: function () {
+                var col = this.popItemsSortCol
+                var comparator = col === 'Released'
+                    ? function (movie) { return new Date(movie[col]).getTime() }
+                    : function (movie) { return movie[col] * 1 }
+                return _.orderBy(this.popItems, comparator, this.popItemsSortDirect)
+            }
         },
         methods: {
             checkOut: function() {
                 window.localStorage.setItem("userId", "")
+            },
+
+            setPopItemsSortConfig: function (col, direct) {
+                this.popItemsSortCol = col
+                this.popItemsSortDirect = direct
             },
 
             pop: function (category) {
