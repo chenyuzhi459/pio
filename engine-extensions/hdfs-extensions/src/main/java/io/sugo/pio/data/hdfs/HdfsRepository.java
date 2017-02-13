@@ -52,7 +52,7 @@ public class HdfsRepository implements Repository {
             FileStatus[] fileStatuses = fs.listStatus(new Path(path));
             String[] files = new String[fileStatuses.length];
             for (int i=0;i<fileStatuses.length;i++) {
-                files[i] = fileStatuses[i].getPath().toString();
+                files[i] = fileStatuses[i].getPath().getName();
             }
             return files;
         } catch (IOException e) {
@@ -117,6 +117,11 @@ public class HdfsRepository implements Repository {
     @Override
     public boolean isDistributed() {
         return true;
+    }
+
+    @JsonProperty
+    public String getPath() {
+        return path;
     }
 
     static class HdfsFileInputStream extends FSInputStream {

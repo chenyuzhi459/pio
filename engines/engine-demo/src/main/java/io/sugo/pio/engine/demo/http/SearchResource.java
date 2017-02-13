@@ -35,9 +35,9 @@ public class SearchResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             SearchQuery query = jsonMapper.readValue(in, SearchQuery.class);
-            SearchModelFactory searchModelFactory = new SearchModelFactory();
             Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            SearchResult searchResult = searchModelFactory.loadModel(repository).predict(query);
+            SearchModelFactory searchModelFactory = new SearchModelFactory(repository);
+            SearchResult searchResult = searchModelFactory.loadModel().predict(query);
             List<String> itemIds = searchResult.getItems();
             List<String> itemNames = searchResult.getNames();
             Map<String , List<String>> res = new HashMap<>();

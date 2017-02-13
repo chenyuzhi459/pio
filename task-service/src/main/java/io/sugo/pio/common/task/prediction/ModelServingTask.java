@@ -1,8 +1,12 @@
 package io.sugo.pio.common.task.prediction;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import io.sugo.pio.common.TaskStatus;
 import io.sugo.pio.common.TaskToolbox;
 import io.sugo.pio.common.task.AbstractTask;
@@ -14,17 +18,17 @@ import io.sugo.pio.query.Query;
 import io.sugo.pio.query.QueryRunner;
 import io.sugo.pio.server.coordination.DataServerAnnouncer;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
  */
-public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
-    private final Repository repository;
+public class ModelServingTask extends AbstractTask<PredictionQueryObject> {
     private final ModelFactory modelFactory;
     private final String modelId;
 
-    @JsonIgnore
-    private PredictionModel<R> model;
+    private PredictionModel model;
 
     @JsonIgnore
     private final Object handoffCondition = new Object();
@@ -34,11 +38,9 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
             @JsonProperty("id") String id,
             @JsonProperty("modelId") String modelId,
             @JsonProperty("context") Map<String, Object> context,
-            @JsonProperty("repository") Repository repository,
-            @JsonProperty("modelFactory") ModelFactory<R> modelFactory) {
+            @JsonProperty("modelFactory") ModelFactory modelFactory) {
         super(id, context);
         this.modelId = modelId;
-        this.repository = repository;
         this.modelFactory = modelFactory;
     }
 
@@ -49,8 +51,9 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
 
     @Override
     public TaskStatus run(TaskToolbox toolbox) throws Exception {
+        model = modelFactory.loadModel();
+
         DataServerAnnouncer announcer =  toolbox.getSegmentAnnouncer();
-        model = modelFactory.loadModel(repository);
         announcer.announce(modelId);
         synchronized (handoffCondition) {
             handoffCondition.wait();
@@ -65,17 +68,12 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
     }
 
     @JsonProperty
-    public Repository getRepository() {
-        return repository;
-    }
-
-    @JsonProperty
     public ModelFactory getModelFactory() {
         return modelFactory;
     }
 
     @Override
-    public QueryRunner<PredictionQueryObject, R> getQueryRunner()
+    public QueryRunner<PredictionQueryObject, Object> getQueryRunner()
     {
         return new PredictQueryRunner(model);
     }
@@ -88,20 +86,19 @@ public class ModelServingTask<R> extends AbstractTask<PredictionQueryObject> {
         }
     }
 
-    class PredictQueryRunner implements QueryRunner<PredictionQueryObject, R> {
-        private final PredictionModel<R> predictionModel;
+    class PredictQueryRunner implements QueryRunner<PredictionQueryObject, Object> {
+        private final PredictionModel predictionModel;
 
-        PredictQueryRunner(PredictionModel<R> predictionModel) {
+        PredictQueryRunner(PredictionModel predictionModel) {
             this.predictionModel = predictionModel;
         }
 
         @Override
-        public R run(Query<PredictionQueryObject> query, Map<String, Object> responseContext) {
+        public Object run(Query<PredictionQueryObject> query, Map<String, Object> responseContext) {
             if (null != predictionModel) {
                 return predictionModel.predict(query.getQueryObject());
             }
             return null;
         }
     }
-
 }

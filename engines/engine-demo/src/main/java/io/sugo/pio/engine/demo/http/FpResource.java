@@ -35,9 +35,9 @@ public class FpResource {
 
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             FpQuery fpQuery = jsonMapper.readValue(in, FpQuery.class);
-            FpModelFactory fpModelFactory = new FpModelFactory();
             Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            FpResult searchResult = fpModelFactory.loadModel(repository).predict(fpQuery);
+            FpModelFactory fpModelFactory = new FpModelFactory(repository);
+            FpResult searchResult = fpModelFactory.loadModel().predict(fpQuery);
             List<String> itemIds = searchResult.getItems();
 
             int queryNum = 10;

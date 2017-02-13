@@ -37,9 +37,10 @@ public class TextSimilarResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             TextSimilarQuery query = jsonMapper.readValue(in, TextSimilarQuery.class);
-            TextSimilarModelFactory TextSimilarModelFactory = new TextSimilarModelFactory();
             Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            TextSimilarResult TextSimilarResult = TextSimilarModelFactory.loadModel(repository).predict(query);
+            TextSimilarModelFactory TextSimilarModelFactory = new TextSimilarModelFactory(repository);
+
+            TextSimilarResult TextSimilarResult = TextSimilarModelFactory.loadModel().predict(query);
             List<String> itemIds = TextSimilarResult.getItems();
             Map<String , List<String>> res = new HashMap<>();
             res.put(Constants.ITEM_ID(), itemIds);

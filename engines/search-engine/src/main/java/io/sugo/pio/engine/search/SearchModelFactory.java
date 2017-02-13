@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.search;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.prediction.ModelFactory;
@@ -20,13 +22,25 @@ import java.util.Map;
 /**
  */
 public class SearchModelFactory implements ModelFactory<SearchResult> {
+    private final Repository repository;
+
+    @JsonCreator
+    public SearchModelFactory(@JsonProperty("repository") Repository repository) {
+        this.repository = repository;
+    }
+
     @Override
-    public PredictionModel<SearchResult> loadModel(Repository repository) {
+    public PredictionModel<SearchResult> loadModel() {
         try{
             return new SearchPredictionModel(new QueryableModelData(repository));
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 
     static class SearchPredictionModel implements PredictionModel<SearchResult>{

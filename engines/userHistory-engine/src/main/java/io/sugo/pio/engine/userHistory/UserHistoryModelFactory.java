@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.userHistory;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.prediction.ModelFactory;
@@ -13,13 +15,25 @@ import java.util.*;
 /**
  */
 public class UserHistoryModelFactory implements ModelFactory<UserHistoryResult> {
+    private final Repository repository;
+
+    @JsonCreator
+    public UserHistoryModelFactory(@JsonProperty("repository") Repository repository) {
+        this.repository = repository;
+    }
+
     @Override
-    public PredictionModel<UserHistoryResult> loadModel(Repository repository) {
+    public PredictionModel<UserHistoryResult> loadModel() {
         try{
             return new UserHistoryPredictionModel(new QueryableModelData(repository));
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 
     static class UserHistoryPredictionModel implements PredictionModel<UserHistoryResult>{

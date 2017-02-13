@@ -33,10 +33,9 @@ public class ALSResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             ALSQuery query = jsonMapper.readValue(in, ALSQuery.class);
-            ALSModelFactory alsModelFactory = new ALSModelFactory();
             Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-
-            ALSResult alsResult = alsModelFactory.loadModel(repository).predict(query);
+            ALSModelFactory alsModelFactory = new ALSModelFactory(repository);
+            ALSResult alsResult = alsModelFactory.loadModel().predict(query);
             List<String> itemIds = alsResult.getItems();
             Map<String, List<String>> res = new HashMap<>();
             res.put(Constants.ITEM_ID(), itemIds);

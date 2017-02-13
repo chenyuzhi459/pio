@@ -34,10 +34,9 @@ public class DetailResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             DetailQuery query = jsonMapper.readValue(in, DetailQuery.class);
-            DetailModelFactory detailModelFactory = new DetailModelFactory();
             Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-
-            DetailResult alsResult = detailModelFactory.loadModel(repository).predict(query);
+            DetailModelFactory detailModelFactory = new DetailModelFactory(repository);
+            DetailResult alsResult = detailModelFactory.loadModel().predict(query);
             List<String> itemIds = alsResult.getItems();
             Map<String, List<String>> res = new HashMap<>();
             res.put(Constants.RELATED_ITEM_ID(), itemIds);

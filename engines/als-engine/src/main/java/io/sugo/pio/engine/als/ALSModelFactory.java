@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.als;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.prediction.ModelFactory;
@@ -17,8 +19,15 @@ import java.util.Map;
 /**
  */
 public class ALSModelFactory implements ModelFactory<ALSResult> {
+    private final Repository repository;
+
+    @JsonCreator
+    public ALSModelFactory(@JsonProperty("repository") Repository repository) {
+        this.repository = repository;
+    }
+
     @Override
-    public PredictionModel<ALSResult> loadModel(Repository repository) {
+    public PredictionModel<ALSResult> loadModel() {
         try{
             return new ALSPredictionModel(new QueryableModelData(repository));
         }catch (IOException e){
@@ -26,7 +35,12 @@ public class ALSModelFactory implements ModelFactory<ALSResult> {
         }
     }
 
-    static class ALSPredictionModel implements PredictionModel<ALSResult>{
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
+    }
+
+    public static class ALSPredictionModel implements PredictionModel<ALSResult>{
         private final QueryableModelData queryableModelData;
         ALSPredictionModel(QueryableModelData queryableModelData){
             this.queryableModelData = queryableModelData;

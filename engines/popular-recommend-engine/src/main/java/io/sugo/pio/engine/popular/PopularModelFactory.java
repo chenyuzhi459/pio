@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.popular;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.prediction.ModelFactory;
@@ -17,13 +19,25 @@ import java.util.Map;
 /**
  */
 public class PopularModelFactory implements ModelFactory<PopResult> {
+    private final Repository repository;
+
+    @JsonCreator
+    public PopularModelFactory(@JsonProperty("repository") Repository repository) {
+        this.repository = repository;
+    }
+
     @Override
-    public PredictionModel<PopResult> loadModel(Repository repository) {
+    public PredictionModel<PopResult> loadModel() {
         try {
             return new PopularPredictionModel(new QueryableModelData(repository));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @JsonProperty
+    public Repository getRepository() {
+        return repository;
     }
 
     static class PopularPredictionModel implements PredictionModel<PopResult> {

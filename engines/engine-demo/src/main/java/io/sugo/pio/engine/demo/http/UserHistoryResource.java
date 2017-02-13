@@ -51,9 +51,9 @@ public class UserHistoryResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             UserHistoryQuery userHistoryQuery = jsonMapper.readValue(in, UserHistoryQuery.class);
-            UserHistoryModelFactory userHistoryModelFactory = new UserHistoryModelFactory();
             Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            UserHistoryResult userHistoryResult = userHistoryModelFactory.loadModel(repository).predict(userHistoryQuery);
+            UserHistoryModelFactory userHistoryModelFactory = new UserHistoryModelFactory(repository);
+            UserHistoryResult userHistoryResult = userHistoryModelFactory.loadModel().predict(userHistoryQuery);
             List<String> hisItemIds = userHistoryResult.getItems();
             Map<String , List<String>> res = new HashMap<>();
 
