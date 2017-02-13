@@ -4,7 +4,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"/>
-	<link href="css/bootstrap-theme.min.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/index.css" rel="stylesheet" type="text/css" media="all"/>
@@ -14,9 +13,11 @@
 	<script type="text/javascript" src="js/move-top.js"></script>
 	<script type="text/javascript" src="js/easing.js"></script>
 	<script type="text/javascript" src="js/vue.min.js"></script>
-	<script type="text/javascript" src="js/bootstrap.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/index.js"></script>
 	<script type="text/javascript" src="js/common.js"></script>
+
+	<script type="text/javascript" src="components/card.js"></script>
 </head>
 
 <body>
@@ -26,14 +27,14 @@
 			<div class="wrap">
 				<div class="nav_list">
 					<ul>
-						<li><a href="index.html">Home</a></li>
+						<li><a href="index.html">首页</a></li>
 					</ul>
 				</div>
 				<div class="account_desc">
 					<ul>
 						<li v-if="userId"><a href="javascript:">{{userId}}</a></li>
-						<li v-else><a href="contact.html">Login</a></li>
-						<li><a href="index.html" @click="checkOut">Checkout</a></li>
+						<li v-else><a href="contact.html">登录</a></li>
+						<li><a href="index.html" @click="checkOut">注销</a></li>
 					</ul>
 				</div>
 				<div class="clear"></div>
@@ -47,7 +48,11 @@
 				<div class="header_top_right">
 					<div class="search_box">
 						<form>
-							<input class="search-keyword" type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}">
+							<input class="search-keyword"
+								   type="text"
+								   value="搜索"
+								   onfocus="this.value = '';"
+								   onblur="if (this.value == '') {this.value = '搜索';}">
 							<input class="search-submit" type="submit" value="" >
 						</form>
 					</div>
@@ -62,7 +67,7 @@
 					<ul>
 						<h3>电影分类</h3>
 						<li v-for="ca in categories">
-							<a :href="'category.html?category=' + ca">{{ca}}</a>
+							<a :href="'category.html?category=' + ca">{{dict[ca] || ca}}</a>
 						</li>
 					</ul>
 				</div>
@@ -127,23 +132,11 @@
 					</div>
 				</div>
 
-				<div v-if="globalRecommends.length" class="section mg-1r group pd1">
-					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in globalRecommends">
-						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
-						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
-						<div class="price-details">
-							<div class="price-number">
-								<p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
-							</div>
-							<div class="add-cart">
-								<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
-							</div>
-							<div class="clear"></div>
-						</div>
+				<div class="mg-1r pd1 container-fluid">
+					<div class="col-md-10" v-for="(movieId, index) in globalRecommends">
+						<movie-card :movie-id="movieId" />
 					</div>
 				</div>
-
-				<div class="color999 aligncenter pd3" v-else>加载中</div>
 
 			</div>
 		</div>
@@ -160,23 +153,11 @@
 					</div>
 				</div>
 
-				<div v-if="customItems.length" class="section mg-1r group pd1">
-					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in customItems">
-						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
-						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
-						<div class="price-details">
-							<div class="price-number">
-								<p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
-							</div>
-							<div class="add-cart">
-								<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
-							</div>
-							<div class="clear"></div>
-						</div>
+				<div class="mg-1r pd1 container-fluid">
+					<div class="col-md-10" v-for="(movieId, index) in customItems">
+						<movie-card :movie-id="movieId" />
 					</div>
 				</div>
-
-				<div class="color999 aligncenter pd3" v-else>加载中</div>
 
 			</div>
 		</div>
@@ -193,23 +174,11 @@
 					</div>
 				</div>
 
-				<div v-if="onlineItems.length" class="section mg-1r group pd1">
-					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
-						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
-						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
-						<div class="price-details">
-							<div class="price-number">
-								<p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
-							</div>
-							<div class="add-cart">
-								<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
-							</div>
-							<div class="clear"></div>
-						</div>
+				<div class="mg-1r pd1 container-fluid">
+					<div class="col-md-10" v-for="(movieId, index) in onlineItems">
+						<movie-card :movie-id="movieId" />
 					</div>
 				</div>
-
-				<div class="color999 aligncenter pd3" v-else>加载中</div>
 
 			</div>
 		</div>

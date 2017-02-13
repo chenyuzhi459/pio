@@ -3,6 +3,7 @@
 	<title>电影详情</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/preview.css" rel="stylesheet" type="text/css" media="all"/>
@@ -14,6 +15,7 @@
 	<script type="text/javascript" src="js/lodash.min.js"></script>
 	<script type="text/javascript" src="js/preview.js"></script>
 	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="components/card.js"></script>
 </head>
 
 <body>
@@ -23,14 +25,14 @@
 			<div class="wrap">
 				<div class="nav_list">
 					<ul>
-						<li><a href="index.html">Home</a></li>
+						<li><a href="index.html">首页</a></li>
 					</ul>
 				</div>
 				<div class="account_desc">
 					<ul>
 						<li v-if="userId"><a href="#">{{userId}}</a></li>
-						<li v-else><a href="contact.html">Login</a></li>
-						<li><a href="index.html" @click="checkOut">Checkout</a></li>
+						<li v-else><a href="contact.html">登录</a></li>
+						<li><a href="index.html" @click="checkOut">注销</a></li>
 					</ul>
 				</div>
 				<div class="clear"></div>
@@ -49,7 +51,7 @@
 		<div class="wrap">
 			<div class="content_top">
 				<div class="back-links">
-					<p><a href="index.html">Home</a> &gt;&gt;&gt;&gt; <a href="#" class="active">English</a></p>
+					<p><a href="index.html" class="active">首页</a> &gt;&gt;&gt;&gt; <span>电影详情</span></p>
 				</div>
 				<div class="clear"></div>
 			</div>
@@ -62,13 +64,13 @@
 						<div class="desc span_3_of_2">
 							<h2>{{filmData.Title}}</h2>
 							<div>
-								<p>Director: <span>{{filmData.Director}}</span></p>
+								<p>导演: <span>{{filmData.Director}}</span></p>
 							</div>
 							<div class="available">
 								<ul>
-									<li><span>Genre:</span> &nbsp; {{filmData.Genre}}</li>
-									<li><span>Writer:</span> &nbsp; {{filmData.Writer}}</li>
-									<li><span>Stars:</span>&nbsp; {{filmData.Actors}}</li>
+									<li><span>类型:</span> &nbsp; {{filmData.Genre}}</li>
+									<li><span>作者:</span> &nbsp; {{filmData.Writer}}</li>
+									<li><span>主演:</span>&nbsp; {{filmData.Actors}}</li>
 									<!--<li><span>Units in Stock:</span>&nbsp; 566</li>-->
 								</ul>
 							</div>
@@ -76,21 +78,41 @@
 						<div class="clear"></div>
 					</div>
 					<div class="product_desc">
-						<h2>Details :</h2>
+						<h2>剧情简介:</h2>
 						<p>{{filmData.Plot}}</p>
 					</div>
+
+					<div v-if="fpFilms.length" class="main">
+						<div class="content">
+							<div class="content_bottom">
+								<div class="heading">
+									<span class="font14 mg1l">购买此电影的顾客也同时购买这些电影</span>
+								</div>
+							</div>
+
+							<div class="mg-1r pd1 container-fluid">
+								<div class="col-md-15" v-for="(movieId, index) in _.take(fpFilms, 4)">
+									<movie-card :movie-id="movieId" :display-genre="true" />
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div class="rightsidebar col-md-20 pd1l pd3t sidebar" v-if="relatedFilms.length">
+				<div class="col-md-20 pd1l pd3t sidebar">
 					<h2>相似推荐</h2>
+					<div class="color999 aligncenter pd3" v-if="!relatedFilms.length">暂无内容</div>
 					<div class="special_movies" v-for="(item, index) in relatedFilms">
 						<div class="movie_poster">
 							<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title"><img :src="item.Poster" alt="" /></a>
 						</div>
 						<div class="movie_desc">
-							<h3><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h3>
-							<p><span>Genre:</span> &nbsp; {{item.Genre}}</p>
-							<p><span>Rating:</span> &nbsp; {{item.imdbRating}}</p>
-							<span><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">View</a></span>
+							<h3>
+								<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"
+								   class="elli block"
+								   :title="item.Title">{{item.Title}}</a></h3>
+							<p><span>类型:</span> &nbsp; {{item.Genre}}</p>
+							<p><span>评分:</span> &nbsp; {{item.imdbRating}}</p>
+							<span><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">浏览</a></span>
 						</div>
 						<div class="clear"></div>
 					</div>
@@ -100,33 +122,6 @@
 	</div>
 
 	<!------------End Header ------------>
-	<div v-if="fpFilms.length" class="main">
-		<div class="wrap">
-			<div class="content">
-				<div class="content_bottom">
-					<div class="heading">
-						<span class="font14 mg1l">购买此电影的顾客也同时购买这些电影</span>
-					</div>
-				</div>
-				<div class="section group mg-1r pd1t">
-					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in fpFilms">
-						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
-						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
-						<div class="price-details">
-							<div class="price-number">
-								<p class="elli"><span>Genre:</span> &nbsp; {{item.Genre}}</p>
-								<p class="elli"><span>Rating:</span> &nbsp; {{item.imdbRating}}</p>
-							</div>
-							<div class="add-cart">
-								<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
-							</div>
-							<div class="clear"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 
 
 	<div class="footer">

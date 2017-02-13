@@ -1,0 +1,23 @@
+<div class="grid-shadow aligncenter pd1p5 mg1b">
+    <a :href="'preview.html?imdbId=' + movieInfo.imdbID +'&id=' + movieId">
+        <img class="height150" :src="movieInfo.Poster" alt=""  />
+    </a>
+    <h2 class="elli movie-title-font">
+        <a :href="'preview.html?imdbId=' + movieInfo.imdbID +'&id=' + movieId"
+           class="color888"
+           :title="movieInfo.Title">{{movieInfo.Title}}</a>
+    </h2>
+    <div class="price-details">
+        <div v-if="displayGenre" class="price-number alignleft font14">
+            <p class="elli"><span>类型:</span> &nbsp; {{movieInfo.Genre}}</p>
+            <p class="elli"><span>评分:</span> &nbsp; {{movieInfo.imdbRating}}</p>
+        </div>
+        <div v-else class="price-number line-height30">
+            <p><span class="movie-title-font font16">评分: {{movieInfo.imdbRating}}</span></p>
+        </div>
+        <div class="add-cart">
+            <h4><a :href="'preview.html?imdbId=' + movieInfo.imdbID +'&id=' + movieId">浏览</a></h4>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

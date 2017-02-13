@@ -37,6 +37,8 @@
     max-width: calc(100% - 51px);
 }
 
+.block { display: block; }
+
 .itblock {
     display: inline-block !important;
     vertical-align: top;
@@ -69,6 +71,7 @@
 .mg3b { margin-bottom: 30px; }
 
 .pd1 { padding: 10px; }
+.pd1p5 { padding: 15px; }
 .pd2 { padding: 20px; }
 .pd3 { padding: 30px; }
 
@@ -89,16 +92,32 @@
 
 .color999 { color: #999; }
 
+.alignleft { text-align: left; }
 .aligncenter { text-align: center; }
 
-.font14 { font-size: 14px }
+.font14, .font14 * { font-size: 14px !important; }
+.font16, .font16 * { font-size: 16px !important; }
 
 .bg-white { background-color: white; }
 .bg-light-gray { background-color: lightgray; }
-.color-orange { color: orangered; }
+.color-orange { color: orangered !important; }
 
 .pointer { cursor: pointer; }
 
 .border { border: 1px solid gray }
 
 .wrap { width: 1152px; }
+
+.grid-shadow {
+    box-shadow: 0px 0px 3px rgb(150, 150, 150);
+    -webkit-box-shadow: 0px 0px 3px rgb(150, 150, 150);
+    -moz-box-shadow: 0px 0px 3px rgb(150, 150, 150);
+    -o-box-shadow: 0px 0px 3px rgb(150, 150, 150);
+}
+
+.height150 {height: 150px;}
+
+.line-height30 { line-height: 30px; }
+
+.color888 {color: #888}
+.movie-title-font { font-family: 'ambleregular'; }

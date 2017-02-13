@@ -3,7 +3,10 @@
 	<title>登录</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"/>
 	<link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+	<link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
+
 	<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="js/move-top.js"></script>
 	<script type="text/javascript" src="js/easing.js"></script>
@@ -18,13 +21,13 @@
 			<div class="wrap">
 				<div class="nav_list">
 					<ul>
-						<li><a href="index.html">Home</a></li>
+						<li><a href="index.html">首页</a></li>
 					</ul>
 				</div>
 				<div class="account_desc">
 					<ul>
-						<li><a href="contact.html">Login</a></li>
-						<li><a href="index.html">Checkout</a></li>
+						<li><a href="contact.html">登录</a></li>
+						<li><a href="index.html">注销</a></li>
 					</ul>
 				</div>
 				<div class="clear"></div>
@@ -39,56 +42,28 @@
 			</div>
 		</div>
 	</div>
-	<div class="main">
-		<div class="wrap">
-			<div class="content">
-				<div class="content_top">
-					<div class="back-links">
-						<p><a href="index.html">Home</a> &gt;&gt;&gt;&gt; <a href="javascript:" class="active">Contact</a></p>
-					</div>
-					<div class="clear"></div>
-				</div>
-				<div class="section group">
-					<div class="col span_2_of_3">
-						<div class="contact-form">
-							<h2>Contact Us</h2>
-							<form method="post" action="index.html" @submit="submit">
-								<div>
-									<span><label>Id</label></span>
-									<span><input name="userId" type="text" class="textbox" v-model="userId"></span>
-								</div>
-								<div>
-									<span><label>E-mail</label></span>
-									<span><input name="userEmail" type="text" class="textbox"></span>
-								</div>
-								<div>
-									<span><input type="submit" value="Submit"  class="mybutton"></span>
-								</div>
-							</form>
-						</div>
-					</div>
-					<div class="col span_1_of_3">
-						<div class="contact_info">
-							<h2>Find Us Here</h2>
-							<div class="map">
-								<iframe width="100%" height="175" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.co.in/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Lighthouse+Point,+FL,+United+States&amp;aq=4&amp;oq=light&amp;sll=26.275636,-80.087265&amp;sspn=0.04941,0.104628&amp;ie=UTF8&amp;hq=&amp;hnear=Lighthouse+Point,+Broward,+Florida,+United+States&amp;t=m&amp;z=14&amp;ll=26.275636,-80.087265&amp;output=embed"></iframe><br><small><a href="https://maps.google.co.in/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=Lighthouse+Point,+FL,+United+States&amp;aq=4&amp;oq=light&amp;sll=26.275636,-80.087265&amp;sspn=0.04941,0.104628&amp;ie=UTF8&amp;hq=&amp;hnear=Lighthouse+Point,+Broward,+Florida,+United+States&amp;t=m&amp;z=14&amp;ll=26.275636,-80.087265" style="color:#888;text-align:left;font-size:0.85em">View Larger Map</a></small>
-							</div>
-						</div>
-						<div class="company_address">
-							<h2>Information :</h2>
-							<p>500 Lorem Ipsum Dolor Sit,</p>
-							<p>22-56-2-9 Sit Amet, Lorem,</p>
-							<p>USA</p>
-							<p>Phone:(00) 222 666 444</p>
-							<p>Fax: (000) 000 00 00 0</p>
-							<p>Email: <span><a href="#">info(at)mycompany.com</a></span></p>
-							<p>Follow on: <span><a href="#">Facebook</a></span>, <span><a href="#">Twitter</a></span></p>
-						</div>
-					</div>
+	<div :style="{width: '576px', margin: '0 auto'}">
+		<form class="form-horizontal" action="index.html" method="post" @submit="submit">
+			<div class="form-group">
+				<label for="userId" class="col-sm-10 control-label">用户编号</label>
+				<div class="col-sm-50">
+					<input type="text" class="form-control" id="userId" v-model="userId" name="userId" placeholder="用户编号">
 				</div>
 			</div>
-		</div>
+			<div class="form-group">
+				<label for="userEmail" class="col-sm-10 control-label">邮箱</label>
+				<div class="col-sm-50">
+					<input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="邮箱">
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-10 col-sm-50">
+					<button type="submit" class="btn btn-default">登录</button>
+				</div>
+			</div>
+		</form>
 	</div>
+
 	<div class="footer">
 		<div class="wrap">
 			<div class="copy_right">
