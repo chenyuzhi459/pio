@@ -27,7 +27,7 @@ $(function() {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'category': category, 'num': 5, 'type': 'pop_query'
+                        'category': category, 'num': 10, 'type': 'pop_query'
                     }),
                     dataType: 'json',
                     type: 'post'
@@ -148,7 +148,9 @@ $(function() {
             }
         }
     })
-    detailUR.pop("Action").then(function() { $('#slider').nivoSlider() })
+    detailUR.pop("Action").then(function() {
+        // $('.carousel').carousel()
+    })
     detailUR.loadGlobalRecommends()
     detailUR.custom()
     detailUR.online()

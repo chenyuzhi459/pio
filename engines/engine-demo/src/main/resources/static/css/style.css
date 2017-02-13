@@ -30,7 +30,7 @@ img{max-width:100%;}
 /*end reset*/
 @font-face {
     font-family: 'ambleregular';
-    src:url(../font/Amble-Regular-webfont.ttf) format('truetype');
+    src:url(../fonts/Amble-Regular-webfont.ttf) format('truetype');
 }
 body {
 	font-family: Arial, Helvetica, sans-serif;
