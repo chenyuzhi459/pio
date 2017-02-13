@@ -21,7 +21,7 @@ $(document).ready(function() {
             },
 
             queryRelated: function(id) {
-                var that = this
+                var this0 = this
                 $.ajax({
                     url: '/pio/query/detail',
                     beforeSend: function(req) {
@@ -31,19 +31,19 @@ $(document).ready(function() {
                         'item_id': id, 'num': 5, 'type': 'detail_query'
                     }),
                     dataType: 'json',
-                    type: 'post',
-                    success: function(data) {
-                        var temp = []
-                        for (var m = 0; m < data.related_item_id.length; m++) {
-                            that.queryOmdbByMovId(data.related_item_id[m], temp)
-                        }
-                        that.relatedFilms = temp
-                    }
+                    type: 'post'
+                }).then(function (data) {
+                    var defs = data.related_item_id.map(this0.queryMovieInfo)
+                    return $when(defs).then(function (results) {
+                        this0.relatedFilms = results.map(function (movieInfo, idx) {
+                            return _.assign({id: data.related_item_id[idx]}, movieInfo[0])
+                        })
+                    })
                 })
             },
 
             queryFp: function(id) {
-                var that = this
+                var this0 = this
                 $.ajax({
                     url: '/pio/query/itemfp',
                     beforeSend: function(req) {
@@ -53,14 +53,14 @@ $(document).ready(function() {
                         'item_id': id, 'num': 8, 'type': 'fp_query'
                     }),
                     dataType: 'json',
-                    type: 'post',
-                    success: function(data) {
-                        var temp = []
-                        for (var m = 0; m < data.item_id.length; m++) {
-                            that.queryOmdbByMovId(data.item_id[m], temp)
-                        }
-                        that.fpFilms = temp
-                    }
+                    type: 'post'
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $when(defs).then(function (results) {
+                        this0.fpFilms = results.map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
+                        })
+                    })
                 })
             },
 
@@ -82,45 +82,19 @@ $(document).ready(function() {
                 })
             },
 
-            queryOmdbById: function (imdbId) {
-                var that = this
-                $.ajax({
-                    url: '/pio/query/movie/infoById/' + imdbId,
-                    dataType: 'json',
-                    type: 'get',
-                    success: function(data) {
-                        that.filmData = data
-                    }
-                })
-            },
-
-            getFilmData: function (id) {
-                var that = this
-                $.ajax({
+            queryMovieInfo: function (id) {
+                return $.ajax({
                     url: '/pio/query/movie/infoByMovId/' + id,
                     dataType: 'json',
-                    type: 'get',
-                    success: function(data) {
-                        that.filmData = data
-                    }
-                })
-            },
-
-            queryOmdbByMovId: function (id, temp) {
-                $.ajax({
-                    url: '/pio/query/movie/infoByMovId/' + escape(id),
-                    dataType: 'json',
-                    type: 'get',
-                    success: function(data) {
-                        data.id = id
-                        temp.push(data)
-                    }
+                    type: 'get'
                 })
             }
         }
     })
 
-    detailUR.getFilmData(qs("id"))
+    detailUR.queryMovieInfo(qs('id')).then(function (data) {
+       detailUR.$data.filmData = data
+    })
     detailUR.queryRelated(qs("id"))
     detailUR.clickPost(qs("id"))
     detailUR.queryFp(qs("id"))

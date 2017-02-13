@@ -33,14 +33,10 @@ $(document).ready(function() {
                     type: 'post'
                 }).then(function (data) {
                     var defs = data.item_id.map(this0.queryMovieInfo)
-                    return $.when.apply(null, defs).then(function () {
-                        this0.searchItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                    return $when(defs).then(function (results) {
+                        this0.searchItems = results.map(function (movieInfo, idx) {
                             return _.assign({id: data.item_id[idx]}, movieInfo[0])
                         })
-
-                        var dtd = $.Deferred();
-                        this0.$nextTick(function () { dtd.resolve(); })
-                        return dtd
                     })
                 })
             },
@@ -63,14 +59,10 @@ $(document).ready(function() {
                     type: 'post'
                 }).then(function (data) {
                     var defs = data.item_id.map(this0.queryMovieInfo)
-                    return $.when.apply(null, defs).then(function () {
-                        this0.userSearchItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                    return $when(defs).then(function (results) {
+                        this0.userSearchItems = results.map(function (movieInfo, idx) {
                             return _.assign({id: data.item_id[idx]}, movieInfo[0])
                         })
-
-                        var dtd = $.Deferred();
-                        this0.$nextTick(function () { dtd.resolve(); })
-                        return dtd
                     })
                 })
             },
@@ -81,7 +73,7 @@ $(document).ready(function() {
                     return
                 }
 
-                return $.ajax({
+                $.ajax({
                     url: '/pio/query/als',
                     beforeSend: function(req) {
                         req.setRequestHeader('Content-Type', 'application/json')
@@ -106,14 +98,10 @@ $(document).ready(function() {
                     })
                 }).then(function (data) {
                     var defs = data.item_id.map(this0.queryMovieInfo)
-                    return $.when.apply(null, defs).then(function () {
-                        this0.onlineItems = Array.prototype.slice.call(arguments).map(function (movieInfo, idx) {
+                    return $when(defs).then(function (results) {
+                        this0.onlineItems = results.map(function (movieInfo, idx) {
                             return _.assign({id: data.item_id[idx]}, movieInfo[0])
                         })
-
-                        var dtd = $.Deferred();
-                        this0.$nextTick(function () { dtd.resolve(); })
-                        return dtd
                     })
                 })
             },

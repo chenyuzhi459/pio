@@ -32,6 +32,11 @@
     width: 300px;
 }
 
+.price-number {
+    /*留下空间给 View 按钮*/
+    max-width: calc(100% - 51px);
+}
+
 .itblock {
     display: inline-block;
     vertical-align: top;

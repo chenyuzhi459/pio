@@ -12,6 +12,7 @@
     <script type="text/javascript" src="js/vue.min.js"></script>
     <script type="text/javascript" src="js/lodash.min.js"></script>
     <script type="text/javascript" src="js/search.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
 </head>
 
 <body>
@@ -51,6 +52,7 @@
                             <h3>搜索结果</h3>
                         </div>
                     </div>
+                    <div v-if="!searchItems.length" class="color999 aligncenter pd3">暂无内容</div>
                     <div class="section pd1 mg-1r group">
                         <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in searchItems">
                             <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
