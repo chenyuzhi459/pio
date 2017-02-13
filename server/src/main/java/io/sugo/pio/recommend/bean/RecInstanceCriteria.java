@@ -10,7 +10,7 @@ public class RecInstanceCriteria implements Serializable {
     private String owner;
     private DateTime createTimeStart;
     private DateTime createTimeEnd;
-    private Boolean enabled = false;
+    private Boolean enabled;
     private PageInfo pageInfo;
 
 //    @JsonCreator
@@ -77,7 +77,7 @@ public class RecInstanceCriteria implements Serializable {
 
     public void check() {
         if(this.createTimeStart != null && this.createTimeEnd != null){
-            Preconditions.checkArgument(createTimeStart.isBefore(createTimeEnd), "start time is not before end time");
+            Preconditions.checkArgument(!createTimeStart.isAfter(createTimeEnd), "start time can be before end time");
         }
     }
 }

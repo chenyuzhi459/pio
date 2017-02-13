@@ -116,7 +116,7 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
                         StringBuilder builder = new StringBuilder();
                         builder.append("SELECT id, name, num, owner, create_date, update_date, enabled ")
                                 .append(" FROM %1$s ")
-                                .append(" WHERE 1 = 1 ");
+                                .append(" WHERE 1=1 ");
                         if (StringUtil.isNotEmpty(criteria.getName())) {
                             builder.append(" AND name like :name");
                         }
@@ -152,33 +152,29 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
                             query.bind("enabled", criteria.getEnabled());
                         }
                         if (criteria.getCreateTimeStart() != null) {
-                            query.bind("create_date_start", criteria.getCreateTimeStart());
+                            query.bind("create_date_start", new Timestamp(criteria.getCreateTimeStart().getMillis()));
                         }
                         if (criteria.getCreateTimeEnd() != null) {
-                            query.bind("create_date_end", criteria.getCreateTimeEnd());
+                            query.bind("create_date_end", new Timestamp(criteria.getCreateTimeEnd().getMillis()));
                         }
 
                         return query.map(new ResultSetMapper<RecInstance>() {
                             @Override
                             public RecInstance map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-                                try {
-                                    RecInstance entry = new RecInstance();
-                                    entry.setId(r.getString("id"));
-                                    entry.setName(r.getString("name"));
-                                    entry.setNum(r.getInt("num"));
-                                    entry.setOwner(r.getString("owner"));
-                                    entry.setCreateTime(new DateTime(r.getTimestamp("create_date")));
-                                    entry.setUpdateTime(new DateTime(r.getTimestamp("update_date")));
-                                    entry.setEnabled(r.getBoolean("enabled"));
-                                    byte[] cBytes = r.getBytes("strategies");
-                                    Map<String, RecStrategy> strategies = jsonMapper.readValue(cBytes,
-                                            new TypeReference<Map<String, RecStrategy>>() {
-                                            });
-                                    entry.setRecStrategys(strategies);
-                                    return entry;
-                                } catch (IOException e) {
-                                    throw Throwables.propagate(e);
-                                }
+                                RecInstance entry = new RecInstance();
+                                entry.setId(r.getString("id"));
+                                entry.setName(r.getString("name"));
+                                entry.setNum(r.getInt("num"));
+                                entry.setOwner(r.getString("owner"));
+                                entry.setCreateTime(new DateTime(r.getTimestamp("create_date")));
+                                entry.setUpdateTime(new DateTime(r.getTimestamp("update_date")));
+                                entry.setEnabled(r.getBoolean("enabled"));
+//                                    byte[] cBytes = r.getBytes("strategies");
+//                                    Map<String, RecStrategy> strategies = jsonMapper.readValue(cBytes,
+//                                            new TypeReference<Map<String, RecStrategy>>() {
+//                                            });
+//                                    entry.setRecStrategys(strategies);
+                                return entry;
                             }
                         }).fold(Lists.newArrayList(), new Folder3<ArrayList<RecInstance>, RecInstance>() {
                             @Override
@@ -252,7 +248,6 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
                                     .bind("enabled", entry.getEnabled())
                                     .bind("strategies", jsonMapper.writeValueAsBytes(entry.getRecStrategys()))
                                     .execute();
-                            handle.commit();
                             return null;
                         }
                     }
@@ -266,13 +261,24 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
 
     public void delete(String id) {
         try {
-            dbi.open().execute("DELETE FROM %s WHERE id=%s", getTableName(), id);
+            dbi.withHandle(
+                    new HandleCallback<Void>() {
+                        @Override
+                        public Void withHandle(Handle handle) throws Exception {
+                            handle.createStatement(
+                                    String.format("DELETE FROM %s WHERE id = :id",
+                                            getTableName())
+                            ).bind("id", id).execute();
+                            return null;
+                        }
+                    }
+            );
         } catch (Exception e) {
             log.error(e, "Exception delete RecInstance with id [%s]", id);
         }
     }
 
     private String getTableName() {
-        return dbTables.get().getOperatorProcessTable();
+        return dbTables.get().getRecommendInstanceTable();
     }
 }

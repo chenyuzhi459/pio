@@ -35,15 +35,13 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     private final Predicate<Throwable> shouldRetry;
 
     public SQLMetadataConnector(
-        Supplier<MetadataStorageConnectorConfig> config,
-        Supplier<MetadataStorageTablesConfig> tablesConfigSupplier) {
+            Supplier<MetadataStorageConnectorConfig> config,
+            Supplier<MetadataStorageTablesConfig> tablesConfigSupplier) {
         this.config = config;
         this.tablesConfigSupplier = tablesConfigSupplier;
-        this.shouldRetry = new Predicate<Throwable>()
-        {
+        this.shouldRetry = new Predicate<Throwable>() {
             @Override
-            public boolean apply(Throwable e)
-            {
+            public boolean apply(Throwable e) {
                 return isTransientException(e);
             }
         };
@@ -58,8 +56,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
      *
      * @return String representing the SQL type
      */
-    protected String getPayloadType()
-    {
+    protected String getPayloadType() {
         return PAYLOAD_TYPE;
     }
 
@@ -76,54 +73,46 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
 
     public abstract boolean tableExists(Handle handle, final String tableName);
 
-    public String getValidationQuery() { return "SELECT 1"; }
+    public String getValidationQuery() {
+        return "SELECT 1";
+    }
 
     public <T> T retryWithHandle(
             final HandleCallback<T> callback,
             final Predicate<Throwable> myShouldRetry
-    )
-    {
-        final Callable<T> call = new Callable<T>()
-        {
+    ) {
+        final Callable<T> call = new Callable<T>() {
             @Override
-            public T call() throws Exception
-            {
+            public T call() throws Exception {
                 return getDBI().withHandle(callback);
             }
         };
         try {
             return RetryUtils.retry(call, myShouldRetry, DEFAULT_MAX_TRIES);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw Throwables.propagate(e);
         }
     }
 
-    public <T> T retryWithHandle(final HandleCallback<T> callback)
-    {
+    public <T> T retryWithHandle(final HandleCallback<T> callback) {
         return retryWithHandle(callback, shouldRetry);
     }
 
-    public <T> T retryTransaction(final TransactionCallback<T> callback, final int quietTries, final int maxTries)
-    {
-        final Callable<T> call = new Callable<T>()
-        {
+    public <T> T retryTransaction(final TransactionCallback<T> callback, final int quietTries, final int maxTries) {
+        final Callable<T> call = new Callable<T>() {
             @Override
-            public T call() throws Exception
-            {
+            public T call() throws Exception {
                 return getDBI().inTransaction(callback);
             }
         };
         try {
             return RetryUtils.retry(call, shouldRetry, quietTries, maxTries);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw Throwables.propagate(e);
         }
     }
 
-    public final boolean isTransientException(Throwable e)
-    {
+    public final boolean isTransientException(Throwable e) {
         return e != null && (e instanceof SQLTransientException
                 || e instanceof SQLRecoverableException
                 || e instanceof UnableToObtainConnectionException
@@ -133,20 +122,16 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                 || (e instanceof DBIException && isTransientException(e.getCause())));
     }
 
-    protected boolean connectorIsTransientException(Throwable e)
-    {
+    protected boolean connectorIsTransientException(Throwable e) {
         return false;
     }
 
-    public void createTable(final String tableName, final Iterable<String> sql)
-    {
+    public void createTable(final String tableName, final Iterable<String> sql) {
         try {
             retryWithHandle(
-                    new HandleCallback<Void>()
-                    {
+                    new HandleCallback<Void>() {
                         @Override
-                        public Void withHandle(Handle handle) throws Exception
-                        {
+                        public Void withHandle(Handle handle) throws Exception {
                             if (!tableExists(handle, tableName)) {
                                 log.info("Creating table[%s]", tableName);
                                 final Batch batch = handle.createBatch();
@@ -161,15 +146,13 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                         }
                     }
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.warn(e, "Exception creating table");
         }
     }
 
 
-    public void createConfigTable(final String tableName)
-    {
+    public void createConfigTable(final String tableName) {
         createTable(
                 tableName,
                 ImmutableList.of(
@@ -185,8 +168,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         );
     }
 
-    public void createEntryTable(final String tableName)
-    {
+    public void createEntryTable(final String tableName) {
         createTable(
                 tableName,
                 ImmutableList.of(
@@ -213,14 +195,11 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
             final String valueColumn,
             final String key,
             final byte[] value
-    ) throws Exception
-    {
+    ) throws Exception {
         return getDBI().inTransaction(
-                new TransactionCallback<Void>()
-                {
+                new TransactionCallback<Void>() {
                     @Override
-                    public Void inTransaction(Handle handle, TransactionStatus transactionStatus) throws Exception
-                    {
+                    public Void inTransaction(Handle handle, TransactionStatus transactionStatus) throws Exception {
                         int count = handle
                                 .createQuery(
                                         String.format("SELECT COUNT(*) FROM %1$s WHERE %2$s = :key", tableName, keyColumn)
@@ -257,10 +236,11 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
 
     public abstract DBI getDBI();
 
-    public MetadataStorageConnectorConfig getConfig() { return config.get(); }
+    public MetadataStorageConnectorConfig getConfig() {
+        return config.get();
+    }
 
-    protected BasicDataSource getDatasource()
-    {
+    protected BasicDataSource getDatasource() {
         MetadataStorageConnectorConfig connectorConfig = getConfig();
 
         BasicDataSource dataSource = new BasicDataSource();
@@ -275,8 +255,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
         return dataSource;
     }
 
-    public void createOperatorProcessTable(final String tableName)
-    {
+    public void createOperatorProcessTable(final String tableName) {
         createTable(
                 tableName,
                 ImmutableList.of(
@@ -299,15 +278,13 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     }
 
     @Override
-    public void createOperatorProcessTable()
-    {
+    public void createOperatorProcessTable() {
         if (config.get().isCreateTables()) {
             createOperatorProcessTable(tablesConfigSupplier.get().getOperatorProcessTable());
         }
     }
 
-    public void createRecommendInstanceTable(final String tableName)
-    {
+    public void createRecommendInstanceTable(final String tableName) {
         createTable(
                 tableName,
                 ImmutableList.of(
@@ -319,7 +296,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                                         + "  owner VARCHAR(50),\n"
                                         + "  create_date timestamp(0) without time zone,\n"
                                         + "  update_date timestamp(0) without time zone,\n"
-                                        + "  enabled enabled,\n"
+                                        + "  enabled boolean,\n"
                                         + "  strategies %2$s,\n"
                                         + "  PRIMARY KEY (id)\n"
                                         + ")",
@@ -330,16 +307,14 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     }
 
     @Override
-    public void createRecommendInstanceTable()
-    {
+    public void createRecommendInstanceTable() {
         if (config.get().isCreateTables()) {
             createRecommendInstanceTable(tablesConfigSupplier.get().getRecommendInstanceTable());
         }
     }
 
     @Override
-    public void createTaskTables()
-    {
+    public void createTaskTables() {
         if (config.get().isCreateTables()) {
             final MetadataStorageTablesConfig tablesConfig = tablesConfigSupplier.get();
             final String entryType = tablesConfig.getTaskEntryType();
@@ -348,8 +323,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
     }
 
     @Override
-    public void createConfigTable()
-    {
+    public void createConfigTable() {
         if (config.get().isCreateTables()) {
             createConfigTable(tablesConfigSupplier.get().getConfigTable());
         }
@@ -361,14 +335,11 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
             final String keyColumn,
             final String valueColumn,
             final String key
-    )
-    {
+    ) {
         return getDBI().withHandle(
-                new HandleCallback<byte[]>()
-                {
+                new HandleCallback<byte[]>() {
                     @Override
-                    public byte[] withHandle(Handle handle) throws Exception
-                    {
+                    public byte[] withHandle(Handle handle) throws Exception {
                         return lookupWithHandle(handle, tableName, keyColumn, valueColumn, key);
                     }
                 }
@@ -381,8 +352,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
             final String keyColumn,
             final String valueColumn,
             final String key
-    )
-    {
+    ) {
         final String selectStatement = String.format(
                 "SELECT %s FROM %s WHERE %s = :key", valueColumn,
                 tableName, keyColumn

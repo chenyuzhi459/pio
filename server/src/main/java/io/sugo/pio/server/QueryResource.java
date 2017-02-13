@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  */
-@Path("/pio/v2/")
+@Path("/pio/v1/")
 public class QueryResource {
     private static final int RESPONSE_CTX_HEADER_LEN_LIMIT = 7*1024;
 

@@ -2,7 +2,6 @@ package io.sugo.pio.recommend.bean;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Preconditions;
 import io.sugo.pio.server.utils.StringUtil;
 import org.joda.time.DateTime;
 
@@ -10,23 +9,14 @@ import java.io.Serializable;
 import java.util.List;
 
 public class RecStrategy implements Serializable {
-    @JsonProperty
     private String id;
-    @JsonProperty
     private String name;
-    @JsonProperty
     private List<String> types;
-    @JsonProperty
     private String orderField;
-    @JsonProperty
     private Boolean asc = false;
-    @JsonProperty
     private Integer percent;
-    @JsonProperty
     private int startPos;
-    @JsonProperty
     private int endPos;
-    @JsonProperty
     private DateTime createTime;
 
     @JsonCreator
@@ -38,11 +28,6 @@ public class RecStrategy implements Serializable {
             @JsonProperty("asc") Boolean asc,
             @JsonProperty("percent") Integer percent
     ) {
-        Preconditions.checkNotNull(id, "Must specify uuid");
-        Preconditions.checkNotNull(name, "Must specify name");
-        Preconditions.checkArgument(types != null && types.isEmpty(), "Must specify types");
-        Preconditions.checkNotNull(orderField, "Must specify orderField");
-        Preconditions.checkNotNull(percent, "Must specify orderField");
         this.id = id;
         this.name = name;
         this.types = types;
@@ -51,6 +36,7 @@ public class RecStrategy implements Serializable {
         this.percent = percent;
     }
 
+    @JsonProperty
     public String getId() {
         if (StringUtil.isEmpty(id)) {
             id = StringUtil.generateUid();
@@ -62,6 +48,7 @@ public class RecStrategy implements Serializable {
         this.id = id;
     }
 
+    @JsonProperty
     public String getName() {
         return name;
     }
@@ -70,6 +57,7 @@ public class RecStrategy implements Serializable {
         this.name = name;
     }
 
+    @JsonProperty
     public List<String> getTypes() {
         return types;
     }
@@ -78,6 +66,7 @@ public class RecStrategy implements Serializable {
         this.types = types;
     }
 
+    @JsonProperty
     public String getOrderField() {
         return orderField;
     }
@@ -86,6 +75,7 @@ public class RecStrategy implements Serializable {
         this.orderField = orderField;
     }
 
+    @JsonProperty
     public Boolean getAsc() {
         return asc;
     }
@@ -94,6 +84,7 @@ public class RecStrategy implements Serializable {
         this.asc = asc;
     }
 
+    @JsonProperty
     public Integer getPercent() {
         return percent;
     }
@@ -108,6 +99,7 @@ public class RecStrategy implements Serializable {
         this.endPos = startPos + percent - 1;
     }
 
+    @JsonProperty
     public int getStartPos() {
         return startPos;
     }
@@ -116,6 +108,7 @@ public class RecStrategy implements Serializable {
         this.startPos = startPos;
     }
 
+    @JsonProperty
     public int getEndPos() {
         return endPos;
     }
@@ -124,6 +117,7 @@ public class RecStrategy implements Serializable {
         this.endPos = endPos;
     }
 
+    @JsonProperty
     public DateTime getCreateTime() {
         if (createTime == null) {
             createTime = new DateTime();

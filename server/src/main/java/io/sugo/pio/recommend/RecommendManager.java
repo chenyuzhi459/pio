@@ -5,11 +5,13 @@ import com.google.inject.Inject;
 import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.client.broker.BrokerServiceClient;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.metadata.MetadataRecInstanceManager;
 import io.sugo.pio.recommend.bean.RecInstance;
 import io.sugo.pio.recommend.bean.RecInstanceCriteria;
 import io.sugo.pio.recommend.bean.RecStrategy;
+import io.sugo.pio.server.utils.StringUtil;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -22,11 +24,14 @@ public class RecommendManager {
     private static final Logger log = new Logger(RecommendManager.class);
 
     private final MetadataRecInstanceManager recInstanceManager;
+    private final BrokerServiceClient brokerServiceClient;
 
     @Inject
     public RecommendManager(
+            BrokerServiceClient brokerServiceClient,
             MetadataRecInstanceManager recInstanceManager
     ) {
+        this.brokerServiceClient = brokerServiceClient;
         this.recInstanceManager = recInstanceManager;
     }
 
@@ -46,9 +51,15 @@ public class RecommendManager {
     public RecInstance update(RecInstance recInstance) {
         RecInstance entry = getRecInstance(recInstance.getId());
         if (entry != null) {
-            entry.setName(recInstance.getName());
-            entry.setNum(recInstance.getNum());
-            entry.setEnabled(recInstance.getEnabled());
+            if (StringUtil.isNotEmpty(recInstance.getName())) {
+                entry.setName(recInstance.getName());
+            }
+            if (recInstance.getNum() != null) {
+                entry.setNum(recInstance.getNum());
+            }
+            if (recInstance.getEnabled() != null) {
+                entry.setEnabled(recInstance.getEnabled());
+            }
             entry.setUpdateTime(new DateTime());
             recInstanceManager.update(entry);
         }
@@ -99,10 +110,19 @@ public class RecommendManager {
         Preconditions.checkNotNull(entry, "No Recommend Instance found with id:" + recId);
         RecStrategy strategy = entry.getRecStrategy(strategyId);
         Preconditions.checkNotNull(strategy, "No Recommend Strategy found with id:" + strategyId);
-        strategy.setName(recStrategy.getName());
-        strategy.setOrderField(recStrategy.getOrderField());
-        strategy.setAsc(recStrategy.getAsc());
-        strategy.setTypes(recStrategy.getTypes());
+        if (StringUtil.isNotEmpty(recStrategy.getName())) {
+            strategy.setName(recStrategy.getName());
+        }
+        if (StringUtil.isNotEmpty(recStrategy.getOrderField())) {
+            strategy.setOrderField(recStrategy.getOrderField());
+        }
+        if (recStrategy.getAsc() != null) {
+            strategy.setAsc(recStrategy.getAsc());
+        }
+        if (recStrategy.getTypes() != null) {
+            strategy.setTypes(recStrategy.getTypes());
+        }
+        entry.setUpdateTime(new DateTime());
         recInstanceManager.update(entry);
     }
 

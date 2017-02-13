@@ -80,7 +80,9 @@ public class RecManageResource {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response create(RecInstance recInstance) {
         try {
-            Preconditions.checkNotNull(recInstance.getName(), "name cannot be null");
+            Preconditions.checkNotNull(recInstance.getId(), "Must specify id");
+            Preconditions.checkNotNull(recInstance.getName(), "Must specify name");
+            Preconditions.checkNotNull(recInstance.getNum(), "Must specify num");
             recommendManager.create(recInstance);
             return Response.ok(recInstance).build();
         } catch (Exception e) {
@@ -94,7 +96,6 @@ public class RecManageResource {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response update(@PathParam("id") final String id, RecInstance recInstance) {
         try {
-            Preconditions.checkNotNull(recInstance.getName(), "name cannot be null");
             recInstance.setId(id);
             recInstance = recommendManager.update(recInstance);
             if (recInstance == null) {
@@ -110,7 +111,7 @@ public class RecManageResource {
     @Path("/enable/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response enable(@PathParam("id") final String id, Boolean enabled) {
+    public Response enable(@PathParam("id") final String id, @QueryParam("enabled") Boolean enabled) {
         try {
             if (enabled == null) {
                 enabled = false;
@@ -147,7 +148,10 @@ public class RecManageResource {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response addStrategy(@PathParam("recId") final String recId, RecStrategy recStrategy) {
         try {
-            Preconditions.checkNotNull(recStrategy.getName(), "name cannot be null");
+            Preconditions.checkNotNull(recStrategy.getId(), "Must specify id");
+            Preconditions.checkNotNull(recStrategy.getName(), "Must specify name");
+            Preconditions.checkArgument(recStrategy.getTypes() != null && !recStrategy.getTypes().isEmpty(), "Must specify types");
+            Preconditions.checkNotNull(recStrategy.getOrderField(), "Must specify orderField");
             recommendManager.addStrategy(recId, recStrategy);
             return Response.ok(recStrategy).build();
         } catch (NullPointerException e) {
@@ -163,7 +167,7 @@ public class RecManageResource {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response updateStrategy(@PathParam("recId") final String recId, @PathParam("strategyId") final String strategyId, RecStrategy recStrategy) {
         try {
-            Preconditions.checkNotNull(recStrategy.getName(), "name cannot be null");
+//            Preconditions.checkNotNull(recStrategy.getName(), "name cannot be null");
             recommendManager.updateStrategy(recId, strategyId, recStrategy);
             return Response.ok(recStrategy).build();
         } catch (NullPointerException e) {
