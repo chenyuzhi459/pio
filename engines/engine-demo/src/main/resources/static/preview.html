@@ -81,9 +81,8 @@
 						<p>{{filmData.Plot}}</p>
 					</div>
 				</div>
-				<div class="rightsidebar pure-u-1-3 pd1l pd3t sidebar">
+				<div class="rightsidebar pure-u-1-3 pd1l pd3t sidebar" v-if="relatedFilms.length">
 					<h2>相似推荐</h2>
-					<div class="color999 aligncenter pd3" v-if="!relatedFilms.length">暂无内容</div>
 					<div class="special_movies" v-for="(item, index) in relatedFilms">
 						<div class="movie_poster">
 							<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title"><img :src="item.Poster" alt="" /></a>
@@ -102,7 +101,7 @@
 	</div>
 
 	<!------------End Header ------------>
-	<div class="main">
+	<div v-if="fpFilms.length" class="main">
 		<div class="wrap">
 			<div class="content">
 				<div class="content_bottom">
@@ -110,8 +109,7 @@
 						<span class="font14 mg1l">购买此电影的顾客也同时购买这些电影</span>
 					</div>
 				</div>
-				<div class="color999 aligncenter pd3" v-if="!fpFilms.length">暂无推荐</div>
-				<div v-else class="section group mg-1r pd1t">
+				<div class="section group mg-1r pd1t">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in fpFilms">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>

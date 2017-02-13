@@ -11,6 +11,7 @@ $(function() {
             popItems:[],
             customItems: [],
             onlineItems: [],
+            globalRecommends: [],
             userId: window.localStorage.getItem("userId") || ''
         },
         methods: {
@@ -40,6 +41,35 @@ $(function() {
                         var dtd = $.Deferred();
                         this0.$nextTick(function () { dtd.resolve(); })
                         return dtd
+                    })
+                })
+            },
+
+            loadGlobalRecommends: function () {
+                var this0 = this
+                if (this0.userId) {
+                    return
+                }
+
+                var category = _.sample(this.categories)
+
+                var this0 = this
+                $.ajax({
+                    url: '/pio/query/itempop',
+                    beforeSend: function(req) {
+                        req.setRequestHeader('Content-Type', 'application/json')
+                    },
+                    data: JSON.stringify({
+                        'category': category, 'num': 5, 'type': 'pop_query'
+                    }),
+                    dataType: 'json',
+                    type: 'post'
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $when(defs).then(function (results) {
+                        this0.globalRecommends = results.map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
+                        })
                     })
                 })
             },
@@ -119,6 +149,7 @@ $(function() {
         }
     })
     detailUR.pop("Action").then(function() { $('#slider').nivoSlider() })
+    detailUR.loadGlobalRecommends()
     detailUR.custom()
     detailUR.online()
 

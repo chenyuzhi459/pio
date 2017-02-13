@@ -93,6 +93,8 @@
 
 .font14 { font-size: 14px }
 
+.bg-white { background-color: white; }
+.bg-light-gray { background-color: lightgray; }
 .color-orange { color: orangered; }
 
 .pointer { cursor: pointer; }

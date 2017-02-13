@@ -66,13 +66,17 @@
 			</div>
 			<div class="header_bottom_right">
 				<div class="content_top mg1b">
-					<d3 class="itblock">热门推荐</d3>
-					<span :class="['mg1l font14 ibblock pointer border pd1l pd1r', {'color-orange': popItemsSortCol === 'imdbRating' && popItemsSortDirect === 'desc'}]"
+					<span :class="['mg1l font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === '' || popItemsSortDirect === ''}]"
+						  @click="setPopItemsSortConfig('', '')"
+						  :style="{marginRight: '-5px'}"
+					>热门↓</span>
+					<span :class="['font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === 'imdbRating' && popItemsSortDirect === 'desc'}]"
 						  @click="setPopItemsSortConfig('imdbRating', 'desc')"
-					>评分⬇️</span>
-					<span :class="['mg1l font14 ibblock pointer border pd1l pd1r', {'color-orange': popItemsSortCol === 'Released' && popItemsSortDirect === 'desc'}]"
+                          :style="{marginRight: '-5px'}"
+					>评分↓</span>
+					<span :class="['font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === 'Released' && popItemsSortDirect === 'desc'}]"
 						  @click="setPopItemsSortConfig('Released', 'desc')"
-					>发布时间⬇️</span>
+					>发布时间↓</span>
 				</div>
 				<!------ Slider ------------>
 				<div class="section mg-1r group">

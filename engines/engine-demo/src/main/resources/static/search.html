@@ -52,7 +52,7 @@
                             <h3>搜索结果</h3>
                         </div>
                     </div>
-                    <div v-if="!searchItems.length" class="color999 aligncenter pd3">暂无内容</div>
+                    <div v-if="!searchItems.length" class="color999 aligncenter pd3">查无内容</div>
                     <div class="section pd1 mg-1r group">
                         <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in searchItems">
                             <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div class="main">
+        <div v-if="userId" class="main">
             <div class="wrap">
                 <div class="content">
                     <div class="content_bottom">
@@ -82,9 +82,7 @@
                         </div>
                     </div>
 
-                    <div v-if="!userId" class="color999 aligncenter pd3">请先登录</div>
-
-                    <div v-else-if="userSearchItems.length" class="section pd1 mg-1r group">
+                    <div v-if="userSearchItems.length" class="section pd1 mg-1r group">
                         <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in userSearchItems">
                             <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
                             <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -100,12 +98,12 @@
                         </div>
                     </div>
 
-                    <div class="color999 aligncenter pd3" v-else>暂无推荐</div>
+                    <div class="color999 aligncenter pd3" v-else>加载中</div>
                 </div>
             </div>
         </div>
 
-        <div class="main">
+        <div v-if="userId" class="main">
             <div class="wrap">
                 <div class="content">
                     <div class="content_bottom">
@@ -115,9 +113,7 @@
                         </div>
                     </div>
 
-                    <div v-if="!userId" class="color999 aligncenter pd3">请先登录</div>
-
-                    <div v-else-if="onlineItems.length" class="section mg-1r group pd1">
+                    <div v-if="onlineItems.length" class="section mg-1r group pd1">
                         <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
                             <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
                             <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -133,7 +129,7 @@
                         </div>
                     </div>
 
-                    <div class="color999 aligncenter pd3" v-else>暂无推荐</div>
+                    <div class="color999 aligncenter pd3" v-else>加载中</div>
 
                 </div>
             </div>

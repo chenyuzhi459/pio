@@ -17,11 +17,14 @@ $(function() {
             popItems:[],
             cacheItems: [],
             userId: window.localStorage.getItem("userId") || '',
-            popItemsSortCol: 'imdbRating',
-            popItemsSortDirect: 'desc'
+            popItemsSortCol: '',
+            popItemsSortDirect: ''
         },
         computed: {
             popItemsSorted: function () {
+                if (!this.popItemsSortCol || !this.popItemsSortDirect) {
+                    return this.popItems
+                }
                 var col = this.popItemsSortCol
                 var comparator = col === 'Released'
                     ? function (movie) { return new Date(movie[col]).getTime() }

@@ -70,9 +70,8 @@
 			<div class="header_bottom_right theme-default">
 				<!------ Slider ------------>
 				<div id="slider" class="nivoSlider">
-					<a
-							:href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"
-							v-for="(item, index) in popItems"
+					<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"
+					   v-for="(item, index) in popItems"
 					>
 						<img :src="item.Poster" :alt="item.Title" :title="item.Title" />
 					</a>
@@ -83,8 +82,41 @@
 			<div class="clear"></div>
 		</div>
 	</div>
+
 	<!------------End Header ------------>
-	<div class="main">
+	<div v-if="!userId" class="main">
+		<div class="wrap">
+			<div class="content">
+				<div class="content_bottom">
+					<div class="heading">
+						<h3 class="itblock">热门推荐</h3>
+					</div>
+				</div>
+
+				<div v-if="globalRecommends.length" class="section mg-1r group pd1">
+					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in globalRecommends">
+						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
+						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
+						<div class="price-details">
+							<div class="price-number">
+								<p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
+							</div>
+							<div class="add-cart">
+								<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
+							</div>
+							<div class="clear"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="color999 aligncenter pd3" v-else>加载中</div>
+
+			</div>
+		</div>
+	</div>
+
+	<!------------End Header ------------>
+	<div v-if="userId" class="main">
 		<div class="wrap">
 			<div class="content">
 				<div class="content_bottom">
@@ -94,9 +126,7 @@
 					</div>
 				</div>
 
-				<div class="color999 aligncenter pd3" v-if="!userId">请先登录</div>
-
-				<div v-else-if="customItems.length" class="section mg-1r group pd1">
+				<div v-if="customItems.length" class="section mg-1r group pd1">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in customItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -112,14 +142,14 @@
 					</div>
 				</div>
 
-				<div class="color999 aligncenter pd3" v-else>暂无推荐</div>
+				<div class="color999 aligncenter pd3" v-else>加载中</div>
 
 			</div>
 		</div>
 	</div>
 
 	<!------------End Header ------------>
-	<div class="main">
+	<div v-if="userId" class="main">
 		<div class="wrap">
 			<div class="content">
 				<div class="content_bottom">
@@ -129,9 +159,7 @@
 					</div>
 				</div>
 
-				<div v-if="!userId" class="color999 aligncenter pd3" v-else>请先登录</div>
-
-				<div v-else-if="onlineItems.length" class="section mg-1r group pd1">
+				<div v-if="onlineItems.length" class="section mg-1r group pd1">
 					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
 						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
 						<h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
@@ -147,7 +175,7 @@
 					</div>
 				</div>
 
-				<div class="color999 aligncenter pd3" v-else>暂无推荐</div>
+				<div class="color999 aligncenter pd3" v-else>加载中</div>
 
 			</div>
 		</div>
