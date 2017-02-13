@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<head>
+	<title>热门推荐</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+	<link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
+	<link href="css/category.css" rel="stylesheet" type="text/css" media="all"/>
+
+	<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" src="js/move-top.js"></script>
+	<script type="text/javascript" src="js/easing.js"></script>
+	<script type="text/javascript" src="js/vue.min.js"></script>
+	<script type="text/javascript" src="js/lodash.min.js"></script>
+	<script type="text/javascript" src="js/category.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+
+<body>
+<div id="app">
+	<div class="header">
+		<div class="headertop_desc">
+			<div class="wrap">
+				<div class="nav_list">
+					<ul>
+						<li><a href="index.html">Home</a></li>
+					</ul>
+				</div>
+				<div class="account_desc">
+					<ul>
+						<li v-if="userId"><a href="javascript:">{{userId}}</a></li>
+						<li v-else><a href="contact.html">Login</a></li>
+						<li><a href="index.html" @click="checkOut">Checkout</a></li>
+					</ul>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>
+		<div class="wrap">
+			<div class="header_top">
+				<div class="logo">
+					<a href="index.html"><img src="images/logo.png" alt="" /></a>
+				</div>
+				<div class="header_top_right">
+					<div class="search_box">
+						<form>
+							<input class="search-keyword" type="text" value="Search" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Search';}">
+							<input class="search-submit" type="submit" value="" >
+						</form>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="header_bottom">
+			<div class="header_bottom_left">
+				<div class="categories">
+					<ul>
+						<h3>电影分类</h3>
+						<li v-for="ca in categories">
+							<a href="javascript:" @click="pop(ca)">{{ca}}</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="header_bottom_right">
+				<div class="content_top mg1b">
+					<span :class="['mg1l font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === '' || popItemsSortDirect === ''}]"
+						  @click="setPopItemsSortConfig('', '')"
+						  :style="{marginRight: '-5px'}"
+					>热门↓</span>
+					<span :class="['font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === 'imdbRating' && popItemsSortDirect === 'desc'}]"
+						  @click="setPopItemsSortConfig('imdbRating', 'desc')"
+                          :style="{marginRight: '-5px'}"
+					>评分↓</span>
+					<span :class="['font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === 'Released' && popItemsSortDirect === 'desc'}]"
+						  @click="setPopItemsSortConfig('Released', 'desc')"
+					>发布时间↓</span>
+				</div>
+				<!------ Slider ------------>
+				<div class="section mg-1r group">
+					<div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in popItemsSorted">
+						<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">
+							<img :src="item.Poster" alt=""  />
+						</a>
+						<h2 class="elli">
+							<a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a>
+						</h2>
+						<div class="price-details">
+							<div class="price-number">
+								<p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
+							</div>
+							<div class="add-cart">
+								<h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
+							</div>
+							<div class="clear"></div>
+						</div>
+
+					</div>
+				</div>
+
+				<!------End Slider ------------>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+	<!------------End Header ------------>
+
+	<div class="footer">
+		<div class="copy_right">
+			<p>Copyright &copy; 2016.Sugo All rights reserved.</p>
+		</div>
+	</div>
+	<script type="text/javascript">
+	</script>
+	<a href="#" id="toTop"><span id="toTopHover"> </span></a>
+</div>
+<div class="hidden">
+	<script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script>
+</div>
+</body>
+</html>
+
