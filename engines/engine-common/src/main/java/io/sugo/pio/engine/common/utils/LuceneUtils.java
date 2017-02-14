@@ -21,7 +21,7 @@ public class LuceneUtils {
         try {
             writer = new IndexWriter(dir, iwc);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return writer;
     }

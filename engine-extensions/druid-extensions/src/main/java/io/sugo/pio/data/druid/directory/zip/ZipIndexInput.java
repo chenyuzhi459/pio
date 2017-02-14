@@ -16,7 +16,7 @@ public class ZipIndexInput extends IndexInput {
     private ZipFile file;
     private long offset;
     private InputStream stream;
-    long position;
+    private long position;
 
     protected ZipIndexInput(String name, ZipFile file) throws IOException {
         this(name, file, 0);
