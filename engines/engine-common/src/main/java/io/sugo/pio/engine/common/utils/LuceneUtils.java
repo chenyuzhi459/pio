@@ -32,20 +32,25 @@ public class LuceneUtils {
     }
 
     public static SearchResult search(IndexSearcher searcher, String field, String q, int nums, SortField sortField, Filter filter, Analyzer analyzer) {
+        if (analyzer == null){
+            analyzer = new NoopAnalyzer();
+        }
+        QueryParser parser = new QueryParser(field, analyzer);
+        Query query = null;
+
+        try {
+            query = parser.parse(q);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return search(searcher, nums, query, sortField, filter);
+    }
+
+    private static SearchResult search(IndexSearcher searcher, int nums, Query query, SortField sortField, Filter filter) {
         TopDocs topDocs = null;
         try {
-            if (analyzer == null){
-                analyzer = new NoopAnalyzer();
-            }
-            QueryParser parser = new QueryParser(field, analyzer);
-            Query query = null;
-
-            try {
-                query = parser.parse(q);
-            } catch (ParseException e) {
-            }
             if (sortField != null) {
-                topDocs = searcher.search(query, filter,nums, new Sort(sortField));
+                topDocs = searcher.search(query, filter, nums, new Sort(sortField));
             } else {
                 topDocs = searcher.search(query, nums);
             }
@@ -57,7 +62,6 @@ public class LuceneUtils {
     }
 
     public static SearchResult groupSearch(IndexSearcher searcher, String[] fields, String[] qs, int nums, SortField sortField, Filter filter, Analyzer analyzer) {
-        TopDocs topDocs = null;
         if (analyzer == null){
             analyzer = new NoopAnalyzer();
         }
@@ -66,18 +70,9 @@ public class LuceneUtils {
         try {
             query = MultiFieldQueryParser.parse(qs, fields, clauses, analyzer);
         } catch (ParseException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        try {
-            if (sortField != null) {
-                topDocs = searcher.search(query, filter, nums, new Sort(sortField));
-            } else {
-                topDocs = searcher.search(query, nums);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        SearchResult result = new SearchResult(topDocs);
-        return result;
+
+        return search(searcher, nums, query, sortField, filter);
     }
 }
