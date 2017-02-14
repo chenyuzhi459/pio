@@ -10,6 +10,7 @@ $(document).ready(function() {
     var detailUR = new Vue({
         el: '#app',
         data: {
+            keyword: '',
             searchItems: [],
             userSearchItems: [],
             userId: window.localStorage.getItem("userId") || ''
@@ -19,6 +20,7 @@ $(document).ready(function() {
                 window.localStorage.setItem("userId", "")
             },
             search: function (text) {
+                this.keyword = text
                 var this0 = this
                 $.ajax({
                     url: '/pio/query/itemSearch',
@@ -60,5 +62,10 @@ $(document).ready(function() {
     detailUR.search(qs("text"))
     detailUR.userSearch(qs("text"))
 
+    $('.search-submit').click(function(ev){
+        ev.stopPropagation()
+        ev.preventDefault()
+        detailUR.search($('.search-keyword').val())
+    })
 });
 

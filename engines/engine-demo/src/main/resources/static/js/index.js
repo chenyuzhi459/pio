@@ -19,6 +19,7 @@ var dict = {
     "Western": "西部类"
 }
 
+
 $(function() {
     $().UItoTop({ easingType: 'easeOutQuart' });
 
@@ -38,6 +39,10 @@ $(function() {
         methods: {
             checkOut: function() {
                 window.localStorage.setItem("userId", "")
+            },
+
+            translate: function (ca) {
+                return dict[ca] || ca
             },
 
             pop: function (category) {

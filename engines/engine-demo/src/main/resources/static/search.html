@@ -42,6 +42,19 @@
                 <div class="logo">
                     <a href="index.html"><img src="images/logo.png" alt="" /></a>
                 </div>
+                <div class="header_top_right">
+                    <div class="search_box">
+                        <form>
+                            <input class="search-keyword"
+                                   type="text"
+                                   value="搜索"
+                                   onfocus="this.value = '';"
+                                   onblur="if (this.value == '') {this.value = '搜索';}">
+                            <input class="search-submit" type="submit" value="" >
+                        </form>
+                    </div>
+                    <div class="clear"></div>
+                </div>
             </div>
             <div class="clear"></div>
         </div>
@@ -51,7 +64,7 @@
                 <div class="content">
                     <div class="content_bottom">
                         <div class="heading">
-                            <h3>搜索结果</h3>
+                            <h3>搜索 {{keyword}} 的结果</h3>
                         </div>
                     </div>
                     <div v-if="searchItems.length" class="mg-1r pd1 container-fluid">
