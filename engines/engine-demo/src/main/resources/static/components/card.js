@@ -1,3 +1,19 @@
+var cache = {}
+
+function getMovieInfo(id) {
+    if (id in cache) {
+        return $.when(cache[id])
+    }
+    return $.ajax({
+        url: '/pio/query/movie/infoByMovId/' + id,
+        dataType: 'json',
+        type: 'get'
+    }).then(function (data) {
+        cache[id] = data
+        return data
+    })
+}
+
 $.ajax({
     url: '/components/card.html',
     type: 'get'
@@ -6,7 +22,6 @@ $.ajax({
         template: data,
         props: {
             movieId: String,
-            movieInfoInit: Object,
             displayGenre: Boolean
         },
         data: function () {
@@ -15,22 +30,17 @@ $.ajax({
             }
         },
         mounted: function () {
-            if (this.movieInfoInit) {
-                this.movieInfo = this.movieInfoInit
-                return
-            }
             var this0 = this
-            $.ajax({
-                url: '/pio/query/movie/infoByMovId/' + this.movieId,
-                dataType: 'json',
-                type: 'get'
-            }).then(function (data) {
+            getMovieInfo(this.movieId).then(function (data) {
                 this0.movieInfo = data
             })
         },
         watch: {
-            movieInfoInit: function (val, oldVal) {
-                this.movieInfo = val
+            movieId: function (val, oldVal) {
+                var this0 = this
+                getMovieInfo(val).then(function (data) {
+                    this0.movieInfo = data
+                })
             }
         }
     })

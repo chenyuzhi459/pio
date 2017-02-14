@@ -67,7 +67,7 @@
 					<ul>
 						<h3>电影分类</h3>
 						<li v-for="ca in categories">
-							<a :href="'category.html?category=' + ca">{{dict[ca] || ca}}</a>
+							<a :href="'category.html?category=' + ca">{{translate(ca)}}</a>
 						</li>
 					</ul>
 				</div>
