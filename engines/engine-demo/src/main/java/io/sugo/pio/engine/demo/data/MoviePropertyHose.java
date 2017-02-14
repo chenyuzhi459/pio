@@ -7,6 +7,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,23 @@ public class MoviePropertyHose implements PropertyHose {
 
     @Override
     public JavaRDD<Map<String, Object>> find(JavaSparkContext sc) {
-        return sc.textFile(filepath).map(new MapStringToPropFunc(seperator, itemGens));
+        List<String> list = readFileToList(filepath);
+        return sc.parallelize(list).map(new MapStringToPropFunc(seperator, itemGens));
+    }
+
+    private List<String> readFileToList(String filepath) {
+        try {
+            InputStream is = this.getClass().getResourceAsStream(filepath);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String s = null;
+            List<String> list = new ArrayList<>();
+            while ((s = br.readLine()) != null) {
+                list.add(s);
+            }
+            return list;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static class MapStringToPropFunc implements Function<String, Map<String, Object>> {

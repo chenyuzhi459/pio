@@ -1,44 +1,27 @@
 package io.sugo.pio.engine.demo;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import io.sugo.pio.engine.demo.http.*;
+import io.airlift.airline.Command;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 
-import java.io.IOException;
-
 /**
  */
-public class DemoServer {
-    public static void main(String[] args) throws Exception {
-        train();
-        eval();
-        startServer();
-    }
-
-    private static void train() throws IOException {
-        PopularTraining popularTraining = new PopularTraining();
-        popularTraining.train();
-        ALSTraining alsTraining = new ALSTraining();
-        alsTraining.train();
-        DetailTraining detailTraining = new DetailTraining();
-        detailTraining.train();
-        FpTraining fpTraining = new FpTraining();
-        fpTraining.train();
-        SearchTraining searchTraining = new SearchTraining();
-        searchTraining.train();
-        UserHistoryTraining userHistoryTraining = new UserHistoryTraining();
-        userHistoryTraining.train();
-        TextSimilarTraining textSimilarTraining = new TextSimilarTraining();
-        textSimilarTraining.train();
-    }
-
-    private static void eval() throws IOException {
-        ALSEval alsEval = new ALSEval();
-        alsEval.eval();
+@Command(
+        name = "demo-server",
+        description = "Runs a demo-server"
+)
+public class DemoServer implements Runnable {
+    @Override
+    public void run() {
+        try {
+            startServer();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void startServer() throws Exception {

@@ -141,6 +141,14 @@ public class PullDependencies implements Runnable
   public List<String> engineExtensionCoordinates = Lists.newArrayList();
 
   @Option(
+          name = {"-ed", "--engine-demo-coordinate"},
+          title = "engine demo coordinate",
+          description = "Engine demo coordinate to pull down, followed by a maven coordinate, e.g. io.sugo.pio.engines:mysql-metadata-storage",
+          required = false)
+  public List<String> engineDemoCoordinates = Lists.newArrayList();
+
+
+  @Option(
           name = {"-s", "--spark-coordinate"},
           title = "spark coordinate",
           description = "Spark dependency to pull down, followed by a maven coordinate, e.g. org.apache.hadoop:hadoop-client:2.4.0",
@@ -177,7 +185,7 @@ public class PullDependencies implements Runnable
   );
 
   @Option(
-      name = {"-d", "--defaultVersion"},
+      name = {"-v", "--defaultVersion"},
       title = "Version to use for extension artifacts without version information.",
       required = false
   )
@@ -205,6 +213,7 @@ public class PullDependencies implements Runnable
     final File sparkDependenciesDir = new File(extensionsConfig.getSparkDependenciesDir());
     final File enginesDir = new File(enginesConfig.getEnginesDirectory());
     final File engineExtensionsDir = new File(enginesConfig.getExtensionsDirectory());
+    final File engineDemosDir = new File(enginesConfig.getDemosDirectory());
 
     if (clean) {
       try {
@@ -212,6 +221,7 @@ public class PullDependencies implements Runnable
         FileUtils.deleteDirectory(sparkDependenciesDir);
         FileUtils.deleteDirectory(enginesDir);
         FileUtils.deleteDirectory(engineExtensionsDir);
+        FileUtils.deleteDirectory(engineDemosDir);
       }
       catch (IOException e) {
         log.error("Unable to clear extension directory at [%s]", extensionsConfig.getDirectory());
@@ -223,6 +233,7 @@ public class PullDependencies implements Runnable
     createRootExtensionsDirectory(sparkDependenciesDir);
     createRootExtensionsDirectory(enginesDir);
     createRootExtensionsDirectory(engineExtensionsDir);
+    createRootExtensionsDirectory(engineDemosDir);
 
     log.info(
         "Start pull-deps with local repository [%s] and remote repositories [%s]",
@@ -261,6 +272,16 @@ public class PullDependencies implements Runnable
         downloadExtension(versionedArtifact, currEngineDir);
       }
       log.info("Finish downloading dependencies for engine extension coordinates: [%s]", engineExtensionCoordinates);
+
+      for (final String coordinate : engineDemoCoordinates) {
+        final Artifact versionedArtifact = getArtifact(coordinate);
+
+        File currEngineDir = new File(engineDemosDir, versionedArtifact.getArtifactId());
+        createExtensionDirectory(coordinate, currEngineDir);
+
+        downloadExtension(versionedArtifact, currEngineDir);
+      }
+      log.info("Finish downloading dependencies for engine demo coordinates: [%s]", engineDemoCoordinates);
 
       if (!noDefaultSpark && sparkCoordinates.isEmpty()) {
         sparkCoordinates.addAll(ImmutableList.of(

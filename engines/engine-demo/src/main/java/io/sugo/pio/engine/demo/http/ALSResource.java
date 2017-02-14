@@ -19,7 +19,6 @@ import java.util.*;
  */
 @Path("query/als")
 public class ALSResource {
-    private static final String ITEM_NAME = "item_name";
     public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/als";
 
     @POST

@@ -3,9 +3,8 @@ package io.sugo.pio.engine.demo;
 /**
  */
 public class Constants {
-    public static final String DATA_PATH = Constants.class.getClassLoader().getResource("movielen100k/u.data").getPath();
-    public static final String USER_PATH = Constants.class.getClassLoader().getResource("movielen100k/u.user").getPath();
-    public static final String ITEM_PATH = Constants.class.getClassLoader().getResource("movielen100k/u.item").getPath();
+    public static final String DATA_PATH = "/movielen100k/u.data";
+    public static final String ITEM_PATH = "/movielen100k/u.item";
 
     public static final String DATA_SEPERATOR = "\t";
 
@@ -21,7 +20,7 @@ public class Constants {
     public static final String TIMENUM = "timenum";
 
     //htc
-    public static final String HTC_DATA_PATH = Constants.class.getClassLoader().getResource("htc/htcData.txt").getPath();
+    public static final String HTC_DATA_PATH = "/htc/htcData.txt";
     public static final String HTC_DATA_SEPERATOR = "::";
     public static final String ITEM_CONTENT = "item_content";
 }
