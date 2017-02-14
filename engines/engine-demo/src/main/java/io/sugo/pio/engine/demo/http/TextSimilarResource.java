@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
+import io.sugo.pio.engine.fp.FpModelFactory;
+import io.sugo.pio.engine.fp.FpResult;
+import io.sugo.pio.engine.prediction.PredictionModel;
 import io.sugo.pio.engine.textSimilar.TextSimilarModelFactory;
 import io.sugo.pio.engine.textSimilar.TextSimilarQuery;
 import io.sugo.pio.engine.textSimilar.TextSimilarResult;
@@ -24,7 +27,15 @@ import java.util.Map;
  */
 @Path("query/itemTextSimilar")
 public class TextSimilarResource {
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/textSimilar";
+    public static final String REPOSITORY_PATH = "repositories/textSimilar";
+
+    private static PredictionModel<TextSimilarResult> model;
+
+    static {
+        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+        TextSimilarModelFactory textSimilarModelFactory = new TextSimilarModelFactory(repository);
+        model = textSimilarModelFactory.loadModel();
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -37,10 +48,7 @@ public class TextSimilarResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             TextSimilarQuery query = jsonMapper.readValue(in, TextSimilarQuery.class);
-            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            TextSimilarModelFactory TextSimilarModelFactory = new TextSimilarModelFactory(repository);
-
-            TextSimilarResult TextSimilarResult = TextSimilarModelFactory.loadModel().predict(query);
+            TextSimilarResult TextSimilarResult = model.predict(query);
             List<String> itemIds = TextSimilarResult.getItems();
             Map<String , List<String>> res = new HashMap<>();
             res.put(Constants.ITEM_ID(), itemIds);

@@ -2,9 +2,12 @@ package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
+import io.sugo.pio.engine.fp.FpModelFactory;
+import io.sugo.pio.engine.fp.FpResult;
 import io.sugo.pio.engine.popular.*;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
+import io.sugo.pio.engine.prediction.PredictionModel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -19,8 +22,16 @@ import java.util.*;
  */
 @Path("query/itempop")
 public class PopluarResource {
-    private static final String ITEM_NAME = "item_name";
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/pop";
+    public static final String REPOSITORY_PATH = "repositories/pop";
+
+
+    private static PredictionModel<PopResult> model;
+
+    static {
+        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+        PopularModelFactory popularModelFactory = new PopularModelFactory(repository);
+        model = popularModelFactory.loadModel();
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -33,9 +44,7 @@ public class PopluarResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             PopQuery query = jsonMapper.readValue(in, PopQuery.class);
-            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            PopularModelFactory popularModelFactory = new PopularModelFactory(repository);
-            PopResult popResult = popularModelFactory.loadModel().predict(query);
+            PopResult popResult = model.predict(query);
             List<String> itemIds = popResult.getItems();
             Map<String , List<String>> res = new HashMap<>();
             res.put(Constants.ITEM_ID(), itemIds);

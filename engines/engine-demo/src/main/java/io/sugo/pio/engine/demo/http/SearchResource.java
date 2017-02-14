@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
+import io.sugo.pio.engine.popular.PopResult;
+import io.sugo.pio.engine.popular.PopularModelFactory;
+import io.sugo.pio.engine.prediction.PredictionModel;
 import io.sugo.pio.engine.search.Constants;
 import io.sugo.pio.engine.search.SearchModelFactory;
 import io.sugo.pio.engine.search.SearchQuery;
@@ -22,7 +25,16 @@ import java.util.*;
  */
 @Path("query/itemSearch")
 public class SearchResource {
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/search";
+    public static final String REPOSITORY_PATH = "repositories/search";
+
+    private static PredictionModel<SearchResult> model;
+
+    static {
+        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+        SearchModelFactory searchModelFactory = new SearchModelFactory(repository);
+        model = searchModelFactory.loadModel();
+    }
+
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -35,9 +47,7 @@ public class SearchResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             SearchQuery query = jsonMapper.readValue(in, SearchQuery.class);
-            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            SearchModelFactory searchModelFactory = new SearchModelFactory(repository);
-            SearchResult searchResult = searchModelFactory.loadModel().predict(query);
+            SearchResult searchResult = model.predict(query);
             List<String> itemIds = searchResult.getItems();
             List<String> itemNames = searchResult.getNames();
             Map<String , List<String>> res = new HashMap<>();

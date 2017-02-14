@@ -5,6 +5,9 @@ import io.sugo.pio.engine.als.*;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
+import io.sugo.pio.engine.detail.DetailModelFactory;
+import io.sugo.pio.engine.detail.DetailResult;
+import io.sugo.pio.engine.prediction.PredictionModel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -19,7 +22,15 @@ import java.util.*;
  */
 @Path("query/als")
 public class ALSResource {
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/als";
+    public static final String REPOSITORY_PATH = "repositories/als";
+
+    private static PredictionModel<ALSResult> model;
+
+    static {
+        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+        ALSModelFactory alsModelFactory = new ALSModelFactory(repository);
+        model = alsModelFactory.loadModel();
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -32,9 +43,7 @@ public class ALSResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             ALSQuery query = jsonMapper.readValue(in, ALSQuery.class);
-            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            ALSModelFactory alsModelFactory = new ALSModelFactory(repository);
-            ALSResult alsResult = alsModelFactory.loadModel().predict(query);
+            ALSResult alsResult = model.predict(query);
             List<String> itemIds = alsResult.getItems();
             Map<String, List<String>> res = new HashMap<>();
             res.put(Constants.ITEM_ID(), itemIds);

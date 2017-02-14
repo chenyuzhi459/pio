@@ -1,10 +1,13 @@
 package io.sugo.pio.engine.demo.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.sugo.pio.engine.als.ALSModelFactory;
+import io.sugo.pio.engine.als.ALSResult;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
 import io.sugo.pio.engine.detail.*;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
+import io.sugo.pio.engine.prediction.PredictionModel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -19,9 +22,15 @@ import java.util.*;
  */
 @Path("query/detail")
 public class DetailResource {
-    private static final String RELATED_ITEM_NAME = "related_item_name";
+    public static final String REPOSITORY_PATH = "repositories/detail";
 
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/detail";
+    private static PredictionModel<DetailResult> model;
+
+    static {
+        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+        DetailModelFactory detailModelFactory = new DetailModelFactory(repository);
+        model = detailModelFactory.loadModel();
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -34,9 +43,7 @@ public class DetailResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             DetailQuery query = jsonMapper.readValue(in, DetailQuery.class);
-            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            DetailModelFactory detailModelFactory = new DetailModelFactory(repository);
-            DetailResult alsResult = detailModelFactory.loadModel().predict(query);
+            DetailResult alsResult = model.predict(query);
             List<String> itemIds = alsResult.getItems();
             Map<String, List<String>> res = new HashMap<>();
             res.put(Constants.RELATED_ITEM_ID(), itemIds);

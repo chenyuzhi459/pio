@@ -5,6 +5,9 @@ import io.sugo.pio.engine.common.data.QueryableModelData;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
+import io.sugo.pio.engine.prediction.PredictionModel;
+import io.sugo.pio.engine.search.SearchModelFactory;
+import io.sugo.pio.engine.search.SearchResult;
 import io.sugo.pio.engine.userHistory.Constants;
 import io.sugo.pio.engine.userHistory.UserHistoryModelFactory;
 import io.sugo.pio.engine.userHistory.UserHistoryQuery;
@@ -25,12 +28,19 @@ import java.util.*;
  */
 @Path("query/userSearch")
 public class UserHistoryResource {
-    private final String ITEM_NAME = "item_name";
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/userhistory";
-    public static final String SEARCH_PATH = "engines/engine-demo/src/main/resources/index/search";
-    public static final String DETAIL_PATH = "engines/engine-demo/src/main/resources/index/detail";
+    public static final String REPOSITORY_PATH = "repositories/userhistory";
+    public static final String SEARCH_PATH = "repositories/search";
+    public static final String DETAIL_PATH = "repositories/detail";
     private final QueryableModelData seaModelData;
     private final QueryableModelData detailModelData;
+
+    private static PredictionModel<UserHistoryResult> model;
+
+    static {
+        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+        UserHistoryModelFactory userHistoryModelFactory = new UserHistoryModelFactory(repository);
+        model = userHistoryModelFactory.loadModel();
+    }
 
     public UserHistoryResource() throws IOException {
         Repository seaRepository = new LocalFileRepository(SEARCH_PATH);
@@ -51,9 +61,7 @@ public class UserHistoryResource {
         try {
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             UserHistoryQuery userHistoryQuery = jsonMapper.readValue(in, UserHistoryQuery.class);
-            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            UserHistoryModelFactory userHistoryModelFactory = new UserHistoryModelFactory(repository);
-            UserHistoryResult userHistoryResult = userHistoryModelFactory.loadModel().predict(userHistoryQuery);
+            UserHistoryResult userHistoryResult = model.predict(userHistoryQuery);
             List<String> hisItemIds = userHistoryResult.getItems();
             Map<String , List<String>> res = new HashMap<>();
 
