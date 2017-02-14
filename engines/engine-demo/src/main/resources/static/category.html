@@ -64,29 +64,29 @@
 					<ul>
 						<h3>电影分类</h3>
 						<li v-for="ca in categories" class="font14">
-							<a href="javascript:" @click="pop(ca)" :class="{'color-orange': currCategory === ca}">{{dict[ca] || ca}}</a>
+							<a href="javascript:" @click="pop(ca)" :class="{'color-orange': currCategory === ca}">{{translate(ca)}}</a>
 						</li>
 					</ul>
 				</div>
 			</div>
 			<div class="header_bottom_right">
 				<div class="content_top mg1b">
-					<span :class="['mg1l font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === '' || popItemsSortDirect === ''}]"
+					<span :class="['mg1l font14 ibblock pointer pd1l pd1r', {'color-orange': popItemsSortCol === '' || popItemsSortDirect === ''}]"
 						  @click="setPopItemsSortConfig('', '')"
 						  :style="{marginRight: '-5px'}"
 					>热门推荐↓</span>
-					<span :class="['font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === 'imdbRating' && popItemsSortDirect === 'desc'}]"
+					<span :class="['font14 ibblock pointer pd1l pd1r', {'color-orange': popItemsSortCol === 'imdbRating' && popItemsSortDirect === 'desc'}]"
 						  @click="setPopItemsSortConfig('imdbRating', 'desc')"
                           :style="{marginRight: '-5px'}"
 					>评分↓</span>
-					<span :class="['font14 ibblock pointer border pd1l pd1r bg-white', {'color-orange bg-light-gray': popItemsSortCol === 'Released' && popItemsSortDirect === 'desc'}]"
+					<span :class="['font14 ibblock pointer pd1l pd1r', {'color-orange': popItemsSortCol === 'Released' && popItemsSortDirect === 'desc'}]"
 						  @click="setPopItemsSortConfig('Released', 'desc')"
 					>发布时间↓</span>
 				</div>
 				<!------ Slider ------------>
 				<div class="mg-1r pd1 container-fluid">
 					<div class="col-md-12" v-for="(movieInfo, index) in popItemsSorted">
-						<movie-card :movie-id="movieInfo.id" :movie-info-init="movieInfo" />
+						<movie-card :movie-id="movieInfo.id" />
 					</div>
 				</div>
 

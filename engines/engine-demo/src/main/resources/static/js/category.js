@@ -19,6 +19,7 @@ var dict = {
     "Western": "西部类"
 }
 
+
 function qs(key) {
     key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&") // escape RegEx meta chars
     var match = location.search.match(new RegExp("[?&]" + key + "=([^&]+)(&|$)"))
@@ -64,6 +65,10 @@ $(function() {
                 this.popItemsSortDirect = direct
             },
 
+            translate: function (ca) {
+                return dict[ca] || ca
+            },
+
             pop: function (category) {
                 var this0 = this
                 this0.currCategory = category
@@ -77,26 +82,22 @@ $(function() {
                         'category': category, 'num': 15, 'type': 'pop_query'
                     }),
                     dataType: 'json',
-                    type: 'post',
-                    success: function(data) {
-                        var temp = []
-                        for (var m = 0; m < data.item_id.length; m++) {
-                            this0.queryOmdb(data.item_id[m], temp)
-                        }
-                        this0.popItems = temp
-                    }
+                    type: 'post'
+                }).then(function (data) {
+                    var defs = data.item_id.map(this0.queryMovieInfo)
+                    return $when(defs).then(function (results) {
+                        this0.popItems = results.map(function (movieInfo, idx) {
+                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
+                        })
+                    })
                 })
             },
 
-            queryOmdb: function (id, temp) {
-                $.ajax({
-                    url: '/pio/query/movie/infoByMovId/' + escape(id),
+            queryMovieInfo: function (id) {
+                return $.ajax({
+                    url: '/pio/query/movie/infoByMovId/' + id,
                     dataType: 'json',
-                    type: 'get',
-                    success: function(data) {
-                        data.id = id
-                        temp.push(data)
-                    }
+                    type: 'get'
                 })
             }
         }
