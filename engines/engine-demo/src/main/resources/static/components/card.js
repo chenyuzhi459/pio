@@ -6,8 +6,14 @@ function getMovieInfo(id) {
     }
     return $.ajax({
         url: '/pio/query/movie/infoByMovId/' + id,
-        dataType: 'json',
+        dataType: 'text',
         type: 'get'
+    }).then(function (str) {
+        try {
+            return JSON.parse(str)
+        } catch (e) {
+            return null
+        }
     }).then(function (data) {
         cache[id] = data
         return data

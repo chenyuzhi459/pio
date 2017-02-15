@@ -61,8 +61,8 @@ $(function() {
                     var defs = data.item_id.map(this0.queryMovieInfo)
                     return $when(defs).then(function (results) {
                         this0.popItems = results.map(function (movieInfo, idx) {
-                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
-                        })
+                            return movieInfo && _.assign({id: data.item_id[idx]}, movieInfo)
+                        }).filter(_.identity)
 
                         var dtd = $.Deferred();
                         this0.$nextTick(function () { dtd.resolve(); })
@@ -153,8 +153,14 @@ $(function() {
             queryMovieInfo: function (id) {
                 return $.ajax({
                     url: '/pio/query/movie/infoByMovId/' + id,
-                    dataType: 'json',
+                    dataType: 'text',
                     type: 'get'
+                }).then(function (str) {
+                    try {
+                        return JSON.parse(str)
+                    } catch (e) {
+                        return null
+                    }
                 })
             }
         }
