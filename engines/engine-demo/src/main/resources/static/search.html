@@ -67,11 +67,13 @@
                             <h3>搜索 {{keyword}} 的结果</h3>
                         </div>
                     </div>
-                    <div v-if="searchItems.length" class="mg-1r pd1 container-fluid">
+                    <div v-if="searching" class="pd3 aligncenter color999">加载中</div>
+                    <div v-else-if="searchItems.length" class="mg-1r pd1 container-fluid">
                         <div class="col-md-10" v-for="(movieId, index) in searchItems">
                             <movie-card :movie-id="movieId" />
                         </div>
                     </div>
+                    <div v-else class="pd3 aligncenter color999">查无内容</div>
                 </div>
             </div>
         </div>

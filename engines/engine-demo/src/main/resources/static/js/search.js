@@ -11,6 +11,7 @@ $(document).ready(function() {
         el: '#app',
         data: {
             keyword: '',
+            searching: false,
             searchItems: [],
             userSearchItems: [],
             userId: window.localStorage.getItem("userId") || ''
@@ -19,8 +20,10 @@ $(document).ready(function() {
             checkOut: function() {
                 window.localStorage.setItem("userId", "")
             },
+
             search: function (text) {
                 this.keyword = text
+                this.searching = true
                 var this0 = this
                 $.ajax({
                     url: '/pio/query/itemSearch',
@@ -30,10 +33,17 @@ $(document).ready(function() {
                     data: JSON.stringify({
                         'item_name': text, 'num': 18, 'type': 'search_query'
                     }),
-                    dataType: 'json',
+                    dataType: 'text',
                     type: 'post'
+                }).then(function (str) {
+                    try {
+                        return JSON.parse(str)
+                    } catch (e) {
+                        return null
+                    }
                 }).then(function (data) {
-                    this0.searchItems = data.item_id
+                    this0.searching = false
+                    this0.searchItems = data && data.item_id || []
                 })
             },
 
@@ -65,7 +75,7 @@ $(document).ready(function() {
     $('.search-submit').click(function(ev){
         ev.stopPropagation()
         ev.preventDefault()
-        detailUR.search($('.search-keyword').val())
+        location.href = '/search.html?text=' + $('.search-keyword').val()
     })
 });
 
