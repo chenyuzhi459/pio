@@ -64,7 +64,8 @@
 					<ul>
 						<h3>电影分类</h3>
 						<li v-for="ca in categories" class="font14">
-							<a href="javascript:" @click="pop(ca)" :class="{'color-orange': currCategory === ca}">{{translate(ca)}}</a>
+							<a :href="'/category.html?category=' + ca"
+							   :class="{'color-orange': currCategory === ca}">{{translate(ca)}}</a>
 						</li>
 					</ul>
 				</div>
