@@ -9,8 +9,8 @@ import java.io.IOException;
 /**
  */
 public class RepositoryInput extends BufferedIndexInput {
-    private final FSInputStream inputStream;
     private final long length;
+    private FSInputStream inputStream;
     private boolean clone = false;
 
     public RepositoryInput(String name, Repository repository) {
@@ -33,7 +33,6 @@ public class RepositoryInput extends BufferedIndexInput {
 
     @Override
     protected void seekInternal(long pos) throws IOException {
-        inputStream.seek(pos);
     }
 
     @Override
