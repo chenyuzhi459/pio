@@ -23,7 +23,8 @@ public class Main {
                         CliProcess.class,
                         CliBroker.class,
                         CliOverlord.class,
-                        CliMiddleManager.class
+                        CliMiddleManager.class,
+                        CliProxy.class
                 );
 
         builder.withGroup("tools")

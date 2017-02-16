@@ -396,7 +396,8 @@ public class Initialization {
                 new DerbyMetadataStoragePioModule(),
 //                new ProcessPioModule(),
                 new JacksonConfigManagerModule(),
-                new TaskServiceDiscoveryModule()
+                new TaskServiceDiscoveryModule(),
+                new BrokerServiceDiscoveryModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);

@@ -29,8 +29,7 @@ import java.util.List;
 public class CliMiddleManager extends ServerRunnable {
     private static final Logger log = new Logger(CliMiddleManager.class);
 
-    public CliMiddleManager()
-    {
+    public CliMiddleManager() {
         super(log);
     }
 
@@ -41,8 +40,8 @@ public class CliMiddleManager extends ServerRunnable {
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        binder.bindConstant().annotatedWith(Names.named("serviceName")).to("pio/middlemanager");
-                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(6091);
+                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_NAME)).to(CliConst.MIDDLE_MANAGER_NAME);
+                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.MIDDLE_MANAGER_PORT);
 
                         TaskServiceModuleHelper.configureTaskRunnerConfigs(binder);
 
@@ -64,8 +63,7 @@ public class CliMiddleManager extends ServerRunnable {
 
                     @Provides
                     @LazySingleton
-                    public Worker getWorker(@Self PioNode node, WorkerConfig config)
-                    {
+                    public Worker getWorker(@Self PioNode node, WorkerConfig config) {
                         return new Worker(
                                 node.getHostAndPort(),
                                 config.getIp(),
