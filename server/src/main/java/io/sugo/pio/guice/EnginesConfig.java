@@ -19,6 +19,9 @@ public class EnginesConfig {
     private String extensionsDirectory = "engine-extensions";
 
     @JsonProperty
+    private String demosDirectory = "demos";
+
+    @JsonProperty
     private List<String> loadList;
 
     public boolean searchCurrentClassloader()
@@ -35,6 +38,10 @@ public class EnginesConfig {
         return extensionsDirectory;
     }
 
+    public String getDemosDirectory() {
+        return demosDirectory;
+    }
+
     public List<String> getLoadList()
     {
         return loadList;
@@ -47,6 +54,7 @@ public class EnginesConfig {
                 "searchCurrentClassloader=" + searchCurrentClassloader +
                 ", enginesDirectory='" + enginesDirectory + '\'' +
                 ", extensionsDirectory='" + extensionsDirectory + '\'' +
+                ", demosDirectory='" + demosDirectory + '\'' +
                 ", loadList=" + loadList +
                 '}';
     }

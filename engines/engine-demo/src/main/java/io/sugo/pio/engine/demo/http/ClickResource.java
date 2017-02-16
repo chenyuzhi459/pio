@@ -62,7 +62,8 @@ public class ClickResource {
         try {
             String str;
             Similarity similarity = new Similarity();
-            TreeMap<Double,String> similarityMap = new TreeMap<Double,String>();
+            HashMap<String,Float> similarityMap = new HashMap<String,Float>();
+
             ClickQuery query = jsonMapper.readValue(in, ClickQuery.class);
             List<String> items = query.items;
             EvictingQueue<Click> clicks = clickMap.get(query.getUserId());
@@ -79,9 +80,10 @@ public class ClickResource {
                         Double featureSimilarity =similarity.getSimilarity(featureQ,featureC);
                         similarityValue += featureSimilarity;
                     }
-                    similarityMap.put(similarityValue,itemQ);
+                    similarityMap.put(itemQ,similarityValue.floatValue());
                 }
-                rankItems = new ArrayList(similarityMap.values());
+                Map<String,Float> sortSimilarityMap = sortMapByValue(similarityMap);
+                rankItems = new ArrayList(sortSimilarityMap.keySet());
             }
 
             Map<String, List<String>> res = new HashMap<>();
@@ -96,6 +98,28 @@ public class ClickResource {
             e.printStackTrace();
         }
         return Response.status(Response.Status.ACCEPTED).entity("items not found").build();
+    }
+
+    private Map<String, Float> sortMapByValue(Map<String, Float> oriMap) {
+        Map<String, Float> sortedMap = new LinkedHashMap<String, Float>();
+        if (oriMap != null && !oriMap.isEmpty()) {
+            List<Map.Entry<String, Float>> entryList = new ArrayList<Map.Entry<String, Float>>(oriMap.entrySet());
+            Collections.sort(entryList, new Comparator<Map.Entry<String, Float>>(){
+                public int compare(Map.Entry<String, Float> map1,
+                                   Map.Entry<String,Float> map2) {
+                    return ((map2.getValue() - map1.getValue() == 0) ? 0
+                            : (map2.getValue() - map1.getValue() < 0) ? 1
+                            : -1);
+                }
+            });
+            Iterator<Map.Entry<String, Float>> iter = entryList.iterator();
+            Map.Entry<String, Float> tmpEntry = null;
+            while (iter.hasNext()) {
+                tmpEntry = iter.next();
+                sortedMap.put(tmpEntry.getKey(), tmpEntry.getValue());
+            }
+        }
+        return sortedMap;
     }
 
     static class ClickQuery {

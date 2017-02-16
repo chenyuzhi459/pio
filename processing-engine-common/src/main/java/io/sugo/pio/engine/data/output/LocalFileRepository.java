@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 /**
  */
 public class LocalFileRepository implements Repository {
-    @JsonProperty
     private String path;
 
     @JsonCreator
@@ -134,5 +133,10 @@ public class LocalFileRepository implements Repository {
             fis.close();
             super.close();
         }
+    }
+
+    @JsonProperty
+    public String getPath() {
+        return path;
     }
 }

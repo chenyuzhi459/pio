@@ -3,6 +3,7 @@
     <title>搜索结果</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"/>
     <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
     <link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
 
@@ -13,6 +14,7 @@
     <script type="text/javascript" src="js/lodash.min.js"></script>
     <script type="text/javascript" src="js/search.js"></script>
     <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="components/card.js"></script>
 </head>
 
 <body>
@@ -22,14 +24,14 @@
             <div class="wrap">
                 <div class="nav_list">
                     <ul>
-                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html">首页</a></li>
                     </ul>
                 </div>
                 <div class="account_desc">
                     <ul>
                         <li v-if="userId"><a href="#">{{userId}}</a></li>
-                        <li v-else><a href="contact.html">Login</a></li>
-                        <li><a href="index.html" @click="checkOut">Checkout</a></li>
+                        <li v-else><a href="contact.html">登录</a></li>
+                        <li><a href="index.html" @click="checkOut">注销</a></li>
                     </ul>
                 </div>
                 <div class="clear"></div>
@@ -40,6 +42,19 @@
                 <div class="logo">
                     <a href="index.html"><img src="images/logo.png" alt="" /></a>
                 </div>
+                <div class="header_top_right">
+                    <div class="search_box">
+                        <form>
+                            <input class="search-keyword"
+                                   type="text"
+                                   value="搜索"
+                                   onfocus="this.value = '';"
+                                   onblur="if (this.value == '') {this.value = '搜索';}">
+                            <input class="search-submit" type="submit" value="" >
+                        </form>
+                    </div>
+                    <div class="clear"></div>
+                </div>
             </div>
             <div class="clear"></div>
         </div>
@@ -49,25 +64,16 @@
                 <div class="content">
                     <div class="content_bottom">
                         <div class="heading">
-                            <h3>搜索结果</h3>
+                            <h3>搜索 {{keyword}} 的结果</h3>
                         </div>
                     </div>
-                    <div v-if="!searchItems.length" class="color999 aligncenter pd3">查无内容</div>
-                    <div class="section pd1 mg-1r group">
-                        <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in searchItems">
-                            <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
-                            <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
-                            <div class="price-details">
-                                <div class="price-number">
-                                    <p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
-                                </div>
-                                <div class="add-cart">
-                                    <h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
+                    <div v-if="searching" class="pd3 aligncenter color999">加载中</div>
+                    <div v-else-if="searchItems.length" class="mg-1r pd1 container-fluid">
+                        <div class="col-md-10" v-for="(movieId, index) in searchItems">
+                            <movie-card :movie-id="movieId" />
                         </div>
                     </div>
+                    <div v-else class="pd3 aligncenter color999">查无内容</div>
                 </div>
             </div>
         </div>
@@ -77,60 +83,16 @@
                 <div class="content">
                     <div class="content_bottom">
                         <div class="heading">
-                            <h3 class="itblock">猜你喜欢</h3>
+                            <h3 class="itblock">猜你想搜</h3>
                             <span class="font14 ibblock mg1l">根据你的历史行为推荐的电影</span>
                         </div>
                     </div>
 
-                    <div v-if="userSearchItems.length" class="section pd1 mg-1r group">
-                        <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in userSearchItems">
-                            <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
-                            <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
-                            <div class="price-details">
-                                <div class="price-number">
-                                    <p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
-                                </div>
-                                <div class="add-cart">
-                                    <h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
+                    <div class="mg-1r pd1 container-fluid">
+                        <div class="col-md-10" v-for="(movieId, index) in userSearchItems">
+                            <movie-card :movie-id="movieId" />
                         </div>
                     </div>
-
-                    <div class="color999 aligncenter pd3" v-else>加载中</div>
-                </div>
-            </div>
-        </div>
-
-        <div v-if="userId" class="main">
-            <div class="wrap">
-                <div class="content">
-                    <div class="content_bottom">
-                        <div class="heading">
-                            <h3 class="itblock">实时推荐</h3>
-                            <span class="font14 ibblock mg1l">根据你浏览记录实时推荐的电影</span>
-                        </div>
-                    </div>
-
-                    <div v-if="onlineItems.length" class="section mg-1r group pd1">
-                        <div class="grid_1_of_5 images_1_of_5" v-for="(item, index) in onlineItems">
-                            <a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id"><img :src="item.Poster" alt=""  /></a>
-                            <h2 class="elli"><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id" :title="item.Title">{{item.Title}}</a></h2>
-                            <div class="price-details">
-                                <div class="price-number">
-                                    <p><span class="rupees">Rating: {{item.imdbRating}}</span></p>
-                                </div>
-                                <div class="add-cart">
-                                    <h4><a :href="'preview.html?imdbId=' + item.imdbID +'&id=' + item.id">View</a></h4>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="color999 aligncenter pd3" v-else>加载中</div>
-
                 </div>
             </div>
         </div>

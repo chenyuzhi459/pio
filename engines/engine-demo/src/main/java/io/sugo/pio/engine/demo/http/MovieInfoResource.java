@@ -40,4 +40,5 @@ public class MovieInfoResource {
         }
         return Response.status(Response.Status.ACCEPTED).entity("items not found, title="+ movieId).build();
     }
+
 }

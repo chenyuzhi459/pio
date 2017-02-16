@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
+import io.sugo.pio.engine.detail.DetailModelFactory;
+import io.sugo.pio.engine.detail.DetailResult;
 import io.sugo.pio.engine.fp.*;
+import io.sugo.pio.engine.prediction.PredictionModel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -19,8 +22,15 @@ import java.util.*;
  */
 @Path("query/itemfp")
 public class FpResource {
-    private static final String ITEM_NAME = "item_name";
-    public static final String REPOSITORY_PATH = "engines/engine-demo/src/main/resources/index/fp";
+    public static final String REPOSITORY_PATH = "repositories/fp";
+
+    private static PredictionModel<FpResult> model;
+
+    static {
+        Repository repository = new LocalFileRepository(REPOSITORY_PATH);
+        FpModelFactory fpModelFactory = new FpModelFactory(repository);
+        model = fpModelFactory.loadModel();
+    }
 
 
     @POST
@@ -35,9 +45,7 @@ public class FpResource {
 
             ObjectMapper jsonMapper = ObjectMapperUtil.getObjectMapper();
             FpQuery fpQuery = jsonMapper.readValue(in, FpQuery.class);
-            Repository repository = new LocalFileRepository(REPOSITORY_PATH);
-            FpModelFactory fpModelFactory = new FpModelFactory(repository);
-            FpResult searchResult = fpModelFactory.loadModel().predict(fpQuery);
+            FpResult searchResult = model.predict(fpQuery);
             List<String> itemIds = searchResult.getItems();
 
             int queryNum = 10;

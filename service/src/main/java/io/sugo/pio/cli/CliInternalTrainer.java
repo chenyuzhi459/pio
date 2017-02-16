@@ -78,7 +78,6 @@ public class CliInternalTrainer extends GuiceRunnable {
                     configuration,
                     ssh);
             YarnHAUtil.setRMHA(configuration);
-            ssh.setUserJar("/home/yaotc/IdeaProjects/pio-sugo/processing-engine-common/target/pio-processing-engine-common-1.0-SNAPSHOT.jar");
             ssh.setUserArguments(trainingSpecJson, null);
 
             Client client = new Client(ssh.createClientArguments(), configuration, ssh.getSparkConf());

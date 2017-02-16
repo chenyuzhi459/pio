@@ -28,8 +28,7 @@ class FpDatasource(propertyHose: PropertyHose, batchEventHose: BatchEventHose) e
               val year = dt.getYear.toString
               val month = dt.getMonth.toString
               val day = dt.getDay.toString
-              val hour = dt.getHours.toString
-              val session = year ++ month ++ day ++ hour
+              val session = year ++ month ++ day
               if (rate >= minEffectRate){
                 (userId, itemId, session)
               }

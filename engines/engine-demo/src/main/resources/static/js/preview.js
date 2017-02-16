@@ -28,7 +28,7 @@ $(document).ready(function() {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'item_id': id, 'num': 5, 'type': 'detail_query'
+                        'item_id': id, 'num': 4, 'type': 'detail_query'
                     }),
                     dataType: 'json',
                     type: 'post'
@@ -36,8 +36,8 @@ $(document).ready(function() {
                     var defs = data.related_item_id.map(this0.queryMovieInfo)
                     return $when(defs).then(function (results) {
                         this0.relatedFilms = results.map(function (movieInfo, idx) {
-                            return _.assign({id: data.related_item_id[idx]}, movieInfo[0])
-                        })
+                            return movieInfo && _.assign({id: data.related_item_id[idx]}, movieInfo)
+                        }).filter(_.identity)
                     })
                 })
             },
@@ -50,17 +50,12 @@ $(document).ready(function() {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'item_id': id, 'num': 8, 'type': 'fp_query'
+                        'item_id': id, 'num': 4, 'type': 'fp_query'
                     }),
                     dataType: 'json',
                     type: 'post'
                 }).then(function (data) {
-                    var defs = data.item_id.map(this0.queryMovieInfo)
-                    return $when(defs).then(function (results) {
-                        this0.fpFilms = results.map(function (movieInfo, idx) {
-                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
-                        })
-                    })
+                    this0.fpFilms = data.item_id
                 })
             },
 
@@ -85,8 +80,14 @@ $(document).ready(function() {
             queryMovieInfo: function (id) {
                 return $.ajax({
                     url: '/pio/query/movie/infoByMovId/' + id,
-                    dataType: 'json',
+                    dataType: 'text',
                     type: 'get'
+                }).then(function (str) {
+                    try {
+                        return JSON.parse(str)
+                    } catch (e) {
+                        return null
+                    }
                 })
             }
         }

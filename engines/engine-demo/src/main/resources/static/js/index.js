@@ -1,3 +1,25 @@
+var dict = {
+    "Action": "动作类",
+    "Adventure": "冒险类",
+    "Animation": "动画类",
+    "Children's": "儿童类",
+    "Comedy": "喜剧类",
+    "Crime": "犯罪类",
+    "Documentary": "记录类",
+    "Drama": "剧情类",
+    "Fantasy": "幻想类",
+    "Film-Noir": "黑色类",
+    "Horror": "惊悚类",
+    "Musical": "歌舞类",
+    "Mystery": "推理类",
+    "Romance": "浪漫类",
+    "Sci-Fi": "科幻类",
+    "Thriller": "惊悚类",
+    "War": "战争类",
+    "Western": "西部类"
+}
+
+
 $(function() {
     $().UItoTop({ easingType: 'easeOutQuart' });
 
@@ -19,6 +41,10 @@ $(function() {
                 window.localStorage.setItem("userId", "")
             },
 
+            translate: function (ca) {
+                return dict[ca] || ca
+            },
+
             pop: function (category) {
                 var this0 = this
                 return $.ajax({
@@ -27,7 +53,7 @@ $(function() {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'category': category, 'num': 5, 'type': 'pop_query'
+                        'category': category, 'num': 10, 'type': 'pop_query'
                     }),
                     dataType: 'json',
                     type: 'post'
@@ -35,8 +61,8 @@ $(function() {
                     var defs = data.item_id.map(this0.queryMovieInfo)
                     return $when(defs).then(function (results) {
                         this0.popItems = results.map(function (movieInfo, idx) {
-                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
-                        })
+                            return movieInfo && _.assign({id: data.item_id[idx]}, movieInfo)
+                        }).filter(_.identity)
 
                         var dtd = $.Deferred();
                         this0.$nextTick(function () { dtd.resolve(); })
@@ -60,17 +86,12 @@ $(function() {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'category': category, 'num': 5, 'type': 'pop_query'
+                        'category': category, 'num': 6, 'type': 'pop_query'
                     }),
                     dataType: 'json',
                     type: 'post'
                 }).then(function (data) {
-                    var defs = data.item_id.map(this0.queryMovieInfo)
-                    return $when(defs).then(function (results) {
-                        this0.globalRecommends = results.map(function (movieInfo, idx) {
-                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
-                        })
-                    })
+                    this0.globalRecommends = data.item_id
                 })
             },
 
@@ -86,17 +107,12 @@ $(function() {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'user_id': this0.userId, 'num': 5, "type":"als_query"
+                        'user_id': this0.userId, 'num': 6, "type":"als_query"
                     }),
                     dataType: 'json',
                     type: 'post'
                 }).then(function (data) {
-                    var defs = data.item_id.map(this0.queryMovieInfo)
-                    return $when(defs).then(function (results) {
-                        this0.customItems = results.map(function (movieInfo, idx) {
-                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
-                        })
-                    })
+                    this0.customItems = data.item_id
                 })
             },
 
@@ -112,7 +128,7 @@ $(function() {
                         req.setRequestHeader('Content-Type', 'application/json')
                     },
                     data: JSON.stringify({
-                        'user_id': this0.userId, 'num': 5, "type":"als_query"
+                        'user_id': this0.userId, 'num': 6, "type":"als_query"
                     }),
                     dataType: 'json',
                     type: 'post'
@@ -130,25 +146,26 @@ $(function() {
                         type: 'post'
                     })
                 }).then(function (data) {
-                    var defs = data.item_id.map(this0.queryMovieInfo)
-                    return $when(defs).then(function (results) {
-                        this0.onlineItems = results.map(function (movieInfo, idx) {
-                            return _.assign({id: data.item_id[idx]}, movieInfo[0])
-                        })
-                    })
+                    this0.onlineItems = data.item_id
                 })
             },
 
             queryMovieInfo: function (id) {
                 return $.ajax({
                     url: '/pio/query/movie/infoByMovId/' + id,
-                    dataType: 'json',
+                    dataType: 'text',
                     type: 'get'
+                }).then(function (str) {
+                    try {
+                        return JSON.parse(str)
+                    } catch (e) {
+                        return null
+                    }
                 })
             }
         }
     })
-    detailUR.pop("Action").then(function() { $('#slider').nivoSlider() })
+    detailUR.pop("Action")
     detailUR.loadGlobalRecommends()
     detailUR.custom()
     detailUR.online()

@@ -8,6 +8,9 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +26,23 @@ public class MovieBatchEventHose implements BatchEventHose {
 
     @Override
     public JavaRDD<Event> find(JavaSparkContext sc) {
-        return sc.textFile(filepath).map(new MapStringToEventFunc(seperator));
+        List<String> list = readFileToList(filepath);
+        return sc.parallelize(list).map(new MapStringToEventFunc(seperator));
+    }
+
+    private List<String> readFileToList(String filepath) {
+        try {
+            InputStream is = this.getClass().getResourceAsStream(filepath);
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String s = null;
+            List<String> list = new ArrayList<>();
+            while ((s = br.readLine()) != null) {
+                list.add(s);
+            }
+            return list;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static class MapStringToEventFunc implements Function<String, Event> {
