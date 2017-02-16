@@ -3,7 +3,7 @@ package io.sugo.pio.recommend.manage.http;
 
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
-import io.sugo.pio.recommend.RecommendManager;
+import io.sugo.pio.recommend.RecommendProxy;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -18,13 +18,13 @@ import java.util.List;
 @Path("/pio/recommend")
 public class RecommendResource {
     private static final Logger log = new Logger(RecommendResource.class);
-    private final RecommendManager recommendManager;
+    private final RecommendProxy recProxy;
 
     @Inject
     public RecommendResource(
-            RecommendManager recommendManager
+            RecommendProxy recProxy
     ) {
-        this.recommendManager = recommendManager;
+        this.recProxy = recProxy;
     }
 
     @GET
@@ -35,7 +35,7 @@ public class RecommendResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            List<String> items = recommendManager.recommend(id, req.getRequestedSessionId());
+            List<String> items = recProxy.recommend(id, req.getRequestedSessionId());
             return Response.ok(items).build();
         } catch (NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();

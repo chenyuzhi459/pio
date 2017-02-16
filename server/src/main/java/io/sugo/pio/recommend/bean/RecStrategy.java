@@ -18,6 +18,7 @@ public class RecStrategy implements Serializable {
     private int startPos;
     private int endPos;
     private DateTime createTime;
+    private Integer num = 10;
 
     @JsonCreator
     public RecStrategy(
@@ -134,5 +135,14 @@ public class RecStrategy implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @JsonProperty
+    public Integer getNum() {
+        return num;
+    }
+
+    public void setNum(Integer num) {
+        this.num = num;
     }
 }

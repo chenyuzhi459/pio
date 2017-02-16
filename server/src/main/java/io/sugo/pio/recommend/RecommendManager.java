@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
 import com.metamx.common.logger.Logger;
-import io.sugo.pio.client.broker.BrokerServiceClient;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.metadata.MetadataRecInstanceManager;
 import io.sugo.pio.recommend.bean.RecInstance;
@@ -24,14 +23,11 @@ public class RecommendManager {
     private static final Logger log = new Logger(RecommendManager.class);
 
     private final MetadataRecInstanceManager recInstanceManager;
-    private final BrokerServiceClient brokerServiceClient;
 
     @Inject
     public RecommendManager(
-            BrokerServiceClient brokerServiceClient,
             MetadataRecInstanceManager recInstanceManager
     ) {
-        this.brokerServiceClient = brokerServiceClient;
         this.recInstanceManager = recInstanceManager;
     }
 
@@ -148,16 +144,5 @@ public class RecommendManager {
         Preconditions.checkNotNull(strategy, "No Recommend Strategy found with id:" + strategyId);
         recInstanceManager.update(entry);
         return strategy;
-    }
-
-    public List<String> recommend(String id, String sessionId) {
-        RecInstance entry = getRecInstance(id);
-        Preconditions.checkNotNull(entry, "No Recommend found with id:" + id);
-
-        Map<String, RecStrategy> strategies = entry.getRecStrategys();
-        RecStrategy strategy = StrategySelector.select(strategies, sessionId);
-
-
-        return null;
     }
 }

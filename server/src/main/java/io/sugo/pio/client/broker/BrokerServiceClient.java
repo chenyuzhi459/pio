@@ -40,13 +40,14 @@ public class BrokerServiceClient {
 
     public InputStream runQuery(Object queryObject) {
         try {
-            return client.go(
+            InputStream inputStream = client.go(
                     new Request(
                             HttpMethod.POST,
                             new URL(String.format("%s/broker", baseUrl()))
                     ).setContent(MediaType.APPLICATION_JSON, jsonMapper.writeValueAsBytes(queryObject)),
                     RESPONSE_HANDLER
             ).get();
+            return inputStream;
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
