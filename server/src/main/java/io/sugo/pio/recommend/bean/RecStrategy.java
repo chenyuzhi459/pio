@@ -2,10 +2,13 @@ package io.sugo.pio.recommend.bean;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.recommend.AlgorithmManager;
+import io.sugo.pio.recommend.algorithm.AbstractAlgorithm;
 import io.sugo.pio.server.utils.StringUtil;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecStrategy implements Serializable {
@@ -19,6 +22,7 @@ public class RecStrategy implements Serializable {
     private int endPos;
     private DateTime createTime;
     private Integer num = 10;
+    private List<AbstractAlgorithm> algorithms;
 
     @JsonCreator
     public RecStrategy(
@@ -31,7 +35,7 @@ public class RecStrategy implements Serializable {
     ) {
         this.id = id;
         this.name = name;
-        this.types = types;
+        setTypes(types);
         this.orderField = orderField;
         this.asc = asc == null ? false : asc;
         this.percent = percent;
@@ -65,6 +69,9 @@ public class RecStrategy implements Serializable {
 
     public void setTypes(List<String> types) {
         this.types = types;
+        for (String type : types) {
+            addAlgorithm(AlgorithmManager.get(type));
+        }
     }
 
     @JsonProperty
@@ -144,5 +151,21 @@ public class RecStrategy implements Serializable {
 
     public void setNum(Integer num) {
         this.num = num;
+    }
+
+    @JsonProperty
+    public List<AbstractAlgorithm> getAlgorithms() {
+        return algorithms;
+    }
+
+    public void setAlgorithms(List<AbstractAlgorithm> algorithms) {
+        this.algorithms = algorithms;
+    }
+
+    public void addAlgorithm(AbstractAlgorithm algorithm) {
+        if(this.algorithms == null){
+            this.algorithms = new ArrayList<>();
+        }
+        this.algorithms.add(algorithm);
     }
 }

@@ -4,6 +4,7 @@ package io.sugo.pio.recommend.manage.http;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.recommend.AlgorithmManager;
 import io.sugo.pio.recommend.RecommendManager;
 import io.sugo.pio.recommend.bean.RecInstance;
 import io.sugo.pio.recommend.bean.RecInstanceCriteria;
@@ -203,6 +204,18 @@ public class RecManageResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("no data found with id:" + recId + "/" + strategyId).build();
             }
             return Response.ok(recStrategy).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/algorithms")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getAllAlgorithms() {
+        try {
+            return Response.ok(AlgorithmManager.getAll()).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
