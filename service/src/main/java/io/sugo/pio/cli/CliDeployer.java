@@ -1,7 +1,9 @@
 package io.sugo.pio.cli;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -12,10 +14,16 @@ import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
 import io.sugo.pio.client.task.TaskServiceClient;
 import io.sugo.pio.common.task.Task;
+import io.sugo.pio.guice.EnginesConfig;
 import io.sugo.pio.guice.LazySingleton;
+import io.sugo.pio.initialization.Initialization;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,9 +37,6 @@ public class CliDeployer extends GuiceRunnable {
 
     @Arguments(description = "deploymentSpec.json", required = true)
     private String deploymentSpec;
-
-    @Inject
-    private ObjectMapper objectMapper;
 
     public CliDeployer() {
         super(log);
@@ -48,8 +53,6 @@ public class CliDeployer extends GuiceRunnable {
             }
 
             String deploySpecJson = FileUtils.readFileToString(file);
-            Task task = objectMapper.readValue(deploySpecJson, Task.class);
-
             TaskServiceClient client = injector.getInstance(TaskServiceClient.class);
             final Lifecycle lifecycle = initLifecycle(injector);
             final Thread hook = new Thread(
@@ -64,7 +67,7 @@ public class CliDeployer extends GuiceRunnable {
                     }
             );
             Runtime.getRuntime().addShutdownHook(hook);
-            client.submitTask(task);
+            client.submitTask(deploySpecJson);
             lifecycle.stop();
         } catch (Throwable t) {
             log.error(t, "Error when starting up.  Failing.");
