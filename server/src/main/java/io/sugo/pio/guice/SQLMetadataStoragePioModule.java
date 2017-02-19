@@ -48,6 +48,13 @@ public class SQLMetadataStoragePioModule implements Module {
                 Key.get(SQLMetadataStorageActionHandlerFactory.class),
                 defaultPropertyValue
         );
+        PolyBind.createChoiceWithDefault(
+                binder,
+                PROPERTY,
+                Key.get(MetadataRecInstanceManager.class),
+                Key.get(SQLMetadataRecInstanceManager.class),
+                defaultPropertyValue
+        );
     }
 
     @Override
@@ -56,6 +63,11 @@ public class SQLMetadataStoragePioModule implements Module {
         PolyBind.optionBinder(binder, Key.get(MetadataProcessManager.class))
                 .addBinding(type)
                 .to(SQLMetadataProcessManager.class)
+                .in(LazySingleton.class);
+
+        PolyBind.optionBinder(binder, Key.get(MetadataRecInstanceManager.class))
+                .addBinding(type)
+                .to(SQLMetadataRecInstanceManager.class)
                 .in(LazySingleton.class);
     }
 }

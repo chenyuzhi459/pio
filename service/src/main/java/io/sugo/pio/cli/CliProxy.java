@@ -9,8 +9,8 @@ import io.airlift.airline.Command;
 import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
-import io.sugo.pio.server.http.OperatorResource;
-import io.sugo.pio.server.http.ProcessResource;
+import io.sugo.pio.recommend.RecommendManager;
+import io.sugo.pio.recommend.manage.http.RecManageResource;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import org.eclipse.jetty.server.Server;
 
@@ -19,14 +19,13 @@ import java.util.List;
 /**
  */
 @Command(
-        name = "process",
-        description = "Runs a pio server"
+        name = "proxy",
+        description = "Runs a pio proxy"
 )
-public class CliProcess extends ServerRunnable {
-    private static final Logger log = new Logger(CliProcess.class);
+public class CliProxy extends ServerRunnable {
+    private static final Logger log = new Logger(CliProxy.class);
 
-    public CliProcess()
-    {
+    public CliProxy() {
         super(log);
     }
 
@@ -36,11 +35,11 @@ public class CliProcess extends ServerRunnable {
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_NAME)).to(CliConst.PROCESS_NAME);
-                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.PROCESS_PORT);
+                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_NAME)).to(CliConst.PROXY_NAME);
+                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.PROXY_PORT);
+                        LifecycleModule.register(binder, RecommendManager.class);
 
-                        Jerseys.addResource(binder, ProcessResource.class);
-                        Jerseys.addResource(binder, OperatorResource.class);
+                        Jerseys.addResource(binder, RecManageResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);

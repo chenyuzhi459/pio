@@ -53,11 +53,8 @@ public class CliOverlord extends ServerRunnable {
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
-                        binder.bindConstant()
-                                .annotatedWith(Names.named("serviceName"))
-                                .to("pio/overlord");
-                        binder.bindConstant().annotatedWith(Names.named("servicePort")).to(8090);
-
+                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_NAME)).to(CliConst.OVERLORD_NAME);
+                        binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.OVERLORD_PORT);
 
                         JsonConfigProvider.bind(binder, "pio.task.queue", TaskQueueConfig.class);
                         JsonConfigProvider.bind(binder, "pio.task", TaskConfig.class);

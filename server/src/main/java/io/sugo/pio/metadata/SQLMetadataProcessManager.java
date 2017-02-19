@@ -80,7 +80,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                         }
                         builder.append(" ORDER BY id DESC LIMIT 1 OFFSET 0");
                         Query<Map<String, Object>> query = handle.createQuery(
-                                String.format(builder.toString(), getOperatorProcessTable())
+                                String.format(builder.toString(), getTableName())
                         ).bind("id", id);
                         if (!includeDelete) {
                             query.bind("status", Status.DELETED);
@@ -91,30 +91,24 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                             @Override
                             public OperatorProcess map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                                 try {
-                                    String id = r.getString("id");
-                                    String name = r.getString("name");
-                                    String description = r.getString("description");
-                                    Status status = Status.valueOf(r.getString("status"));
-                                    DateTime createTime = new DateTime(r.getString("created_date"));
-                                    DateTime updateTime = new DateTime(r.getString("update_date"));
                                     ProcessRootOperator root = jsonMapper.readValue(
                                             r.getBytes("operators"), new TypeReference<ProcessRootOperator>() {
                                             });
 
-                                    OperatorProcess process = new OperatorProcess(name, root);
-                                    process.setId(id);
+                                    OperatorProcess process = new OperatorProcess(r.getString("name"), root);
+                                    process.setId(r.getString("id"));
                                     byte[] cBytes = r.getBytes("connections");
                                     if (cBytes != null && cBytes.length > 0) {
-                                        Set<Connection> connections = jsonMapper.readValue(
-                                                r.getBytes("connections"), new TypeReference<Set<Connection>>() {
+                                        Set<Connection> connections = jsonMapper.readValue(cBytes,
+                                                new TypeReference<Set<Connection>>() {
                                                 }
                                         );
                                         process.setConnections(connections);
                                     }
-                                    process.setDescription(description);
-                                    process.setStatus(status);
-                                    process.setCreateTime(createTime);
-                                    process.setUpdateTime(updateTime);
+                                    process.setDescription(r.getString("description"));
+                                    process.setStatus(Status.valueOf(r.getString("status")));
+                                    process.setCreateTime(new DateTime(r.getString("created_date")));
+                                    process.setUpdateTime(new DateTime(r.getString("update_date")));
                                     return process;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
@@ -141,7 +135,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                         }
                         builder.append(" ORDER BY created_date DESC");
                         Query<Map<String, Object>> query = handle.createQuery(
-                                String.format(builder.toString(), getOperatorProcessTable())
+                                String.format(builder.toString(), getTableName())
                         );
                         if (!includeDelete) {
                             query.bind("status", Status.DELETED);
@@ -151,29 +145,23 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                             @Override
                             public OperatorProcess map(int index, ResultSet r, StatementContext ctx) throws SQLException {
                                 try {
-                                    String id = r.getString("id");
-                                    String name = r.getString("name");
-                                    String description = r.getString("description");
-                                    Status status = Status.valueOf(r.getString("status"));
-                                    DateTime createTime = new DateTime(r.getString("created_date"));
-                                    DateTime updateTime = new DateTime(r.getString("update_date"));
                                     ProcessRootOperator root = jsonMapper.readValue(
                                             r.getBytes("operators"), new TypeReference<ProcessRootOperator>() {
                                             });
-                                    OperatorProcess process = new OperatorProcess(name, root);
-                                    process.setId(id);
+                                    OperatorProcess process = new OperatorProcess(r.getString("name"), root);
+                                    process.setId(r.getString("id"));
                                     byte[] cBytes = r.getBytes("connections");
                                     if (cBytes != null & cBytes.length > 0) {
-                                        Set<Connection> connections = jsonMapper.readValue(
-                                                r.getBytes("connections"), new TypeReference<Set<Connection>>() {
+                                        Set<Connection> connections = jsonMapper.readValue(cBytes,
+                                                new TypeReference<Set<Connection>>() {
                                                 }
                                         );
                                         process.setConnections(connections);
                                     }
-                                    process.setDescription(description);
-                                    process.setStatus(status);
-                                    process.setCreateTime(createTime);
-                                    process.setUpdateTime(updateTime);
+                                    process.setDescription(r.getString("description"));
+                                    process.setStatus(Status.valueOf(r.getString("status")));
+                                    process.setCreateTime(new DateTime(r.getString("created_date")));
+                                    process.setUpdateTime(new DateTime(r.getString("update_date")));
                                     return process;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
@@ -211,7 +199,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     String.format(
                                             "INSERT INTO %s (id, name, description, status, created_date, update_date, operators, connections) " +
                                                     " VALUES (:id, :name, :description, :status, :created_date, :update_date, :operators, :connections)",
-                                            getOperatorProcessTable()
+                                            getTableName()
                                     )
                             )
                                     .bind("id", process.getId())
@@ -242,7 +230,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(
                                     String.format("UPDATE %s SET name=:name, description=:description, status=:status, update_date=:update_date, operators = :operators, connections=:connections WHERE id = :id",
-                                            getOperatorProcessTable())
+                                            getTableName())
                             )
                                     .bind("id", process.getId())
                                     .bind("name", process.getName())
@@ -263,7 +251,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
         return true;
     }
 
-    private String getOperatorProcessTable() {
+    private String getTableName() {
         return dbTables.get().getOperatorProcessTable();
     }
 }

@@ -1,30 +1,15 @@
 package io.sugo.pio.cli;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.inject.Binder;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.name.Names;
-import com.metamx.common.lifecycle.Lifecycle;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
-import io.sugo.pio.common.TaskToolboxFactory;
-import io.sugo.pio.common.config.TaskConfig;
-import io.sugo.pio.guice.*;
+import io.sugo.pio.guice.EnginesConfig;
+import io.sugo.pio.guice.ExtensionsConfig;
 import io.sugo.pio.initialization.Initialization;
-import io.sugo.pio.overlord.TaskRunner;
-import io.sugo.pio.overlord.ThreadPoolTaskRunner;
-import io.sugo.pio.query.QueryWalker;
-import io.sugo.pio.server.QueryResource;
-import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
-import io.sugo.pio.worker.executor.ExecutorLifecycle;
-import io.sugo.pio.worker.executor.ExecutorLifecycleConfig;
-import org.eclipse.jetty.server.Server;
 
 import java.io.File;
 import java.lang.reflect.Method;
