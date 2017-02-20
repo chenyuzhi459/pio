@@ -21,6 +21,7 @@ import java.util.Map;
 @Path("/pio/manage/recommend")
 public class RecManageResource {
     private static final Logger log = new Logger(RecManageResource.class);
+
     private final RecommendManager recommendManager;
 
     @Inject
@@ -58,6 +59,7 @@ public class RecManageResource {
             }
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -71,6 +73,7 @@ public class RecManageResource {
             List<RecInstance> recInstance = recommendManager.getAll(criteria);
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -87,6 +90,7 @@ public class RecManageResource {
             recommendManager.create(recInstance);
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -104,6 +108,7 @@ public class RecManageResource {
             }
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -123,6 +128,7 @@ public class RecManageResource {
             }
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -139,6 +145,7 @@ public class RecManageResource {
             }
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -158,6 +165,7 @@ public class RecManageResource {
         } catch (NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -174,6 +182,7 @@ public class RecManageResource {
         } catch (NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -189,6 +198,7 @@ public class RecManageResource {
         } catch (NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -205,6 +215,7 @@ public class RecManageResource {
             }
             return Response.ok(recStrategy).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }

@@ -65,7 +65,7 @@ public class BrokerServiceClient {
                     null,
                     instance.getAddress(),
                     instance.getPort(),
-                    "/pio/v1",
+                    "/pio",
                     null,
                     null
             ).toString();

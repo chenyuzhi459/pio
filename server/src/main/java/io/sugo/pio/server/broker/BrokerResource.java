@@ -7,9 +7,9 @@ import com.google.common.collect.MapMaker;
 import com.google.common.io.CountingOutputStream;
 import com.google.inject.Inject;
 import io.sugo.pio.guice.annotations.Json;
-import io.sugo.pio.query.Query;
 import io.sugo.pio.query.QueryRunner;
 import io.sugo.pio.query.QueryWalker;
+import io.sugo.pio.recommend.bean.RecStrategy;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -20,6 +20,7 @@ import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,13 +31,17 @@ public class BrokerResource {
 
     private final QueryWalker texasRanger;
     private final ObjectMapper jsonMapper;
+    private final StrategyRunner runner;
 
     @Inject
     public BrokerResource(
             @Json ObjectMapper jsonMapper,
-            QueryWalker texasRanger) {
+            QueryWalker texasRanger,
+            StrategyRunner runner
+    ) {
         this.texasRanger = texasRanger;
         this.jsonMapper = jsonMapper;
+        this.runner = runner;
     }
 
     @POST
@@ -48,7 +53,7 @@ public class BrokerResource {
             @Context final HttpServletRequest req
     ) throws IOException {
         final long start = System.currentTimeMillis();
-        Query query = null;
+        RecStrategy strategy = null;
 
         final String contentType = MediaType.APPLICATION_JSON;
         final ObjectWriter jsonWriter = pretty != null
@@ -56,21 +61,17 @@ public class BrokerResource {
                 : jsonMapper.writer();
 
         try {
-            query = jsonMapper.readValue(in, Query.class);
-            final Map<String, Object> responseContext = new MapMaker().makeMap();
-            final QueryRunner queryRunner = texasRanger.getQueryRunner();
-            final Object res = queryRunner.run(query, responseContext);
+            strategy = jsonMapper.readValue(in, RecStrategy.class);
+            final List<String> data = runner.run(strategy);
 
             Response.ResponseBuilder builder = Response
                     .ok(
-                            new StreamingOutput()
-                            {
+                            new StreamingOutput() {
                                 @Override
-                                public void write(OutputStream outputStream) throws IOException, WebApplicationException
-                                {
+                                public void write(OutputStream outputStream) throws IOException, WebApplicationException {
                                     // json serializer will always close the yielder
                                     CountingOutputStream os = new CountingOutputStream(outputStream);
-                                    jsonWriter.writeValue(os, res);
+                                    jsonWriter.writeValue(os, data);
 
                                     os.flush(); // Some types of OutputStream suppress flush errors in the .close() method.
                                     os.close();
@@ -81,16 +82,7 @@ public class BrokerResource {
                             contentType
                     );
 
-            //Limit the response-context header, see https://github.com/druid-io/druid/issues/2331
-            //Note that Response.ResponseBuilder.header(String key,Object value).build() calls value.toString()
-            //and encodes the string using ASCII, so 1 char is = 1 byte
-            String responseCtxString = jsonMapper.writeValueAsString(responseContext);
-            if (responseCtxString.length() > RESPONSE_CTX_HEADER_LEN_LIMIT) {
-                responseCtxString = responseCtxString.substring(0, RESPONSE_CTX_HEADER_LEN_LIMIT);
-            }
-
             return builder
-                    .header("X-Druid-Response-Context", responseCtxString)
                     .build();
         } catch (Exception e) {
             return Response.serverError().type(contentType).entity(

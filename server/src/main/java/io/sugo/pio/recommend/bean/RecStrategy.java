@@ -8,8 +8,7 @@ import io.sugo.pio.server.utils.StringUtil;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RecStrategy implements Serializable {
     private String id;
@@ -22,7 +21,8 @@ public class RecStrategy implements Serializable {
     private int endPos;
     private DateTime createTime;
     private Integer num = 10;
-    private List<AbstractAlgorithm> algorithms;
+    private Set<AbstractAlgorithm> algorithms;
+    private Map<String, String> parmas;
 
     @JsonCreator
     public RecStrategy(
@@ -31,7 +31,8 @@ public class RecStrategy implements Serializable {
             @JsonProperty("types") List<String> types,
             @JsonProperty("orderField") String orderField,
             @JsonProperty("asc") Boolean asc,
-            @JsonProperty("percent") Integer percent
+            @JsonProperty("percent") Integer percent,
+            @JsonProperty("params") Map<String, String> parmas
     ) {
         this.id = id;
         this.name = name;
@@ -39,6 +40,7 @@ public class RecStrategy implements Serializable {
         this.orderField = orderField;
         this.asc = asc == null ? false : asc;
         this.percent = percent;
+        this.parmas = parmas;
     }
 
     @JsonProperty
@@ -69,6 +71,9 @@ public class RecStrategy implements Serializable {
 
     public void setTypes(List<String> types) {
         this.types = types;
+        if (algorithms != null && !algorithms.isEmpty()) {
+            this.algorithms.clear();
+        }
         for (String type : types) {
             addAlgorithm(AlgorithmManager.get(type));
         }
@@ -94,6 +99,9 @@ public class RecStrategy implements Serializable {
 
     @JsonProperty
     public Integer getPercent() {
+        if (percent == null) {
+            return 0;
+        }
         return percent;
     }
 
@@ -154,18 +162,34 @@ public class RecStrategy implements Serializable {
     }
 
     @JsonProperty
-    public List<AbstractAlgorithm> getAlgorithms() {
+    public Set<AbstractAlgorithm> getAlgorithms() {
         return algorithms;
     }
 
-    public void setAlgorithms(List<AbstractAlgorithm> algorithms) {
+    public void setAlgorithms(Set<AbstractAlgorithm> algorithms) {
         this.algorithms = algorithms;
     }
 
     public void addAlgorithm(AbstractAlgorithm algorithm) {
-        if(this.algorithms == null){
-            this.algorithms = new ArrayList<>();
+        if (this.algorithms == null) {
+            this.algorithms = new HashSet<>();
         }
         this.algorithms.add(algorithm);
+    }
+
+    public void addParams(String key, String value) {
+        if(this.parmas == null){
+            this.parmas = new HashMap<>();
+        }
+        this.parmas.put(key,value);
+    }
+
+    @JsonProperty
+    public Map<String, String> getParmas() {
+        return parmas;
+    }
+
+    public void setParmas(Map<String, String> parmas) {
+        this.parmas = parmas;
     }
 }

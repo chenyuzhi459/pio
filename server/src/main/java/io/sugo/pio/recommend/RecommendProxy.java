@@ -8,11 +8,14 @@ import com.metamx.common.logger.Logger;
 import io.sugo.pio.client.broker.BrokerServiceClient;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.metadata.MetadataRecInstanceManager;
+import io.sugo.pio.recommend.algorithm.AbstractAlgorithm;
 import io.sugo.pio.recommend.bean.RecInstance;
 import io.sugo.pio.recommend.bean.RecStrategy;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @ManageLifecycle
 public class RecommendProxy {
@@ -44,16 +47,29 @@ public class RecommendProxy {
         return entry;
     }
 
-    public List<String> recommend(String id, String sessionId) {
+    public List<String> recommend(String id, HttpServletRequest req) {
         RecInstance entry = getRecInstance(id);
         Preconditions.checkNotNull(entry, "No Recommend found with id:" + id);
         Preconditions.checkArgument(entry.getEnabled(), "Recommend with id:" + id + " is disabled");
 
         Map<String, RecStrategy> strategies = entry.getRecStrategys();
-        RecStrategy strategy = StrategySelector.select(strategies, sessionId);
+        RecStrategy strategy = StrategySelector.select(strategies, req.getSession().getId());
         strategy.setNum(entry.getNum());
+        checkAndParseParameters(strategy, req);
         brokerServiceClient.runQuery(strategy);
 
         return null;
+    }
+
+    private void checkAndParseParameters(RecStrategy strategy, HttpServletRequest req) {
+        Set<AbstractAlgorithm> algorithms = strategy.getAlgorithms();
+        for(AbstractAlgorithm algorithm : algorithms){
+            Set<String> argNames = algorithm.getArgs().keySet();
+            for(String argName: argNames){
+                String argVal = req.getParameter(argName);
+                Preconditions.checkNotNull(argVal, "Must specify arg:" + argName);
+                strategy.addParams(argName, argVal);
+            }
+        }
     }
 }
