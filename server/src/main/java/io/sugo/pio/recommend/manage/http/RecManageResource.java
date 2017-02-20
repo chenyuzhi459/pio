@@ -4,6 +4,7 @@ package io.sugo.pio.recommend.manage.http;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.recommend.AlgorithmManager;
 import io.sugo.pio.recommend.RecommendManager;
 import io.sugo.pio.recommend.bean.RecInstance;
 import io.sugo.pio.recommend.bean.RecInstanceCriteria;
@@ -20,6 +21,7 @@ import java.util.Map;
 @Path("/pio/manage/recommend")
 public class RecManageResource {
     private static final Logger log = new Logger(RecManageResource.class);
+
     private final RecommendManager recommendManager;
 
     @Inject
@@ -57,6 +59,7 @@ public class RecManageResource {
             }
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -70,6 +73,7 @@ public class RecManageResource {
             List<RecInstance> recInstance = recommendManager.getAll(criteria);
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -86,6 +90,7 @@ public class RecManageResource {
             recommendManager.create(recInstance);
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -103,6 +108,7 @@ public class RecManageResource {
             }
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -122,6 +128,7 @@ public class RecManageResource {
             }
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -138,6 +145,7 @@ public class RecManageResource {
             }
             return Response.ok(recInstance).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -157,6 +165,7 @@ public class RecManageResource {
         } catch (NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -173,6 +182,7 @@ public class RecManageResource {
         } catch (NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -188,6 +198,7 @@ public class RecManageResource {
         } catch (NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
+            log.error(e, e.getMessage());
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -203,6 +214,19 @@ public class RecManageResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("no data found with id:" + recId + "/" + strategyId).build();
             }
             return Response.ok(recStrategy).build();
+        } catch (Exception e) {
+            log.error(e, e.getMessage());
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/algorithms")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getAllAlgorithms() {
+        try {
+            return Response.ok(AlgorithmManager.getAll()).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }

@@ -92,10 +92,12 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
                                     entry.setUpdateTime(new DateTime(r.getTimestamp("update_date")));
                                     entry.setEnabled(r.getBoolean("enabled"));
                                     byte[] cBytes = r.getBytes("strategies");
-                                    Map<String, RecStrategy> strategies = jsonMapper.readValue(cBytes,
-                                            new TypeReference<Map<String, RecStrategy>>() {
-                                            });
-                                    entry.setRecStrategys(strategies);
+                                    if (cBytes != null) {
+                                        Map<String, RecStrategy> strategies = jsonMapper.readValue(cBytes,
+                                                new TypeReference<Map<String, RecStrategy>>() {
+                                                });
+                                        entry.setRecStrategys(strategies);
+                                    }
                                     return entry;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
@@ -169,11 +171,13 @@ public class SQLMetadataRecInstanceManager implements MetadataRecInstanceManager
                                 entry.setCreateTime(new DateTime(r.getTimestamp("create_date")));
                                 entry.setUpdateTime(new DateTime(r.getTimestamp("update_date")));
                                 entry.setEnabled(r.getBoolean("enabled"));
-//                                    byte[] cBytes = r.getBytes("strategies");
+//                                byte[] cBytes = r.getBytes("strategies");
+//                                if (cBytes != null) {
 //                                    Map<String, RecStrategy> strategies = jsonMapper.readValue(cBytes,
 //                                            new TypeReference<Map<String, RecStrategy>>() {
 //                                            });
 //                                    entry.setRecStrategys(strategies);
+//                                }
                                 return entry;
                             }
                         }).fold(Lists.newArrayList(), new Folder3<ArrayList<RecInstance>, RecInstance>() {
