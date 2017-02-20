@@ -25,6 +25,7 @@ public class RecommendProxy {
     private final MetadataRecInstanceManager recInstanceManager;
     private final BrokerServiceClient brokerServiceClient;
 
+
     @Inject
     public RecommendProxy(
             BrokerServiceClient brokerServiceClient,
@@ -63,9 +64,9 @@ public class RecommendProxy {
 
     private void checkAndParseParameters(RecStrategy strategy, HttpServletRequest req) {
         Set<AbstractAlgorithm> algorithms = strategy.getAlgorithms();
-        for(AbstractAlgorithm algorithm : algorithms){
+        for (AbstractAlgorithm algorithm : algorithms) {
             Set<String> argNames = algorithm.getArgs().keySet();
-            for(String argName: argNames){
+            for (String argName : argNames) {
                 String argVal = req.getParameter(argName);
                 Preconditions.checkNotNull(argVal, "Must specify arg:" + argName);
                 strategy.addParams(argName, argVal);

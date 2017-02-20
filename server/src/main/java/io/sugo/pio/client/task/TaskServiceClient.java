@@ -1,6 +1,5 @@
 package io.sugo.pio.client.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.metamx.common.ISE;
@@ -35,8 +34,8 @@ public class TaskServiceClient {
         this.selector = selector;
     }
 
-    public void submitTask(String taskJson) {
-        runQuery(taskJson);
+    public InputStream submitTask(String taskJson) {
+        return runQuery(taskJson);
     }
 
     private InputStream runQuery(String queryJson) {
