@@ -5,12 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.engine.data.output.FSInputStream;
 import io.sugo.pio.engine.data.output.Repository;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.permission.FsPermission;
 
 import java.io.*;
+import java.util.EnumSet;
 
 /**
  */
@@ -31,7 +30,12 @@ public class HdfsRepository implements Repository {
     @Override
     public OutputStream openOutput(String name) {
         try {
-            return fs.create(new Path(path, name));
+            FsServerDefaults fsDefaults = fs.getServerDefaults(new Path(path, name));
+            EnumSet<CreateFlag> flags = EnumSet.of(CreateFlag.CREATE,
+                    CreateFlag.OVERWRITE);
+            return fs.create(new Path(path, name), FsPermission.getDefault(), flags, fsDefaults
+                    .getFileBufferSize(), fsDefaults.getReplication(), fsDefaults
+                    .getBlockSize(), null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
