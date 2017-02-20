@@ -28,15 +28,8 @@ import java.util.List;
 public class CliPeon implements Runnable {
     private static final Logger log = new Logger(CliPeon.class);
 
-    private final List<String> finalSparkDependencyCoordinates = ImmutableList.of(
-            "org.apache.spark:spark-yarn_2.11:2.0.2"
-    );
-
     @Arguments(description = "task.json status.json", required = true)
     public List<String> taskAndStatusFile;
-
-    @Inject
-    private ExtensionsConfig extensionsConfig = null;
 
     @Inject
     private EnginesConfig enginesConfig = null;
@@ -57,25 +50,10 @@ public class CliPeon implements Runnable {
                 extensionURLs.addAll(Arrays.asList(((URLClassLoader) extensionLoader).getURLs()));
             }
 
-            final List<URL> jobUrls = Lists.newArrayList();
-            jobUrls.addAll(engineURLs);
-            jobUrls.addAll(extensionURLs);
-            System.setProperty("pio.spark.internal.classpath", Joiner.on(File.pathSeparator).join(jobUrls));
-
-            final List<URL> nonHadoopURLs = Lists.newArrayList();
-            nonHadoopURLs.addAll(Arrays.asList(((URLClassLoader) CliTrainer.class.getClassLoader()).getURLs()));
-
             final List<URL> driverURLs = Lists.newArrayList();
-            driverURLs.addAll(nonHadoopURLs);
-            // put spark dependencies last to avoid jets3t & apache.httpcore version conflicts
-            for (final File dependency :
-                    Initialization.getSparkFilesToLoad(
-                            finalSparkDependencyCoordinates,
-                            extensionsConfig
-                    )) {
-                final ClassLoader sparkLoader = Initialization.getClassLoaderForExtension(dependency);
-                driverURLs.addAll(Arrays.asList(((URLClassLoader) sparkLoader).getURLs()));
-            }
+            driverURLs.addAll(engineURLs);
+            driverURLs.addAll(extensionURLs);
+            driverURLs.addAll(Arrays.asList(((URLClassLoader) CliPeon.class.getClassLoader()).getURLs()));
 
             final URLClassLoader loader = new URLClassLoader(driverURLs.toArray(new URL[driverURLs.size()]), null);
             Thread.currentThread().setContextClassLoader(loader);

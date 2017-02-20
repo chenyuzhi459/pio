@@ -1,10 +1,11 @@
 package io.sugo.pio.engine.data.input;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  */
-public class Event {
+public class Event implements Serializable {
     private long timestamp;
     private Map<String, Object> properties;
 

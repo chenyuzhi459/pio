@@ -23,32 +23,29 @@ public class TaskServiceClient {
     private static final InputStreamResponseHandler RESPONSE_HANDLER = new InputStreamResponseHandler();
 
     private final HttpClient client;
-    private final ObjectMapper jsonMapper;
     private final ServerDiscoverySelector selector;
 
 
     @Inject
     public TaskServiceClient(
             @Global HttpClient client,
-            ObjectMapper jsonMapper,
             @TaskService ServerDiscoverySelector selector
     ) {
         this.client = client;
-        this.jsonMapper = jsonMapper;
         this.selector = selector;
     }
 
-    public void submitTask(Object taskObject) {
-        runQuery(taskObject);
+    public void submitTask(String taskJson) {
+        runQuery(taskJson);
     }
 
-    private InputStream runQuery(Object queryObject) {
+    private InputStream runQuery(String queryJson) {
         try {
             return client.go(
                     new Request(
                             HttpMethod.POST,
                             new URL(String.format("%s/task", baseUrl()))
-                    ).setContent(MediaType.APPLICATION_JSON, jsonMapper.writeValueAsBytes(queryObject)),
+                    ).setContent(MediaType.APPLICATION_JSON, queryJson.getBytes()),
                     RESPONSE_HANDLER
             ).get();
         } catch (Exception e) {
