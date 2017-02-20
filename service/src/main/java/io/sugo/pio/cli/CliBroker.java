@@ -10,6 +10,7 @@ import io.sugo.pio.client.BrokerServerView;
 import io.sugo.pio.client.CachingClusteredClient;
 import io.sugo.pio.client.selector.ServerSelectorStrategy;
 import io.sugo.pio.client.selector.TierSelectorStrategy;
+import io.sugo.pio.data.fetcher.DataFetcherConfig;
 import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.JsonConfigProvider;
 import io.sugo.pio.guice.LazySingleton;
@@ -52,6 +53,7 @@ public class CliBroker extends ServerRunnable {
 
                         JsonConfigProvider.bind(binder, "pio.broker.select", TierSelectorStrategy.class);
                         JsonConfigProvider.bind(binder, "pio.broker.balancer", ServerSelectorStrategy.class);
+                        JsonConfigProvider.bind(binder, "pio.broker.data.fetcher", DataFetcherConfig.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, StrategyRunner.class);
