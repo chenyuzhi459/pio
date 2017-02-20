@@ -1,5 +1,7 @@
 package io.sugo.pio.engine.textSimilar;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 /**
@@ -11,6 +13,7 @@ public class TextSimilarResult {
         this.items = items;
     }
 
+    @JsonProperty
     public List<String> getItems(){
         return items;
     }
