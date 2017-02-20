@@ -64,24 +64,31 @@ public class RecommendManager {
 
     public RecInstance enable(String id, Boolean enabled) {
         RecInstance entry = getRecInstance(id);
-        if (entry != null) {
-            entry.setEnabled(enabled);
-            entry.setUpdateTime(new DateTime());
-            recInstanceManager.update(entry);
+        Preconditions.checkNotNull(entry, "No Recommend Instance found with id:" + id);
+        if (enabled) {
+            int totalPercent = 0;
+            Preconditions.checkNotNull(entry.getRecStrategys(), "Must add Recommend Strategy with Recommand Instance " + entry.getName());
+            for (RecStrategy item : entry.getRecStrategys().values()) {
+                totalPercent += item.getPercent();
+            }
+            Preconditions.checkArgument(totalPercent == 100, "sum value of all percentage must be 100%");
         }
+        entry.setEnabled(enabled);
+        entry.setUpdateTime(new DateTime());
+        recInstanceManager.update(entry);
         return entry;
     }
 
     public RecInstance delete(String id) {
         RecInstance entry = getRecInstance(id);
-        if (entry != null) {
-            recInstanceManager.delete(id);
-        }
+        Preconditions.checkNotNull(entry, "No Recommend Instance found with id:" + id);
+        recInstanceManager.delete(id);
         return entry;
     }
 
     public RecInstance getRecInstance(String id) {
         RecInstance entry = recInstanceManager.get(id);
+        Preconditions.checkNotNull(entry, "No Recommend Instance found with id:" + id);
         return entry;
     }
 

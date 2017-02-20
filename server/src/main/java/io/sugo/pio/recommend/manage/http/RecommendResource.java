@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/pio/recommend")
+@Path("/pio/rec")
 public class RecommendResource {
     private static final Logger log = new Logger(RecommendResource.class);
     private final RecommendProxy recProxy;
@@ -35,9 +35,10 @@ public class RecommendResource {
             @Context final HttpServletRequest req
     ) {
         try {
-            List<String> items = recProxy.recommend(id, req.getRequestedSessionId());
+            List<String> items = recProxy.recommend(id, req);
             return Response.ok(items).build();
         } catch (NullPointerException e) {
+            log.error(e, e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
             log.error(e, "recommend error with %s", id);

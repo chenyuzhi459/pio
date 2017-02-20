@@ -16,7 +16,9 @@ import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.query.QueryWalker;
 import io.sugo.pio.server.ClientQueryWalker;
-import io.sugo.pio.server.QueryResource;
+import io.sugo.pio.server.broker.BrokerResource;
+import io.sugo.pio.server.broker.PioBroker;
+import io.sugo.pio.server.broker.StrategyRunner;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import org.eclipse.jetty.server.Server;
 
@@ -52,8 +54,9 @@ public class CliBroker extends ServerRunnable {
                         JsonConfigProvider.bind(binder, "pio.broker.balancer", ServerSelectorStrategy.class);
 
                         binder.bind(JettyServerInitializer.class).to(QueryJettyServerInitializer.class).in(LazySingleton.class);
-                        Jerseys.addResource(binder, QueryResource.class);
-                        LifecycleModule.register(binder, QueryResource.class);
+                        LifecycleModule.register(binder, StrategyRunner.class);
+                        Jerseys.addResource(binder, BrokerResource.class);
+                        LifecycleModule.register(binder, PioBroker.class);
                         LifecycleModule.register(binder, Server.class);
                     }
                 });
