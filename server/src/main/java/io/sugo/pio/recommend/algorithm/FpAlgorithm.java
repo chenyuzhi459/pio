@@ -1,11 +1,13 @@
 package io.sugo.pio.recommend.algorithm;
 
 public class FpAlgorithm extends AbstractAlgorithm {
-    public static final String TYPE = "fp_query";
+    public static final String TYPE = "itemfp";
+    public static final String QUERY_TYPE = "fp_query";
     protected static FpAlgorithm algorithm;
 
     public FpAlgorithm() {
-        setName(TYPE);
+        setType(TYPE);
+        setQueryType(QUERY_TYPE);
         setDescription("组合推荐");
         addArg("item_id", "产品id");
     }

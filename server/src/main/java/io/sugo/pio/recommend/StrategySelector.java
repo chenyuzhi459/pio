@@ -14,12 +14,12 @@ public class StrategySelector {
         if (strategyList.size() == 1) {
             return strategyList.iterator().next();
         }
-        int hashIndex = MurmurhashUtil.hash(sessionId) % 100;
+        int hashIndex = Math.abs(MurmurhashUtil.hash(sessionId)) % 100;
         Iterator<RecStrategy> iterator = strategies.values().iterator();
         RecStrategy strategy = null;
         while (iterator.hasNext()) {
             strategy = iterator.next();
-            if (iterator.next().match(hashIndex)) {
+            if (strategy.match(hashIndex)) {
                 return strategy;
             }
         }

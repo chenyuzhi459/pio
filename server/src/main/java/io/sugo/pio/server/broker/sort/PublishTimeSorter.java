@@ -30,9 +30,15 @@ public class PublishTimeSorter extends Sorter {
     protected List<Item> fetchSortingData(List<String> itemIdSet) {
         String[] values = dataFetcher.fetchData(itemIdSet, TYPE);
         List<Item> items = new ArrayList<>(values.length);
+        String value;
         for (int i = 0; i < values.length; i++) {
             Item item = new Item(itemIdSet.get(i));
-            item.setPublishTime(Long.valueOf(values[i]));
+            value = values[i];
+            if (value == null) {
+                item.setPublishTime(0L);
+            } else {
+                item.setPublishTime(Long.valueOf(value));
+            }
         }
         return items;
     }

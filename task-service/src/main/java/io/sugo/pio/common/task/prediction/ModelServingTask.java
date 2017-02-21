@@ -1,16 +1,11 @@
 package io.sugo.pio.common.task.prediction;
 
-import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import io.sugo.pio.common.TaskStatus;
 import io.sugo.pio.common.TaskToolbox;
 import io.sugo.pio.common.task.AbstractTask;
-import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.prediction.ModelFactory;
 import io.sugo.pio.engine.prediction.PredictionModel;
 import io.sugo.pio.engine.prediction.PredictionQueryObject;
@@ -18,8 +13,6 @@ import io.sugo.pio.query.Query;
 import io.sugo.pio.query.QueryRunner;
 import io.sugo.pio.server.coordination.DataServerAnnouncer;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -27,6 +20,7 @@ import java.util.Map;
 public class ModelServingTask extends AbstractTask<PredictionQueryObject> {
     private final ModelFactory modelFactory;
     private final String modelId;
+    private final String modelType;
 
     private PredictionModel model;
 
@@ -37,10 +31,12 @@ public class ModelServingTask extends AbstractTask<PredictionQueryObject> {
     public ModelServingTask(
             @JsonProperty("id") String id,
             @JsonProperty("modelId") String modelId,
+            @JsonProperty("modelType") String modelType,
             @JsonProperty("context") Map<String, Object> context,
             @JsonProperty("modelFactory") ModelFactory modelFactory) {
         super(id, context);
         this.modelId = modelId;
+        this.modelType = modelType;
         this.modelFactory = modelFactory;
     }
 
@@ -54,7 +50,7 @@ public class ModelServingTask extends AbstractTask<PredictionQueryObject> {
         model = modelFactory.loadModel();
 
         DataServerAnnouncer announcer =  toolbox.getSegmentAnnouncer();
-        announcer.announce(modelId);
+        announcer.announce(modelType, modelId);
         synchronized (handoffCondition) {
             handoffCondition.wait();
         }
@@ -65,6 +61,11 @@ public class ModelServingTask extends AbstractTask<PredictionQueryObject> {
     @JsonProperty
     public String getModelId() {
         return modelId;
+    }
+
+    @JsonProperty
+    public String getModelType() {
+        return modelType;
     }
 
     @JsonProperty

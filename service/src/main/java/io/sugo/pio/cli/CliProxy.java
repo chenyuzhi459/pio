@@ -11,8 +11,8 @@ import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.recommend.RecommendManager;
 import io.sugo.pio.recommend.RecommendProxy;
+import io.sugo.pio.recommend.http.RecommendResource;
 import io.sugo.pio.recommend.manage.http.RecManageResource;
-import io.sugo.pio.recommend.manage.http.RecommendResource;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import org.eclipse.jetty.server.Server;
 

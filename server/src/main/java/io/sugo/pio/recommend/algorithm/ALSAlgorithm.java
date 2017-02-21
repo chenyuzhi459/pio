@@ -1,11 +1,13 @@
 package io.sugo.pio.recommend.algorithm;
 
 public class ALSAlgorithm extends AbstractAlgorithm {
-    public static final String TYPE = "als_query";
+    public static final String TYPE = "als";
+    public static final String QUERY_TYPE = "als_query";
     protected static ALSAlgorithm algorithm;
 
     private ALSAlgorithm() {
-        setName(TYPE);
+        setType(TYPE);
+        setQueryType(QUERY_TYPE);
         setDescription("协同过滤推荐");
         addArg("user_id", "用户id");
     }
