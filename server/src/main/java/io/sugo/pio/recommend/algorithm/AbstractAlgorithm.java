@@ -18,17 +18,27 @@ import java.util.Map;
         @JsonSubTypes.Type(name = UserHistoryAlgorithm.TYPE, value = UserHistoryAlgorithm.class),
 })
 public abstract class AbstractAlgorithm implements Serializable {
-    private String name;
+    private String type;
+    private String queryType;
     private String description;
     private Map<String, String> args = new HashMap<>();
 
     @JsonProperty
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @JsonProperty
+    public String getQueryType() {
+        return queryType;
+    }
+
+    public void setQueryType(String queryType) {
+        this.queryType = queryType;
     }
 
     @JsonProperty

@@ -2,11 +2,12 @@
   "type":"model",
   "id":"model1",
   "modelId":"model1",
+  "modelType":"als",
   "modelFactory":{
-    "type": "als_model"
-  },
-  "repository": {
-    "type": "hdfs",
-    "path": "hdfs://sugo/user/yaotc/"
+    "type": "als_model",
+    "repository": {
+      "type": "hdfs",
+      "path": "hdfs://sugo/user/yaotc/als"
+    }
   }
 }

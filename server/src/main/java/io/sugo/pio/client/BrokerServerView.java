@@ -106,10 +106,10 @@ public class BrokerServerView implements ServerView {
     private void addServer(PioDataServer server)
     {
         synchronized (lock) {
-            ServerSelector selector = selectors.get(server.getId());
+            ServerSelector selector = selectors.get(server.getType());
             if (selector == null) {
                 selector = new ServerSelector(tierSelectorStrategy);
-                selectors.put(server.getId(), selector);
+                selectors.put(server.getType(), selector);
             }
 
             QueryablePioServer queryablePioServer = clients.get(server.getServer().getName());
@@ -126,7 +126,7 @@ public class BrokerServerView implements ServerView {
 
     private void updateServer(PioDataServer oldServer, PioDataServer newServer) {
         synchronized (lock) {
-            ServerSelector oldSelector = selectors.get(oldServer.getId());
+            ServerSelector oldSelector = selectors.get(oldServer.getType());
             QueryablePioServer oldQueryablePioServer = clients.get(oldServer.getServer().getName());
             if (oldQueryablePioServer != null) {
                 clients.remove(oldServer.getServer().getName());
@@ -138,10 +138,10 @@ public class BrokerServerView implements ServerView {
             QueryablePioServer queryablePioServer = new QueryablePioServer(baseView.getInventoryValue(newServer.getServer().getName()).getServer(), makeDirectClient(newServer));
             clients.put(newServer.getServer().getName(), queryablePioServer);
 
-            ServerSelector newSelector = selectors.get(newServer.getId());
+            ServerSelector newSelector = selectors.get(newServer.getType());
             if (newSelector == null) {
                 newSelector = new ServerSelector(tierSelectorStrategy);
-                selectors.put(newServer.getId(), newSelector);
+                selectors.put(newServer.getType(), newSelector);
             }
             newSelector.addServer(queryablePioServer);
         }
@@ -157,8 +157,8 @@ public class BrokerServerView implements ServerView {
         return clients.remove(server.getId());
     }
 
-    public ServerSelector getServerSelector(String id) {
-        return selectors.get(id);
+    public ServerSelector getServerSelector(String type) {
+        return selectors.get(type);
     }
 
     public <Q, R> QueryRunner<Q, R> getQueryRunner(PioServer server)

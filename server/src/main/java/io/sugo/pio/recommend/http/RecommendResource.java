@@ -1,4 +1,4 @@
-package io.sugo.pio.recommend.manage.http;
+package io.sugo.pio.recommend.http;
 
 
 import com.google.inject.Inject;
@@ -36,13 +36,13 @@ public class RecommendResource {
     ) {
         try {
             List<String> items = recProxy.recommend(id, req);
-            return Response.ok(items).build();
+            return Response.ok().entity(items).build();
         } catch (NullPointerException e) {
             log.error(e, e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
             log.error(e, "recommend error with %s", id);
-            return Response.serverError().build();
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 }

@@ -7,6 +7,7 @@ import io.sugo.pio.engine.prediction.PredictionQueryObject;
 /**
  */
 public class PredictionQuery implements Query {
+    public static final String TYPE = "prediction";
     private final PredictionQueryObject predictionQueryObject;
 
     @JsonCreator

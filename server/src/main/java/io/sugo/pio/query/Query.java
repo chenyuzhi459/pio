@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(value = {
-        @JsonSubTypes.Type(name = "prediction", value = PredictionQuery.class)
+        @JsonSubTypes.Type(name = PredictionQuery.TYPE, value = PredictionQuery.class)
 })
 public interface Query<Q> {
     public String getType();

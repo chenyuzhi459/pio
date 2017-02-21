@@ -43,7 +43,7 @@ public class BatchDataServerAnnouncer implements DataServerAnnouncer
   }
 
   @Override
-  public void announce(String id) throws IOException
+  public void announce(String type, String id) throws IOException
   {
     synchronized (lock) {
       if (announced) {
@@ -53,7 +53,7 @@ public class BatchDataServerAnnouncer implements DataServerAnnouncer
       try {
         final String path = makeAnnouncementPath();
         log.info("Announcing self[%s] at [%s]", server, path);
-        PioDataServer dataServer = new PioDataServer(id, server);
+        PioDataServer dataServer = new PioDataServer(type, id, server);
         announcer.announce(path, jsonMapper.writeValueAsBytes(dataServer), false);
       }
       catch (JsonProcessingException e) {
