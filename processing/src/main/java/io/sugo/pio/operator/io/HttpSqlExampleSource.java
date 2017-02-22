@@ -15,16 +15,21 @@ import io.sugo.pio.example.util.ExampleSets;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
+import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeText;
+import io.sugo.pio.parameter.TextType;
 import io.sugo.pio.tools.Ontology;
 
 import java.io.IOException;
 import java.util.*;
 
-public class SqlExampleSource extends AbstractExampleSource {
+public class HttpSqlExampleSource extends AbstractExampleSource {
 
     public static final String PARAMETER_URL = "url";
 
     public static final String PARAMETER_SQL = "sql";
+
+    private static final String[] DATETIME_FIELD_NAME = {"__time", "event_time"};
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -49,7 +54,7 @@ public class SqlExampleSource extends AbstractExampleSource {
                 throw new OperatorException("Parse result failed: " + e, e);
             }
 
-            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, '.');
+            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
             List<Attribute> attributes = getAttributes(resultList);
             ExampleSetBuilder builder = ExampleSets.from(attributes);
 
@@ -62,11 +67,11 @@ public class SqlExampleSource extends AbstractExampleSource {
                     DataRow dataRow = factory.create(attrSize);
                     for (int i = 0; i < attrSize; i++) {
                         Attribute attr = attributes.get(i);
-                        // TODO：特殊key的处理（__time, event_time）
                         String attrName = attr.getName();
-                        Object attrValue = map.get(attrName);
-                        double value = attr.getMapping().mapString(attrValue == null ? null : attrValue.toString());
+                        Object attrValue = map.get(attrName); // 当该字段为日期类型时，此值为json串，需要进一步反序列化取出真正的日期值
+                        String attrValueStr = extractAttrValue(attrName, attrValue);
 
+                        double value = attr.getMapping().mapString(attrValueStr);
                         dataRow.set(attr, value);
                     }
 
@@ -82,7 +87,7 @@ public class SqlExampleSource extends AbstractExampleSource {
 
     @Override
     public String getDefaultFullName() {
-        return I18N.getMessage("pio.SqlExampleSource.name");
+        return I18N.getMessage("pio.HttpSqlExampleSource.name");
     }
 
     @Override
@@ -92,7 +97,21 @@ public class SqlExampleSource extends AbstractExampleSource {
 
     @Override
     public String getDescription() {
-        return I18N.getMessage("pio.SqlExampleSource.description");
+        return I18N.getMessage("pio.HttpSqlExampleSource.description");
+    }
+
+    @Override
+    public List<ParameterType> getParameterTypes() {
+        List types = super.getParameterTypes();
+        ParameterTypeText urlType = new ParameterTypeText(PARAMETER_URL,
+                I18N.getMessage("pio.HttpSqlExampleSource.url"), TextType.PLAIN, false);
+        types.add(urlType);
+
+        ParameterTypeText sqlType = new ParameterTypeText(PARAMETER_SQL,
+                I18N.getMessage("pio.HttpSqlExampleSource.sql"), TextType.SQL, false);
+        types.add(sqlType);
+
+        return types;
     }
 
     private List<Attribute> getAttributes(List<HashMap<String, Object>> resultList) {
@@ -138,6 +157,26 @@ public class SqlExampleSource extends AbstractExampleSource {
         return resultVo.getResult();
     }
 
+    private String extractAttrValue(String attrName, Object originValue) {
+        if (Objects.nonNull(originValue)) {
+            for (String datetimeFieldName : DATETIME_FIELD_NAME) {
+                if (datetimeFieldName.equals(attrName)) {
+                    ObjectReader reader = jsonMapper.readerFor(DatetimeVo.class);
+                    try {
+                        String valueStr = originValue == null ? null : jsonMapper.writeValueAsString(originValue);
+                        DatetimeVo datetimeVo = reader.readValue(valueStr);
+
+                        return datetimeVo.getValue();
+                    } catch (IOException e) {
+                        return originValue.toString();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     private static class QueryVo {
         String query; // query key
 
@@ -150,6 +189,9 @@ public class SqlExampleSource extends AbstractExampleSource {
         }
     }
 
+    /**
+     * 返回结果接收类
+     */
     private static class ResultVo {
         List<HashMap<String, Object>> result;
         Integer code;
@@ -171,8 +213,38 @@ public class SqlExampleSource extends AbstractExampleSource {
         }
     }
 
+    /**
+     * 时间字段映射类。返回的时间字段不是一个字符串，而是一串json，需要做特殊处理
+     * "__time": {
+     * "type": "TIME",
+     * "value": "2017-02-07T23:59:20.880Z"
+     * }
+     *
+     * @see DATETIME_FIELD_NAME
+     */
+    private static class DatetimeVo {
+        String type;
+        String value;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+    }
+
     public static void main(String[] args) {
-        new SqlExampleSource().createExampleSet();
+        new HttpSqlExampleSource().createExampleSet();
     }
 
 
