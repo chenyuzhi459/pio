@@ -16,6 +16,7 @@ import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.parameter.ParameterTypeText;
 import io.sugo.pio.parameter.TextType;
 import io.sugo.pio.tools.Ontology;
@@ -103,8 +104,8 @@ public class HttpSqlExampleSource extends AbstractExampleSource {
     @Override
     public List<ParameterType> getParameterTypes() {
         List types = super.getParameterTypes();
-        ParameterTypeText urlType = new ParameterTypeText(PARAMETER_URL,
-                I18N.getMessage("pio.HttpSqlExampleSource.url"), TextType.PLAIN, false);
+        ParameterTypeString urlType = new ParameterTypeString(PARAMETER_URL,
+                I18N.getMessage("pio.HttpSqlExampleSource.url"), false);
         types.add(urlType);
 
         ParameterTypeText sqlType = new ParameterTypeText(PARAMETER_SQL,
@@ -219,8 +220,6 @@ public class HttpSqlExampleSource extends AbstractExampleSource {
      * "type": "TIME",
      * "value": "2017-02-07T23:59:20.880Z"
      * }
-     *
-     * @see DATETIME_FIELD_NAME
      */
     private static class DatetimeVo {
         String type;

@@ -27,6 +27,7 @@ import java.util.LinkedList;
         @JsonSubTypes.Type(name = "param_type_attributes", value = ParameterTypeAttributes.class),
         @JsonSubTypes.Type(name = "param_type_category", value = ParameterTypeCategory.class),
         @JsonSubTypes.Type(name = "param_type_string_category", value = ParameterTypeStringCategory.class),
+        @JsonSubTypes.Type(name = "param_type_linkage_http_category", value = ParameterTypeLinkageHttpCategory.class),
         @JsonSubTypes.Type(name = "param_type_configuration", value = ParameterTypeConfiguration.class),
         @JsonSubTypes.Type(name = "param_type_enum", value = ParameterTypeEnumeration.class),
         @JsonSubTypes.Type(name = "param_type_filter", value = ParameterTypeFilter.class),

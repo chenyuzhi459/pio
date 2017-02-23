@@ -8,7 +8,7 @@ import com.google.inject.Binder;
 import io.sugo.pio.initialization.PioModule;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
-import io.sugo.pio.operator.io.SingleMapExampleSource;
+import io.sugo.pio.operator.io.SingleViewExampleSource;
 import io.sugo.pio.operator.learner.functions.LogisticRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
@@ -34,7 +34,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(ParallelDecisionTreeLearner.class, "decision_tree_learner"),
                                 new NamedType(LogisticRegression.class, "logistic_regression"),
                                 new NamedType(HttpSqlExampleSource.class, "http_sql_source"),
-                                new NamedType(SingleMapExampleSource.class, "single_map_source")
+                                new NamedType(SingleViewExampleSource.class, "single_view_source")
                         )
         );
     }
