@@ -3,6 +3,7 @@ package io.sugo.pio.operator.io;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.google.common.base.Strings;
 import io.sugo.pio.common.utils.HttpClientUtil;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
@@ -14,14 +15,12 @@ import io.sugo.pio.example.util.ExampleSets;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.parameter.ParameterType;
-import io.sugo.pio.parameter.ParameterTypeString;
-import io.sugo.pio.parameter.ParameterTypeText;
-import io.sugo.pio.parameter.TextType;
+import io.sugo.pio.parameter.*;
 import io.sugo.pio.tools.Ontology;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class SingleViewExampleSource extends AbstractExampleSource {
 
@@ -29,17 +28,15 @@ public class SingleViewExampleSource extends AbstractExampleSource {
 
     public static final String PARAMETER_DATA_SOURCE = "data_source";
 
-    public static final String PARAMETER_DATA_SOURCE_NAME = "data_source_name";
-
-    public static final String PARAMETER_SINGLE_VIEW_NAME = "single_view_name";
-
-    public static final String PARAMETER_SINGLE_VIEW_REQUEST_PARAM = "single_view_request_param";
+    public static final String PARAMETER_SINGLE_VIEW_DATA_SOURCE = "single_view_data_source";
 
     private static final String URI_LIST_DATA_SOURCE = "/datasources/list";
 
     private static final String URI_LIST_SINGLE_MAP = "/slices/list/";
 
     private static final String URI_QUERY_DRUID = "/slices/query-druid";
+
+    private static final Pattern urlPattern = Pattern.compile("(http|https){1}://");
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -48,7 +45,11 @@ public class SingleViewExampleSource extends AbstractExampleSource {
 //        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
         String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
         String druidUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_QUERY_DRUID);
-        String queryParam = "{\n" +
+        String selectedSingleView = getParameterAsString(PARAMETER_SINGLE_VIEW_DATA_SOURCE);
+
+        ParameterTypeDynamicCategory dynamicCategory = (ParameterTypeDynamicCategory)(getParameters().getParameterType(selectedSingleView));
+//        String singleViewValue = dynamicCategory.getCategoryValue(selectedSingleView);
+        String singleViewValue = "{\n" +
                 "\"druid_datasource_id\": \"rydmYyUYzl\",\n" +
                 "      \"params\": {\n" +
                 "        \"filters\": [\n" +
@@ -78,7 +79,7 @@ public class SingleViewExampleSource extends AbstractExampleSource {
 
         String result = null;
         try {
-            result = HttpClientUtil.post(druidUrl, queryParam);
+            result = HttpClientUtil.post(druidUrl, singleViewValue);
         } catch (IOException e) {
             throw new OperatorException("Http post failed: " + e, e);
         }
@@ -129,6 +130,7 @@ public class SingleViewExampleSource extends AbstractExampleSource {
 
             return builder.build();
         }
+
         return null;
     }
 
@@ -154,16 +156,80 @@ public class SingleViewExampleSource extends AbstractExampleSource {
                 I18N.getMessage("pio.SingleViewExampleSource.url"), false);
         types.add(urlType);
 
-        /*ParameterTypeText sqlType = new ParameterTypeList(PARAMETER_DATA_SOURCE,
-                I18N.getMessage("pio.SingleViewExampleSource.data_source"), TextType.PLAIN, false);
-        types.add(sqlType);*/
+        ParameterTypeDynamicCategory dataSourceType = getDataSourceParamType();
+        types.add(dataSourceType);
+
+        ParameterTypeDynamicCategory singleViewDataSourceType = getSingleViewParamType();
+        types.add(singleViewDataSourceType);
 
         return types;
     }
 
+    private boolean isValidUrl(String url) {
+//        return !Strings.isNullOrEmpty(url) && urlPattern.matcher(url).matches();
+        return !Strings.isNullOrEmpty(url);
+    }
+
+    private ParameterTypeDynamicCategory getSingleViewParamType() {
+        String dataSourceName = getParameterAsString(PARAMETER_DATA_SOURCE);
+        if (!Strings.isNullOrEmpty(dataSourceName)) {
+            List<SingleMapVo> singleMapList = listSingleView();
+            if (singleMapList != null && !singleMapList.isEmpty()) {
+                String[] categories = new String[singleMapList.size()];
+                String[] categoryValues = new String[singleMapList.size()];
+
+                for (int i=0; i < singleMapList.size(); i++) {
+                    SingleMapVo singleMap = singleMapList.get(i);
+                    categories[i] = singleMap.getDatasource_name();
+
+                    SingleMapRequestVo requestVo = new SingleMapRequestVo();
+                    requestVo.setDruid_datasource_id(singleMap.getDruid_datasource_id());
+                    requestVo.setParams(singleMap.getParams());
+                    try {
+                        String requestStr = jsonMapper.writeValueAsString(requestVo);
+                        categoryValues[i] = requestStr;
+                    } catch (JsonProcessingException ignore) { }
+                }
+
+                return new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE, PARAMETER_DATA_SOURCE,
+                                I18N.getMessage("pio.SingleViewExampleSource.data_source"),
+                                categories, categoryValues, categories[0]);
+            }
+        }
+
+        return new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE,
+                PARAMETER_DATA_SOURCE,
+                I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"));
+    }
+
+    private ParameterTypeDynamicCategory getDataSourceParamType() {
+        String url = getParameterAsString(PARAMETER_URL);
+        if (isValidUrl(url)) {
+            List<DataSourceVo> dataSourceList = listDataSource();
+            if (dataSourceList != null && !dataSourceList.isEmpty()) {
+                String[] categories = new String[dataSourceList.size()];
+                String[] categoryValues = new String[dataSourceList.size()];
+
+                for (int i=0; i < dataSourceList.size(); i++) {
+                    DataSourceVo dataSource = dataSourceList.get(i);
+                    categories[i] = dataSource.getTitle();
+                    categoryValues[i] = dataSource.getName();
+                }
+
+                return new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, PARAMETER_URL,
+                        I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"),
+                        categories, categoryValues, categories[0]);
+
+            }
+        }
+
+        return new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, PARAMETER_URL,
+                I18N.getMessage("pio.SingleViewExampleSource.data_source"));
+    }
+
     private List<DataSourceVo> listDataSource() {
-//        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
+        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
+//        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
 
         String result;
         try {
@@ -184,12 +250,14 @@ public class SingleViewExampleSource extends AbstractExampleSource {
         return null;
     }
 
-    private List<SingleMapVo> listSingleMap() {
-//        String selectedDataSourceName = getParameterAsString(PARAMETER_DATA_SOURCE_NAME);
-//        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
-        String selectedDataSourceName = "wuxianjiRT";
-        String listSingleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_LIST_SINGLE_MAP) + selectedDataSourceName;
+    private List<SingleMapVo> listSingleView() {
+        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
+        String selectedDataSourceName = getParameterAsString(PARAMETER_DATA_SOURCE);
+//        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
+//        String selectedDataSourceName = "wuxianjiRT";
+        ParameterTypeDynamicCategory dynamicCategory = (ParameterTypeDynamicCategory)(getParameters().getParameterType(selectedDataSourceName));
+        String dataSourceValue = dynamicCategory.getCategoryValue(selectedDataSourceName);
+        String listSingleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_LIST_SINGLE_MAP) + dataSourceValue;
 
         String result;
         try {
@@ -427,7 +495,7 @@ public class SingleViewExampleSource extends AbstractExampleSource {
 
     private static class SingleMapRequestVo {
         String druid_datasource_id;
-        String params;
+        Object params;
 
         public String getDruid_datasource_id() {
             return druid_datasource_id;
@@ -437,11 +505,11 @@ public class SingleViewExampleSource extends AbstractExampleSource {
             this.druid_datasource_id = druid_datasource_id;
         }
 
-        public String getParams() {
+        public Object getParams() {
             return params;
         }
 
-        public void setParams(String params) {
+        public void setParams(Object params) {
             this.params = params;
         }
     }
@@ -450,6 +518,8 @@ public class SingleViewExampleSource extends AbstractExampleSource {
         SingleViewExampleSource singleViewExampleSource = new SingleViewExampleSource();
 //        singleViewExampleSource.listDataSource();
 //        singleViewExampleSource.listSingleMap();
-        singleViewExampleSource.createExampleSet();
+//        singleViewExampleSource.createExampleSet();
+        boolean matched = singleViewExampleSource.isValidUrl("http://202.199.160.62:8080/validateCodeAction");
+        System.out.println(matched);
     }
 }

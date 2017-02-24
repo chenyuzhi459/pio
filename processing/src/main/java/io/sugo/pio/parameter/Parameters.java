@@ -53,6 +53,12 @@ public class Parameters implements Cloneable, Iterable<String> {
         keyToTypeMap.put(type.getKey(), type);
     }
 
+    public void udpateParameterType(ParameterType type) {
+        if (keyToTypeMap.get(type.getKey()) != null) {
+            keyToTypeMap.put(type.getKey(), type);
+        }
+    }
+
     /**
      * Performs a deep clone on this parameters object.
      */
