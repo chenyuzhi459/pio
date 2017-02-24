@@ -109,16 +109,6 @@
             <version>${hadoop.version}</version>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>io.sugo.pio.engine-extensions</groupId>
-            <artifactId>jdbc-extensions</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sugo.pio.engines</groupId>
-            <artifactId>articleCluster-engine</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <!--<build>-->
