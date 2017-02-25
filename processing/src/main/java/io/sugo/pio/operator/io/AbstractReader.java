@@ -5,6 +5,7 @@ import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.nio.model.ParseException;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
@@ -76,10 +77,10 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
     /**
      * Creates (or reads) the ExampleSet that will be returned by {@link #apply()}.
      */
-    public abstract T read();
+    public abstract T read() throws OperatorException;
 
     @Override
-    public void doWork() {
+    public void doWork() throws OperatorException {
         final T result = read();
         outputPort.deliver(result);
     }

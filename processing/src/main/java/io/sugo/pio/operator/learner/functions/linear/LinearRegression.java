@@ -738,7 +738,9 @@ public class LinearRegression extends AbstractLearner {
 		List<ParameterType> types = super.getParameterTypes();
 		String[] availableSelectionMethods = SELECTION_METHODS.keySet().toArray(new String[SELECTION_METHODS.size()]);
 		types.add(new ParameterTypeCategory(PARAMETER_FEATURE_SELECTION,
-				"The feature selection method used during regression.", availableSelectionMethods, M5_PRIME));
+				I18N.getMessage("pio.LinearRegression.feature_selection"),
+//				"The feature selection method used during regression.",
+				availableSelectionMethods, M5_PRIME));
 
 		// adding parameter of methods
 		int i = 0;
@@ -757,17 +759,25 @@ public class LinearRegression extends AbstractLearner {
 		}
 
 		types.add(new ParameterTypeBoolean(PARAMETER_ELIMINATE_COLINEAR_FEATURES,
-				"Indicates if the algorithm should try to delete colinear features during the regression.", true));
+				I18N.getMessage("pio.LinearRegression.eliminate_colinear_features"),
+//				"Indicates if the algorithm should try to delete colinear features during the regression.",
+				true));
 		ParameterType type = new ParameterTypeDouble(PARAMETER_MIN_TOLERANCE,
-				"The minimum tolerance for the removal of colinear features.", 0.0d, 1.0d, 0.05d);
+				I18N.getMessage("pio.LinearRegression.min_tolerance"),
+//				"The minimum tolerance for the removal of colinear features.",
+				0.0d, 1.0d, 0.05d);
 		type.registerDependencyCondition(
 				new BooleanParameterCondition(this, PARAMETER_ELIMINATE_COLINEAR_FEATURES, true, true));
 		types.add(type);
 
 		types.add(
-				new ParameterTypeBoolean(PARAMETER_USE_BIAS, "Indicates if an intercept value should be calculated.", true));
+				new ParameterTypeBoolean(PARAMETER_USE_BIAS,
+						I18N.getMessage("pio.LinearRegression.use_bias"),
+//						"Indicates if an intercept value should be calculated.",
+						true));
 		types.add(new ParameterTypeDouble(PARAMETER_RIDGE,
-				"The ridge parameter used for ridge regression. A value of zero switches to ordinary least squares estimate.",
+				I18N.getMessage("pio.LinearRegression.ridge"),
+//				"The ridge parameter used for ridge regression. A value of zero switches to ordinary least squares estimate.",
 				0.0d, Double.POSITIVE_INFINITY, 1.0E-8));
 		return types;
 	}

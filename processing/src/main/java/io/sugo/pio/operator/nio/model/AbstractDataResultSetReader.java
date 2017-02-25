@@ -8,8 +8,10 @@ import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.io.AbstractDataReader;
 import io.sugo.pio.operator.io.AbstractReader;
+import io.sugo.pio.operator.nio.file.FileInputPortHandler;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
+import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -51,12 +53,15 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
 //        return fileInputPort;
 //    }
 
+    private InputPort fileInputPort = getInputPorts().createPort("file");
+    private FileInputPortHandler filePortHandler = new FileInputPortHandler(this, fileInputPort, this.getFileParameterName());
+
     public AbstractDataResultSetReader(Class<? extends IOObject> generatedClass){
         super(generatedClass);
     }
 
     @Override
-    public ExampleSet read() {
+    public ExampleSet read() throws OperatorException {
         // loading data result set
         ExampleSet exampleSet = null;
         try (DataResultSetFactory dataResultSetFactory = getDataResultSetFactory();
@@ -76,6 +81,12 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
      * Returns the configured number format or null if a default number format should be used.
      */
     protected abstract NumberFormat getNumberFormat() throws OperatorException;
+
+    /**
+     * Returns the name of the {@link ParameterTypeFile} to be added through which the user can
+     * specify the file name.
+     */
+    protected abstract String getFileParameterName();
 
     /**
      * Returns the allowed file extension.
@@ -184,5 +195,13 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
      */
     protected boolean isSupportingFirstRowAsNames() {
         return true;
+    }
+
+    /**
+     * Same as {@link #getSelectedFile()}, but returns true if file is specified (in the respective
+     * way).
+     * */
+    public boolean isFileSpecified() {
+        return filePortHandler.isFileSpecified();
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.operator.nio.model.ParseException;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
@@ -12,6 +13,7 @@ import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MDTransformer;
 import io.sugo.pio.ports.metadata.SimpleProcessSetupError;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -286,7 +288,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * Performs the actual work of the operator and must be implemented by subclasses. Replaces the
      * old method <code>apply()</code>.
      */
-    public void doWork() {
+    public void doWork() throws OperatorException {
     }
 
     public void execute() {
@@ -582,6 +584,77 @@ public abstract class Operator implements ParameterHandler, Serializable {
         } catch (Exception e) {
         }
         return false; // cannot happen
+    }
+
+    /**
+     * Returns a single named parameter and casts it to File. This file is already resolved against
+     * the process definition file but missing directories will not be created. If the parameter
+     * name defines a non-optional parameter which is not set and has no default value, a
+     * UndefinedParameterError will be thrown. If the parameter is optional and was not set this
+     * method returns null. Operators should always use this method instead of directly using the
+     * method {@link Process#resolveFileName(String)}.
+     */
+    @Override
+    public java.io.File getParameterAsFile(String key) throws UserError {
+        return getParameterAsFile(key, false);
+    }
+
+    /**
+     * Returns a single named parameter and casts it to File. This file is already resolved against
+     * the process definition file and missing directories will be created. If the parameter name
+     * defines a non-optional parameter which is not set and has no default value, a
+     * UndefinedParameterError will be thrown. If the parameter is optional and was not set this
+     * method returns null. Operators should always use this method instead of directly using the
+     * method {@link Process#resolveFileName(String)}.
+     *
+     * @throws DirectoryCreationError
+     */
+//    @Override
+    public java.io.File getParameterAsFile(String key, boolean createMissingDirectories) throws UserError {
+        String fileName = getParameter(key);
+        if (fileName == null) {
+            return null;
+        }
+
+        /*Process process = getProcess();
+        if (process != null) {
+            File result = process.resolveFileName(fileName);
+            if (createMissingDirectories) {
+                File parent = result.getParentFile();
+                if (parent != null) {
+                    if (!parent.exists()) {
+                        boolean isDirectoryCreated = parent.mkdirs();
+                        if (!isDirectoryCreated) {
+                            throw new UserError(null, "io.dir_creation_fail", parent.getAbsolutePath());
+                        }
+                    }
+                }
+            }
+            return result;
+        } else {*/
+            getLogger().fine(getName() + " is not attached to a process. Trying '" + fileName + "' as absolute filename.");
+            File result = new File(fileName);
+            if (createMissingDirectories) {
+                if (result.isDirectory()) {
+                    boolean isDirectoryCreated = result.mkdirs();
+                    if (!isDirectoryCreated) {
+                        throw new UserError(null, "io.dir_creation_fail", result.getAbsolutePath());
+                    }
+                } else {
+                    File parent = result.getParentFile();
+                    if (parent != null) {
+                        if (!parent.exists()) {
+                            boolean isDirectoryCreated = parent.mkdirs();
+                            if (!isDirectoryCreated) {
+                                throw new UserError(null, "io.dir_creation_fail", parent.getAbsolutePath());
+                            }
+                        }
+
+                    }
+                }
+            }
+            return result;
+//        }
     }
 
     public void addError(ProcessSetupError error) {

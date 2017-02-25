@@ -23,6 +23,16 @@ public class ParameterTypeString extends ParameterType {
         this(key, description, true);
     }
 
+    public ParameterTypeString(String key, String description, boolean optional, boolean expert) {
+        this(key, description, optional);
+        setExpert(expert);
+    }
+
+    public ParameterTypeString(String key, String description, String defaultValue, boolean expert) {
+        this(key, description, defaultValue);
+        setExpert(expert);
+    }
+
     @Override
     public Object getDefaultValue() {
         return defaultValue;

@@ -10,6 +10,11 @@ public class ParameterTypeBoolean extends ParameterTypeSingle {
         this.defaultValue = defaultValue;
     }
 
+    public ParameterTypeBoolean(String key, String description, boolean defaultValue, boolean expert) {
+        this(key, description, defaultValue);
+        setExpert(expert);
+    }
+
     @Override
     public Object getDefaultValue() {
         return defaultValue;

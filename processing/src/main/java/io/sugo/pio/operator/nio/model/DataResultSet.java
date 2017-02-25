@@ -74,7 +74,7 @@ public interface DataResultSet extends AutoCloseable {
 	 * @param columnIndex
 	 * @return
 	 */
-	Number getNumber(int columnIndex);
+	Number getNumber(int columnIndex) throws ParseException;
 
 	/**
 	 * Returns a nominal value contained in the specified column in the current row. Should return
@@ -83,7 +83,7 @@ public interface DataResultSet extends AutoCloseable {
 	 * @param columnIndex
 	 * @return
 	 */
-	String getString(int columnIndex);
+	String getString(int columnIndex) throws ParseException;
 
 	/**
 	 * Returns a date, time or date_time value contained in the specified column in the current row.
@@ -92,7 +92,7 @@ public interface DataResultSet extends AutoCloseable {
 	 * @param columnIndex
 	 * @return
 	 */
-	Date getDate(int columnIndex);
+	Date getDate(int columnIndex) throws ParseException;
 
 	/**
 	 *
@@ -100,7 +100,7 @@ public interface DataResultSet extends AutoCloseable {
 	 *         corresponding getter method for this type must not throw an RuntimeException when
 	 *         invoked for this column.
 	 */
-	ValueType getNativeValueType(int columnIndex);
+	ValueType getNativeValueType(int columnIndex) throws ParseException;
 
 	/**
 	 * Closes the data source. May tear down a database connection or close a file which is read
