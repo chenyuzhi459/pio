@@ -136,6 +136,7 @@ public class LocalFileRepository implements Repository {
     }
 
     @JsonProperty
+    @Override
     public String getPath() {
         return path;
     }

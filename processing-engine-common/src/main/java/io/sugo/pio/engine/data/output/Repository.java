@@ -15,6 +15,8 @@ import java.io.Serializable;
 public interface Repository extends Serializable {
     void init();
 
+    String getPath();
+
     OutputStream openOutput(String name);
 
     String[] listAll();

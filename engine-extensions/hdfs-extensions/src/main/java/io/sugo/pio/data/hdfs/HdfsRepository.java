@@ -124,6 +124,7 @@ public class HdfsRepository implements Repository {
     }
 
     @JsonProperty
+    @Override
     public String getPath() {
         return path;
     }
