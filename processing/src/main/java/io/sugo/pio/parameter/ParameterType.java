@@ -58,6 +58,12 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
     private String description;
 
     /**
+     * Indicates if this is a parameter only viewable in expert mode. Mandatory parameters are
+     * always viewable. The default value is true.
+     */
+    private boolean expert = true;
+
+    /**
      * Indicates if this parameter is hidden and is not shown in the GUI. May be used in conjunction
      * with a configuration wizard which lets the user configure the parameter.
      */
@@ -100,6 +106,23 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
      * Sets the default value.
      */
     public abstract void setDefaultValue(Object defaultValue);
+
+    /**
+     * Returns true if this parameter can only be seen in expert mode. The default implementation
+     * returns true if the parameter is optional. It is ensured that an non-optional parameter is
+     * never expert!
+     */
+    public boolean isExpert() {
+        return expert && isOptional;
+    }
+
+    /**
+     * Sets if this parameter can be seen in expert mode (true) or beginner mode (false).
+     *
+     */
+    public void setExpert(boolean expert) {
+        this.expert = expert;
+    }
 
     /**
      * Returns true if this parameter is hidden or not all dependency conditions are fulfilled. Then

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class SingleViewExampleSource extends AbstractExampleSource {
+public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     public static final String PARAMETER_URL = "url";
 
@@ -36,99 +36,68 @@ public class SingleViewExampleSource extends AbstractExampleSource {
 
     private static final String URI_QUERY_DRUID = "/slices/query-druid";
 
-    private static final Pattern urlPattern = Pattern.compile("(http|https){1}://");
-
-    private final ObjectMapper jsonMapper = new ObjectMapper();
-
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
-//        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
-        String druidUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_QUERY_DRUID);
-        String selectedSingleView = getParameterAsString(PARAMETER_SINGLE_VIEW_DATA_SOURCE);
+        if (isParameterExist(PARAMETER_URL) && isParameterExist(PARAMETER_DATA_SOURCE) &&
+                isParameterExist(PARAMETER_SINGLE_VIEW_DATA_SOURCE)) {
+            String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
+//        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
+            String druidUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_QUERY_DRUID);
+            String selectedSingleView = getParameterAsString(PARAMETER_SINGLE_VIEW_DATA_SOURCE);
 
-        ParameterTypeDynamicCategory dynamicCategory = (ParameterTypeDynamicCategory)(getParameters().getParameterType(selectedSingleView));
-//        String singleViewValue = dynamicCategory.getCategoryValue(selectedSingleView);
-        String singleViewValue = "{\n" +
-                "\"druid_datasource_id\": \"rydmYyUYzl\",\n" +
-                "      \"params\": {\n" +
-                "        \"filters\": [\n" +
-                "          {\n" +
-                "            \"eq\": \"-3 days\",\n" +
-                "            \"op\": \"in\",\n" +
-                "            \"col\": \"__time\"\n" +
-                "          }\n" +
-                "        ],\n" +
-                "        \"metrics\": [\n" +
-                "          \"wuxianjiRT_total\"\n" +
-                "        ],\n" +
-                "        \"vizType\": \"table\",\n" +
-                "        \"timezone\": \"Asia/Shanghai\",\n" +
-                "        \"dimensions\": [\n" +
-                "          \"Province\"\n" +
-                "        ],\n" +
-                "        \"dimensionExtraSettingDict\": {\n" +
-                "          \"Province\": {\n" +
-                "            \"limit\": 10,\n" +
-                "            \"sortCol\": \"wuxianjiRT_total\",\n" +
-                "            \"sortDirect\": \"desc\"\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "      }";
+            ParameterTypeDynamicCategory dynamicCategory = (ParameterTypeDynamicCategory)(getParameters().getParameterType(selectedSingleView));
+            if (dynamicCategory != null) {
+                String singleViewValue = dynamicCategory.getCategoryValue(selectedSingleView);
 
-        String result = null;
-        try {
-            result = HttpClientUtil.post(druidUrl, singleViewValue);
-        } catch (IOException e) {
-            throw new OperatorException("Http post failed: " + e, e);
-        }
+                String result = httpPost(druidUrl, singleViewValue);
 
-        if (result != null) {
-            List<Object> resultList = null;
-            try {
-                resultList = parseResult(result);
-            } catch (IOException e) {
-                throw new OperatorException("Parse result failed: " + e, e);
-            }
-
-            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
-            List<Attribute> attributes = getAttributes(resultList);
-            ExampleSetBuilder builder = ExampleSets.from(attributes);
-
-            if (resultList != null && !resultList.isEmpty()) {
-                int attrSize = attributes.size();
-
-                // traverse all rows to store data
-                for (Object resultObj : resultList) {
-                    String resultStr;
-                    Map resultMap = null;
+                if (result != null) {
+                    List<Object> resultList;
                     try {
-                        resultStr = jsonMapper.writeValueAsString(resultObj);
-                        if (Objects.nonNull(resultStr)) {
-                            resultMap = jsonMapper.readValue(resultStr, Map.class);
-                        }
+                        resultList = parseResult(result);
                     } catch (IOException e) {
                         throw new OperatorException("Parse result failed: " + e, e);
                     }
 
-                    // one result corresponds to one data row
-                    DataRow dataRow = factory.create(attrSize);
-                    for (int i = 0; i < attrSize; i++) {
-                        Attribute attr = attributes.get(i);
-                        String attrName = attr.getName();
-                        Object attrValue = resultMap.get(attrName);
-                        String attrValueStr = attrValue == null ? null : attrValue.toString();
+                    DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
+                    List<Attribute> attributes = getAttributes(resultList);
+                    ExampleSetBuilder builder = ExampleSets.from(attributes);
 
-                        double value = attr.getMapping().mapString(attrValueStr);
-                        dataRow.set(attr, value);
+                    if (resultList != null && !resultList.isEmpty()) {
+                        int attrSize = attributes.size();
+
+                        // traverse all rows to store data
+                        for (Object resultObj : resultList) {
+                            String resultStr;
+                            Map resultMap = null;
+                            try {
+                                resultStr = jsonMapper.writeValueAsString(resultObj);
+                                if (Objects.nonNull(resultStr)) {
+                                    resultMap = jsonMapper.readValue(resultStr, Map.class);
+                                }
+                            } catch (IOException e) {
+                                throw new OperatorException("Parse result failed: " + e, e);
+                            }
+
+                            // one result corresponds to one data row
+                            DataRow dataRow = factory.create(attrSize);
+                            for (int i = 0; i < attrSize; i++) {
+                                Attribute attr = attributes.get(i);
+                                String attrName = attr.getName();
+                                Object attrValue = resultMap.get(attrName);
+                                String attrValueStr = attrValue == null ? null : attrValue.toString();
+
+                                double value = attr.getMapping().mapString(attrValueStr);
+                                dataRow.set(attr, value);
+                            }
+
+                            builder.addDataRow(dataRow);
+                        }
                     }
 
-                    builder.addDataRow(dataRow);
+                    return builder.build();
                 }
             }
-
-            return builder.build();
         }
 
         return null;
@@ -165,35 +134,32 @@ public class SingleViewExampleSource extends AbstractExampleSource {
         return types;
     }
 
-    private boolean isValidUrl(String url) {
-//        return !Strings.isNullOrEmpty(url) && urlPattern.matcher(url).matches();
-        return !Strings.isNullOrEmpty(url);
-    }
-
     private ParameterTypeDynamicCategory getSingleViewParamType() {
-        String dataSourceName = getParameterAsString(PARAMETER_DATA_SOURCE);
-        if (!Strings.isNullOrEmpty(dataSourceName)) {
-            List<SingleMapVo> singleMapList = listSingleView();
-            if (singleMapList != null && !singleMapList.isEmpty()) {
-                String[] categories = new String[singleMapList.size()];
-                String[] categoryValues = new String[singleMapList.size()];
+        if (isParameterExist(PARAMETER_DATA_SOURCE)) { // parameters不为空，且包含有值，再去取参数值，否则会死循环
+            String dataSourceName = getParameterAsString(PARAMETER_DATA_SOURCE);
+            if (!Strings.isNullOrEmpty(dataSourceName)) {
+                List<SingleMapVo> singleMapList = listSingleView();
+                if (singleMapList != null && !singleMapList.isEmpty()) {
+                    String[] categories = new String[singleMapList.size()];
+                    String[] categoryValues = new String[singleMapList.size()];
 
-                for (int i=0; i < singleMapList.size(); i++) {
-                    SingleMapVo singleMap = singleMapList.get(i);
-                    categories[i] = singleMap.getDatasource_name();
+                    for (int i=0; i < singleMapList.size(); i++) {
+                        SingleMapVo singleMap = singleMapList.get(i);
+                        categories[i] = singleMap.getDatasource_name();
 
-                    SingleMapRequestVo requestVo = new SingleMapRequestVo();
-                    requestVo.setDruid_datasource_id(singleMap.getDruid_datasource_id());
-                    requestVo.setParams(singleMap.getParams());
-                    try {
-                        String requestStr = jsonMapper.writeValueAsString(requestVo);
-                        categoryValues[i] = requestStr;
-                    } catch (JsonProcessingException ignore) { }
+                        SingleMapRequestVo requestVo = new SingleMapRequestVo();
+                        requestVo.setDruid_datasource_id(singleMap.getDruid_datasource_id());
+                        requestVo.setParams(singleMap.getParams());
+                        try {
+                            String requestStr = jsonMapper.writeValueAsString(requestVo);
+                            categoryValues[i] = requestStr;
+                        } catch (JsonProcessingException ignore) { }
+                    }
+
+                    return new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE, PARAMETER_DATA_SOURCE,
+                            I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"),
+                            categories, categoryValues, categories[0]);
                 }
-
-                return new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE, PARAMETER_DATA_SOURCE,
-                                I18N.getMessage("pio.SingleViewExampleSource.data_source"),
-                                categories, categoryValues, categories[0]);
             }
         }
 
@@ -203,23 +169,25 @@ public class SingleViewExampleSource extends AbstractExampleSource {
     }
 
     private ParameterTypeDynamicCategory getDataSourceParamType() {
-        String url = getParameterAsString(PARAMETER_URL);
-        if (isValidUrl(url)) {
-            List<DataSourceVo> dataSourceList = listDataSource();
-            if (dataSourceList != null && !dataSourceList.isEmpty()) {
-                String[] categories = new String[dataSourceList.size()];
-                String[] categoryValues = new String[dataSourceList.size()];
+        if (isParameterExist(PARAMETER_URL)) { // parameters不为空，且包含有值，再去取参数值，否则会死循环
+            String url = getParameterAsString(PARAMETER_URL);
+            if (isValidUrl(url)) {
+                List<DataSourceVo> dataSourceList = listDataSource();
+                if (dataSourceList != null && !dataSourceList.isEmpty()) {
+                    String[] categories = new String[dataSourceList.size()];
+                    String[] categoryValues = new String[dataSourceList.size()];
 
-                for (int i=0; i < dataSourceList.size(); i++) {
-                    DataSourceVo dataSource = dataSourceList.get(i);
-                    categories[i] = dataSource.getTitle();
-                    categoryValues[i] = dataSource.getName();
+                    for (int i=0; i < dataSourceList.size(); i++) {
+                        DataSourceVo dataSource = dataSourceList.get(i);
+                        categories[i] = dataSource.getTitle();
+                        categoryValues[i] = dataSource.getName();
+                    }
+
+                    return new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, PARAMETER_URL,
+                            I18N.getMessage("pio.SingleViewExampleSource.data_source"),
+                            categories, categoryValues, categories[0]);
+
                 }
-
-                return new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, PARAMETER_URL,
-                        I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"),
-                        categories, categoryValues, categories[0]);
-
             }
         }
 
@@ -231,12 +199,7 @@ public class SingleViewExampleSource extends AbstractExampleSource {
         String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
 //        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
 
-        String result;
-        try {
-            result = HttpClientUtil.get(listDataSourceUrl);
-        } catch (IOException e) {
-            throw new OperatorException("Http get failed: " + e, e);
-        }
+        String result = httpGet(listDataSourceUrl);
 
         if (result != null) {
             try {
@@ -256,22 +219,20 @@ public class SingleViewExampleSource extends AbstractExampleSource {
 //        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
 //        String selectedDataSourceName = "wuxianjiRT";
         ParameterTypeDynamicCategory dynamicCategory = (ParameterTypeDynamicCategory)(getParameters().getParameterType(selectedDataSourceName));
-        String dataSourceValue = dynamicCategory.getCategoryValue(selectedDataSourceName);
-        String listSingleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_LIST_SINGLE_MAP) + dataSourceValue;
 
-        String result;
-        try {
-            result = HttpClientUtil.get(listSingleMapUrl);
-        } catch (IOException e) {
-            throw new OperatorException("Http get failed: " + e, e);
-        }
+        if (dynamicCategory != null) {
+            String dataSourceValue = dynamicCategory.getCategoryValue(selectedDataSourceName);
+            String listSingleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_LIST_SINGLE_MAP) + dataSourceValue;
 
-        if (result != null) {
-            try {
-                SingleMapWrapperVo wrapperVo = jsonMapper.readValue(result, SingleMapWrapperVo.class);
-                return wrapperVo == null ? null : wrapperVo.getResult();
-            } catch (IOException ex) {
-                throw new OperatorException("Parse result failed: " + ex, ex);
+            String result = httpGet(listSingleMapUrl);
+
+            if (result != null) {
+                try {
+                    SingleMapWrapperVo wrapperVo = jsonMapper.readValue(result, SingleMapWrapperVo.class);
+                    return wrapperVo == null ? null : wrapperVo.getResult();
+                } catch (IOException ex) {
+                    throw new OperatorException("Parse result failed: " + ex, ex);
+                }
             }
         }
 
@@ -519,7 +480,7 @@ public class SingleViewExampleSource extends AbstractExampleSource {
 //        singleViewExampleSource.listDataSource();
 //        singleViewExampleSource.listSingleMap();
 //        singleViewExampleSource.createExampleSet();
-        boolean matched = singleViewExampleSource.isValidUrl("http://202.199.160.62:8080/validateCodeAction");
+        boolean matched = singleViewExampleSource.isValidUrl("http://www.202.199.160.62:890/validateCodeAction?as=00:sd&sdfsd=098");
         System.out.println(matched);
     }
 }

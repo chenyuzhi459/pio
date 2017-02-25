@@ -1,5 +1,6 @@
 package io.sugo.pio.example.table;
 
+import io.sugo.pio.example.AttributeTransformation;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -40,6 +41,16 @@ public class DateAttribute extends AbstractAttribute {
 	@Override
 	public Object clone() {
 		return new DateAttribute(this);
+	}
+
+	@Override
+	public AttributeTransformation getLastTransformation() {
+		return null;
+	}
+
+	@Override
+	public String getConstruction() {
+		return null;
 	}
 
 	@Override
@@ -84,6 +95,11 @@ public class DateAttribute extends AbstractAttribute {
 	/** Do nothing. */
 	@Override
 	public void setMapping(NominalMapping nominalMapping) {}
+
+	@Override
+	public void setBlockType(int b) {
+
+	}
 
 	@Override
 	public boolean isDateTime() {

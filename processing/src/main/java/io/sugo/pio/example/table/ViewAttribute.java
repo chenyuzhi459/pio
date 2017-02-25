@@ -67,6 +67,16 @@ public class ViewAttribute extends AbstractAttribute {
 	}
 
 	@Override
+	public AttributeTransformation getLastTransformation() {
+		return null;
+	}
+
+	@Override
+	public String getConstruction() {
+		return null;
+	}
+
+	@Override
 	public Object clone() {
 		return new ViewAttribute(this);
 	}
@@ -123,6 +133,11 @@ public class ViewAttribute extends AbstractAttribute {
 	@Override
 	public void setMapping(NominalMapping nominalMapping) {
 		mapping = nominalMapping;
+	}
+
+	@Override
+	public void setBlockType(int b) {
+
 	}
 
 	@Override

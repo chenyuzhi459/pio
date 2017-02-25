@@ -69,6 +69,8 @@ public interface Attribute extends Cloneable, Serializable {
 
     public void addTransformation(AttributeTransformation transformation);
 
+    public AttributeTransformation getLastTransformation();
+
     /** Clear all transformations. */
     public void clearTransformations();
 
@@ -77,6 +79,9 @@ public interface Attribute extends Cloneable, Serializable {
      * Additional statistics can be registered via {@link #registerStatistics(Statistics)}.
      */
     public Iterator<Statistics> getAllStatistics();
+
+    /** Returns the construction description. */
+    public String getConstruction();
 
     /** Registers the attribute statistics. */
     public void registerStatistics(Statistics statistics);
@@ -99,6 +104,20 @@ public interface Attribute extends Cloneable, Serializable {
      * attributes.
      */
     void setMapping(NominalMapping nominalMapping);
+
+    /**
+     * Returns the block type of this attribute.
+     *
+     * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_BLOCK_TYPE
+     */
+    public int getBlockType();
+
+    /**
+     * Sets the block type of this attribute.
+     *
+     * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_BLOCK_TYPE
+     */
+    public void setBlockType(int b);
 
 
     /**

@@ -187,7 +187,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
     }
 
     /**
-     * @see OperatorVersion
      */
 //    public void setCompatibilityLevel(OperatorVersion compatibilityLevel) {
 //        this.compatibilityLevel = compatibilityLevel;
@@ -362,6 +361,15 @@ public abstract class Operator implements ParameterHandler, Serializable {
     }
 
     /**
+     * This method should be called within long running loops of an operator to check if the user
+     * has canceled the execution in the mean while. This then will throw a
+     * {@link ProcessStoppedException} to cancel the execution.
+     */
+    public final void checkForStop() throws ProcessStoppedException {
+        // TODO
+    }
+
+    /**
      * Returns the first ancestor that does not have a parent. Note that this is not necessarily a
      * ProcessRootOperator!
      */
@@ -423,6 +431,10 @@ public abstract class Operator implements ParameterHandler, Serializable {
             parameters = new Parameters(getParameterTypes());
         }
         return parameters;
+    }
+
+    public boolean isParameterExist(String key) {
+        return parameters != null && parameters.isSpecified(key);
     }
 
     /**

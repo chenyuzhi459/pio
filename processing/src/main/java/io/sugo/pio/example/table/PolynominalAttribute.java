@@ -1,5 +1,6 @@
 package io.sugo.pio.example.table;
 
+import io.sugo.pio.example.AttributeTransformation;
 import io.sugo.pio.tools.Ontology;
 
 import java.util.Iterator;
@@ -60,6 +61,16 @@ public class PolynominalAttribute extends NominalAttribute {
 	}
 
 	@Override
+	public AttributeTransformation getLastTransformation() {
+		return null;
+	}
+
+	@Override
+	public String getConstruction() {
+		return null;
+	}
+
+	@Override
 	public NominalMapping getMapping() {
 		return this.nominalMapping;
 	}
@@ -67,6 +78,11 @@ public class PolynominalAttribute extends NominalAttribute {
 	@Override
 	public void setMapping(NominalMapping newMapping) {
 		this.nominalMapping = new PolynominalMapping();
+	}
+
+	@Override
+	public void setBlockType(int b) {
+
 	}
 
 	@Override

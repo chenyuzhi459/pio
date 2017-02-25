@@ -24,7 +24,7 @@ import io.sugo.pio.tools.Ontology;
 import java.io.IOException;
 import java.util.*;
 
-public class HttpSqlExampleSource extends AbstractExampleSource {
+public class HttpSqlExampleSource extends AbstractHttpExampleSource {
 
     public static final String PARAMETER_URL = "url";
 
@@ -40,12 +40,7 @@ public class HttpSqlExampleSource extends AbstractExampleSource {
         String postUrl = "http://192.168.0.212:8000/api/plyql/sql";
         String queryParam = buildQueryParam();
 
-        String result = null;
-        try {
-            result = HttpClientUtil.post(postUrl, queryParam);
-        } catch (IOException e) {
-            throw new OperatorException("Http post failed: " + e, e);
-        }
+        String result = httpPost(postUrl, queryParam);
 
         if (result != null) {
             List<HashMap<String, Object>> resultList = null;

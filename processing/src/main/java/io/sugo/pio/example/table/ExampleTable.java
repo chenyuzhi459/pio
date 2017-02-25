@@ -66,4 +66,12 @@ public interface ExampleTable extends Serializable {
      * mind, that some of these attributes may be null.
      */
     public int getNumberOfAttributes();
+
+    /**
+     * Returns the number of non null attributes. <b>Attention</b>: Since there might be null
+     * attributes in the table, the return value of this method must not be used in a for-loop!
+     *
+     * @see ExampleTable#getNumberOfAttributes().
+     */
+    public int getAttributeCount();
 }

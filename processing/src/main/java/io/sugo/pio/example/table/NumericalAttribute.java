@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 
+import io.sugo.pio.example.AttributeTransformation;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -51,6 +52,16 @@ public class NumericalAttribute extends AbstractAttribute {
 	}
 
 	@Override
+	public AttributeTransformation getLastTransformation() {
+		return null;
+	}
+
+	@Override
+	public String getConstruction() {
+		return null;
+	}
+
+	@Override
 	public boolean isNominal() {
 		return false;
 	}
@@ -69,6 +80,11 @@ public class NumericalAttribute extends AbstractAttribute {
 	/** Does nothing. */
 	@Override
 	public void setMapping(NominalMapping mapping) {}
+
+	@Override
+	public void setBlockType(int b) {
+
+	}
 
 	/**
 	 * Returns a string representation of value. If the numberOfDigits is greater than 0 this number

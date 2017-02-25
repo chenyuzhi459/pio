@@ -46,6 +46,12 @@ public interface NominalMapping extends Cloneable, Serializable {
     public String mapIndex(int index);
 
     /**
+     * Sets the given mapping. This might be practical for example for replacing a nominal value
+     * (without a data scan!).
+     */
+    public void setMapping(String nominalValue, int index);
+
+    /**
      * Returns the internal double representation (actually an integer index) for the given nominal
      * value. This method creates a mapping if it did not exist before.
      */

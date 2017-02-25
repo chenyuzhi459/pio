@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 
+import io.sugo.pio.example.AttributeTransformation;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -52,6 +53,11 @@ public class BinominalAttribute extends NominalAttribute {
 	}
 
 	@Override
+	public void setBlockType(int b) {
+
+	}
+
+	@Override
 	public boolean isNumerical() {
 		return false;
 	}
@@ -64,6 +70,16 @@ public class BinominalAttribute extends NominalAttribute {
 	@Override
 	public void setValue(DataRow row, double value) {
 
+	}
+
+	@Override
+	public AttributeTransformation getLastTransformation() {
+		return null;
+	}
+
+	@Override
+	public String getConstruction() {
+		return null;
 	}
 
 	@Override
