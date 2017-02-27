@@ -56,8 +56,8 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
     private InputPort fileInputPort = getInputPorts().createPort("file");
     private FileInputPortHandler filePortHandler = new FileInputPortHandler(this, fileInputPort, this.getFileParameterName());
 
-    public AbstractDataResultSetReader(Class<? extends IOObject> generatedClass){
-        super(generatedClass);
+    public AbstractDataResultSetReader(){
+        super(ExampleSet.class);
     }
 
     @Override

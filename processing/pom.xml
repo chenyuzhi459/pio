@@ -55,6 +55,10 @@
             <groupId>com.twitter</groupId>
             <artifactId>chill-java</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.metamx</groupId>
+            <artifactId>http-client</artifactId>
+        </dependency>
     </dependencies>
 
     <!--<build>-->
