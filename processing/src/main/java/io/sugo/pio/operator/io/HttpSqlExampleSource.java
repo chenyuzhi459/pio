@@ -36,8 +36,8 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
 
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
-//        String postUrl = getParameterAsString(PARAMETER_URL);
-        String postUrl = "http://192.168.0.212:8000/api/plyql/sql";
+        String postUrl = getParameterAsString(PARAMETER_URL);
+//        String postUrl = "http://192.168.0.212:8000/api/plyql/sql";
         String queryParam = buildQueryParam();
 
         String result = httpPost(postUrl, queryParam);
@@ -129,9 +129,9 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
     }
 
     private String buildQueryParam() {
-//        String sql = getParameterAsString(PARAMETER_SQL);
+        String sql = getParameterAsString(PARAMETER_SQL);
 //        String sql = "select ClientDeviceAgent,ClientDeviceBrand,Province,SessionID,__time from wuxianjiRT limit 10";
-        String sql = "select * from wuxianjiRT limit 10";
+//        String sql = "select * from wuxianjiRT limit 10";
         QueryVo queryVo = new QueryVo();
         queryVo.setQuery(sql);
 

@@ -44,6 +44,7 @@ public class Tree implements Serializable {
 	@JsonProperty
 	private List<Edge> children = new LinkedList<Edge>();
 
+	@JsonProperty
 	private Map<String, Integer> counterMap = new LinkedHashMap<String, Integer>();
 
 	private transient ExampleSet trainingSet = null;

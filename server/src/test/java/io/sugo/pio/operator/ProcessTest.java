@@ -7,6 +7,8 @@ import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ProcessPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import io.sugo.pio.operator.io.HttpSqlExampleSource;
+import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
@@ -111,5 +113,45 @@ public class ProcessTest {
 //                jsonMapper.writerWithDefaultPrettyPrinter()
 //                        .writeValueAsString(set)
 //        );
+    }
+
+    @Test
+    public void httpSqlTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("httpSql");
+        process.setDescription("Huangama http sql test.");
+
+        HttpSqlExampleSource httpSqlSource = new HttpSqlExampleSource();
+        httpSqlSource.setParameter("url", "http://192.168.0.212:8000/api/plyql/sql");
+        httpSqlSource.setParameter("sql", "select * from wuxianjiRT limit 10");
+        httpSqlSource.setName("http_sql");
+        process.getRootOperator().getExecutionUnit().addOperator(httpSqlSource);
+
+        ChangeAttributeRole role = new ChangeAttributeRole();
+        role.setName("change_role");
+        role.setParameter("attribute_name", "Nation");
+        role.setParameter("target_role", "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role);
+
+        LinearRegression linearRegression = new LinearRegression();
+        linearRegression.setParameter("feature_selection", "M5 prime");
+        linearRegression.setParameter("eliminate_colinear_features", "true");
+        linearRegression.setParameter("min_tolerance", "0.05");
+        linearRegression.setParameter("use_bias", "true");
+        linearRegression.setParameter("ridge", "1.0E-8");
+        linearRegression.setName("linear_regression");
+        process.getRootOperator().getExecutionUnit().addOperator(linearRegression);
+
+        process.connect(new Connection("http_sql", "output", "change_role", "example set input"), true);
+        process.connect(new Connection("change_role", "example set output", "linear_regression", "training set"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        System.out.println(
+                jsonMapper.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(linearRegression.getResult())
+        );
+        System.out.println();
     }
 }
