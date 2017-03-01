@@ -6,6 +6,7 @@ import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.net.MediaType;
 import com.metamx.common.lifecycle.Lifecycle;
+import com.metamx.common.logger.Logger;
 import com.metamx.http.client.HttpClient;
 import com.metamx.http.client.HttpClientConfig;
 import com.metamx.http.client.HttpClientInit;
@@ -25,6 +26,8 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
 
     private static final Pattern urlPattern = Pattern.compile("^((ht)tps?):\\/\\/([\\w\\-]+(\\.[\\w\\-\\:]+)*\\/)*[\\w\\-]+(\\.[\\w\\-]+)*\\/?(\\?([\\w\\-\\.,@?^=%&:\\/~\\+#]*)+)?");
 
+    private static final Logger logger = new Logger(AbstractHttpExampleSource.class);
+
     public final ObjectMapper jsonMapper = new ObjectMapper();
 
     protected String httpGet(String url) {
@@ -36,7 +39,8 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
         try {
             result = HttpClientUtil.get(url);
         } catch (IOException e) {
-            throw new OperatorException("Http get failed, url: '" + url + "', reason: ", e, e);
+            logger.error("Get request url '" + url + " failed, details:" + e.getMessage());
+            throw new OperatorException("Http get failed, url: '" + url + "', reason: ", e);
         }
 
         return result;
@@ -56,7 +60,8 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
         try {
             result = HttpClientUtil.post(url, requestJson);
         } catch (IOException e) {
-            throw new OperatorException("Http post failed, url: '" + url + "', reason: ", e, e);
+            logger.error("Post request url '" + url + " failed, details:" + e.getMessage());
+            throw new OperatorException("Http post failed, url: '" + url + "', reason: ", e);
         }
 
         return result;
@@ -74,6 +79,8 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
                 T instance = reader.readValue(json);
                 return instance;
             } catch (IOException e) {
+                logger.warn("Deserialize '" + json + "' to type [" + clazz.getName() +
+                        "] failed, details:" + e.getMessage());
                 return null;
             }
         }
@@ -94,9 +101,9 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
 
         try {
             InputStream input = httpClient.go(new Request(
-                    HttpMethod.GET,
-                    new URL("http://192.168.0.212:8000/api/datasources/list")
-            ).setContent(MediaType.JSON_UTF_8.toString(), jsonMapper.writeValueAsBytes("")),
+                            HttpMethod.GET,
+                            new URL("http://192.168.0.212:8000/api/datasources/list")
+                    ).setContent(MediaType.JSON_UTF_8.toString(), jsonMapper.writeValueAsBytes("")),
                     RESPONSE_HANDLER).get();
 
             String result = jsonMapper.readValue(input, String.class);

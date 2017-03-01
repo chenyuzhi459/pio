@@ -133,6 +133,9 @@ public class ProcessManager {
         process.setDescription(description);
         processCache.put(process.getId(), process);
         metadataProcessManager.insert(process);
+
+        log.info("Create process named %s[with id: %s]  successfully.", process.getName(), process.getId());
+
         return process;
     }
 
@@ -149,6 +152,9 @@ public class ProcessManager {
         }
         process.setUpdateTime(new DateTime());
         metadataProcessManager.update(process);
+
+        log.info("Update process named %s[with id: %s]  successfully.", process.getName(), process.getId());
+
         return process;
     }
 
@@ -159,6 +165,9 @@ public class ProcessManager {
             process.setUpdateTime(new DateTime());
             metadataProcessManager.update(process);
             processCache.invalidate(id);
+
+            log.info("Delete process named %s[with id: %s]  successfully.", process.getName(), process.getId());
+
             return process;
         } else {
             return null;
@@ -172,7 +181,7 @@ public class ProcessManager {
             queue.offer(process, 10, TimeUnit.SECONDS);
             process.setUpdateTime(new DateTime());
             metadataProcessManager.update(process);
-            log.info("queue size:%d", queue.size());
+            log.info("Processes that waiting for running number are:%d", queue.size());
             return process;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -184,6 +193,8 @@ public class ProcessManager {
         if (processes == null || processes.isEmpty()) {
             return new ArrayList<>();
         }
+        log.info("Get all processes[number:%d] from database successfully.", processes.size());
+
         return processes;
     }
 
@@ -199,6 +210,8 @@ public class ProcessManager {
                 processCache.invalidate(id);
                 return null;
             }
+
+            log.info("Get process named %s[id:%s] from cache successfully.", process.getName(), id);
 
             return process;
         } catch (ExecutionException e) {

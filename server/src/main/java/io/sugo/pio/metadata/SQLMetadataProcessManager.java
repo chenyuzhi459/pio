@@ -112,6 +112,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
 
                                     // when a single process first loaded, then transform the metadata
                                     process.getRootOperator().getExecutionUnit().transformMetaData();
+
+                                    log.info("Get process named %s[id:%s] from database successfully.", process.getName(), id);
+
                                     return process;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
@@ -214,6 +217,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
                                     .bind("connections", jsonMapper.writeValueAsBytes(process.getConnections()))
                                     .execute();
+
+                            log.info("Insert process named %s[id:%s] to database successfully.", process.getName(), process.getId());
+
                             return null;
                         }
                     }
@@ -243,6 +249,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
                                     .bind("connections", jsonMapper.writeValueAsBytes(process.getConnections()))
                                     .execute();
+
+                            log.info("Update process named %s[id:%s] to database successfully.", process.getName(), process.getId());
+
                             return null;
                         }
                     }

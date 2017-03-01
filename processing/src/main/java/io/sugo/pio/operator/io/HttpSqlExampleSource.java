@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.common.utils.HttpClientUtil;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
@@ -29,6 +30,8 @@ import java.util.*;
 
 public class HttpSqlExampleSource extends AbstractHttpExampleSource {
 
+    private static final Logger logger = new Logger(HttpSqlExampleSource.class);
+
     public static final String PARAMETER_URL = "url";
 
     public static final String PARAMETER_SQL = "sql";
@@ -46,18 +49,23 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
         String result = httpPost(postUrl, queryParam);
 
         if (result != null) {
-            List<HashMap<String, Object>> resultList = null;
+            List<HashMap<String, Object>> resultList;
             try {
                 resultList = parseResult(result);
             } catch (IOException e) {
+                logger.error("Parse http sql failed, details:" + e.getMessage());
                 throw new OperatorException("Parse result failed: " + e, e);
             }
+
+            logger.info("Get data from url '" + postUrl + "' with parameter '" + queryParam + "'successfully.");
 
             DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_BYTE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
             List<Attribute> attributes = getAttributes(resultList);
             ExampleSetBuilder builder = ExampleSets.from(attributes);
 
             if (resultList != null && !resultList.isEmpty()) {
+                logger.info("Begin to traverse sql data to example set data. Data size:" + resultList.size());
+
                 int attrSize = attributes.size();
 
                 // traverse all rows to store data
@@ -76,6 +84,8 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
 
                     builder.addDataRow(dataRow);
                 }
+
+                logger.info("Traverse sql data to example set data successfully.");
             }
 
             return builder.build();
@@ -123,11 +133,12 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
             String result = httpPost(postUrl, queryParam);
 
             if (result != null) {
-                List<HashMap<String, Object>> resultList = null;
+                List<HashMap<String, Object>> resultList;
                 try {
                     resultList = parseResult(result);
                 } catch (IOException e) {
-                    throw new OperatorException("Parse result failed: " + e, e);
+                    logger.error("Parse metadata failed, details:" + e.getMessage());
+                    throw new OperatorException("Parse metadata failed: " + e, e);
                 }
 
                 List<Attribute> attributes = getAttributes(resultList);
@@ -136,6 +147,8 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
                         metaData.addAttribute(new AttributeMetaData(attribute));
                     });
                 }
+
+                logger.info("Dynamic generate http sql metadata successfully.");
             }
         }
 
@@ -195,6 +208,7 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
 
                         return datetimeVo.getValue();
                     } catch (IOException e) {
+                        logger.error("Extract value from datetime failed.", e);
                         return originValue.toString();
                     }
                 }
@@ -269,10 +283,5 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
             this.value = value;
         }
     }
-
-    public static void main(String[] args) {
-        new HttpSqlExampleSource().createExampleSet();
-    }
-
 
 }

@@ -1,10 +1,7 @@
 package io.sugo.pio.operator.io;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.google.common.base.Strings;
-import io.sugo.pio.common.utils.HttpClientUtil;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
@@ -15,7 +12,9 @@ import io.sugo.pio.example.util.ExampleSets;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.parameter.*;
+import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeDynamicCategory;
+import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
@@ -23,9 +22,10 @@ import io.sugo.pio.tools.Ontology;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class SingleViewExampleSource extends AbstractHttpExampleSource {
+
+    private static final Logger logger = new Logger(SingleViewExampleSource.class);
 
     public static final String PARAMETER_URL = "url";
 
@@ -56,14 +56,19 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 try {
                     resultList = parseResult(result);
                 } catch (IOException e) {
-                    throw new OperatorException("Parse result failed: " + e, e);
+                    logger.error("Parse druid result failed: ", e);
+                    throw new OperatorException("Parse druid result failed: " + e, e);
                 }
+
+                logger.info("Get druid data from url '" + druidUrl + "' successfully.");
 
                 DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
                 List<Attribute> attributes = getAttributes(resultList);
                 ExampleSetBuilder builder = ExampleSets.from(attributes);
 
                 if (resultList != null && !resultList.isEmpty()) {
+                    logger.info("Begin to traverse druid data to example set data. Data size:" + resultList.size());
+
                     int attrSize = attributes.size();
 
                     // traverse all rows to store data
@@ -76,7 +81,8 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                                 resultMap = jsonMapper.readValue(resultStr, Map.class);
                             }
                         } catch (IOException e) {
-                            throw new OperatorException("Parse result failed: " + e, e);
+                            logger.error("Parse druid data row failed, details:" + e.getMessage());
+                            throw new OperatorException("Parse result failed: ", e);
                         }
 
                         // one result corresponds to one data row
@@ -93,11 +99,12 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
                         builder.addDataRow(dataRow);
                     }
+
+                    logger.info("Traverse druid data to example set data successfully.");
                 }
 
                 return builder.build();
             }
-//            }
         }
 
         return null;
@@ -150,6 +157,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 try {
                     resultList = parseResult(result);
                 } catch (IOException e) {
+                    logger.error("Parse metadata failed, details:" + e.getMessage());
                     throw new OperatorException("Parse result failed: " + e, e);
                 }
 
@@ -159,6 +167,8 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                         metaData.addAttribute(new AttributeMetaData(attribute));
                     });
                 }
+
+                logger.info("Dynamic generate single view metadata successfully.");
             }
         }
 
@@ -190,6 +200,8 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 //                        category.setDesc(singleMap.getDatasource_name());
                         categories[i] = category;
                     }
+
+                    logger.info("Dynamic generate single view parameter type successfully.");
 
                     return new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE, PARAMETER_DATA_SOURCE,
                             I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"),
@@ -228,6 +240,8 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                         categories[i] = category;
                     }
 
+                    logger.info("Dynamic generate data source parameter type successfully.");
+
                     return new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, PARAMETER_URL,
                             I18N.getMessage("pio.SingleViewExampleSource.data_source"),
                             categories, categories.length > 0 ? categories[0].getId() : null);
@@ -257,6 +271,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                     String requestStr = jsonMapper.writeValueAsString(requestVo);
                     return requestStr;
                 } catch (IOException e) {
+                    logger.error("Build druid query parameter failed, details:" + e.getMessage());
                     return null;
                 }
             }
@@ -305,9 +320,9 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         if (resultVo != null) {
             List<HashMap<String, Object>> resList = resultVo.getResult();
             if (resList != null && !resList.isEmpty()) {
-                HashMap<String, Object> map = resList.get(0); // result列表仅有一条
+                HashMap<String, Object> map = resList.get(0); // only has one result
                 if (map != null && !map.isEmpty()) {
-                    Object resultSetObj = map.get("resultSet"); // 仅取key为"resultSet"的数据
+                    Object resultSetObj = map.get("resultSet"); // only get key named "resultSet"
                     String resultSetStr = resultSetObj == null ? null : jsonMapper.writeValueAsString(resultSetObj);
                     if (Objects.nonNull(resultSetStr)) {
                         List resultList = jsonMapper.readValue(resultSetStr, List.class);
@@ -541,12 +556,4 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     }
 
-    public static void main(String[] args) {
-        SingleViewExampleSource singleViewExampleSource = new SingleViewExampleSource();
-//        singleViewExampleSource.listDataSource();
-//        singleViewExampleSource.listSingleMap();
-//        singleViewExampleSource.createExampleSet();
-        boolean matched = singleViewExampleSource.isValidUrl("http://www.202.199.160.62:890/validateCodeAction?as=00:sd&sdfsd=098");
-        System.out.println(matched);
-    }
 }
