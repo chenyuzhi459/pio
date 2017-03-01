@@ -19,6 +19,9 @@ import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.parameter.ParameterTypeText;
 import io.sugo.pio.parameter.TextType;
+import io.sugo.pio.ports.metadata.AttributeMetaData;
+import io.sugo.pio.ports.metadata.ExampleSetMetaData;
+import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.tools.Ontology;
 
 import java.io.IOException;
@@ -50,7 +53,7 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
                 throw new OperatorException("Parse result failed: " + e, e);
             }
 
-            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
+            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_BYTE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
             List<Attribute> attributes = getAttributes(resultList);
             ExampleSetBuilder builder = ExampleSets.from(attributes);
 
@@ -110,6 +113,35 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
         return types;
     }
 
+    @Override
+    public MetaData getGeneratedMetaData() throws OperatorException {
+        ExampleSetMetaData metaData = new ExampleSetMetaData();
+        if (isParameterExist(PARAMETER_URL)) {
+            String postUrl = getParameterAsString(PARAMETER_URL);
+            String queryParam = buildQueryParam();
+
+            String result = httpPost(postUrl, queryParam);
+
+            if (result != null) {
+                List<HashMap<String, Object>> resultList = null;
+                try {
+                    resultList = parseResult(result);
+                } catch (IOException e) {
+                    throw new OperatorException("Parse result failed: " + e, e);
+                }
+
+                List<Attribute> attributes = getAttributes(resultList);
+                if (attributes  != null && !attributes.isEmpty()) {
+                    attributes.forEach(attribute -> {
+                        metaData.addAttribute(new AttributeMetaData(attribute));
+                    });
+                }
+            }
+        }
+
+        return metaData;
+    }
+
     private List<Attribute> getAttributes(List<HashMap<String, Object>> resultList) {
         List<Attribute> attributes = new ArrayList<>();
 
@@ -147,10 +179,9 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
     }
 
     private List<HashMap<String, Object>> parseResult(String result) throws IOException {
-        ObjectReader reader = jsonMapper.readerFor(ResultVo.class);
-        ResultVo resultVo = reader.readValue(result);
+        ResultVo resultVo = deserialize(result, ResultVo.class);
 
-        return resultVo.getResult();
+        return resultVo == null ? null : resultVo.getResult();
     }
 
     private String extractAttrValue(String attrName, Object originValue) {
@@ -168,6 +199,8 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
                     }
                 }
             }
+
+            return originValue.toString();
         }
 
         return null;

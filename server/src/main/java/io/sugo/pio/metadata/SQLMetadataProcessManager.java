@@ -109,6 +109,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     process.setStatus(Status.valueOf(r.getString("status")));
                                     process.setCreateTime(new DateTime(r.getString("created_date")));
                                     process.setUpdateTime(new DateTime(r.getString("update_date")));
+
+                                    // when a single process first loaded, then transform the metadata
+                                    process.getRootOperator().getExecutionUnit().transformMetaData();
                                     return process;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);

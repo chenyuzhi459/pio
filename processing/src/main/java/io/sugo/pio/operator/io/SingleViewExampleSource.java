@@ -16,6 +16,9 @@ import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.*;
+import io.sugo.pio.ports.metadata.AttributeMetaData;
+import io.sugo.pio.ports.metadata.ExampleSetMetaData;
+import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.tools.Ontology;
 
 import java.io.IOException;
@@ -34,6 +37,8 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private static final String URI_LIST_SINGLE_MAP = "/slices/list/";
 
+    private static final String URI_DETAIL_SINGLE_MAP = "/slices/";
+
     private static final String URI_QUERY_DRUID = "/slices/query-druid";
 
     @Override
@@ -41,63 +46,58 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         if (isParameterExist(PARAMETER_URL) && isParameterExist(PARAMETER_DATA_SOURCE) &&
                 isParameterExist(PARAMETER_SINGLE_VIEW_DATA_SOURCE)) {
             String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-//        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
             String druidUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_QUERY_DRUID);
-            String selectedSingleView = getParameterAsString(PARAMETER_SINGLE_VIEW_DATA_SOURCE);
 
-            ParameterTypeDynamicCategory dynamicCategory = (ParameterTypeDynamicCategory)(getParameters().getParameterType(selectedSingleView));
-            if (dynamicCategory != null) {
-                String singleViewValue = dynamicCategory.getCategoryValue(selectedSingleView);
+            String singleViewValue = buildQueryDruidParam();
+            String result = httpPost(druidUrl, singleViewValue);
 
-                String result = httpPost(druidUrl, singleViewValue);
-
-                if (result != null) {
-                    List<Object> resultList;
-                    try {
-                        resultList = parseResult(result);
-                    } catch (IOException e) {
-                        throw new OperatorException("Parse result failed: " + e, e);
-                    }
-
-                    DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
-                    List<Attribute> attributes = getAttributes(resultList);
-                    ExampleSetBuilder builder = ExampleSets.from(attributes);
-
-                    if (resultList != null && !resultList.isEmpty()) {
-                        int attrSize = attributes.size();
-
-                        // traverse all rows to store data
-                        for (Object resultObj : resultList) {
-                            String resultStr;
-                            Map resultMap = null;
-                            try {
-                                resultStr = jsonMapper.writeValueAsString(resultObj);
-                                if (Objects.nonNull(resultStr)) {
-                                    resultMap = jsonMapper.readValue(resultStr, Map.class);
-                                }
-                            } catch (IOException e) {
-                                throw new OperatorException("Parse result failed: " + e, e);
-                            }
-
-                            // one result corresponds to one data row
-                            DataRow dataRow = factory.create(attrSize);
-                            for (int i = 0; i < attrSize; i++) {
-                                Attribute attr = attributes.get(i);
-                                String attrName = attr.getName();
-                                Object attrValue = resultMap.get(attrName);
-                                String attrValueStr = attrValue == null ? null : attrValue.toString();
-
-                                double value = attr.getMapping().mapString(attrValueStr);
-                                dataRow.set(attr, value);
-                            }
-
-                            builder.addDataRow(dataRow);
-                        }
-                    }
-
-                    return builder.build();
+            if (result != null) {
+                List<Object> resultList;
+                try {
+                    resultList = parseResult(result);
+                } catch (IOException e) {
+                    throw new OperatorException("Parse result failed: " + e, e);
                 }
+
+                DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
+                List<Attribute> attributes = getAttributes(resultList);
+                ExampleSetBuilder builder = ExampleSets.from(attributes);
+
+                if (resultList != null && !resultList.isEmpty()) {
+                    int attrSize = attributes.size();
+
+                    // traverse all rows to store data
+                    for (Object resultObj : resultList) {
+                        String resultStr;
+                        Map resultMap = null;
+                        try {
+                            resultStr = jsonMapper.writeValueAsString(resultObj);
+                            if (Objects.nonNull(resultStr)) {
+                                resultMap = jsonMapper.readValue(resultStr, Map.class);
+                            }
+                        } catch (IOException e) {
+                            throw new OperatorException("Parse result failed: " + e, e);
+                        }
+
+                        // one result corresponds to one data row
+                        DataRow dataRow = factory.create(attrSize);
+                        for (int i = 0; i < attrSize; i++) {
+                            Attribute attr = attributes.get(i);
+                            String attrName = attr.getName();
+                            Object attrValue = resultMap.get(attrName);
+                            String attrValueStr = attrValue == null ? null : attrValue.toString();
+
+                            double value = attr.getMapping().mapString(attrValueStr);
+                            dataRow.set(attr, value);
+                        }
+
+                        builder.addDataRow(dataRow);
+                    }
+                }
+
+                return builder.build();
             }
+//            }
         }
 
         return null;
@@ -134,31 +134,66 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         return types;
     }
 
+    @Override
+    public MetaData getGeneratedMetaData() throws OperatorException {
+        ExampleSetMetaData metaData = new ExampleSetMetaData();
+        if (isParameterExist(PARAMETER_URL) && isParameterExist(PARAMETER_DATA_SOURCE) &&
+                isParameterExist(PARAMETER_SINGLE_VIEW_DATA_SOURCE)) {
+            String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
+            String druidUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_QUERY_DRUID);
+            String singleViewValue = buildQueryDruidParam();
+
+            String result = httpPost(druidUrl, singleViewValue);
+
+            if (result != null) {
+                List<Object> resultList;
+                try {
+                    resultList = parseResult(result);
+                } catch (IOException e) {
+                    throw new OperatorException("Parse result failed: " + e, e);
+                }
+
+                List<Attribute> attributes = getAttributes(resultList);
+                if (attributes != null && !attributes.isEmpty()) {
+                    attributes.forEach(attribute -> {
+                        metaData.addAttribute(new AttributeMetaData(attribute));
+                    });
+                }
+            }
+        }
+
+        return metaData;
+    }
+
+    /**
+     * 动态获取单图下拉列表的值
+     *
+     * @return
+     */
     private ParameterTypeDynamicCategory getSingleViewParamType() {
         if (isParameterExist(PARAMETER_DATA_SOURCE)) { // parameters不为空，且包含有值，再去取参数值，否则会死循环
             String dataSourceName = getParameterAsString(PARAMETER_DATA_SOURCE);
             if (!Strings.isNullOrEmpty(dataSourceName)) {
                 List<SingleMapVo> singleMapList = listSingleView();
                 if (singleMapList != null && !singleMapList.isEmpty()) {
-                    String[] categories = new String[singleMapList.size()];
-                    String[] categoryValues = new String[singleMapList.size()];
+                    ParameterTypeDynamicCategory.DynamicCategoryCombo[] categories =
+                            new ParameterTypeDynamicCategory.DynamicCategoryCombo[singleMapList.size()];
 
-                    for (int i=0; i < singleMapList.size(); i++) {
+                    for (int i = 0; i < singleMapList.size(); i++) {
                         SingleMapVo singleMap = singleMapList.get(i);
-                        categories[i] = singleMap.getDatasource_name();
 
-                        SingleMapRequestVo requestVo = new SingleMapRequestVo();
-                        requestVo.setDruid_datasource_id(singleMap.getDruid_datasource_id());
-                        requestVo.setParams(singleMap.getParams());
-                        try {
-                            String requestStr = jsonMapper.writeValueAsString(requestVo);
-                            categoryValues[i] = requestStr;
-                        } catch (JsonProcessingException ignore) { }
+                        ParameterTypeDynamicCategory.DynamicCategoryCombo category =
+                                new ParameterTypeDynamicCategory.DynamicCategoryCombo();
+
+                        category.setId(singleMap.getId());
+                        category.setName(singleMap.getSlice_name());
+//                        category.setDesc(singleMap.getDatasource_name());
+                        categories[i] = category;
                     }
 
                     return new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE, PARAMETER_DATA_SOURCE,
                             I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"),
-                            categories, categoryValues, categories[0]);
+                            categories, categories.length > 0 ? categories[0].getId() : null);
                 }
             }
         }
@@ -168,24 +203,34 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"));
     }
 
+    /**
+     * 动态获取数据源下拉列表的值
+     *
+     * @return
+     */
     private ParameterTypeDynamicCategory getDataSourceParamType() {
         if (isParameterExist(PARAMETER_URL)) { // parameters不为空，且包含有值，再去取参数值，否则会死循环
             String url = getParameterAsString(PARAMETER_URL);
             if (isValidUrl(url)) {
                 List<DataSourceVo> dataSourceList = listDataSource();
                 if (dataSourceList != null && !dataSourceList.isEmpty()) {
-                    String[] categories = new String[dataSourceList.size()];
-                    String[] categoryValues = new String[dataSourceList.size()];
+                    ParameterTypeDynamicCategory.DynamicCategoryCombo[] categories =
+                            new ParameterTypeDynamicCategory.DynamicCategoryCombo[dataSourceList.size()];
 
-                    for (int i=0; i < dataSourceList.size(); i++) {
+                    for (int i = 0; i < dataSourceList.size(); i++) {
                         DataSourceVo dataSource = dataSourceList.get(i);
-                        categories[i] = dataSource.getTitle();
-                        categoryValues[i] = dataSource.getName();
+
+                        ParameterTypeDynamicCategory.DynamicCategoryCombo category =
+                                new ParameterTypeDynamicCategory.DynamicCategoryCombo();
+                        category.setId(dataSource.getId());
+                        category.setName(dataSource.getName());
+                        category.setDesc(dataSource.getTitle());
+                        categories[i] = category;
                     }
 
                     return new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, PARAMETER_URL,
                             I18N.getMessage("pio.SingleViewExampleSource.data_source"),
-                            categories, categoryValues, categories[0]);
+                            categories, categories.length > 0 ? categories[0].getId() : null);
 
                 }
             }
@@ -195,43 +240,24 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 I18N.getMessage("pio.SingleViewExampleSource.data_source"));
     }
 
-    private List<DataSourceVo> listDataSource() {
-        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-//        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
+    private String buildQueryDruidParam() {
+        if (isParameterExist(PARAMETER_SINGLE_VIEW_DATA_SOURCE)) {
+            String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
+            String selectedSingleViewId = getParameterAsString(PARAMETER_SINGLE_VIEW_DATA_SOURCE);
 
-        String result = httpGet(listDataSourceUrl);
+            String singleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_DETAIL_SINGLE_MAP) + selectedSingleViewId;
+            SingleMapDetailWrapperVo singleMapDetailWrapper = httpGet(singleMapUrl, SingleMapDetailWrapperVo.class);
 
-        if (result != null) {
-            try {
-                DataSourceWrapperVo wrapperVo = jsonMapper.readValue(result, DataSourceWrapperVo.class);
-                return wrapperVo == null ? null : wrapperVo.getResult();
-            } catch (IOException ex) {
-                throw new OperatorException("Parse result failed: " + ex, ex);
-            }
-        }
-
-        return null;
-    }
-
-    private List<SingleMapVo> listSingleView() {
-        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-        String selectedDataSourceName = getParameterAsString(PARAMETER_DATA_SOURCE);
-//        String listDataSourceUrl = "http://192.168.0.32:8080/api/datasources/list";
-//        String selectedDataSourceName = "wuxianjiRT";
-        ParameterTypeDynamicCategory dynamicCategory = (ParameterTypeDynamicCategory)(getParameters().getParameterType(selectedDataSourceName));
-
-        if (dynamicCategory != null) {
-            String dataSourceValue = dynamicCategory.getCategoryValue(selectedDataSourceName);
-            String listSingleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_LIST_SINGLE_MAP) + dataSourceValue;
-
-            String result = httpGet(listSingleMapUrl);
-
-            if (result != null) {
+            if (singleMapDetailWrapper != null) {
                 try {
-                    SingleMapWrapperVo wrapperVo = jsonMapper.readValue(result, SingleMapWrapperVo.class);
-                    return wrapperVo == null ? null : wrapperVo.getResult();
-                } catch (IOException ex) {
-                    throw new OperatorException("Parse result failed: " + ex, ex);
+                    SingleMapVo singleMapVo = singleMapDetailWrapper.getResult();
+                    SingleMapRequestVo requestVo = new SingleMapRequestVo();
+                    requestVo.setDruid_datasource_id(singleMapVo.getDruid_datasource_id());
+                    requestVo.setParams(singleMapVo.getParams());
+                    String requestStr = jsonMapper.writeValueAsString(requestVo);
+                    return requestStr;
+                } catch (IOException e) {
+                    return null;
                 }
             }
         }
@@ -239,36 +265,54 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         return null;
     }
 
+    private List<DataSourceVo> listDataSource() {
+        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
+        DataSourceWrapperVo wrapperVo = httpGet(listDataSourceUrl, DataSourceWrapperVo.class);
+
+        return wrapperVo == null ? null : wrapperVo.getResult();
+    }
+
+    private List<SingleMapVo> listSingleView() {
+        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
+        String dataSourceValue = getParameterAsString(PARAMETER_DATA_SOURCE);
+
+        String listSingleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_LIST_SINGLE_MAP) + dataSourceValue;
+        SingleMapWrapperVo wrapperVo = httpGet(listSingleMapUrl, SingleMapWrapperVo.class);
+
+        return wrapperVo == null ? null : wrapperVo.getResult();
+    }
+
     /**
      * {
-     *   "result": [
-     *        {
-     *          "wuxianjiRT_total": 224058,
-     *          "resultSet": [
-     *             {
-     *               "wuxianjiRT_total": 32185,
-     *               "Province": "海南省"
-     *             },
-     *              ......
-     *           ]
-     *        }
-     *     ],
-     *   "code": 0
+     * "result": [
+     * {
+     * "wuxianjiRT_total": 224058,
+     * "resultSet": [
+     * {
+     * "wuxianjiRT_total": 32185,
+     * "Province": "海南省"
+     * },
+     * ......
+     * ]
+     * }
+     * ],
+     * "code": 0
      * }
      */
     private List<Object> parseResult(String result) throws IOException {
-        ObjectReader reader = jsonMapper.readerFor(DruidResultVo.class);
-        DruidResultVo resultVo = reader.readValue(result);
+        DruidResultVo resultVo = deserialize(result, DruidResultVo.class);
 
-        List<HashMap<String, Object>> resList = resultVo.getResult();
-        if (resList != null && !resList.isEmpty()) {
-            HashMap<String, Object> map = resList.get(0); // result列表仅有一条
-            if (map != null && !map.isEmpty()) {
-                Object resultSetObj = map.get("resultSet"); // 仅取key为"resultSet"的数据
-                String resultSetStr = resultSetObj == null ? null : jsonMapper.writeValueAsString(resultSetObj);
-                if (Objects.nonNull(resultSetStr)) {
-                    List resultList = jsonMapper.readValue(resultSetStr, List.class);
-                    return resultList;
+        if (resultVo != null) {
+            List<HashMap<String, Object>> resList = resultVo.getResult();
+            if (resList != null && !resList.isEmpty()) {
+                HashMap<String, Object> map = resList.get(0); // result列表仅有一条
+                if (map != null && !map.isEmpty()) {
+                    Object resultSetObj = map.get("resultSet"); // 仅取key为"resultSet"的数据
+                    String resultSetStr = resultSetObj == null ? null : jsonMapper.writeValueAsString(resultSetObj);
+                    if (Objects.nonNull(resultSetStr)) {
+                        List resultList = jsonMapper.readValue(resultSetStr, List.class);
+                        return resultList;
+                    }
                 }
             }
         }
@@ -384,6 +428,27 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         }
     }
 
+    private static class SingleMapDetailWrapperVo {
+        SingleMapVo result;
+        Integer code;
+
+        public SingleMapVo getResult() {
+            return result;
+        }
+
+        public void setResult(SingleMapVo result) {
+            this.result = result;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
+    }
+
     private static class SingleMapVo {
         String id;
         String slice_name;
@@ -473,6 +538,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         public void setParams(Object params) {
             this.params = params;
         }
+
     }
 
     public static void main(String[] args) {

@@ -301,6 +301,9 @@ public abstract class Operator implements ParameterHandler, Serializable {
         } catch (OperatorException oe) {
             setStatus(Status.FAILED);
             throw oe;
+        } catch (Exception oe) {
+            setStatus(Status.FAILED);
+            throw oe;
         } finally {
             isRunning = false;
         }

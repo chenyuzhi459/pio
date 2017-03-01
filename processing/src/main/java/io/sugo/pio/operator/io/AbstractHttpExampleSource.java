@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.io;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.net.MediaType;
@@ -17,6 +18,7 @@ import org.jboss.netty.handler.codec.http.HttpMethod;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
@@ -40,6 +42,11 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
         return result;
     }
 
+    protected <T> T httpGet(String url, Class<T> clazz) {
+        String result = httpGet(url);
+        return deserialize(result, clazz);
+    }
+
     protected String httpPost(String url, String requestJson) {
         if (!isValidUrl(url)) {
             throw new OperatorException("Invalid request url:" + url);
@@ -53,6 +60,25 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
         }
 
         return result;
+    }
+
+    protected <T> T httpPost(String url, String requestJson, Class<T> clazz) {
+        String result = httpPost(url, requestJson);
+        return deserialize(result, clazz);
+    }
+
+    protected <T> T deserialize(String json, Class<T> clazz) {
+        if (Objects.nonNull(json)) {
+            ObjectReader reader = jsonMapper.readerFor(clazz);
+            try {
+                T instance = reader.readValue(json);
+                return instance;
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
     protected boolean isValidUrl(String url) {

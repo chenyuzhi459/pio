@@ -199,6 +199,7 @@ public class ProcessManager {
                 processCache.invalidate(id);
                 return null;
             }
+
             return process;
         } catch (ExecutionException e) {
             log.error(e, "get process %s error", id);

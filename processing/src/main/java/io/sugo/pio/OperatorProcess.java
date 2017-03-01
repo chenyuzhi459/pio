@@ -141,11 +141,17 @@ public class OperatorProcess {
 
                 }
             }
-            try {
+
+            /*
+             * Transform of metadata called when a single process first loaded.
+             * Loaded here will cause perform problem.
+             * @see SQLMetadataProcessManager#get(String id, boolean includeDelete)
+             */
+            /*try {
                 rootOperator.getExecutionUnit().transformMetaData();
             } catch (Exception e) {
 
-            }
+            }*/
         }
     }
 
