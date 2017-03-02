@@ -2,6 +2,7 @@ package io.sugo.pio.operator;
 
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.i18n.I18N;
+import io.sugo.pio.operator.error.UnsupportedApplicationParameterError;
 import io.sugo.pio.operator.preprocessing.PreprocessingOperator;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;

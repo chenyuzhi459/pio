@@ -5,7 +5,6 @@ import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.nio.model.ParseException;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
@@ -13,7 +12,7 @@ import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.MetaDataError;
 import io.sugo.pio.ports.metadata.SimpleMetaDataError;
 import io.sugo.pio.tools.io.Encoding;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 
 import java.util.List;
 
@@ -51,7 +50,7 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
                         }
                         // will be added below
                         cachedError = new SimpleMetaDataError(Severity.WARNING, outputPort,
-                                "cannot_create_exampleset_metadata", new Object[] { msg });
+                                "pio.error.metadata.cannot_create_exampleset_metadata", new Object[] { msg });
                     }
                     if (cachedMetaData != null) {
                         cachedMetaData.addToHistory(outputPort);

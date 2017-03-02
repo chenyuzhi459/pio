@@ -102,7 +102,8 @@ public class BinDiscretization extends AbstractDiscretizationOperator {
             double min = getParameterAsDouble(PARAMETER_MIN_VALUE);
             double max = getParameterAsDouble(PARAMETER_MAX_VALUE);
             if (min > max) {
-                throw new UserError(this, 116, PARAMETER_MIN_VALUE + " and " + PARAMETER_MAX_VALUE,
+                throw new UserError(this, "pio.error.illegal_param_value",
+                        PARAMETER_MIN_VALUE + " and " + PARAMETER_MAX_VALUE,
                         "minimum must be less than maximum");
             }
             for (Attribute attribute : exampleSet.getAttributes()) {

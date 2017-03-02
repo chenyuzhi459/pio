@@ -81,7 +81,7 @@ public class ProcessManager {
 
     @LifecycleStart
     public void start() {
-        I18N.loadLanguageResource();
+        I18N.loadResources();
 
         operatorMetaMap = OperatorMapHelper.getAllOperatorMetas(jsonMapper);
         try {

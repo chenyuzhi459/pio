@@ -1,6 +1,7 @@
 package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.operator.error.MissingIOObjectException;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -4,6 +4,7 @@ package io.sugo.pio.operator.learner;
 import io.sugo.pio.example.AttributeWeights;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.*;
+import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.operator.performance.PerformanceVector;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
@@ -119,13 +120,13 @@ public abstract class AbstractLearner extends Operator implements Learner {
 
         // some checks
         if (exampleSet.getAttributes().getLabel() == null) {
-            throw new UserError(this, 105);
+            throw new UserError(this, "pio.error.operator.exampleset_miss_label");
         }
         if (exampleSet.getAttributes().size() == 0) {
-            throw new UserError(this, 106);
+            throw new UserError(this, "pio.error.operator.exampleset_no_attributes");
         }
         if (exampleSet.size() == 0) {
-            throw new UserError(this, 117);
+            throw new UserError(this, "pio.error.operator.exampleset_empty");
         }
 
         // check capabilities and produce errors if they are not fulfilled
@@ -212,7 +213,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
     }
 
     public MetaDataError getWeightCalculationError(OutputPort weightPort) {
-        return new SimpleMetaDataError(ProcessSetupError.Severity.ERROR, weightPort, "parameters.incompatible_for_delivering",
+        return new SimpleMetaDataError(ProcessSetupError.Severity.ERROR, weightPort,
+                "pio.error.metadata.parameters.incompatible_for_delivering",
                 "AttributeWeights");
     }
 
@@ -232,7 +234,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      */
     @Override
     public PerformanceVector getEstimatedPerformance() throws OperatorException {
-        throw new UserError(this, 912, getName(), "estimation of performance not supported.");
+        throw new UserError(this, "pio.error.operator.learner_cannot_estimate",
+                getName(), "estimation of performance not supported.");
     }
 
     /**
@@ -241,7 +244,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      * implementation throws an exception.
      */
     public PerformanceVector getOptimizationPerformance() throws OperatorException {
-        throw new UserError(this, 912, getName(), "delivering the original optimization performance is not supported.");
+        throw new UserError(this, "pio.error.operator.learner_cannot_estimate",
+                getName(), "delivering the original optimization performance is not supported.");
     }
 
     /**
@@ -250,7 +254,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      */
     @Override
     public AttributeWeights getWeights(ExampleSet exampleSet) throws OperatorException {
-        throw new UserError(this, 916, getName(), "calculation of weights not supported.");
+        throw new UserError(this, "pio.error.operator.learner_cannot_weights",
+                getName(), "calculation of weights not supported.");
     }
 
     public boolean onlyWarnForNonSufficientCapabilities() {

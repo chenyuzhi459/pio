@@ -18,6 +18,8 @@
  */
 package io.sugo.pio.operator;
 
+import io.sugo.pio.i18n.I18N;
+
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -50,12 +52,13 @@ public class OperatorException extends RuntimeException {
         super(message, cause);
     }
 
-    public OperatorException(String errorKey, Throwable cause, Object... arguments) {
-        super(getErrorMessage(errorKey, arguments), cause);
+    public OperatorException(String errorId, Throwable cause, Object... arguments) {
+        super(getErrorMessage(errorId, arguments), cause);
     }
 
-    public static String getErrorMessage(String identifier, Object[] arguments) {
-        String message = getResourceString(identifier, "short", "No message.");
+    public static String getErrorMessage(String errorId, Object[] arguments) {
+        String message = I18N.getErrorMessage(errorId);
+//        String message = getResourceString(identifier, "short", "No message.");
         try {
             formatter.applyPattern(message);
             String formatted = formatter.format(arguments);
@@ -63,7 +66,6 @@ public class OperatorException extends RuntimeException {
         } catch (Throwable t) {
             return message;
         }
-
     }
 
     /**
@@ -81,7 +83,7 @@ public class OperatorException extends RuntimeException {
      * @param deflt
      *            The default if no resource bundle is available.
      */
-    public static String getResourceString(String id, String key, String deflt) {
+    /*public static String getResourceString(String id, String key, String deflt) {
         if (messages == null) {
             return deflt;
         }
@@ -90,5 +92,5 @@ public class OperatorException extends RuntimeException {
         } catch (java.util.MissingResourceException e) {
             return deflt;
         }
-    }
+    }*/
 }

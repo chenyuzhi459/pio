@@ -154,9 +154,9 @@ public class ExampleFilter extends AbstractDataProcessing {
                     getParameterAsBoolean(PARAMETER_FILTERS_LOGIC_AND), getProcess().getMacroHandler());
 
         } catch (AttributeTypeException e) {
-            throw new UserError(this, e, "filter_wrong_type", e.getMessage());
+            throw new UserError(this, e, "pio.error.filter_wrong_type", e.getMessage());
         } catch (IllegalArgumentException e) {
-            throw new UserError(this, e, 904, className, e.getMessage());
+            throw new UserError(this, e, "pio.error.cannot_instantiate", className, e.getMessage());
         }
         try {
             ExampleSet result = new ConditionedExampleSet(inputSet, condition,
@@ -168,9 +168,9 @@ public class ExampleFilter extends AbstractDataProcessing {
             }
             return result;
         } catch (AttributeTypeException e) {
-            throw new UserError(this, e, "filter_wrong_type", e.getMessage());
+            throw new UserError(this, e, "pio.error.filter_wrong_type", e.getMessage());
         } catch (ExpressionEvaluationException e) {
-            throw new UserError(this, e, 904, className, e.getMessage());
+            throw new UserError(this, e, "pio.error.cannot_instantiate", className, e.getMessage());
         }
     }
 

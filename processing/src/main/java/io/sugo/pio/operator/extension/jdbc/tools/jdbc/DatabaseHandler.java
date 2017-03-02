@@ -1021,14 +1021,16 @@ public class DatabaseHandler implements AutoCloseable {
                             prepared.setDouble(i + 1, Double.parseDouble(replacementValue));
                         } catch (NumberFormatException var21) {
                             prepared.close();
-                            throw new UserError(parameterHandler, 158, new Object[]{replacementValue, sqlType});
+                            throw new UserError(parameterHandler, "pio.error.database_wrong_sql_type",
+                                    new Object[]{replacementValue, sqlType});
                         }
                     } else if ("LONG".equals(sqlType)) {
                         try {
                             prepared.setLong(i + 1, Long.parseLong(replacementValue));
                         } catch (NumberFormatException var20) {
                             prepared.close();
-                            throw new UserError(parameterHandler, 158, new Object[]{replacementValue, sqlType});
+                            throw new UserError(parameterHandler, "pio.error.database_wrong_sql_type",
+                                    new Object[]{replacementValue, sqlType});
                         }
                     } else {
                         if (!"INTEGER".equals(sqlType)) {
@@ -1040,7 +1042,8 @@ public class DatabaseHandler implements AutoCloseable {
                             prepared.setInt(i + 1, Integer.parseInt(replacementValue));
                         } catch (NumberFormatException var19) {
                             prepared.close();
-                            throw new UserError(parameterHandler, 158, new Object[]{replacementValue, sqlType});
+                            throw new UserError(parameterHandler, "pio.error.database_wrong_sql_type",
+                                    new Object[]{replacementValue, sqlType});
                         }
                     }
                 }
@@ -1091,7 +1094,8 @@ public class DatabaseHandler implements AutoCloseable {
 
     public void updateTable(Operator operator, ExampleSet exampleSet, TableName selectedTableName, Set<Attribute> idAttributes, Logger logger) throws SQLException, OperatorException {
         if (exampleSet.getAttributes().size() == 0 && exampleSet.getAttributes().getId() == null) {
-            throw new UserError(operator, 125, new Object[]{Integer.valueOf(0), Integer.valueOf(1)});
+            throw new UserError(operator, "pio.error.operator.exampleset_too_few_attributes",
+                    new Object[]{Integer.valueOf(0), Integer.valueOf(1)});
         } else {
             StatementCreator sc = new StatementCreator(this.getConnection());
             List allColumnNames = this.getAllColumnNames(selectedTableName, this.getConnection().getMetaData());

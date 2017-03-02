@@ -51,14 +51,16 @@ public class ChiSquaredWeighting extends AbstractWeighting {
 	protected AttributeWeights calculateWeights(ExampleSet exampleSet) throws OperatorException {
 		Attribute label = exampleSet.getAttributes().getLabel();
 		if (!label.isNominal()) {
-			throw new UserError(this, 101, "chi squared test", label.getName());
+			throw new UserError(this, "pio.error.attribute_must_nominal",
+					"chi squared test", label.getName());
 		}
 
 		BinDiscretization discretization = null;
 		try {
 			discretization = OperatorService.createOperator(BinDiscretization.class);
 		} catch (OperatorCreationException e) {
-			throw new UserError(this, 904, "Discretization", e.getMessage());
+			throw new UserError(this, "pio.error.cannot_instantiate",
+					"Discretization", e.getMessage());
 		}
 
 		int numberOfBins = getParameterAsInt(BinDiscretization.PARAMETER_NUMBER_OF_BINS);

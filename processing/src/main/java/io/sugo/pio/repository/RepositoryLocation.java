@@ -394,7 +394,7 @@ public class RepositoryLocation {
 			try {
 //				result = process.resolveRepositoryLocation(loc);
 			} catch (MalformedRepositoryLocationException e) {
-				throw new UserError(op, e, 319, e.getMessage());
+				throw new UserError(op, e, "pio.error.repository_location_malformed", e.getMessage());
 			}
 //			result.setAccessor(process.getRepositoryAccessor());
 //			return result;
@@ -405,11 +405,11 @@ public class RepositoryLocation {
 				try {
 					result = new RepositoryLocation(loc);
 				} catch (MalformedRepositoryLocationException e) {
-					throw new UserError(op, e, 319, e.getMessage());
+					throw new UserError(op, e, "pio.error.repository_location_malformed", e.getMessage());
 				}
 				return result;
 			} else {
-				throw new UserError(op, 320, loc);
+				throw new UserError(op, "pio.error.repository_location_unresolvable", loc);
 			}
 		}
 	}

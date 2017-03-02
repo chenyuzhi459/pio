@@ -60,7 +60,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
             this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
             String sqle = this.getQuery(this.databaseHandler.getStatementCreator());
             if (sqle == null) {
-                throw new UserError(this, 202, new Object[]{"query", "query_file", "table_name"});
+                throw new UserError(this, "pio.error.parameter_must_set",
+                        new Object[]{"query", "query_file", "table_name"});
             } else {
                 return this.databaseHandler.executeStatement(sqle, true, this, this.getLogger());
             }
@@ -68,7 +69,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
             if (this.databaseHandler != null && this.databaseHandler.isCancelled()) {
                 throw new ProcessStoppedException(this);
             } else {
-                throw new UserError(this, var2, 304, new Object[]{var2.getMessage()});
+                throw new UserError(this, var2, "pio.error.database_error", new Object[]{var2.getMessage()});
             }
         }
     }
@@ -82,7 +83,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 //            builder = createExampleTable(resultSet, e, this.getParameterAsInt("datamanagement"), this.getLogger(), this);
             builder = createExampleTable(resultSet, e, DATA_MANAGEMENT, this.getLogger(), this);
         } catch (SQLException var11) {
-            throw new UserError(this, var11, 304, new Object[]{var11.getMessage()});
+            throw new UserError(this, var11, "pio.error.database_error", new Object[]{var11.getMessage()});
         } finally {
             try {
                 resultSet.close();
@@ -262,7 +263,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         }
 
         if (query == null) {
-            throw new UserError(this, 202, new Object[]{PARAMETER_QUERY, "query_file"});
+            throw new UserError(this, "pio.error.parameter_must_set",
+                    new Object[]{PARAMETER_QUERY, "query_file"});
         } else {
             return query;
         }

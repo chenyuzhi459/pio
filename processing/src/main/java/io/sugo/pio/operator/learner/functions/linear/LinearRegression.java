@@ -267,15 +267,15 @@ public class LinearRegression extends AbstractLearner {
 		String selectedMethod = selectionMethodNames[selectionMethodIndex]; // getParameterAsString(PARAMETER_FEATURE_SELECTION);
 		Class<? extends LinearRegressionMethod> methodClass = SELECTION_METHODS.get(selectedMethod);
 		if (methodClass == null) {
-			throw new UserError(this, 904, PARAMETER_FEATURE_SELECTION, "unknown method");
+			throw new UserError(this, "pio.error.cannot_instantiate", PARAMETER_FEATURE_SELECTION, "unknown method");
 		}
 		LinearRegressionMethod method;
 		try {
 			method = methodClass.newInstance();
 		} catch (InstantiationException e) {
-			throw new UserError(this, 904, PARAMETER_FEATURE_SELECTION, e.getMessage());
+			throw new UserError(this, "pio.error.cannot_instantiate", PARAMETER_FEATURE_SELECTION, e.getMessage());
 		} catch (IllegalAccessException e) {
-			throw new UserError(this, 904, PARAMETER_FEATURE_SELECTION, e.getMessage());
+			throw new UserError(this, "pio.error.cannot_instantiate", PARAMETER_FEATURE_SELECTION, e.getMessage());
 		}
 
 		// apply feature selection technique

@@ -4,7 +4,7 @@ import io.sugo.pio.datatable.DataTable;
 import io.sugo.pio.datatable.DataTableExampleSetAdapter;
 import io.sugo.pio.example.*;
 import io.sugo.pio.operator.IOContainer;
-import io.sugo.pio.operator.MissingIOObjectException;
+import io.sugo.pio.operator.error.MissingIOObjectException;
 import io.sugo.pio.operator.ResultObjectAdapter;
 
 import java.util.*;

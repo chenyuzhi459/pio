@@ -1,6 +1,6 @@
 package io.sugo.pio.ports.metadata;
 
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.ports.InputPort;
 
 public abstract class AbstractPrecondition implements Precondition {

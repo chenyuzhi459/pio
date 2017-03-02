@@ -23,7 +23,7 @@ import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.parameter.ParameterHandler;
@@ -55,7 +55,7 @@ public class ProportionNormalizationMethod extends AbstractNormalizationMethod {
 			Range range = amd.getValueRange();
 			if (range.getLower() < 0d) {
 				exampleSetInputPort.addError(new SimpleMetaDataError(Severity.WARNING, exampleSetInputPort,
-						"attribute_contains_negative_values", amd.getName(), getName()));
+						"pio.error.metadata.attribute_contains_negative_values", amd.getName(), getName()));
 			}
 		} else {
 			// set to unknown

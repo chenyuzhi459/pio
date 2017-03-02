@@ -413,7 +413,7 @@ public class Tools {
 				AttributeRole att = allAttributes.next();
 				if (!att.isSpecial() || specialToCheck.contains(att.getAttribute())) {
 					if (Double.isNaN(example.getValue(att.getAttribute()))) {
-						throw new UserError(operator, 139, task);
+						throw new UserError(operator, "pio.error.operator.data_contains_miss_value", task);
 					}
 				}
 			}
@@ -440,7 +440,8 @@ public class Tools {
 	public static void onlyNumericalAttributes(Attributes attributes, String task) throws OperatorException {
 		for (Attribute attribute : attributes) {
 			if (!Ontology.ATTRIBUTE_VALUE_TYPE.isA(attribute.getValueType(), Ontology.NUMERICAL)) {
-				throw new UserError(null, 104, task, attribute.getName());
+				throw new UserError(null, "pio.error.operator.exampleset_contains_non_numerical",
+						task, attribute.getName());
 			}
 		}
 	}
@@ -464,7 +465,8 @@ public class Tools {
 	public static void onlyNominalAttributes(Attributes attributes, String task) throws OperatorException {
 		for (Attribute attribute : attributes) {
 			if (!Ontology.ATTRIBUTE_VALUE_TYPE.isA(attribute.getValueType(), Ontology.NOMINAL)) {
-				throw new UserError(null, 103, task, attribute.getName());
+				throw new UserError(null, "pio.error.operator.exampleset_contains_non_nominal",
+						task, attribute.getName());
 			}
 		}
 	}
@@ -490,7 +492,8 @@ public class Tools {
 				}
 			}
 			if (throwError) {
-				throw new UserError(null, 114, task, attribute.getName());
+				throw new UserError(null, "pio.error.attribute_must_binominal",
+						task, attribute.getName());
 			}
 		}
 	}
@@ -504,7 +507,7 @@ public class Tools {
 	 */
 	public static void isLabelled(ExampleSet es) throws OperatorException {
 		if (es.getAttributes().getLabel() == null) {
-			throw new UserError(null, 105);
+			throw new UserError(null, "pio.error.operator.exampleset_miss_label");
 		}
 	}
 
@@ -517,7 +520,7 @@ public class Tools {
 	 */
 	public static void isIdTagged(ExampleSet es) throws OperatorException {
 		if (es.getAttributes().getId() == null) {
-			throw new UserError(null, 129);
+			throw new UserError(null, "pio.error.operator.exampleset_not_have_id");
 		}
 	}
 
@@ -536,14 +539,14 @@ public class Tools {
 				IdTagging idTagging = OperatorService.createOperator(IdTagging.class);
 				idTagging.apply(es);
 			} catch (OperatorCreationException e) {
-				throw new UserError(null, 129);
+				throw new UserError(null, "pio.error.operator.exampleset_not_have_id");
 			}
 		}
 	}
 
 	public static void checkIds(ExampleSet exampleSet) throws UserError {
 		if (exampleSet.getAttributes().getId() == null) {
-			throw new UserError(null, 129);
+			throw new UserError(null, "pio.error.operator.exampleset_not_have_id");
 		}
 	}
 
@@ -558,7 +561,8 @@ public class Tools {
 		isLabelled(es);
 		Attribute a = es.getAttributes().getLabel();
 		if (!Ontology.ATTRIBUTE_VALUE_TYPE.isA(a.getValueType(), Ontology.NOMINAL)) {
-			throw new UserError(null, 101, "clustering", a.getName());
+			throw new UserError(null, "pio.error.attribute_must_nominal",
+					"clustering", a.getName());
 		}
 	}
 
@@ -571,7 +575,7 @@ public class Tools {
 	 */
 	public static void isNonEmpty(ExampleSet es) throws OperatorException {
 		if (es.size() == 0) {
-			throw new UserError(null, 117);
+			throw new UserError(null, "pio.error.operator.exampleset_empty");
 		}
 	}
 

@@ -3,7 +3,7 @@ package io.sugo.pio.ports.metadata;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.operator.IOObject;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 
@@ -106,7 +106,8 @@ public class MetaData implements Serializable {
             for (Map.Entry<String, Object> entry : this.keyValueMap.entrySet()) {
                 Object isValue = isData.keyValueMap.get(entry.getKey());
                 if (!entry.getValue().equals(isValue)) {
-                    errors.add(new SimpleMetaDataError(Severity.ERROR, inputPort, "general_property_mismatch", new Object[] {
+                    errors.add(new SimpleMetaDataError(Severity.ERROR, inputPort,
+                            "pio.error.metadata.general_property_mismatch", new Object[] {
                             entry.getKey(), entry.getValue() }));
                 }
             }

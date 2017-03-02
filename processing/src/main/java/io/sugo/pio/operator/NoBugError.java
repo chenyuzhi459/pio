@@ -30,9 +30,9 @@ public interface NoBugError {
 	public String getDetails();
 
 	/** Returns the error name. */
-	public String getErrorName();
+//	public String getErrorName();
 
 	/** Returns the error code. */
-	public int getCode();
+//	public int getCode();
 
 }

@@ -71,7 +71,7 @@ public class RangeNormalizationMethod extends AbstractNormalizationMethod {
 		double min = operator.getParameterAsDouble(PARAMETER_MIN);
 		double max = operator.getParameterAsDouble(PARAMETER_MAX);
 		if (max <= min) {
-			throw new UserError(operator, 116, "max", "Must be greater than 'min'");
+			throw new UserError(operator, "pio.error.illegal_param_value", "max", "Must be greater than 'min'");
 		}
 
 		// calculating attribute ranges

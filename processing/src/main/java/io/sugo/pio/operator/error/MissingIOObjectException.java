@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see http://www.gnu.org/licenses/.
  */
-package io.sugo.pio.operator;
+package io.sugo.pio.operator.error;
+
+import io.sugo.pio.operator.UserError;
 
 /**
  * Will be thrown if an operator can not get its desired input. Is usually thrown during a process
@@ -32,7 +34,7 @@ public class MissingIOObjectException extends UserError {
 	private Class wanted;
 
 	public MissingIOObjectException(Class cls) {
-		super(null, 122, cls.getName());
+		super(null, "pio.error.operator.miss_input_type", cls.getName());
 		wanted = cls;
 	}
 

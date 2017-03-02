@@ -3,7 +3,7 @@ package io.sugo.pio.tools;
 import io.sugo.pio.example.*;
 import io.sugo.pio.example.set.ConditionCreationException;
 import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.error.AttributeNotFoundError;
 import io.sugo.pio.operator.preprocessing.filter.attributes.*;
@@ -164,7 +164,8 @@ public class AttributeSubsetSelector {
             if (errorOnMissing) {
                 if (condition instanceof SingleAttributeFilter) {
                     if (resultSet.getAllAttributes().size() != 1) {
-                        inPort.addError(new SimpleMetaDataError(Severity.ERROR, inPort, "missing_attribute", operator
+                        inPort.addError(new SimpleMetaDataError(Severity.ERROR, inPort,
+                                "pio.error.metadata.missing_attribute", operator
                                 .getParameterAsString(SingleAttributeFilter.PARAMETER_ATTRIBUTE)));
                     }
                 } else if (condition instanceof SubsetAttributeFilter) {
@@ -183,7 +184,8 @@ public class AttributeSubsetSelector {
                         if (!shouldBeFound.isEmpty()) {
                             // show suitable error
                             for (String attName : shouldBeFound) {
-                                inPort.addError(new SimpleMetaDataError(Severity.ERROR, inPort, "missing_attribute", attName));
+                                inPort.addError(new SimpleMetaDataError(Severity.ERROR, inPort,
+                                        "pio.error.metadata.missing_attribute", attName));
                             }
                         }
                     }
@@ -389,10 +391,11 @@ public class AttributeSubsetSelector {
                 throw (UserError) cause;
             } else {
                 if (operator instanceof Operator) {
-                    throw new UserError((Operator) operator, e, 904,
+                    throw new UserError((Operator) operator, e, "pio.error.cannot_instantiate",
                             CONDITION_NAMES[PARAMETER_DEFAULT_FILTER_TYPE], e.getMessage());
                 } else {
-                    throw new UserError(null, e, 904, CONDITION_NAMES[PARAMETER_DEFAULT_FILTER_TYPE],
+                    throw new UserError(null, e, "pio.error.cannot_instantiate",
+                            CONDITION_NAMES[PARAMETER_DEFAULT_FILTER_TYPE],
                             e.getMessage());
                 }
             }
@@ -423,8 +426,8 @@ public class AttributeSubsetSelector {
             if (throwError) {
                 // if include special attributes is NOT selected
                 // that might be the reason why it's not found
-                int errorNumber = includeSpecial ? AttributeNotFoundError.ATTRIBUTE_NOT_FOUND : 164;
-                throw new AttributeNotFoundError((Operator) operator, errorNumber,
+                String errorId = includeSpecial ? AttributeNotFoundError.ATTRIBUTE_NOT_FOUND : "pio.error.regular_attribute_not_exist";
+                throw new AttributeNotFoundError((Operator) operator, errorId,
                         SingleAttributeFilter.PARAMETER_ATTRIBUTE, shouldBeFound);
             }
         } else if (condition instanceof SubsetAttributeFilter) {
@@ -442,17 +445,17 @@ public class AttributeSubsetSelector {
                 // show suitable error
                 // if include special attributes is NOT selected
                 // that might be the reason why it's not found
-                int errorNumber;
+                String errorId;
                 if (includeSpecial) {
-                    errorNumber = 160;
+                    errorId = "pio.error.attribute_not_exist";
                 } else {
-                    errorNumber = 164;
+                    errorId = "pio.error.regular_attribute_not_exist";
                 }
                 switch (shouldBeFound.size()) {
                     case 0:
                         break;
                     default:
-                        throw new AttributeNotFoundError((Operator) operator, errorNumber,
+                        throw new AttributeNotFoundError((Operator) operator, errorId,
                                 SubsetAttributeFilter.PARAMETER_ATTRIBUTES, shouldBeFound.get(0));
                 }
             }
@@ -575,7 +578,8 @@ public class AttributeSubsetSelector {
                 if (metaData instanceof ExampleSetMetaData) {
                     ExampleSetMetaData subsetMetaData = getMetaDataSubset((ExampleSetMetaData) metaData, false);
                     if (subsetMetaData.getAllAttributes().isEmpty()) {
-                        SimpleMetaDataError error = new SimpleMetaDataError(Severity.WARNING, inPort, "attribute_selection_empty");
+                        SimpleMetaDataError error = new SimpleMetaDataError(Severity.WARNING, inPort,
+                                "pio.error.metadata.attribute_selection_empty");
                         inPort.addError(error);
                     }
                 }

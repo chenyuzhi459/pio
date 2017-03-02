@@ -21,13 +21,10 @@ package io.sugo.pio.ports.metadata;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorCapability;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.operator.learner.CapabilityProvider;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.tools.Ontology;
-
-import java.util.Collections;
-import java.util.LinkedList;
 
 
 /**
@@ -110,12 +107,12 @@ public class CapabilityPrecondition extends ExampleSetPrecondition {
 					case UNKNOWN:
 						getInputPort().addError(
 								new SimpleMetaDataError(Severity.WARNING, getInputPort(),
-										"special_unknown", new Object[] { Attributes.LABEL_NAME }));
+										"pio.error.metadata.special_unknown", new Object[] { Attributes.LABEL_NAME }));
 						break;
 					case NO:
 						getInputPort().addError(
 								new SimpleMetaDataError(Severity.ERROR, getInputPort(),
-										"special_missing", new Object[] { Attributes.LABEL_NAME }));
+										"pio.error.metadata.special_missing", new Object[] { Attributes.LABEL_NAME }));
 						break;
 					case YES:
 						AttributeMetaData label = metaData.getLabelMetaData();

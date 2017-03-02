@@ -18,7 +18,7 @@ public class UndefinedMacroError extends UndefinedParameterError {
 	 *            the key of the missing macro
 	 */
 	public UndefinedMacroError(String parameterKey, String macroKey) {
-		super(null, 227, parameterKey, macroKey);
+		super(null, "pio.error.macro_undefined", parameterKey, macroKey);
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class UndefinedMacroError extends UndefinedParameterError {
 	 *
 	 * @param operator
 	 *            the executing Operator which performs the action or null
-	 * @param code
+	 * @param key
 	 *            errorID of the UserErrorMessage which should be shown
 	 * @param additionalText
 	 *            text to paste in the UserErrorMessage

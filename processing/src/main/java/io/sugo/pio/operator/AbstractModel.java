@@ -2,6 +2,7 @@ package io.sugo.pio.operator;
 
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.HeaderExampleSet;
+import io.sugo.pio.operator.error.UnsupportedApplicationParameterError;
 
 /**
  */

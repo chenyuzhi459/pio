@@ -15,27 +15,27 @@ public class UndefinedParameterError extends ParameterError {
 
 	/** Creates a new UndefinedParameterError. */
 	public UndefinedParameterError(String key) {
-		super(null, 205, key, "");
+		super(null, "pio.error.parameter_missing_1", key, "");
 	}
 
 	public UndefinedParameterError(String key, String additionalMessage) {
-		super(null, 205, key, additionalMessage);
+		super(null, "pio.error.parameter_missing_1", key, additionalMessage);
 	}
 
 	public UndefinedParameterError(String key, Operator operator) {
-		super(operator, 217, key, "");
+		super(operator, "pio.error.parameter_missing_2", key, "");
 	}
 
 	public UndefinedParameterError(String key, Operator operator, String additionalMessage) {
-		super(operator, 217, key, additionalMessage);
+		super(operator, "pio.error.parameter_missing_2", key, additionalMessage);
 	}
 
 	public UndefinedParameterError(Operator operator, String code, String additionalText) {
 		super(operator, code, additionalText);
 	}
 
-	public UndefinedParameterError(Operator operator, int code, String parameterKey, Object... arguments) {
-		super(operator, code, parameterKey, arguments);
+	public UndefinedParameterError(Operator operator, String errorId, String parameterkey, String additionalText) {
+		super(operator, errorId, parameterkey, new Object[] { parameterkey, additionalText });
 	}
 
 }

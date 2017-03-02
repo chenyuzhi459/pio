@@ -128,7 +128,7 @@ public class CSVResultSet implements DataResultSet {
 					in.close();
 				} catch (IOException e1) {
 				}
-				throw new UserError(operator, e, 321, configuration.getCsvFile(), e.toString());
+				throw new UserError(operator, e, "pio.error.io_error", configuration.getCsvFile(), e.toString());
 			}
 		}
 
@@ -153,7 +153,7 @@ public class CSVResultSet implements DataResultSet {
 				in.close();
 			} catch (IOException e1) {
 			}
-			throw new UserError(operator, e, 321, configuration.getCsvFile(), e.toString());
+			throw new UserError(operator, e, "pio.error.io_error", configuration.getCsvFile(), e.toString());
 		}
 		if (next == null) {
 			errors.add(new ParsingError(1, -1, ErrorCode.FILE_SYNTAX_ERROR, "No valid line found."));
@@ -240,7 +240,7 @@ public class CSVResultSet implements DataResultSet {
 			try {
 				return WebServiceTools.openStreamFromURL(url);
 			} catch (IOException e) {
-				throw new UserError(operator, 301, e, configuration.getCsvFile());
+				throw new UserError(operator, "pio.error.file_not_found", e, configuration.getCsvFile());
 			}
 		} catch (MalformedURLException e) {
 			// URL did not work? Try as file...
@@ -252,7 +252,7 @@ public class CSVResultSet implements DataResultSet {
 
 				return new FileInputStream(csvFile);
 			} catch (FileNotFoundException e1) {
-				throw new UserError(operator, 301, e1, configuration.getCsvFile());
+				throw new UserError(operator, "pio.error.file_not_found", e1, configuration.getCsvFile());
 			}
 		}
 	}
@@ -319,7 +319,7 @@ public class CSVResultSet implements DataResultSet {
 		try {
 			readNext();
 		} catch (IOException e) {
-			throw new UserError(operator, e, 321, configuration.getCsvFile(), e.toString());
+			throw new UserError(operator, e, "pio.error.io_error", configuration.getCsvFile(), e.toString());
 		}
 	}
 
@@ -330,7 +330,7 @@ public class CSVResultSet implements DataResultSet {
 		try {
 			readNext();
 		} catch (IOException e) {
-			throw new UserError(operator, e, 321, configuration.getCsvFile(), e.toString());
+			throw new UserError(operator, e, "pio.error.io_error", configuration.getCsvFile(), e.toString());
 		}
 	}
 
@@ -383,7 +383,7 @@ public class CSVResultSet implements DataResultSet {
 		try {
 			reader.close();
 		} catch (IOException e) {
-			throw new UserError(operator, 321, e, configuration.getCsvFile(), e.toString());
+			throw new UserError(operator, "pio.error.io_error", e, configuration.getCsvFile(), e.toString());
 		} finally {
 			reader = null;
 		}

@@ -26,6 +26,6 @@ import io.sugo.pio.ports.InputPort;
 public class MetaDataUnderspecifiedError extends SimpleMetaDataError {
 
 	public MetaDataUnderspecifiedError(InputPort inputPort) {
-		super(Severity.WARNING, inputPort, "metadata_underspecified");
+		super(Severity.WARNING, inputPort, "pio.error.metadata.metadata_underspecified");
 	}
 }

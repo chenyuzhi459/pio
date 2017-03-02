@@ -45,12 +45,15 @@ public class Encoding {
 		try {
 			return Charset.forName(selectedCharsetName);
 		} catch (IllegalCharsetNameException e) {
-			throw new UserError(handler, 207, selectedCharsetName, PARAMETER_ENCODING, "No legal charset name.");
+			throw new UserError(handler, "pio.error.parameter_value_impossible",
+					selectedCharsetName, PARAMETER_ENCODING, "No legal charset name.");
 		} catch (UnsupportedCharsetException e) {
-			throw new UserError(handler, 207, selectedCharsetName, PARAMETER_ENCODING,
+			throw new UserError(handler, "pio.error.parameter_value_impossible",
+					selectedCharsetName, PARAMETER_ENCODING,
 					"Charset not supported on this Java VM.");
 		} catch (IllegalArgumentException e) {
-			throw new UserError(handler, 207, selectedCharsetName, PARAMETER_ENCODING, "Select different charset.");
+			throw new UserError(handler, "pio.error.parameter_value_impossible",
+					selectedCharsetName, PARAMETER_ENCODING, "Select different charset.");
 		}
 	}
 

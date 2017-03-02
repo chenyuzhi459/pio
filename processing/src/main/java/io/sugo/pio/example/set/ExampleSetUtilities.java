@@ -115,13 +115,15 @@ public class ExampleSetUtilities {
 					Ontology valueTypes = Ontology.ATTRIBUTE_VALUE_TYPE;
 					if (compareTypes == TypesCompareOption.ALLOW_SUBTYPES) {
 						if (!valueTypes.isA(comparedValueType, originalValueType)) {
-							throw new UserError(op, 964, comparedAttribute.getName(),
+							throw new UserError(op, "pio.error.operator.exampleset_not_match_4",
+									comparedAttribute.getName(),
 									Ontology.VALUE_TYPE_NAMES[comparedValueType],
 									Ontology.VALUE_TYPE_NAMES[originalValueType]);
 						}
 					} else if (compareTypes == TypesCompareOption.ALLOW_SUPERTYPES) {
 						if (!valueTypes.isA(originalValueType, comparedValueType)) {
-							throw new UserError(null, 965, comparedAttribute.getName(),
+							throw new UserError(null, "pio.error.operator.exampleset_not_match_5",
+									comparedAttribute.getName(),
 									Ontology.VALUE_TYPE_NAMES[comparedValueType],
 									Ontology.VALUE_TYPE_NAMES[originalValueType]);
 						}
@@ -136,21 +138,22 @@ public class ExampleSetUtilities {
 						parentCompared = parentCompared <= Ontology.ATTRIBUTE_VALUE ? comparedValueType : parentCompared;
 
 						if (!valueTypes.isA(parentCompared, parentOriginal)) {
-							throw new UserError(op, 965, comparedAttribute.getName(),
+							throw new UserError(op, "pio.error.operator.exampleset_not_match_5",
+									comparedAttribute.getName(),
 									Ontology.VALUE_TYPE_NAMES[comparedValueType],
 									Ontology.VALUE_TYPE_NAMES[originalValueType]);
 						}
 					} else if (compareTypes == TypesCompareOption.EQUAL) {
-						throw new UserError(op, 963, comparedAttribute.getName(),
+						throw new UserError(op, "pio.error.operator.exampleset_not_match_3", comparedAttribute.getName(),
 								Ontology.VALUE_TYPE_NAMES[originalValueType], Ontology.VALUE_TYPE_NAMES[comparedValueType]);
 					}
 				}
 			} else {
 				if (compareSets == SetsCompareOption.EQUAL) {
-					throw new UserError(op, 960, originalAttribute.getName());
+					throw new UserError(op, "pio.error.operator.exampleset_not_match_0", originalAttribute.getName());
 				}
 				if (compareSets == SetsCompareOption.ALLOW_SUPERSET) {
-					throw new UserError(op, 962, originalAttribute.getName());
+					throw new UserError(op, "pio.error.operator.exampleset_not_match_2", originalAttribute.getName());
 				}
 			}
 		}
@@ -158,10 +161,10 @@ public class ExampleSetUtilities {
 		for (Attribute comparedAttribute : comparedAttributes) {
 			if (!originalAttributes.contains(comparedAttribute)) {
 				if (compareSets == SetsCompareOption.EQUAL) {
-					throw new UserError(op, 960, comparedAttribute.getName());
+					throw new UserError(op, "pio.error.operator.exampleset_not_match_0", comparedAttribute.getName());
 				}
 				if (compareSets == SetsCompareOption.ALLOW_SUBSET) {
-					throw new UserError(op, 961, comparedAttribute.getName());
+					throw new UserError(op, "pio.error.operator.exampleset_not_match_1", comparedAttribute.getName());
 				}
 			}
 		}

@@ -3,6 +3,7 @@ package io.sugo.pio.ports.impl;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.UserError;
+import io.sugo.pio.operator.error.PortUserError;
 import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.Ports;
 import io.sugo.pio.ports.metadata.MetaDataError;
@@ -53,13 +54,14 @@ public abstract class AbstractPort implements Port {
     public <T extends IOObject> T getData(Class<T> desiredClass) {
         IOObject data = getAnyDataOrNull();
         if (data == null) {
-            // TODO: Maybe change this to a checked exception
-            throw new RuntimeException("");
+            throw new PortUserError(this, "pio.error.operator.no_input", getSpec());
         } else if (desiredClass.isAssignableFrom(data.getClass())) {
             return desiredClass.cast(data);
         } else {
-            // TODO: Maybe change this to a checked exception
-            throw new RuntimeException("");
+            PortUserError error = new PortUserError(this, "pio.error.operator.wrong_input_type", this.getName());
+            error.setExpectedType(desiredClass);
+            error.setActualType(data.getClass());
+            throw error;
         }
     }
 

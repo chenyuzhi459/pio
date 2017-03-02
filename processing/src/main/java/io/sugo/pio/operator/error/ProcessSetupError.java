@@ -1,4 +1,4 @@
-package io.sugo.pio.operator;
+package io.sugo.pio.operator.error;
 
 
 import io.sugo.pio.ports.PortOwner;
@@ -22,6 +22,9 @@ public interface ProcessSetupError {
 		/** Process will definitely (well, say, most certainly) not run. */
 		ERROR
 	}
+
+	/** Returns the human readable, formatted message. */
+	public String getMessage();
 
 	/**
 	 * Returns the owner of the port that should be displayed by the GUI to fix the error.

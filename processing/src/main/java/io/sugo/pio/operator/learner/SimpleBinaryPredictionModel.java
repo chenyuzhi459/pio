@@ -52,10 +52,12 @@ public abstract class SimpleBinaryPredictionModel extends PredictionModel {
 	public ExampleSet performPrediction(ExampleSet exampleSet, Attribute predictedLabel) throws OperatorException {
 		// checks
 		if (!predictedLabel.isNominal()) {
-			throw new UserError(null, 101, getName(), predictedLabel.getName());
+			throw new UserError(null, "pio.error.attribute_must_nominal",
+					getName(), predictedLabel.getName());
 		}
 		if (predictedLabel.getMapping().getValues().size() != 2) {
-			throw new UserError(null, 114, getName(), predictedLabel.getName());
+			throw new UserError(null, "pio.error.attribute_must_binominal",
+					getName(), predictedLabel.getName());
 		}
 
 		Iterator<Example> r = exampleSet.iterator();

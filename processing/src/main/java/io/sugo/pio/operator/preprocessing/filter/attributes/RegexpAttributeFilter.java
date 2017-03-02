@@ -40,7 +40,8 @@ public class RegexpAttributeFilter extends AbstractAttributeFilterCondition {
 	public void init(ParameterHandler operator) throws UserError, ConditionCreationException {
 		attributeNameRegexp = operator.getParameterAsString(PARAMETER_REGULAR_EXPRESSION);
 		if ((attributeNameRegexp == null) || (attributeNameRegexp.length() == 0)) {
-			throw new UserError((operator instanceof Operator) ? (Operator) operator : null, 904,
+			throw new UserError((operator instanceof Operator) ? (Operator) operator : null,
+					"pio.error.cannot_instantiate",
 					"The condition for attribute names needs a parameter string.");
 		}
 		if (operator.isParameterSet(PARAMETER_EXCEPT_REGULAR_EXPRESSION)

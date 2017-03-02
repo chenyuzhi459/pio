@@ -282,7 +282,7 @@ public final class ExpressionParserUtils {
 			shortenedFunction = function.substring(0, 15).concat(" (...)");
 		}
 
-		return new UserError(op, e, "expression_evaluation_failed", e.getShortMessage(), shortenedFunction);
+		return new UserError(op, e, "pio.error.expression_evaluation_failed", e.getShortMessage(), shortenedFunction);
 	}
 
 }

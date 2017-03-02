@@ -144,7 +144,8 @@ public class LogisticRegression extends AbstractLearner {
                 return estimatedPerformance;
             }
         }
-        throw new UserError(this, 912, getName(), "could not deliver optimization performance.");
+        throw new UserError(this, "pio.error.operator.learner_cannot_estimate",
+                getName(), "could not deliver optimization performance.");
     }
 
     @Override

@@ -19,7 +19,7 @@
 package io.sugo.pio.ports.metadata;
 
 import io.sugo.pio.example.ExampleSet;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.tools.Ontology;

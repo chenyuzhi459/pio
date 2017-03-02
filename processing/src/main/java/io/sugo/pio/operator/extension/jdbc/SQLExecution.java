@@ -46,7 +46,7 @@ public class SQLExecution extends Operator {
             sqle.executeStatement(query, true, this, this.getLogger());
             sqle.disconnect();
         } catch (SQLException var3) {
-            throw new UserError(this, var3, 304, new Object[]{var3.getMessage()});
+            throw new UserError(this, var3, "pio.error.database_error", new Object[]{var3.getMessage()});
         }
 
         this.dummyPorts.passDataThrough();
@@ -59,7 +59,8 @@ public class SQLExecution extends Operator {
         }
 
         if (query == null) {
-            throw new UserError(this, 202, new Object[]{PARAMETER_QUERY, "query_file"});
+            throw new UserError(this, "pio.error.parameter_must_set",
+                    new Object[]{PARAMETER_QUERY, "query_file"});
         } else {
             return query;
         }

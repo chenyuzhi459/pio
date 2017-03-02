@@ -28,7 +28,8 @@ public class SingleAttributeFilter extends AbstractAttributeFilterCondition {
 	public void init(ParameterHandler operator) throws UserError, ConditionCreationException {
 		attributeName = operator.getParameterAsString(PARAMETER_ATTRIBUTE);
 		if (attributeName == null || attributeName.length() == 0) {
-			throw new UserError(operator instanceof Operator ? (Operator) operator : null, 111);
+			throw new UserError(operator instanceof Operator ? (Operator) operator : null,
+					"pio.error.no_attribute_selected");
 		}
 	}
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
@@ -342,13 +343,13 @@ public abstract class Operator implements ParameterHandler, Serializable {
                 boolean parameterSet = getParameters().isSet(type.getKey());
                 if (type.getDefaultValue() == null && !parameterSet) {
                     addError(new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, portOwner,
-                            "undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
+                            "pio.error.process.undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
                     errorCount++;
                 } else if (type instanceof ParameterTypeAttribute && parameterSet) {
                     try {
                         if ("".equals(getParameter(type.getKey()))) {
                             addError(new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, portOwner,
-                                    "undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
+                                    "pio.error.process.undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
                             errorCount++;
                         }
                     } catch (UndefinedParameterError e) {
@@ -359,7 +360,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
             if (!optional && type instanceof ParameterTypeDate) {
                 String value = getParameters().getParameter(type.getKey());
                 if (value != null && !ParameterTypeDate.isValidDate(value)) {
-                    addError(new SimpleProcessSetupError(ProcessSetupError.Severity.WARNING, portOwner, "invalid_date_format",
+                    addError(new SimpleProcessSetupError(ProcessSetupError.Severity.WARNING, portOwner, "pio.error.process.invalid_date_format",
                             new Object[]{type.getKey().replace('_', ' '), value}));
                 }
             }
