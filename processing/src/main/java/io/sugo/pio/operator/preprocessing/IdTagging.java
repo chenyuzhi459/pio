@@ -129,7 +129,7 @@ public class IdTagging extends AbstractDataProcessing {
 		// only warning, removing is done by createSpecialAttribute(...)
 		Attribute idAttribute = eSet.getAttributes().getId();
 		if (idAttribute != null) {
-			getLogger().warning("Overwriting old id attribute!");
+			getLogger().warn("Overwriting old id attribute!");
 		}
 
 		// create new id attribute

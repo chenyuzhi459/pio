@@ -1,6 +1,6 @@
 package io.sugo.pio.operator.extension.jdbc.io;
 
-
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DatabaseDataReader extends AbstractExampleSource implements ConnectionProvider {
     public static final String PARAMETER_QUERY = "query";
@@ -47,7 +46,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                 try {
                     this.databaseHandler.getConnection().close();
                 } catch (SQLException var9) {
-                    this.getLogger().log(Level.WARNING, "Error closing database connection: " + var9, var9);
+                    this.getLogger().warn("Error closing database connection: " + var9, var9);
                 }
             }
 
@@ -88,7 +87,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
             try {
                 resultSet.close();
             } catch (SQLException var10) {
-                this.getLogger().log(Level.WARNING, "DB error closing result set: " + var10, var10);
+                this.getLogger().warn("DB error closing result set: " + var10, var10);
             }
 
         }
@@ -120,7 +119,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                     this.databaseHandler.disconnect();
                 }
             } catch (SQLException var15) {
-                this.getLogger().log(Level.WARNING, "DB error closing connection: " + var15, var15);
+                this.getLogger().warn("DB error closing connection: " + var15, var15);
             }
 
         }
@@ -156,7 +155,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                     }
                 } else if (!Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, 1)) {
                     if (logger != null) {
-                        logger.warning("Unknown column type: " + attribute);
+                        logger.warn("Unknown column type: " + attribute);
                     }
 
                     value = 0.0D / 0.0;

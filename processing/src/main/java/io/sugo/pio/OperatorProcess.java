@@ -2,6 +2,7 @@ package io.sugo.pio;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.metamx.common.IAE;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.ProcessRootOperator;
@@ -14,7 +15,6 @@ import io.sugo.pio.repository.RepositoryLocation;
 import org.joda.time.DateTime;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  */
@@ -35,7 +35,8 @@ public class OperatorProcess {
      */
     private final MacroHandler macroHandler = new MacroHandler(this);
 
-    private transient final Logger logger = Logger.getLogger(Process.class.getName());
+    private static final Logger logger = new Logger(Process.class);
+
     /**
      * This map holds the names of all operators in the process. Operators are automatically
      * registered during adding and unregistered after removal.

@@ -54,15 +54,20 @@ public class ProcessRunner implements Runnable {
                 OperatorProcess process = queue.poll(WAIT_TIME, TimeUnit.SECONDS);
                 if (process != null) {
                     try {
-                        log.info("start execute Process:%s", process.getId());
+                        log.info("Take the will be running process[id:%s] from the queue, and begin to execute...", process.getId());
+
                         process.getRootOperator().getExecutionUnit().transformMetaData();
+                        log.info("The executing process[id:%s] transform metadata finished.", process.getId());
+
                         process.run();
+                        log.info("The process[id:%s] executing finished.", process.getId());
+
                         metadataProcessManager.update(process);
                         process.success();
                         metadataProcessManager.update(process);
-                        log.info("Process:%s finished successfully", process.getId());
+                        log.info("The process[id:%s] executing finished, and update status and metadata successfully.", process.getId());
                     } catch (RuntimeException re) {
-                        log.error(re, "Process %s run failed", process.getId());
+                        log.error(re,"The process[id:%s] executing failed.", process.getId());
                         process.failed();
                         metadataProcessManager.update(process);
                     }

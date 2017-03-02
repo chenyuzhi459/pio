@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.execution;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.operator.ExecutionUnit;
 import io.sugo.pio.operator.Operator;
 
@@ -12,14 +13,22 @@ import java.util.Iterator;
  *
  */
 public class SimpleUnitExecutor implements UnitExecutor {
+
+    private static final Logger log = new Logger(SimpleUnitExecutor.class);
+
     @Override
     public void execute(ExecutionUnit unit) {
         Iterator<Operator> opIter = unit.getOperatorIterator();
 
         Operator operator = opIter.hasNext() ? opIter.next() : null;
         while (operator != null) {
+            String name = operator.getName();
+            log.info("Begin to execute operator named: %s ...", name);
+
             operator.execute();
             operator.freeMemory();
+
+            log.info("Execute operator named: %s successfully.", name);
 
             operator = opIter.hasNext() ? opIter.next() : null;
         }

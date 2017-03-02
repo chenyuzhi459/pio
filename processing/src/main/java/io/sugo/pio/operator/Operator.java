@@ -3,8 +3,8 @@ package io.sugo.pio.operator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
-import io.sugo.pio.operator.nio.model.ParseException;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
@@ -17,13 +17,15 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "operatorType")
 @JsonSubTypes(value = {
         @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class)
 })
 public abstract class Operator implements ParameterHandler, Serializable {
+
+    private transient static final Logger log = new Logger(Operator.class);
+
     private String name;
     protected String fullName;
     private Integer xPos;
@@ -48,8 +50,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * Number of times the operator was applied.
      */
     private AtomicInteger applyCount = new AtomicInteger();
-
-    private transient final Logger logger = Logger.getLogger(Operator.class.getName());
 
 //    private OperatorVersion compatibilityLevel;
 
@@ -299,9 +299,11 @@ public abstract class Operator implements ParameterHandler, Serializable {
             doWork();
             setStatus(Status.SUCCESS);
         } catch (OperatorException oe) {
+            log.error(oe,"Operator named: %s execute failed.", getName());
             setStatus(Status.FAILED);
             throw oe;
         } catch (Exception oe) {
+            log.error(oe,"Operator named: %s execute failed.", getName());
             setStatus(Status.FAILED);
             throw oe;
         } finally {
@@ -388,7 +390,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     public Logger getLogger() {
         if (getProcess() == null) {
-            return logger;
+            return log;
         } else {
             return getProcess().getLogger();
         }
@@ -635,28 +637,28 @@ public abstract class Operator implements ParameterHandler, Serializable {
             }
             return result;
         } else {*/
-            getLogger().fine(getName() + " is not attached to a process. Trying '" + fileName + "' as absolute filename.");
-            File result = new File(fileName);
-            if (createMissingDirectories) {
-                if (result.isDirectory()) {
-                    boolean isDirectoryCreated = result.mkdirs();
-                    if (!isDirectoryCreated) {
-                        throw new UserError(null, "io.dir_creation_fail", result.getAbsolutePath());
-                    }
-                } else {
-                    File parent = result.getParentFile();
-                    if (parent != null) {
-                        if (!parent.exists()) {
-                            boolean isDirectoryCreated = parent.mkdirs();
-                            if (!isDirectoryCreated) {
-                                throw new UserError(null, "io.dir_creation_fail", parent.getAbsolutePath());
-                            }
+        getLogger().debug(getName() + " is not attached to a process. Trying '" + fileName + "' as absolute filename.");
+        File result = new File(fileName);
+        if (createMissingDirectories) {
+            if (result.isDirectory()) {
+                boolean isDirectoryCreated = result.mkdirs();
+                if (!isDirectoryCreated) {
+                    throw new UserError(null, "io.dir_creation_fail", result.getAbsolutePath());
+                }
+            } else {
+                File parent = result.getParentFile();
+                if (parent != null) {
+                    if (!parent.exists()) {
+                        boolean isDirectoryCreated = parent.mkdirs();
+                        if (!isDirectoryCreated) {
+                            throw new UserError(null, "io.dir_creation_fail", parent.getAbsolutePath());
                         }
-
                     }
+
                 }
             }
-            return result;
+        }
+        return result;
 //        }
     }
 
@@ -765,7 +767,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
         }
     }
 
-    public IOContainer getResult(){
+    public IOContainer getResult() {
         return new IOContainer(new ArrayList<>());
     }
 }

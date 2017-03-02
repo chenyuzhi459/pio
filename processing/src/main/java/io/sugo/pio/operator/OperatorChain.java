@@ -1,7 +1,9 @@
 package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.operator.execution.SimpleUnitExecutor;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
 import io.sugo.pio.ports.impl.OutputPortsImpl;
@@ -14,6 +16,8 @@ import java.util.List;
 //        @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class)
 //})
 public abstract class OperatorChain extends Operator {
+
+    private static final Logger log = new Logger(OperatorChain.class);
 
     @JsonProperty
     private List<ExecutionUnit> execUnits;
@@ -86,7 +90,11 @@ public abstract class OperatorChain extends Operator {
     @Override
     public void doWork() {
         for (ExecutionUnit execUnit : execUnits) {
+            log.info("Begin to execute execution unit...");
+
             execUnit.execute();
+
+            log.info("Execute execution unit successfully.");
         }
     }
 

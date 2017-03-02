@@ -178,10 +178,15 @@ public class ProcessManager {
         try {
             OperatorProcess process = get(id);
             process.clearStatus();
+
+            log.info("Put the will be running process[id:%s] to the queue.", id);
             queue.offer(process, 10, TimeUnit.SECONDS);
+
             process.setUpdateTime(new DateTime());
             metadataProcessManager.update(process);
+
             log.info("Processes that waiting for running number are:%d", queue.size());
+
             return process;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -252,6 +257,10 @@ public class ProcessManager {
             process.getRootOperator().getExecutionUnit().addOperator(operator);
             process.setUpdateTime(new DateTime());
             metadataProcessManager.update(process);
+
+            log.info("The process named %s[id:%s] add operator[name:%s] successfully.",
+                    process.getName(), processId, meta.getName());
+
             return process;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -274,6 +283,10 @@ public class ProcessManager {
             process.setUpdateTime(new DateTime());
             process.removeOperator(operatorId);
             metadataProcessManager.update(process);
+
+            log.info("The process named %s[id:%s] delete operator[id:%s] successfully.",
+                    process.getName(), processId, operatorId);
+
             return process;
         } else {
             return null;
@@ -286,6 +299,10 @@ public class ProcessManager {
             process.setUpdateTime(new DateTime());
             process.connect(dto, true);
             metadataProcessManager.update(process);
+
+            log.info("The process named %s[id:%s] add connection successfully.",
+                    process.getName(), processId);
+
             process.getRootOperator().getExecutionUnit().transformMetaData();
             return process;
         } else {
@@ -299,6 +316,10 @@ public class ProcessManager {
             process.setUpdateTime(new DateTime());
             process.disconnect(dto);
             metadataProcessManager.update(process);
+
+            log.info("The process named %s[id:%s] delete connection successfully.",
+                    process.getName(), processId);
+
             process.getRootOperator().getExecutionUnit().transformMetaData();
             return process;
         } else {
@@ -312,6 +333,10 @@ public class ProcessManager {
             Operator operator = process.getOperator(operatorId);
             operator.setParameter(key, value);
             metadataProcessManager.update(process);
+
+            log.info("The process named %s[id:%s] update parameter[key:%s;value:%s] successfully.",
+                    process.getName(), processId, key, value);
+
             return operator;
         } else {
             return null;
@@ -333,6 +358,10 @@ public class ProcessManager {
             }
 
             metadataProcessManager.update(process);
+
+            log.info("The process named %s[id:%s] update operator[id:%s] successfully.",
+                    process.getName(), processId, operatorId);
+
             return operator;
         } else {
             return null;
@@ -342,6 +371,10 @@ public class ProcessManager {
     public OperatorProcess getResult(String id) {
         OperatorProcess process = get(id);
         IOContainer result = process.getRootOperator().getResults(true);
+
+        log.info("Get result of process named %s[id:%s] successfully.",
+                process.getName(), id);
+
         return process;
     }
 }

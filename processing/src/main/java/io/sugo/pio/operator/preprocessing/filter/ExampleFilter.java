@@ -140,7 +140,7 @@ public class ExampleFilter extends AbstractDataProcessing {
 
     @Override
     public ExampleSet apply(final ExampleSet inputSet) throws OperatorException {
-        getLogger().fine(getName() + ": input set has " + inputSet.size() + " examples.");
+        getLogger().info(getName() + ": input set has " + inputSet.size() + " examples.");
 
 //		String className = getParameterAsString(PARAMETER_CONDITION_CLASS);
 //		String parameter = getParameterAsString(PARAMETER_PARAMETER_STRING);

@@ -57,7 +57,7 @@ public class ParameterValue implements Serializable {
 //				"Setting parameter '" + parameterKey + "' of operator '" + opName + "' to '" + parameterValue + "'.");
 		Operator operator = process.getOperator(opName);
 		if (operator == null) {
-			process.getLogger().warning("No such operator: '" + opName + "'.");
+			process.getLogger().warn("No such operator: '" + opName + "'.");
 		} else {
 			operator.getParameters().setParameter(parameterKey, parameterValue);
 		}

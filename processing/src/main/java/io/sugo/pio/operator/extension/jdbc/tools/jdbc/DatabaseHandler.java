@@ -1,6 +1,6 @@
 package io.sugo.pio.operator.extension.jdbc.tools.jdbc;
 
-
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.ProcessStateListener;
 import io.sugo.pio.example.Attribute;
@@ -28,7 +28,6 @@ import io.sugo.pio.tools.Tools;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
-import java.util.logging.Logger;
 
 public class DatabaseHandler implements AutoCloseable {
     public static final String PARAMETER_DEFINE_CONNECTION = "define_connection";
@@ -1063,7 +1062,7 @@ public class DatabaseHandler implements AutoCloseable {
                 }
             }
         } finally {
-            logger.fine("Query executed.");
+            logger.debug("Query executed.");
             if (!isQuery && statement != null) {
                 ((Statement) statement).close();
             }
@@ -1262,7 +1261,7 @@ public class DatabaseHandler implements AutoCloseable {
                             int var119 = 0;
                             if (attCount > 0) {
                                 if (logger != null) {
-                                    logger.fine(prepUpdateStatement.toString());
+                                    logger.debug(prepUpdateStatement.toString());
                                 }
 
                                 var119 = this.executeUpdate(prepUpdateStatement, operator);
@@ -1295,7 +1294,7 @@ public class DatabaseHandler implements AutoCloseable {
 
                             if (var119 <= 0) {
                                 if (logger != null) {
-                                    logger.fine(prepInsertStatement.toString());
+                                    logger.debug(prepInsertStatement.toString());
                                 }
 
                                 this.executeUpdate(prepInsertStatement, operator);
