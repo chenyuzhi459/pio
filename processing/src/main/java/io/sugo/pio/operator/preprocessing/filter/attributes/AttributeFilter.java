@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.preprocessing.filter.attributes;
 
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
@@ -43,6 +44,8 @@ import java.util.Set;
  */
 public class AttributeFilter extends AbstractFeatureSelection {
 
+	private static final Logger logger = new Logger(AttributeFilter.class);
+
 	private final AttributeSubsetSelector attributeSelector = new AttributeSubsetSelector(this, getExampleSetInputPort());
 
 	@Override
@@ -61,6 +64,8 @@ public class AttributeFilter extends AbstractFeatureSelection {
 
 	@Override
 	public ExampleSet apply(ExampleSet exampleSet) throws OperatorException {
+		logger.info("Attribute filter begin to apply example set[%s]", exampleSet.getName());
+
 		Attributes attributes = exampleSet.getAttributes();
 		Set<Attribute> attributeSubset = attributeSelector.getAttributeSubset(exampleSet, true);
 		Iterator<Attribute> r = attributes.allAttributes();
@@ -70,6 +75,9 @@ public class AttributeFilter extends AbstractFeatureSelection {
 				r.remove();
 			}
 		}
+
+		logger.info("Attribute filter apply example set[%s] successfully!", exampleSet.getName());
+
 		return exampleSet;
 	}
 

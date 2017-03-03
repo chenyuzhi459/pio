@@ -1,10 +1,10 @@
 package io.sugo.pio.operator.nio.model;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.DataRowFactory;
 import io.sugo.pio.operator.Annotations;
-import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.io.AbstractDataReader;
 import io.sugo.pio.operator.io.AbstractReader;
@@ -31,6 +31,8 @@ import static io.sugo.pio.operator.nio.model.DataResultSetTranslationConfigurati
  */
 public abstract class AbstractDataResultSetReader extends AbstractReader<ExampleSet> {
 
+    private static final Logger logger = new Logger(AbstractDataResultSetReader.class);
+
     public static final String PARAMETER_ANNOTATIONS = "annotations";
 
     /**
@@ -56,12 +58,14 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
     private InputPort fileInputPort = getInputPorts().createPort("file");
     private FileInputPortHandler filePortHandler = new FileInputPortHandler(this, fileInputPort, this.getFileParameterName());
 
-    public AbstractDataResultSetReader(){
+    public AbstractDataResultSetReader() {
         super(ExampleSet.class);
     }
 
     @Override
     public ExampleSet read() throws OperatorException {
+        logger.info("AbstractDataResultSetReader begin to load data result set...");
+
         // loading data result set
         ExampleSet exampleSet = null;
         try (DataResultSetFactory dataResultSetFactory = getDataResultSetFactory();
@@ -200,7 +204,7 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
     /**
      * Same as {@link #getSelectedFile()}, but returns true if file is specified (in the respective
      * way).
-     * */
+     */
     public boolean isFileSpecified() {
         return filePortHandler.isFileSpecified();
     }

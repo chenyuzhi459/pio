@@ -18,6 +18,7 @@
  */
 package io.sugo.pio.operator.preprocessing.normalization;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
@@ -45,9 +46,10 @@ import java.util.List;
  * maximum value or by a z-transformation, i.e. on mean 0 and variance 1. or by a proportional
  * transformation as proportion of the total sum of the respective attribute.
  *
- * @author Ingo Mierswa, Sebastian Land
  */
 public class Normalization extends PreprocessingOperator {
+
+    private static final Logger logger = new Logger(Normalization.class);
 
     private static final ArrayList<NormalizationMethod> METHODS = new ArrayList<NormalizationMethod>();
 
@@ -77,7 +79,9 @@ public class Normalization extends PreprocessingOperator {
      */
     private static final OperatorVersion VERSION_MAY_WRITE_INTO_DATA = new OperatorVersion(7, 1, 1);
 
-    /** Creates a new Normalization operator. */
+    /**
+     * Creates a new Normalization operator.
+     */
     public Normalization() {
         super();
     }
@@ -96,6 +100,8 @@ public class Normalization extends PreprocessingOperator {
 
     @Override
     public PreprocessingModel createPreprocessingModel(ExampleSet exampleSet) throws OperatorException {
+        logger.info("Normalization begin to create preprocessing model through example set[%s]...", exampleSet.getName());
+
         int method = getParameterAsInt(PARAMETER_NORMALIZATION_METHOD);
         NormalizationMethod normalizationMethod = METHODS.get(method);
         normalizationMethod.init();
@@ -122,7 +128,9 @@ public class Normalization extends PreprocessingOperator {
         return I18N.getMessage("pio.Normalization.description");
     }
 
-    /** Returns a list with all parameter types of this model. */
+    /**
+     * Returns a list with all parameter types of this model.
+     */
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();

@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.preprocessing.filter;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.Condition;
 import io.sugo.pio.example.set.ConditionedExampleSet;
@@ -53,6 +54,8 @@ import java.util.List;
  * </p>
  */
 public class ExampleFilter extends AbstractDataProcessing {
+
+    private static final Logger logger = new Logger(ExampleFilter.class);
 
     /**
      * The parameter name for &quot;Implementation of the condition.&quot;
@@ -140,7 +143,7 @@ public class ExampleFilter extends AbstractDataProcessing {
 
     @Override
     public ExampleSet apply(final ExampleSet inputSet) throws OperatorException {
-        getLogger().info(getName() + ": input set has " + inputSet.size() + " examples.");
+        logger.info(getName() + ": input set has " + inputSet.size() + " examples.");
 
 //		String className = getParameterAsString(PARAMETER_CONDITION_CLASS);
 //		String parameter = getParameterAsString(PARAMETER_PARAMETER_STRING);
@@ -166,6 +169,9 @@ public class ExampleFilter extends AbstractDataProcessing {
                         !getParameterAsBoolean(PARAMETER_INVERT_FILTER));
                 unmatchedOutput.deliver(unmatchedResult);
             }
+
+            logger.info(getName() + ": remained " + result.size() + " examples after filtered.");
+
             return result;
         } catch (AttributeTypeException e) {
             throw new UserError(this, e, "pio.error.filter_wrong_type", e.getMessage());

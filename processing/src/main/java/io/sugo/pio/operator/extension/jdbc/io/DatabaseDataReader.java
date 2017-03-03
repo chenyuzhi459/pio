@@ -28,9 +28,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 
 public class DatabaseDataReader extends AbstractExampleSource implements ConnectionProvider {
+
+    private static final Logger logger = new Logger(DatabaseDataReader.class);
+
     public static final String PARAMETER_QUERY = "query";
     public static final int DATA_MANAGEMENT = 0;
 
@@ -46,7 +48,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                 try {
                     this.databaseHandler.getConnection().close();
                 } catch (SQLException var9) {
-                    this.getLogger().warn("Error closing database connection: " + var9, var9);
+                    logger.warn("Error closing database connection: " + var9, var9);
                 }
             }
 
@@ -58,11 +60,14 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     protected ResultSet getResultSet() throws OperatorException {
         try {
             this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
+            logger.info("Database data reader connected to database: " + databaseHandler.getDatabaseUrl());
+
             String sqle = this.getQuery(this.databaseHandler.getStatementCreator());
             if (sqle == null) {
                 throw new UserError(this, "pio.error.parameter_must_set",
                         new Object[]{"query", "query_file", "table_name"});
             } else {
+                logger.info("Database data reader begin to execute sql: " + sqle);
                 return this.databaseHandler.executeStatement(sqle, true, this, this.getLogger());
             }
         } catch (SQLException var2) {
@@ -76,21 +81,22 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 
     public ExampleSet createExampleSet() throws OperatorException {
         ResultSet resultSet = this.getResultSet();
+        logger.info("Database data reader get result set successfully.");
 
         ExampleSetBuilder builder;
         try {
             List e = getAttributes(resultSet);
 //            builder = createExampleTable(resultSet, e, this.getParameterAsInt("datamanagement"), this.getLogger(), this);
-            builder = createExampleTable(resultSet, e, DATA_MANAGEMENT, this.getLogger(), this);
+            builder = createExampleTable(resultSet, e, DATA_MANAGEMENT, this);
         } catch (SQLException var11) {
             throw new UserError(this, var11, "pio.error.database_error", new Object[]{var11.getMessage()});
         } finally {
             try {
                 resultSet.close();
+                logger.info("Database data reader closed result set.");
             } catch (SQLException var10) {
-                this.getLogger().warn("DB error closing result set: " + var10, var10);
+                logger.warn("Database data reader error closing result set: " + var10, var10);
             }
-
         }
 
         return builder.build();
@@ -128,7 +134,9 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         return metaData;
     }
 
-    public static ExampleSetBuilder createExampleTable(ResultSet resultSet, List<Attribute> attributes, int dataManagementType, Logger logger, Operator op) throws SQLException, OperatorException {
+    public static ExampleSetBuilder createExampleTable(ResultSet resultSet, List<Attribute> attributes, int dataManagementType, Operator op) throws SQLException, OperatorException {
+        logger.info("Database data reader begin to create example table through result set....");
+
         ResultSetMetaData metaData = resultSet.getMetaData();
         Attribute[] attributeArray = (Attribute[]) attributes.toArray(new Attribute[attributes.size()]);
         ExampleSetBuilder builder = ExampleSets.from(attributes);
@@ -208,6 +216,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
             }
 
             builder.addDataRow(dataRow);
+
+            counter++;
 //            if(op != null) {
 //                ++counter;
 //                if(counter % 100 == 0) {
@@ -215,6 +225,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 //                }
 //            }
         }
+
+        logger.info("Database data reader created [%d] example table successfully.", counter);
 
         return builder;
     }

@@ -1,5 +1,6 @@
 package io.sugo.pio.operator;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.error.UnsupportedApplicationParameterError;
@@ -21,6 +22,8 @@ public class ModelApplier extends Operator {
 //    public ModelApplier(String name) {
 //
 //    }
+
+    private static final Logger logger = new Logger(ModelApplier.class);
 
     /**
      * The parameter name for &quot;key&quot;
@@ -79,6 +82,9 @@ public class ModelApplier extends Operator {
     public void doWork() throws OperatorException {
         ExampleSet inputExampleSet = exampleSetInput.getData(ExampleSet.class);
         Model model = modelInput.getData(Model.class);
+
+        logger.info("Begin to apply model[%s]...", model.getName());
+
         if (AbstractModel.class.isAssignableFrom(model.getClass())) {
             ((AbstractModel) model).setOperator(this);
             ((AbstractModel) model).setShowProgress(true);
@@ -109,6 +115,7 @@ public class ModelApplier extends Operator {
         ExampleSet result = inputExampleSet;
         try {
             result = model.apply(inputExampleSet);
+            logger.info("Apply model[%s] to example set[%s]", model.getName(), inputExampleSet.getName());
         } catch (UserError e) {
             if (e.getOperator() == null) {
                 e.setOperator(this);

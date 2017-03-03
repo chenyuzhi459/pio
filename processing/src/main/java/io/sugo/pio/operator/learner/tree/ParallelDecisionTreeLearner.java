@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.learner.tree;
 
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorCapability;
@@ -24,12 +25,10 @@ import java.util.List;
  * CART / C4.5.
  * </p>
  *
- * @rapidminer.index C4.5
- * @rapidminer.index CART
- *
- * @author Sebastian Land, Ingo Mierswa, Gisa Schaefer
  */
 public class ParallelDecisionTreeLearner extends AbstractParallelTreeLearner {
+
+	private static final Logger logger = new Logger(ParallelDecisionTreeLearner.class);
 
 	@Override
 	public Pruner getPruner() throws OperatorException {
@@ -51,6 +50,9 @@ public class ParallelDecisionTreeLearner extends AbstractParallelTreeLearner {
 			maxDepth = exampleSet.size();
 		}
 		result.add(new ColumnMaxDepthTermination(maxDepth));
+
+		logger.info("Parallel decision tree get termination criteria of example set[%s]", exampleSet.getName());
+
 		return result;
 	}
 

@@ -27,11 +27,11 @@ import java.util.ResourceBundle;
 /**
  * Exception class whose instances are thrown by instances of the class {@link Operator} or of one
  * of its subclasses.
- *
+ * <p>
  * This exception also allows using i18n keys, but it is not obligatory to do so. Currently only the
  * .short tag will be used, but this should be changed in future, so adding the other descriptions
  * could be wise.
- *
+ * <p>
  * TODO: Change usage to i18n keys.
  *
  * @author Ingo Mierswa, Simon Fischer, Sebastian Land
@@ -50,6 +50,10 @@ public class OperatorException extends RuntimeException {
 
     public OperatorException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public OperatorException(String errorId, Object... arguments) {
+        super(getErrorMessage(errorId, arguments));
     }
 
     public OperatorException(String errorId, Throwable cause, Object... arguments) {

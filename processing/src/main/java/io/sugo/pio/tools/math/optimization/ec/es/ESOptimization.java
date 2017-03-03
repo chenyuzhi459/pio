@@ -1,8 +1,6 @@
 package io.sugo.pio.tools.math.optimization.ec.es;
 
-import io.sugo.pio.datatable.DataTable;
-import io.sugo.pio.datatable.SimpleDataTable;
-import io.sugo.pio.datatable.SimpleDataTableRow;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.performance.PerformanceVector;
@@ -20,10 +18,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Evolutionary Strategy approach for all real-valued optimization tasks.
- *
- * @author Ingo Mierswa
  */
 public abstract class ESOptimization implements Optimization {
+
+    private static final Logger logger = new Logger(ESOptimization.class);
 
     public static final String PARAMETER_MAX_GENERATIONS = "max_generations";
     public static final String PARAMETER_USE_EARLY_STOPPING = "use_early_stopping";
@@ -37,53 +35,85 @@ public abstract class ESOptimization implements Optimization {
     public static final String PARAMETER_SHOW_CONVERGENCE_PLOT = "show_convergence_plot";
     public static final String PARAMETER_SPECIFIY_POPULATION_SIZE = "specify_population_size";
 
-    /** The names of all available selection schemes. */
-    public static final String[] SELECTION_TYPES = { "uniform", "cut", "roulette wheel", "stochastic universal sampling",
-            "Boltzmann", "rank", "tournament", "non dominated sorting" };
+    /**
+     * The names of all available selection schemes.
+     */
+    public static final String[] SELECTION_TYPES = {"uniform", "cut", "roulette wheel", "stochastic universal sampling",
+            "Boltzmann", "rank", "tournament", "non dominated sorting"};
 
-    /** Indicates a uniform sampling selection scheme. */
+    /**
+     * Indicates a uniform sampling selection scheme.
+     */
     public static final int UNIFORM_SELECTION = 0;
 
-    /** Indicates a cut selection scheme. */
+    /**
+     * Indicates a cut selection scheme.
+     */
     public static final int CUT_SELECTION = 1;
 
-    /** Indicates a roulette wheel selection scheme. */
+    /**
+     * Indicates a roulette wheel selection scheme.
+     */
     public static final int ROULETTE_WHEEL = 2;
 
-    /** Indicates a stochastic universal sampling selection scheme. */
+    /**
+     * Indicates a stochastic universal sampling selection scheme.
+     */
     public static final int STOCHASTIC_UNIVERSAL = 3;
 
-    /** Indicates a Boltzmann selection scheme. */
+    /**
+     * Indicates a Boltzmann selection scheme.
+     */
     public static final int BOLTZMANN_SELECTION = 4;
 
-    /** Indicates a rank based selection scheme. */
+    /**
+     * Indicates a rank based selection scheme.
+     */
     public static final int RANK_SELECTION = 5;
 
-    /** Indicates a tournament selection scheme. */
+    /**
+     * Indicates a tournament selection scheme.
+     */
     public static final int TOURNAMENT_SELECTION = 6;
 
-    /** Indicates a multi-objective selection scheme (NSGA II). */
+    /**
+     * Indicates a multi-objective selection scheme (NSGA II).
+     */
     public static final int NON_DOMINATED_SORTING_SELECTION = 7;
 
-    /** The names of the mutation types. */
-    public static final String[] MUTATION_TYPES = { "none", "gaussian_mutation", "switching_mutation", "sparsity_mutation" };
+    /**
+     * The names of the mutation types.
+     */
+    public static final String[] MUTATION_TYPES = {"none", "gaussian_mutation", "switching_mutation", "sparsity_mutation"};
 
-    /** Indicates no mutation. */
+    /**
+     * Indicates no mutation.
+     */
     public static final int NO_MUTATION = 0;
 
-    /** Indicates a gaussian mutation. */
+    /**
+     * Indicates a gaussian mutation.
+     */
     public static final int GAUSSIAN_MUTATION = 1;
 
-    /** Indicates a switching mutation. */
+    /**
+     * Indicates a switching mutation.
+     */
     public static final int SWITCHING_MUTATION = 2;
 
-    /** Indicates a hybrid between switching mutation and Gaussian mutation. */
+    /**
+     * Indicates a hybrid between switching mutation and Gaussian mutation.
+     */
     public static final int SPARSITY_MUTATION = 3;
 
-    /** The names of the initialization types. */
-    public static final String[] POPULATION_INIT_TYPES = { "random", "min", "max" };
+    /**
+     * The names of the initialization types.
+     */
+    public static final String[] POPULATION_INIT_TYPES = {"random", "min", "max"};
 
-    /** Indicates that the start population should be randomly initialized. */
+    /**
+     * Indicates that the start population should be randomly initialized.
+     */
     public static final int INIT_TYPE_RANDOM = 0;
 
     /**
@@ -96,49 +126,77 @@ public abstract class ESOptimization implements Optimization {
      */
     public static final int INIT_TYPE_MAX = 2;
 
-    /** Indicates that the start population should be initialized with one. */
+    /**
+     * Indicates that the start population should be initialized with one.
+     */
     public static final int INIT_TYPE_ONE = 3;
 
-    /** Indicates that the start population should be initialized with zero. */
+    /**
+     * Indicates that the start population should be initialized with zero.
+     */
     public static final int INIT_TYPE_ZERO = 4;
 
-    /** This parameter indicates the minimum value for all genes. */
+    /**
+     * This parameter indicates the minimum value for all genes.
+     */
     private double[] min;
 
-    /** This parameter indicates the maximum value for all genes. */
+    /**
+     * This parameter indicates the maximum value for all genes.
+     */
     private double[] max;
 
-    /** The value types, either DOUBLE (default) or INT. */
+    /**
+     * The value types, either DOUBLE (default) or INT.
+     */
     private OptimizationValueType[] valueTypes;
 
-    /** The number of individuals. */
+    /**
+     * The number of individuals.
+     */
     private int populationSize;
 
-    /** The dimension of each individual. */
+    /**
+     * The dimension of each individual.
+     */
     private int individualSize;
 
-    /** The maximum number of generations. */
+    /**
+     * The maximum number of generations.
+     */
     private int maxGenerations;
 
-    /** The maximum numbers of generations without improvement. */
+    /**
+     * The maximum numbers of generations without improvement.
+     */
     private int generationsWithoutImprovement;
 
-    /** The type of start population initialization. */
+    /**
+     * The type of start population initialization.
+     */
     private int initType = INIT_TYPE_RANDOM;
 
     /** The type of the mutation. */
     // private int mutationType = GAUSSIAN_MUTATION;
 
-    /** The mutation operator. */
+    /**
+     * The mutation operator.
+     */
     private Mutation mutation;
 
-    /** The current population. */
+    /**
+     * The current population.
+     */
     private Population population;
 
-    /** Population operators. */
+    /**
+     * Population operators.
+     */
     private Collection<PopulationOperator> popOps;
 
-    /** Indicates if a convergence plot should be drawn. */
+    /**
+     * Indicates if a convergence plot should be drawn.
+     */
     private boolean showConvergencePlot = false;
 
     /**
@@ -152,7 +210,9 @@ public abstract class ESOptimization implements Optimization {
      */
     private AtomicInteger currentEvalCounter = new AtomicInteger();
 
-    /** The random number generator. */
+    /**
+     * The random number generator.
+     */
     private RandomGenerator random;
 
     private Individual currentBest;
@@ -177,7 +237,9 @@ public abstract class ESOptimization implements Optimization {
                 random, null);
     }
 
-    /** Creates a new evolutionary SVM optimization. */
+    /**
+     * Creates a new evolutionary SVM optimization.
+     */
     @Deprecated
     public ESOptimization(double minValue, double maxValue, int populationSize, int individualSize, int initType,        // population
                           // paras
@@ -196,8 +258,7 @@ public abstract class ESOptimization implements Optimization {
      * Creates a new evolutionary SVM optimization which also checks for Stop if the
      * executingOperator is set.
      *
-     * @param executingOperator
-     *            If this parameter is null, no exception will be thrown.
+     * @param executingOperator If this parameter is null, no exception will be thrown.
      */
     public ESOptimization(double minValue, double maxValue, int populationSize, int individualSize, int initType,        // population
                           // paras
@@ -205,7 +266,7 @@ public abstract class ESOptimization implements Optimization {
                           int selectionType, double tournamentFraction, boolean keepBest,        // selection
                           // paras
                           int mutationType,        // type of mutation
-                          double crossoverProb, boolean showConvergencePlot,  RandomGenerator random,
+                          double crossoverProb, boolean showConvergencePlot, RandomGenerator random,
                           Operator executingOperator) {
         this(createBoundArray(minValue, individualSize), createBoundArray(maxValue, individualSize), populationSize,
                 individualSize, initType, maxGenerations, generationsWithoutImprovement, selectionType, tournamentFraction,
@@ -216,9 +277,7 @@ public abstract class ESOptimization implements Optimization {
     /**
      * Creates a new evolutionary SVM optimization.
      *
-     * @param executingOperator
-     *            If this parameter is null, no exception will be thrown.
-     *
+     * @param executingOperator If this parameter is null, no exception will be thrown.
      */
     public ESOptimization(double[] minValues, double[] maxValues, int populationSize, int individualSize, int initType,        // population
                           // paras
@@ -302,6 +361,8 @@ public abstract class ESOptimization implements Optimization {
             default:
                 break; // no mutation at all
         }
+
+        logger.info("Initialize ESOptimization successfully.");
     }
 
     private static double[] createBoundArray(double bound, int size) {
@@ -323,7 +384,8 @@ public abstract class ESOptimization implements Optimization {
      * This method is invoked after each evaluation. The default implementation does nothing but
      * subclasses might implement this method to support online plotting or logging.
      */
-    public void nextIteration() throws OperatorException {}
+    public void nextIteration() throws OperatorException {
+    }
 
     public double getMin(int index) {
         return min[index];
@@ -335,8 +397,8 @@ public abstract class ESOptimization implements Optimization {
 
     public void setMin(int index, double v) {
         this.min[index] = v;
-		/*
-		 * if (mutationType == GAUSSIAN_MUTATION) recalculateSigma((GaussianMutation)this.mutation,
+        /*
+         * if (mutationType == GAUSSIAN_MUTATION) recalculateSigma((GaussianMutation)this.mutation,
 		 * this.individualSize);
 		 */
     }
@@ -373,6 +435,8 @@ public abstract class ESOptimization implements Optimization {
      */
     @Override
     public void optimize() throws OperatorException {
+        logger.info("ESOptimization start to optimize...");
+
         this.totalEvalCounter = new AtomicInteger();
         this.currentEvalCounter = new AtomicInteger();
         boolean executingOperatorExists = executingOperator != null;
@@ -424,10 +488,16 @@ public abstract class ESOptimization implements Optimization {
             population.nextGeneration();
             nextIteration();
         }
+
+        logger.info("ESOptimization optimize end.");
     }
 
-    /** Evaluates the individuals of the given population. */
+    /**
+     * Evaluates the individuals of the given population.
+     */
     protected void evaluate(Population population) throws OperatorException {
+        logger.info("ESOptimization start to evaluate...");
+
         currentBest = null;
         evaluateAll(population);
         if (currentBest != null) {
@@ -440,6 +510,8 @@ public abstract class ESOptimization implements Optimization {
                 population.setBestEver(bestEverClone);
             }
         }
+
+        logger.info("ESOptimization evaluate end.");
     }
 
     protected void evaluateAll(Population population) throws OperatorException {
@@ -480,13 +552,17 @@ public abstract class ESOptimization implements Optimization {
         currentEvalCounter.incrementAndGet();
     }
 
-    /** Returns the current generation. */
+    /**
+     * Returns the current generation.
+     */
     @Override
     public int getGeneration() {
         return population.getGeneration();
     }
 
-    /** Returns the best fitness in the current generation. */
+    /**
+     * Returns the best fitness in the current generation.
+     */
     @Override
     public double getBestFitnessInGeneration() {
         Individual individual = population.getCurrentBest();
@@ -497,7 +573,9 @@ public abstract class ESOptimization implements Optimization {
         }
     }
 
-    /** Returns the best fitness ever. */
+    /**
+     * Returns the best fitness ever.
+     */
     @Override
     public double getBestFitnessEver() {
         Individual individual = population.getBestEver();
@@ -508,7 +586,9 @@ public abstract class ESOptimization implements Optimization {
         }
     }
 
-    /** Returns the best performance vector ever. */
+    /**
+     * Returns the best performance vector ever.
+     */
     @Override
     public PerformanceVector getBestPerformanceEver() {
         Individual individual = population.getBestEver();
@@ -541,7 +621,9 @@ public abstract class ESOptimization implements Optimization {
     // S T A R T P O P U L A T I O N S
     // ================================================================================
 
-    /** Randomly creates the initial population. */
+    /**
+     * Randomly creates the initial population.
+     */
     private Population createRandomStartPopulation() {
         Population population = new Population();
         for (int p = 0; p < this.populationSize; p++) {
@@ -565,7 +647,9 @@ public abstract class ESOptimization implements Optimization {
         return population;
     }
 
-    /** Randomly creates the initial population. */
+    /**
+     * Randomly creates the initial population.
+     */
     private Population createMinStartPopulation() {
         Population population = new Population();
         for (int p = 0; p < this.populationSize; p++) {
@@ -578,7 +662,9 @@ public abstract class ESOptimization implements Optimization {
         return population;
     }
 
-    /** Randomly creates the initial population. */
+    /**
+     * Randomly creates the initial population.
+     */
     private Population createMaxStartPopulation() {
         Population population = new Population();
         for (int p = 0; p < this.populationSize; p++) {
@@ -591,7 +677,9 @@ public abstract class ESOptimization implements Optimization {
         return population;
     }
 
-    /** Randomly creates the initial population. */
+    /**
+     * Randomly creates the initial population.
+     */
     private Population createFixedStartPopulation(double fixedValue) {
         Population population = new Population();
         for (int p = 0; p < this.populationSize; p++) {

@@ -32,15 +32,14 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
 
     protected String httpGet(String url) {
         if (!isValidUrl(url)) {
-            throw new OperatorException("Invalid request url:" + url);
+            throw new OperatorException("pio.error.parsing.invalid_url", url);
         }
 
         String result;
         try {
             result = HttpClientUtil.get(url);
         } catch (IOException e) {
-            logger.error("Get request url '" + url + " failed, details:" + e.getMessage());
-            throw new OperatorException("Http get failed, url: '" + url + "', reason: ", e);
+            throw new OperatorException("pio.error.http_request_failed",url , e);
         }
 
         return result;
@@ -53,15 +52,14 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
 
     protected String httpPost(String url, String requestJson) {
         if (!isValidUrl(url)) {
-            throw new OperatorException("Invalid request url:" + url);
+            throw new OperatorException("pio.error.parsing.invalid_url", url);
         }
 
         String result;
         try {
             result = HttpClientUtil.post(url, requestJson);
         } catch (IOException e) {
-            logger.error("Post request url '" + url + " failed, details:" + e.getMessage());
-            throw new OperatorException("Http post failed, url: '" + url + "', reason: ", e);
+            throw new OperatorException("pio.error.http_request_failed",url , e);
         }
 
         return result;

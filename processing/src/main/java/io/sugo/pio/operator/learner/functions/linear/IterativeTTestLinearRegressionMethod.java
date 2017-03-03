@@ -19,6 +19,7 @@
 package io.sugo.pio.operator.learner.functions.linear;
 
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.ProcessStoppedException;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeDouble;
@@ -140,12 +141,13 @@ public class IterativeTTestLinearRegressionMethod extends TTestLinearRegressionM
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = new LinkedList<ParameterType>();
 
-		types.add(new ParameterTypeInt(PARAMETER_MAX_ITERATIONS, "The maximal number of rounds for iterative selection.", 1,
+		types.add(new ParameterTypeInt(PARAMETER_MAX_ITERATIONS,
+				I18N.getMessage("pio.IterativeTTestLinearRegressionMethod.max_iterations"), 1,
 				Integer.MAX_VALUE, 10));
 		types.add(new ParameterTypeDouble(PARAMETER_FORWARD_SELECTION_THRESHOLD,
-				"This is the alpha level for the used t-test for selecting attributes.", 0, 1, 0.05));
+				I18N.getMessage("pio.IterativeTTestLinearRegressionMethod.forward_alpha"), 0, 1, 0.05));
 		types.add(new ParameterTypeDouble(PARAMETER_BACKWARD_SELECTION_THRESHOLD,
-				"This is the alpha level for the used t-test for deselecting attributes.", 0, 1, 0.05));
+				I18N.getMessage("pio.IterativeTTestLinearRegressionMethod.backward_alpha"), 0, 1, 0.05));
 		return types;
 	}
 

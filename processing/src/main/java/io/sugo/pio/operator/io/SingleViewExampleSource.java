@@ -56,8 +56,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 try {
                     resultList = parseResult(result);
                 } catch (IOException e) {
-                    logger.error("Parse druid result failed: ", e);
-                    throw new OperatorException("Parse druid result failed: " + e, e);
+                    throw new OperatorException("pio.error.parsing.unresolvable_druid_result", result, e);
                 }
 
                 logger.info("Get druid data from url '" + druidUrl + "' successfully.");
@@ -73,7 +72,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
                     // traverse all rows to store data
                     for (Object resultObj : resultList) {
-                        String resultStr;
+                        String resultStr = null;
                         Map resultMap = null;
                         try {
                             resultStr = jsonMapper.writeValueAsString(resultObj);
@@ -81,8 +80,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                                 resultMap = jsonMapper.readValue(resultStr, Map.class);
                             }
                         } catch (IOException e) {
-                            logger.error("Parse druid data row failed, details:" + e.getMessage());
-                            throw new OperatorException("Parse result failed: ", e);
+                            throw new OperatorException("pio.error.parsing.unresolvable_druid_row", resultStr, e);
                         }
 
                         // one result corresponds to one data row
@@ -157,8 +155,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 try {
                     resultList = parseResult(result);
                 } catch (IOException e) {
-                    logger.error("Parse metadata failed, details:" + e.getMessage());
-                    throw new OperatorException("Parse result failed: " + e, e);
+                    throw new OperatorException("pio.error.parsing.unresolvable_druid_result", result, e);
                 }
 
                 List<Attribute> attributes = getAttributes(resultList);

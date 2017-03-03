@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.learner;
 
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.AttributeWeights;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.*;
@@ -20,9 +21,10 @@ import java.util.List;
  * method. New learning schemes should extend this class to support the same parameters as other
  * RapidMiner learners. The main purpose of this class is to perform some compatibility checks.
  *
- * @author Ingo Mierswa
  */
 public abstract class AbstractLearner extends Operator implements Learner {
+
+    private static final Logger logger = new Logger(AbstractLearner.class);
 
     private final InputPort exampleSetInput = getInputPorts().createPort("training set");
     private final OutputPort modelOutput = getOutputPorts().createPort("model");
@@ -32,13 +34,15 @@ public abstract class AbstractLearner extends Operator implements Learner {
     private final OutputPort exampleSetOutput = getOutputPorts().createPort("exampleSet");
 
     @Override
-    public IOContainer getResult(){
+    public IOContainer getResult() {
         List<IOObject> ioObjects = new ArrayList<>();
         ioObjects.add(modelOutput.getAnyDataOrNull());
         return new IOContainer(ioObjects);
     }
 
-    /** Creates a new abstract */
+    /**
+     * Creates a new abstract
+     */
     public AbstractLearner() {
         exampleSetInput.addPrecondition(new LearnerPrecondition(this, exampleSetInput));
         getTransformer().addRule(
@@ -117,6 +121,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
     @Override
     public void doWork() throws OperatorException {
         ExampleSet exampleSet = exampleSetInput.getData(ExampleSet.class);
+        logger.info("Abstract learner begin to learn through example set[%s], which has size[%d]",
+                exampleSet.getName(), exampleSet.size());
 
         // some checks
         if (exampleSet.getAttributes().getLabel() == null) {
@@ -163,6 +169,9 @@ public abstract class AbstractLearner extends Operator implements Learner {
         }
 
         exampleSetOutput.deliver(exampleSet);
+
+        logger.info("Abstract learner learn through example set[%s] and deliver to the next operator finished.",
+                exampleSet.getName(), exampleSet.size());
     }
 
     /**
@@ -171,8 +180,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      * estimated performance. The default implementation returns false.
      *
      * @deprecated This method is not used any longer. Performance is estimated iff
-     *             {@link #canEstimatePerformance()} returns true and the corresponding port is
-     *             connected.
+     * {@link #canEstimatePerformance()} returns true and the corresponding port is
+     * connected.
      */
     @Override
     @Deprecated
@@ -195,8 +204,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      * The default implementation returns false.
      *
      * @deprecated This method is not used any longer. Weights are computed iff
-     *             {@link #canCalculateWeights()} returns true and the corresponding port is
-     *             connected.
+     * {@link #canCalculateWeights()} returns true and the corresponding port is
+     * connected.
      */
     @Override
     @Deprecated

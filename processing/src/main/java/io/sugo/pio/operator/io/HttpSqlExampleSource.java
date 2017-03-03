@@ -53,8 +53,7 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
             try {
                 resultList = parseResult(result);
             } catch (IOException e) {
-                logger.error("Parse http sql failed, details:" + e.getMessage());
-                throw new OperatorException("Parse result failed: " + e, e);
+                throw new OperatorException("pio.error.parsing.unresolvable_http_result", e, result);
             }
 
             logger.info("Get data from url '" + postUrl + "' with parameter '" + queryParam + "'successfully.");
@@ -137,8 +136,7 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
                 try {
                     resultList = parseResult(result);
                 } catch (IOException e) {
-                    logger.error("Parse metadata failed, details:" + e.getMessage());
-                    throw new OperatorException("Parse metadata failed: " + e, e);
+                    throw new OperatorException("pio.error.parsing.unresolvable_http_metadata", e, result);
                 }
 
                 List<Attribute> attributes = getAttributes(resultList);
@@ -208,7 +206,7 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
 
                         return datetimeVo.getValue();
                     } catch (IOException e) {
-                        logger.error("Extract value from datetime failed.", e);
+                        logger.warn("Extract value from datetime failed.", e);
                         return originValue.toString();
                     }
                 }
