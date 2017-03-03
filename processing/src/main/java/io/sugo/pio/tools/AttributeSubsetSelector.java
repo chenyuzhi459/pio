@@ -2,15 +2,15 @@ package io.sugo.pio.tools;
 
 import io.sugo.pio.example.*;
 import io.sugo.pio.example.set.ConditionCreationException;
+import io.sugo.pio.i18n.*;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.error.AttributeNotFoundError;
 import io.sugo.pio.operator.preprocessing.filter.attributes.*;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilterCondition.ScanResult;
-import io.sugo.pio.parameter.ParameterHandler;
-import io.sugo.pio.parameter.ParameterType;
-import io.sugo.pio.parameter.UndefinedParameterError;
+import io.sugo.pio.parameter.*;
+import io.sugo.pio.parameter.conditions.EqualTypeCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.metadata.*;
 
@@ -31,7 +31,8 @@ public class AttributeSubsetSelector {
     /**
      * The parameter name for &quot;Implementation of the condition.&quot;
      */
-//    public static final String PARAMETER_FILTER_TYPE = "attribute_filter_type";
+    public static final String PARAMETER_FILTER_TYPE = "attribute_filter_type";
+
     public static final int PARAMETER_DEFAULT_FILTER_TYPE = 2;
 
     /**
@@ -528,40 +529,41 @@ public class AttributeSubsetSelector {
      */
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = new LinkedList<>();
-//		ParameterType type = new ParameterTypeCategory(PARAMETER_FILTER_TYPE,
-//				"The condition specifies which attributes are selected or affected by this operator.", CONDITION_NAMES, 0);
-//		types.add(type);
+        ParameterType type = new ParameterTypeCategory(PARAMETER_FILTER_TYPE,
+                io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.attribute_filter_type"),
+                CONDITION_NAMES, 0);
+        types.add(type);
 
-//		for (int i = 0; i < CONDITION_IMPLEMENTATIONS.length; i++) {
-//            Collection<ParameterType> filterConditions;
-//            try {
-//                filterConditions = ((AttributeFilterCondition) CONDITION_IMPLEMENTATIONS[i].newInstance())
-//                        .getParameterTypes(operator, inPort, valueTypes);
-//                for (ParameterType conditionalType : filterConditions) {
-//                    types.add(conditionalType);
-//                    conditionalType.registerDependencyCondition(new EqualTypeCondition(operator, PARAMETER_FILTER_TYPE,
-//                            CONDITION_NAMES, true, i));
-//                }
-//                // can't do anything about it
-//            } catch (InstantiationException e) {
-//            } catch (IllegalAccessException e) {
-//            } catch (IllegalArgumentException e) {
-//            } catch (SecurityException e) {
-//            }
-//        }
+        for (int i = 0; i < CONDITION_IMPLEMENTATIONS.length; i++) {
+            Collection<ParameterType> filterConditions;
+            try {
+                filterConditions = ((AttributeFilterCondition) CONDITION_IMPLEMENTATIONS[i].newInstance())
+                        .getParameterTypes(operator, inPort, valueTypes);
+                for (ParameterType conditionalType : filterConditions) {
+                    types.add(conditionalType);
+                    conditionalType.registerDependencyCondition(new EqualTypeCondition(operator, PARAMETER_FILTER_TYPE,
+                            CONDITION_NAMES, true, i));
+                }
+                // can't do anything about it
+            } catch (InstantiationException e) {
+            } catch (IllegalAccessException e) {
+            } catch (IllegalArgumentException e) {
+            } catch (SecurityException e) {
+            }
+        }
 
         types.addAll(new SubsetAttributeFilter().getParameterTypes(operator, inPort, valueTypes));
 
-//        ParameterType type = new ParameterTypeBoolean(PARAMETER_INVERT_SELECTION,
-//                "Indicates if only attributes should be accepted which would normally filtered.", false);
-//        type.setHidden(true);
-//        types.add(type);
-//        type = new ParameterTypeBoolean(
-//                PARAMETER_INCLUDE_SPECIAL_ATTRIBUTES,
-//                "Indicate if this operator should also be applied on the special attributes. Otherwise they are always kept.",
-//                false);
-//        type.setHidden(true);
-//        types.add(type);
+        type = new ParameterTypeBoolean(PARAMETER_INVERT_SELECTION,
+                io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.invert_selection"), false);
+        type.setHidden(true);
+        types.add(type);
+        type = new ParameterTypeBoolean(
+                PARAMETER_INCLUDE_SPECIAL_ATTRIBUTES,
+                io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.include_special_attributes"),
+                false);
+        type.setHidden(true);
+        types.add(type);
 
         return types;
     }

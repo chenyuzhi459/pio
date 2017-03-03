@@ -2,6 +2,7 @@ package io.sugo.pio.operator.preprocessing;
 
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.NonSpecialAttributesExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.AbstractModel;
 import io.sugo.pio.operator.Model;
 import io.sugo.pio.operator.OperatorException;
@@ -174,12 +175,12 @@ public abstract class PreprocessingOperator extends AbstractDataProcessing {
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = super.getParameterTypes();
 		ParameterType type = new ParameterTypeBoolean(PARAMETER_RETURN_PREPROCESSING_MODEL,
-				"Indicates if the preprocessing model should also be returned", false);
+				I18N.getMessage("pio.PreprocessingOperator.return_preprocessing_model"), false);
 		type.setHidden(true);
 		types.add(type);
 
 		type = new ParameterTypeBoolean(PARAMETER_CREATE_VIEW,
-				"Create View to apply preprocessing instead of changing the data", false);
+				I18N.getMessage("pio.PreprocessingOperator.create_view"), false);
 		type.setHidden(!isSupportingView());
 		types.add(type);
 

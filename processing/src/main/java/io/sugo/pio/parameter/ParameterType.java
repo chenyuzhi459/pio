@@ -11,6 +11,7 @@ import io.sugo.pio.parameter.extension.jdbc.ParameterTypeSQLQuery;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "paramType")
@@ -94,6 +95,7 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
     /**
      * This collection assembles all conditions to be met to show this parameter within the gui.
      */
+    @JsonProperty
     private final Collection<ParameterCondition> conditions = new LinkedList<>();
 
 
@@ -138,6 +140,10 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
             conditionsMet &= condition.dependencyMet();
         }
         return isDeprecated || isHidden || !conditionsMet;
+    }
+
+    public Collection<ParameterCondition> getConditions() {
+        return Collections.unmodifiableCollection(conditions);
     }
 
     /**

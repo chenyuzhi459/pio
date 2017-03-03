@@ -2,6 +2,7 @@ package io.sugo.pio.operator.preprocessing.filter.attributes;
 
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.set.ConditionCreationException;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.ParameterHandler;
 import io.sugo.pio.parameter.ParameterType;
@@ -88,10 +89,10 @@ public class BlockTypeAttributeFilter extends AbstractAttributeFilterCondition {
 		String[] exceptValueTypeNames = new String[valueTypeSet.size()];
 		exceptValueTypeNames = valueTypeSet.toArray(valueTypeNames);
 
-		types.add(new ParameterTypeCategory(PARAMETER_BLOCK_TYPE, "The block type of the attributes.", valueTypeNames, 0));
+		types.add(new ParameterTypeCategory(PARAMETER_BLOCK_TYPE, I18N.getMessage("pio.BlockTypeAttributeFilter.block_type"), valueTypeNames, 0));
 		types.add(new ParameterTypeBoolean(PARAMETER_ADD_EXCEPTION,
-				"If enabled, an exception to the specified block type might be specified.", false));
-		ParameterType type = new ParameterTypeCategory(PARAMETER_EXCEPT_BLOCK_TYPE, "Except this block type.",
+				I18N.getMessage("pio.BlockTypeAttributeFilter.use_block_type_exception"), false));
+		ParameterType type = new ParameterTypeCategory(PARAMETER_EXCEPT_BLOCK_TYPE, I18N.getMessage("pio.BlockTypeAttributeFilter.except_block_type"),
 				exceptValueTypeNames, exceptValueTypeNames.length - 1);
 		type.registerDependencyCondition(new BooleanParameterCondition(operator, PARAMETER_ADD_EXCEPTION, true, true));
 		types.add(type);

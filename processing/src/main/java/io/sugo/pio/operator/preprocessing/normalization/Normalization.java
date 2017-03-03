@@ -126,7 +126,7 @@ public class Normalization extends PreprocessingOperator {
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
-        types.add(new ParameterTypeCategory(PARAMETER_NORMALIZATION_METHOD, "Select the normalization method.",
+        types.add(new ParameterTypeCategory(PARAMETER_NORMALIZATION_METHOD, I18N.getMessage("pio.Normalization.method"),
                 NORMALIZATION_METHODS, 0));
         int i = 0;
         for (NormalizationMethod method : METHODS) {

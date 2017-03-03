@@ -18,6 +18,7 @@
  */
 package io.sugo.pio.parameter.conditions;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.parameter.ParameterHandler;
@@ -32,8 +33,9 @@ import io.sugo.pio.parameter.PortProvider;
  * 
  */
 public class PortConnectedCondition extends ParameterCondition {
-
+	@JsonProperty
 	private final PortProvider portProvider;
+	@JsonProperty
 	private final boolean connected;
 
 	public PortConnectedCondition(ParameterHandler handler, PortProvider portProvider, boolean becomeMandatory,

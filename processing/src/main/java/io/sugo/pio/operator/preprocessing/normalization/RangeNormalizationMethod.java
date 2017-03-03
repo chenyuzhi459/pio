@@ -21,6 +21,7 @@ package io.sugo.pio.operator.preprocessing.normalization;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.Statistics;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.ports.InputPort;
@@ -96,9 +97,9 @@ public class RangeNormalizationMethod extends AbstractNormalizationMethod {
 	@Override
 	public List<ParameterType> getParameterTypes(ParameterHandler handler) {
 		List<ParameterType> types = super.getParameterTypes(handler);
-		types.add(new ParameterTypeDouble(PARAMETER_MIN, "The minimum value after normalization", Double.NEGATIVE_INFINITY,
+		types.add(new ParameterTypeDouble(PARAMETER_MIN, I18N.getMessage("pio.RangeNormalizationMethod.min"), Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY, 0.0d));
-		types.add(new ParameterTypeDouble(PARAMETER_MAX, "The maximum value after normalization", Double.NEGATIVE_INFINITY,
+		types.add(new ParameterTypeDouble(PARAMETER_MAX, I18N.getMessage("pio.RangeNormalizationMethod.max"), Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY, 1.0d));
 		return types;
 	}

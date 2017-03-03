@@ -1,5 +1,6 @@
 package io.sugo.pio.parameter.conditions;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.parameter.ParameterHandler;
 
 /**
@@ -8,8 +9,9 @@ public abstract class ParameterCondition {
 
     protected ParameterHandler parameterHandler;
 
+    @JsonProperty
     protected String conditionParameter;
-
+    @JsonProperty
     protected boolean becomeMandatory;
 
     /**

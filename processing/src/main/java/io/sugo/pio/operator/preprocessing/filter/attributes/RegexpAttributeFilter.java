@@ -2,6 +2,7 @@ package io.sugo.pio.operator.preprocessing.filter.attributes;
 
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.set.ConditionCreationException;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.ParameterHandler;
@@ -100,7 +101,7 @@ public class RegexpAttributeFilter extends AbstractAttributeFilterCondition {
 	public List<ParameterType> getParameterTypes(ParameterHandler operator, final InputPort inPort, final int... valueTypes) {
 		List<ParameterType> types = new LinkedList<ParameterType>();
 		types.add(new ParameterTypeRegexp(PARAMETER_REGULAR_EXPRESSION,
-				"A regular expression for the names of the attributes which should be kept.", true) {
+				I18N.getMessage("pio.RegexpAttributeFilter.regular_expression"), true) {
 
 			private static final long serialVersionUID = 8133149560984042644L;
 
@@ -124,12 +125,12 @@ public class RegexpAttributeFilter extends AbstractAttributeFilterCondition {
 		});
 		types.add(new ParameterTypeBoolean(
 				PARAMETER_ADD_EXCEPTION,
-				"If enabled, an exception to the specified regular expression might be specified. Attributes of matching this will be filtered out, although matching the first expression.",
+				I18N.getMessage("pio.RegexpAttributeFilter.use_except_expression"),
 				false));
 
 		ParameterType type = (new ParameterTypeRegexp(
 				PARAMETER_EXCEPT_REGULAR_EXPRESSION,
-				"A regular expression for the names of the attributes which should be filtered out although matching the above regular expression.",
+				I18N.getMessage("pio.RegexpAttributeFilter.except_regular_expression"),
 				true) {
 
 			private static final long serialVersionUID = 81331495609840426L;

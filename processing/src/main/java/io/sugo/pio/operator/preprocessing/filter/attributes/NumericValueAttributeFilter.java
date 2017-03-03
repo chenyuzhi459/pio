@@ -3,6 +3,7 @@ package io.sugo.pio.operator.preprocessing.filter.attributes;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.set.ConditionCreationException;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.ParameterHandler;
@@ -200,7 +201,8 @@ public class NumericValueAttributeFilter extends AbstractAttributeFilterConditio
 	@Override
 	public List<ParameterType> getParameterTypes(ParameterHandler operator, InputPort inPort, int... valueTypes) {
 		LinkedList<ParameterType> types = new LinkedList<ParameterType>();
-		types.add(new ParameterTypeString(PARAMETER_NUMERIC_CONDITION, "Parameter string for the condition, e.g. '>= 5'",
+		types.add(new ParameterTypeString(PARAMETER_NUMERIC_CONDITION,
+				I18N.getMessage("pio.NumericValueAttributeFilter.numeric_condition"),
 				true));
 		return types;
 	}
