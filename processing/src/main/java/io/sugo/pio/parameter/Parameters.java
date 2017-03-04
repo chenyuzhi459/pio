@@ -1,12 +1,13 @@
 package io.sugo.pio.parameter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.tools.AbstractObservable;
 
 import java.util.*;
 
 /**
  */
-public class Parameters implements Cloneable, Iterable<String> {
+public class Parameters extends AbstractObservable<String> implements Cloneable, Iterable<String> {
 
     //    public static final char PAIR_SEPARATOR = '\u241D';
 //    public static final char RECORD_SEPARATOR = '\u241E';

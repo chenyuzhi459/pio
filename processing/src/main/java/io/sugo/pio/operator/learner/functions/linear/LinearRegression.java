@@ -132,7 +132,7 @@ public class LinearRegression extends AbstractLearner {
             getProgress().setIndeterminate(true);
         }
 
-        io.sugo.pio.example.Tools.onlyNonMissingValues(exampleSet, "", this, Attributes.LABEL_NAME);
+        io.sugo.pio.example.Tools.onlyNonMissingValues(exampleSet, "LinearRegression", this, Attributes.LABEL_NAME);
 
         boolean useBias = getParameterAsBoolean(PARAMETER_USE_BIAS);
         boolean removeColinearAttributes = getParameterAsBoolean(PARAMETER_ELIMINATE_COLINEAR_FEATURES);

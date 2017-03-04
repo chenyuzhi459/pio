@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import io.sugo.pio.initialization.PioModule;
 import io.sugo.pio.operator.ModelApplier;
+import io.sugo.pio.operator.clustering.clusterer.KMeans;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
 import io.sugo.pio.operator.io.SingleViewExampleSource;
@@ -41,6 +42,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(ParallelRandomForestLearner.class, "random_forest_learner"),
                                 new NamedType(LogisticRegression.class, "logistic_regression"),
                                 new NamedType(LinearRegression.class, "linear_regression"),
+                                new NamedType(KMeans.class, "kmeans"),
                                 new NamedType(ModelApplier.class, "model_applier"),
                                 new NamedType(CSVExampleSource.class, "csv_source"),
                                 new NamedType(HttpSqlExampleSource.class, "http_sql_source"),
