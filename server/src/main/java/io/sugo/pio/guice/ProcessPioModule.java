@@ -13,6 +13,7 @@ import io.sugo.pio.operator.io.SingleViewExampleSource;
 import io.sugo.pio.operator.learner.functions.LogisticRegression;
 import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
+import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
 import io.sugo.pio.operator.nio.CSVExampleSource;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
@@ -37,6 +38,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(ChangeAttributeRole.class, "change_attribute_role"),
                                 new NamedType(Normalization.class, "normalization"),
                                 new NamedType(ParallelDecisionTreeLearner.class, "decision_tree_learner"),
+                                new NamedType(ParallelRandomForestLearner.class, "random_forest_learner"),
                                 new NamedType(LogisticRegression.class, "logistic_regression"),
                                 new NamedType(LinearRegression.class, "linear_regression"),
                                 new NamedType(ModelApplier.class, "model_applier"),
