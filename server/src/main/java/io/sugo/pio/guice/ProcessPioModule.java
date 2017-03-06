@@ -12,6 +12,7 @@ import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
 import io.sugo.pio.operator.io.SingleViewExampleSource;
 import io.sugo.pio.operator.learner.functions.LogisticRegression;
+import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
 import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
@@ -43,6 +44,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(LogisticRegression.class, "logistic_regression"),
                                 new NamedType(LinearRegression.class, "linear_regression"),
                                 new NamedType(KMeans.class, "kmeans"),
+                                new NamedType(JMySVMLearner.class, "svm"),
                                 new NamedType(ModelApplier.class, "model_applier"),
                                 new NamedType(CSVExampleSource.class, "csv_source"),
                                 new NamedType(HttpSqlExampleSource.class, "http_sql_source"),

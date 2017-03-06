@@ -119,6 +119,11 @@ public interface Attribute extends Cloneable, Serializable {
      */
     public void setBlockType(int b);
 
+    /** Sets the default value for this attribute. */
+    public void setDefault(double value);
+
+    /** Returns the default value for this attribute. */
+    public double getDefault();
 
     /**
      * Returns true if the attribute is nominal.

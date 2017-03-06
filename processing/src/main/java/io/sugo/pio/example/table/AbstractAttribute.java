@@ -1,9 +1,6 @@
 package io.sugo.pio.example.table;
 
-import io.sugo.pio.example.Attribute;
-import io.sugo.pio.example.AttributeTransformation;
-import io.sugo.pio.example.Attributes;
-import io.sugo.pio.example.Statistics;
+import io.sugo.pio.example.*;
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.tools.Ontology;
 
@@ -27,6 +24,9 @@ public abstract class AbstractAttribute implements Attribute {
     private transient List<Attributes> owners = new LinkedList<Attributes>();
 
     private final List<AttributeTransformation> transformations = new ArrayList<AttributeTransformation>();
+
+    /** The basic information about the attribute. Will only be shallowly cloned. */
+    private AttributeDescription attributeDescription;
 
     /**
      * Contains all attribute statistics calculation algorithms.
@@ -55,6 +55,8 @@ public abstract class AbstractAttribute implements Attribute {
      */
     protected AbstractAttribute(AbstractAttribute attribute) {
         tableIndex = attribute.tableIndex;
+        this.attributeDescription = attribute.attributeDescription;
+
         // copy statistics
         this.statistics = new LinkedList<Statistics>();
         for (Statistics statistics : attribute.statistics) {
@@ -234,6 +236,17 @@ public abstract class AbstractAttribute implements Attribute {
     @Override
     public Annotations getAnnotations() {
         return annotations;
+    }
+
+    @Override
+    public void setDefault(double value) {
+        this.attributeDescription = (AttributeDescription) this.attributeDescription.clone();
+        this.attributeDescription.setDefault(value);
+    }
+
+    @Override
+    public double getDefault() {
+        return this.attributeDescription.getDefault();
     }
 
     @Override
