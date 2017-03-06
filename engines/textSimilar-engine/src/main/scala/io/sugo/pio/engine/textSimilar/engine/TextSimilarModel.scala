@@ -8,10 +8,12 @@ import io.sugo.pio.engine.training.Model
 import org.apache.lucene.document._
 import java.lang.{Float => jFloat}
 
+import org.apache.spark.api.java.JavaSparkContext
+
 /**
   */
 class TextSimilarModel(repository: Repository) extends Model[TextSimilarModelData] with Serializable{
-  override def save(md: TextSimilarModelData): Unit = {
+  override def save(sc: JavaSparkContext,md: TextSimilarModelData): Unit = {
     val resItem = md.mdata
     val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository))
     resItem.foreach{ resmap =>

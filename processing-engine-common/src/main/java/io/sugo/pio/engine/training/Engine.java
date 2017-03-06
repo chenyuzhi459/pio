@@ -36,7 +36,7 @@ public abstract class Engine<TD, PD, MD, EQ, EAR, IND> {
         TD trainingData = dataSource.readTraining(sc);
         PD preparedData = preparator.prepare(sc, trainingData);
         MD modelData = alg.train(sc, preparedData);
-        model.save(modelData);
+        model.save(sc, modelData);
     }
 
     public void eval(JavaSparkContext sc) {

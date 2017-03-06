@@ -42,6 +42,7 @@
         <module>engines/online-content-based-engine</module>
         <module>engines/userHistory-engine</module>
         <module>engines/textSimilar-engine</module>
+        <module>engines/articleCluster-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>
     </modules>

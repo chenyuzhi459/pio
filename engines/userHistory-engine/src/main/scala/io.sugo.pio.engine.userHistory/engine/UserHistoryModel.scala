@@ -10,10 +10,11 @@ import io.sugo.pio.engine.data.output.Repository
 import io.sugo.pio.engine.training.Model
 import io.sugo.pio.engine.userHistory.{Constants, LucenceConstants}
 import io.sugo.pio.engine.userHistory.data.UserHistoryModelData
+import org.apache.spark.api.java.JavaSparkContext
 
 
 class UserHistoryModel(val repository: Repository) extends Model[UserHistoryModelData] with Serializable {
-  override def save(md: UserHistoryModelData): Unit = {
+  override def save(sc: JavaSparkContext,md: UserHistoryModelData): Unit = {
     val resItem = md.algData
     resItem.foreachPartition{ res =>
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository), null)

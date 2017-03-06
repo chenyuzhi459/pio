@@ -7,11 +7,12 @@ import io.sugo.pio.engine.popular.data.PopularModelData
 import io.sugo.pio.engine.popular.{Constants, LucenceConstants}
 import io.sugo.pio.engine.training.Model
 import org.apache.lucene.document._
+import org.apache.spark.api.java.JavaSparkContext
 
 
 class PopularModel(val repository: Repository) extends Model[PopularModelData] with Serializable {
 
-  override def save(md: PopularModelData): Unit = {
+  override def save(sc: JavaSparkContext,md: PopularModelData): Unit = {
     val resItem = md.itemPopular
     resItem.coalesce(1).foreachPartition(iter => {
       val indexWriter = LuceneUtils.getWriter(new RepositoryDirectory(repository))

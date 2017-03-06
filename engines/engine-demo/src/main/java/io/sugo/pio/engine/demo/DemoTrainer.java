@@ -36,5 +36,8 @@ public class DemoTrainer implements Runnable {
         userHistoryTraining.train();
         TextSimilarTraining textSimilarTraining = new TextSimilarTraining();
         textSimilarTraining.train();
+        ArtiClusterTraining artiClusterTraining = new ArtiClusterTraining();
+        artiClusterTraining.train();
+
     }
 }

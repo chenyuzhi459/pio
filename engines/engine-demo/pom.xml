@@ -59,6 +59,16 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>articleCluster-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engine-extensions</groupId>
+            <artifactId>jdbc-extensions</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>airline</artifactId>
         </dependency>
