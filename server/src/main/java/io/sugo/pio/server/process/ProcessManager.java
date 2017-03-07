@@ -188,7 +188,7 @@ public class ProcessManager {
             log.info("Processes that waiting for running number are:%d", queue.size());
 
             return process;
-        } catch (InterruptedException e) {
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
@@ -219,7 +219,7 @@ public class ProcessManager {
             log.info("Get process named %s[id:%s] from cache successfully.", process.getName(), id);
 
             return process;
-        } catch (ExecutionException e) {
+        } catch (Throwable e) {
             log.error(e, "get process %s error", id);
             throw new RuntimeException(e);
         }
@@ -262,7 +262,8 @@ public class ProcessManager {
                     process.getName(), processId, meta.getName());
 
             return process;
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            log.error(e, "add process %s error", processId);
             throw new RuntimeException(e);
         }
     }

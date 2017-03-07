@@ -17,6 +17,7 @@ import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
 import io.sugo.pio.operator.nio.CSVExampleSource;
+import io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEvaluator;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
@@ -35,18 +36,19 @@ public class ProcessPioModule implements PioModule {
                 new SimpleModule(ProcessPioModule.class.getSimpleName())
                         .registerSubtypes(
                                 new NamedType(DatabaseDataReader.class, "db_data_reader"),
-                                new NamedType(AttributeFilter.class, "attribute_filter"),
-                                new NamedType(ExampleFilter.class, "example_filter"),
-                                new NamedType(ChangeAttributeRole.class, "change_attribute_role"),
+                                new NamedType(AttributeFilter.class, "select_attributes"),
+                                new NamedType(ExampleFilter.class, "filter_examples"),
+                                new NamedType(ChangeAttributeRole.class, "set_role"),
                                 new NamedType(Normalization.class, "normalization"),
-                                new NamedType(ParallelDecisionTreeLearner.class, "decision_tree_learner"),
-                                new NamedType(ParallelRandomForestLearner.class, "random_forest_learner"),
+                                new NamedType(ParallelDecisionTreeLearner.class, "parallel_decision_tree"),
+                                new NamedType(ParallelRandomForestLearner.class, "random_forest"),
                                 new NamedType(LogisticRegression.class, "logistic_regression"),
                                 new NamedType(LinearRegression.class, "linear_regression"),
-                                new NamedType(KMeans.class, "kmeans"),
-                                new NamedType(JMySVMLearner.class, "svm"),
-                                new NamedType(ModelApplier.class, "model_applier"),
-                                new NamedType(CSVExampleSource.class, "csv_source"),
+                                new NamedType(KMeans.class, "k_means"),
+                                new NamedType(JMySVMLearner.class, "support_vector_machine"),
+                                new NamedType(PolynominalClassificationPerformanceEvaluator.class, "performance_classification"),
+                                new NamedType(ModelApplier.class, "apply_model"),
+                                new NamedType(CSVExampleSource.class, "read_csv"),
                                 new NamedType(HttpSqlExampleSource.class, "http_sql_source"),
                                 new NamedType(SingleViewExampleSource.class, "single_view_source")
                         )

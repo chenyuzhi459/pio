@@ -89,6 +89,9 @@ public interface Attributes extends Iterable<Attribute>, Cloneable, Serializable
     /** Removes all regular attributes. */
     public void clearRegular();
 
+    /** Removes all special attributes. */
+    public void clearSpecial();
+
     /** Returns the attribute for the given name. The search is case sensitive. */
     public Attribute get(String name);
 
