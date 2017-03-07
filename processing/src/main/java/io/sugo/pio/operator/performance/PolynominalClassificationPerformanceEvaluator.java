@@ -166,12 +166,12 @@ public class PolynominalClassificationPerformanceEvaluator extends AbstractPerfo
             } catch (InstantiationException e) {
                 // LogService.getGlobal().logError("Cannot instantiate " +
                 // SIMPLE_CRITERIA_CLASSES[i] + ". Skipping...");
-                logger.error("io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEvaluator.instantiating_simple_criteria_classes_error",
+                logger.error("Cannot instantiate {0}. Skipping...",
                         SIMPLE_CRITERIA_CLASSES[i]);
             } catch (IllegalAccessException e) {
                 // LogService.getGlobal().logError("Cannot instantiate " +
                 // SIMPLE_CRITERIA_CLASSES[i] + ". Skipping...");
-                logger.error("io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEvaluator.instantiating_simple_criteria_classes_error",
+                logger.error("Cannot instantiate {0}. Skipping...",
                         SIMPLE_CRITERIA_CLASSES[i]);
             }
         }

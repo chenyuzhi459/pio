@@ -18,6 +18,7 @@ import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
 import io.sugo.pio.operator.nio.CSVExampleSource;
 import io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEvaluator;
+import io.sugo.pio.operator.performance.RegressionPerformanceEvaluator;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
@@ -47,6 +48,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(KMeans.class, "k_means"),
                                 new NamedType(JMySVMLearner.class, "support_vector_machine"),
                                 new NamedType(PolynominalClassificationPerformanceEvaluator.class, "performance_classification"),
+                                new NamedType(RegressionPerformanceEvaluator.class, "performance_regression"),
                                 new NamedType(ModelApplier.class, "apply_model"),
                                 new NamedType(CSVExampleSource.class, "read_csv"),
                                 new NamedType(HttpSqlExampleSource.class, "http_sql_source"),
