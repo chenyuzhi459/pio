@@ -11,6 +11,7 @@ import io.sugo.pio.operator.clustering.clusterer.KMeans;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
 import io.sugo.pio.operator.io.SingleViewExampleSource;
+import io.sugo.pio.operator.learner.associations.AssociationRuleGenerator;
 import io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth;
 import io.sugo.pio.operator.learner.functions.LogisticRegression;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
@@ -51,6 +52,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(PolynominalClassificationPerformanceEvaluator.class, "performance_classification"),
                                 new NamedType(RegressionPerformanceEvaluator.class, "performance_regression"),
                                 new NamedType(FPGrowth.class, "fp_growth"),
+                                new NamedType(AssociationRuleGenerator.class, "create_association_rules"),
                                 new NamedType(ModelApplier.class, "apply_model"),
                                 new NamedType(CSVExampleSource.class, "read_csv"),
                                 new NamedType(HttpSqlExampleSource.class, "http_sql_source"),
