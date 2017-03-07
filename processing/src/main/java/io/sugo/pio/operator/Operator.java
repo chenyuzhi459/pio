@@ -445,6 +445,11 @@ public abstract class Operator implements ParameterHandler, Serializable {
         return parameters != null && parameters.isSpecified(key);
     }
 
+//    @Override
+    public ParameterHandler getParameterHandler() {
+        return this;
+    }
+
     /**
      * Returns a single parameter retrieved from the {@link Parameters} of this Operator.
      */

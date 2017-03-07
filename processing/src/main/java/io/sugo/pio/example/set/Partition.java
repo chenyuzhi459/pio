@@ -8,7 +8,6 @@ import java.util.logging.Level;
  * arbitrary sizes without actually make a copy of the data. Partitions are used by
  * {@link SplittedExampleSet}s. Partition numbering starts at 0.
  *
- * @author Simon Fischer, Ingo Mierswa
  */
 public class Partition implements Cloneable, Serializable {
 

@@ -25,6 +25,7 @@ import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
 import io.sugo.pio.operator.preprocessing.normalization.Normalization;
+import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
 import io.sugo.pio.server.process.ProcessManager;
 import io.sugo.pio.server.process.ProcessManagerConfig;
 
@@ -53,6 +54,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(RegressionPerformanceEvaluator.class, "performance_regression"),
                                 new NamedType(FPGrowth.class, "fp_growth"),
                                 new NamedType(AssociationRuleGenerator.class, "create_association_rules"),
+                                new NamedType(SamplingOperator.class, "sample"),
                                 new NamedType(ModelApplier.class, "apply_model"),
                                 new NamedType(CSVExampleSource.class, "read_csv"),
                                 new NamedType(HttpSqlExampleSource.class, "http_sql_source"),
