@@ -53,6 +53,12 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
     private String key;
 
     /**
+     * The full name of this parameter.
+     */
+    @JsonProperty
+    private String fullName;
+
+    /**
      * The documentation. Used as tooltip text...
      */
     @JsonProperty
@@ -83,13 +89,13 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
      */
     private boolean isDeprecated = false;
 
-
     /**
      * Creates a new ParameterType.
      */
-    public ParameterType(String key, String description) {
+    public ParameterType(String key, String fullName) {
         this.key = key;
-        this.description = description;
+        this.fullName = fullName;
+        this.description = fullName;
     }
 
     /**
@@ -236,6 +242,14 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     /**
