@@ -19,6 +19,7 @@ import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
 import io.sugo.pio.operator.nio.CSVExampleSource;
+import io.sugo.pio.operator.performance.BinominalClassificationPerformanceEvaluator;
 import io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEvaluator;
 import io.sugo.pio.operator.performance.RegressionPerformanceEvaluator;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
@@ -51,6 +52,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(KMeans.class, "k_means"),
                                 new NamedType(JMySVMLearner.class, "support_vector_machine"),
                                 new NamedType(PolynominalClassificationPerformanceEvaluator.class, "performance_classification"),
+                                new NamedType(BinominalClassificationPerformanceEvaluator.class, "performance_binominal_classification"),
                                 new NamedType(RegressionPerformanceEvaluator.class, "performance_regression"),
                                 new NamedType(FPGrowth.class, "fp_growth"),
                                 new NamedType(AssociationRuleGenerator.class, "create_association_rules"),
