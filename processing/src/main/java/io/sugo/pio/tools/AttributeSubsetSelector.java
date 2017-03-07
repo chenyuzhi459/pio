@@ -552,8 +552,6 @@ public class AttributeSubsetSelector {
             }
         }
 
-        types.addAll(new SubsetAttributeFilter().getParameterTypes(operator, inPort, valueTypes));
-
         type = new ParameterTypeBoolean(PARAMETER_INVERT_SELECTION,
                 io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.invert_selection"), false);
         type.setHidden(true);
