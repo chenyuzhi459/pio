@@ -122,6 +122,8 @@ public class RegressionPerformanceEvaluator extends AbstractPerformanceEvaluator
             allCriteria.add(new RankCorrelation(i));
         }
 
+        logger.info("RegressionPerformanceEvaluator get criteria successfully, size[%d].", allCriteria.size());
+
         return allCriteria;
     }
 
