@@ -2,15 +2,15 @@ package io.sugo.pio.tools;
 
 import io.sugo.pio.example.*;
 import io.sugo.pio.example.set.ConditionCreationException;
-import io.sugo.pio.i18n.*;
 import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.error.AttributeNotFoundError;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.operator.preprocessing.filter.attributes.*;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilterCondition.ScanResult;
-import io.sugo.pio.parameter.*;
-import io.sugo.pio.parameter.conditions.EqualTypeCondition;
+import io.sugo.pio.parameter.ParameterHandler;
+import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.metadata.*;
 
@@ -529,7 +529,7 @@ public class AttributeSubsetSelector {
      */
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = new LinkedList<>();
-        ParameterType type = new ParameterTypeCategory(PARAMETER_FILTER_TYPE,
+        /*ParameterType type = new ParameterTypeCategory(PARAMETER_FILTER_TYPE,
                 io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.attribute_filter_type"),
                 CONDITION_NAMES, 0);
         types.add(type);
@@ -550,9 +550,12 @@ public class AttributeSubsetSelector {
             } catch (IllegalArgumentException e) {
             } catch (SecurityException e) {
             }
-        }
+        }*/
 
-        type = new ParameterTypeBoolean(PARAMETER_INVERT_SELECTION,
+        // Only retain this type.
+        types.addAll(new SubsetAttributeFilter().getParameterTypes(operator, inPort, valueTypes));
+
+        /*type = new ParameterTypeBoolean(PARAMETER_INVERT_SELECTION,
                 io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.invert_selection"), false);
         type.setHidden(true);
         types.add(type);
@@ -561,7 +564,7 @@ public class AttributeSubsetSelector {
                 io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.include_special_attributes"),
                 false);
         type.setHidden(true);
-        types.add(type);
+        types.add(type);*/
 
         return types;
     }
