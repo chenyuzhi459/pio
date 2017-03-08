@@ -49,11 +49,6 @@ public class DateAttribute extends AbstractAttribute {
 	}
 
 	@Override
-	public String getConstruction() {
-		return null;
-	}
-
-	@Override
 	public String getAsString(double value, int digits, boolean quoteNominal) {
 		if (Double.isNaN(value)) {
 			return "?";

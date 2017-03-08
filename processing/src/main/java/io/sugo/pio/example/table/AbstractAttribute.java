@@ -87,6 +87,8 @@ public abstract class AbstractAttribute implements Attribute {
      * generator, i.e. this attribute has no function arguments.
      */
     protected AbstractAttribute(String name, int valueType) {
+        this.attributeDescription = new AttributeDescription(this, name, valueType, Ontology.SINGLE_VALUE, 0.0d,
+                UNDEFINED_ATTRIBUTE_INDEX);
         this.constructionDescription = name;
         this.valueType = valueType;
     }
@@ -163,14 +165,6 @@ public abstract class AbstractAttribute implements Attribute {
         tableIndex = i;
     }
 
-    /**
-     * Returns the construction description.
-     */
-    @Override
-    public void setConstruction(String description) {
-        this.constructionDescription = description;
-    }
-
     @Override
     public double getValue(DataRow row) {
         double result = row.get(getTableIndex(), defaultValue);
@@ -236,6 +230,18 @@ public abstract class AbstractAttribute implements Attribute {
     @Override
     public Annotations getAnnotations() {
         return annotations;
+    }
+
+    /** Returns the construction description. */
+    @Override
+    public String getConstruction() {
+        return this.constructionDescription;
+    }
+
+    /** Returns the construction description. */
+    @Override
+    public void setConstruction(String description) {
+        this.constructionDescription = description;
     }
 
     @Override

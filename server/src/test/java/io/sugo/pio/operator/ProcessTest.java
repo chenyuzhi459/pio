@@ -3,11 +3,13 @@ package io.sugo.pio.operator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ProcessPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
+import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
 import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
@@ -17,6 +19,7 @@ import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilte
 import io.sugo.pio.ports.Connection;
 import org.junit.Test;
 
+import static io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner.*;
 import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.*;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_NAME;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_TARGET_ROLE;
@@ -24,6 +27,11 @@ import static io.sugo.pio.operator.preprocessing.filter.ExampleFilter.PARAMETER_
 
 public class ProcessTest {
     private static final ObjectMapper jsonMapper = new DefaultObjectMapper();
+
+    private static final String DB_URL = "jdbc:postgresql://192.168.0.210:5432/druid_perform";
+    private static final String DB_USERNAME = "postgres";
+    private static final String DB_PASSWORD = "123456";
+    private static final String DB_QUERY = "SELECT * from bank_sample";
 
     static {
 
@@ -38,17 +46,11 @@ public class ProcessTest {
     }
 
     @Test
-    public void test() throws JsonProcessingException {
+    public void decisionTreeTest() throws JsonProcessingException {
         OperatorProcess process = new OperatorProcess("testProcess");
         process.setDescription("testProcess desc");
 
-        DatabaseDataReader dbReader = new DatabaseDataReader();
-        dbReader.setParameter("database_url", "jdbc:postgresql://192.168.0.210:5432/druid_perform");
-        dbReader.setParameter("username", "postgres");
-        dbReader.setParameter("password", "123456");
-        dbReader.setParameter("query", "SELECT * from bank_sample");
-        dbReader.setName("operator_db_reader");
-
+        DatabaseDataReader dbReader = getDbReader();
         process.getRootOperator().getExecutionUnit().addOperator(dbReader);
 
         AttributeFilter af = new AttributeFilter();
@@ -116,7 +118,7 @@ public class ProcessTest {
     }
 
     @Test
-    public void httpSqlTest() throws JsonProcessingException {
+    public void linearRegressionTest() throws JsonProcessingException {
         OperatorProcess process = new OperatorProcess("httpSql");
         process.setDescription("Huangama http sql test.");
 
@@ -148,10 +150,74 @@ public class ProcessTest {
 
         IOContainer set = process.run();
         set = process.getRootOperator().getResults(true);
-        System.out.println(
-                jsonMapper.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(linearRegression.getResult())
-        );
-        System.out.println();
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(linearRegression.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    @Test
+    public void svmTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("svm_test");
+        process.setDescription("svm_test");
+
+        DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
+
+        AttributeFilter af = new AttributeFilter();
+        af.setName("operator_attribute_filter");
+        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        process.getRootOperator().getExecutionUnit().addOperator(af);
+
+        ExampleFilter ef = new ExampleFilter();
+        ef.setName("operator_example_filter");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        process.getRootOperator().getExecutionUnit().addOperator(ef);
+
+        ChangeAttributeRole role = new ChangeAttributeRole();
+        role.setName("change_role");
+        role.setParameter(PARAMETER_NAME, "is_default");
+        role.setParameter(PARAMETER_TARGET_ROLE, "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role);
+
+        JMySVMLearner svm = new JMySVMLearner();
+        svm.setName("svm");
+        svm.setParameter(PARAMETER_KERNEL_TYPE, "0");
+        svm.setParameter(PARAMETER_KERNEL_CACHE, "200");
+        svm.setParameter(PARAMETER_C, "0.0");
+        svm.setParameter(PARAMETER_CONVERGENCE_EPSILON, "0.001");
+        svm.setParameter(PARAMETER_MAX_ITERATIONS, "100000");
+        svm.setParameter(PARAMETER_SCALE, "false");
+        svm.setParameter(PARAMETER_L_POS, "1.0");
+        svm.setParameter(PARAMETER_L_NEG, "1.0");
+        svm.setParameter(PARAMETER_EPSILON, "0.0");
+        svm.setParameter(PARAMETER_EPSILON_PLUS, "0.0");
+        svm.setParameter(PARAMETER_EPSILON_MINUS, "0.0");
+        svm.setParameter(PARAMETER_BALANCE_COST, "false");
+        svm.setParameter(PARAMETER_QUADRATIC_LOSS_POS, "false");
+        svm.setParameter(PARAMETER_QUADRATIC_LOSS_NEG, "false");
+        process.getRootOperator().getExecutionUnit().addOperator(svm);
+
+        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
+        process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
+        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
+        process.connect(new Connection("change_role", "example set output", "svm", "training set"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        jsonMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(svm.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    private DatabaseDataReader getDbReader() {
+        DatabaseDataReader dbReader = new DatabaseDataReader();
+        dbReader.setParameter("database_url", DB_URL);
+        dbReader.setParameter("username", DB_USERNAME);
+        dbReader.setParameter("password", DB_PASSWORD);
+        dbReader.setParameter("query", DB_QUERY);
+        dbReader.setName("operator_db_reader");
+
+        return dbReader;
     }
 }

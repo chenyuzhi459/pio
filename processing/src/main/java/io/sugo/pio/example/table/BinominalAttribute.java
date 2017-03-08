@@ -78,11 +78,6 @@ public class BinominalAttribute extends NominalAttribute {
 	}
 
 	@Override
-	public String getConstruction() {
-		return null;
-	}
-
-	@Override
 	public boolean isDateTime() {
 		return false;
 	}

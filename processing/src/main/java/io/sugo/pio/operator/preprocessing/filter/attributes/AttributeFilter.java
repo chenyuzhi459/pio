@@ -30,7 +30,7 @@ import java.util.Set;
  * &quot;&gt; 6 ANDAND &lt; 11&quot; or &quot;&lt;= 5 || &lt; 0&quot;. But ANDAND and || must not be
  * mixed. Please note that ANDAND has to be replaced by two ampers ands.
  * </p>
- * 
+ * <p>
  * <p>
  * The attribute_name_filter keeps all attributes which names match the given regular expression.
  * The nominal_value_filter keeps all numeric attribute and all nominal attributes containing at
@@ -40,66 +40,66 @@ import java.util.Set;
  * &quot;sunny&quot;. ANDAND and || are not allowed to be mixed. And again, ANDAND has to be
  * replaced by two ampers ands.
  * </p>
- * 
  */
 public class AttributeFilter extends AbstractFeatureSelection {
 
-	private static final Logger logger = new Logger(AttributeFilter.class);
+    private static final Logger logger = new Logger(AttributeFilter.class);
 
-	private final AttributeSubsetSelector attributeSelector = new AttributeSubsetSelector(this, getExampleSetInputPort());
+    private final AttributeSubsetSelector attributeSelector = new AttributeSubsetSelector(this, getExampleSetInputPort());
 
-	@Override
-	protected MetaData modifyMetaData(ExampleSetMetaData metaData) {
-		ExampleSetMetaData subset = attributeSelector.getMetaDataSubset(metaData, true);
-		Iterator<AttributeMetaData> amdIterator = metaData.getAllAttributes().iterator();
-		while (amdIterator.hasNext()) {
-			AttributeMetaData amd = amdIterator.next();
-			AttributeMetaData subsetAMD = subset.getAttributeByName(amd.getName());
-			if (subsetAMD == null) {
-				amdIterator.remove();
-			}
-		}
-		return metaData;
-	}
+    @Override
+    protected MetaData modifyMetaData(ExampleSetMetaData metaData) {
+        ExampleSetMetaData subset = attributeSelector.getMetaDataSubset(metaData, true);
+        Iterator<AttributeMetaData> amdIterator = metaData.getAllAttributes().iterator();
+        while (amdIterator.hasNext()) {
+            AttributeMetaData amd = amdIterator.next();
+            AttributeMetaData subsetAMD = subset.getAttributeByName(amd.getName());
+            if (subsetAMD == null) {
+                amdIterator.remove();
+            }
+        }
+        return metaData;
+    }
 
-	@Override
-	public ExampleSet apply(ExampleSet exampleSet) throws OperatorException {
-		logger.info("Attribute filter begin to apply example set[%s]", exampleSet.getName());
+    @Override
+    public ExampleSet apply(ExampleSet exampleSet) throws OperatorException {
+        logger.info("AttributeFilter begin to apply example set[%s]", exampleSet.getName());
 
-		Attributes attributes = exampleSet.getAttributes();
-		Set<Attribute> attributeSubset = attributeSelector.getAttributeSubset(exampleSet, true);
-		Iterator<Attribute> r = attributes.allAttributes();
-		while (r.hasNext()) {
-			Attribute attribute = r.next();
-			if (!attributeSubset.contains(attribute)) {
-				r.remove();
-			}
-		}
+        Attributes attributes = exampleSet.getAttributes();
+        Set<Attribute> attributeSubset = attributeSelector.getAttributeSubset(exampleSet, true);
+        Iterator<Attribute> r = attributes.allAttributes();
+        while (r.hasNext()) {
+            Attribute attribute = r.next();
+            if (!attributeSubset.contains(attribute)) {
+                r.remove();
+            }
+        }
 
-		logger.info("Attribute filter apply example set[%s] successfully!", exampleSet.getName());
+        logger.info("AttributeFilter apply example set[%s] successfully!", exampleSet.getName());
 
-		return exampleSet;
-	}
+        return exampleSet;
+    }
 
-	@Override
-	public String getDefaultFullName() {
-		return I18N.getMessage("pio.AttributeFilter.name");
-	}
+    @Override
+    public String getDefaultFullName() {
+        return I18N.getMessage("pio.AttributeFilter.name");
+    }
 
-	@Override
-	public OperatorGroup getGroup() {
-		return OperatorGroup.processing;
-	}
+    @Override
+    public OperatorGroup getGroup() {
+        return OperatorGroup.processing;
+    }
 
-	@Override
-	public String getDescription() {
-		return I18N.getMessage("pio.AttributeFilter.description");
-	}
+    @Override
+    public String getDescription() {
+        return I18N.getMessage("pio.AttributeFilter.description");
+    }
 
-	@Override
-	public List<ParameterType> getParameterTypes() {
-		List<ParameterType> types = super.getParameterTypes();
-		types.addAll(attributeSelector.getParameterTypes());
-		return types;
-	}
+    @Override
+    public List<ParameterType> getParameterTypes() {
+        List<ParameterType> types = super.getParameterTypes();
+//		types.addAll(attributeSelector.getParameterTypes());
+        types.addAll(attributeSelector.getSubsetAttributeFilterParamTypes());
+        return types;
+    }
 }

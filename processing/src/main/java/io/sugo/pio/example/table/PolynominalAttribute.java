@@ -66,11 +66,6 @@ public class PolynominalAttribute extends NominalAttribute {
 	}
 
 	@Override
-	public String getConstruction() {
-		return null;
-	}
-
-	@Override
 	public NominalMapping getMapping() {
 		return this.nominalMapping;
 	}

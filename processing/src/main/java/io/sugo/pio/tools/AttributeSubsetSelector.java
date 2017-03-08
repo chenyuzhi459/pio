@@ -8,9 +8,8 @@ import io.sugo.pio.operator.error.AttributeNotFoundError;
 import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.operator.preprocessing.filter.attributes.*;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilterCondition.ScanResult;
-import io.sugo.pio.parameter.ParameterHandler;
-import io.sugo.pio.parameter.ParameterType;
-import io.sugo.pio.parameter.UndefinedParameterError;
+import io.sugo.pio.parameter.*;
+import io.sugo.pio.parameter.conditions.EqualTypeCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.metadata.*;
 
@@ -23,7 +22,6 @@ import static io.sugo.pio.parameter.ParameterTypeAttributes.ATTRIBUTE_SEPARATOR_
  * also provides parameters for the selection of subsets which can be used in operators that should
  * work on a subset of the available attributes. According to the specified parameters, the
  * available methods select the subsets in both meta data and actual data.
- *
  */
 public class AttributeSubsetSelector {
 
@@ -528,7 +526,7 @@ public class AttributeSubsetSelector {
      */
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = new LinkedList<>();
-        /*ParameterType type = new ParameterTypeCategory(PARAMETER_FILTER_TYPE,
+        ParameterType type = new ParameterTypeCategory(PARAMETER_FILTER_TYPE,
                 io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.attribute_filter_type"),
                 CONDITION_NAMES, 0);
         types.add(type);
@@ -549,12 +547,12 @@ public class AttributeSubsetSelector {
             } catch (IllegalArgumentException e) {
             } catch (SecurityException e) {
             }
-        }*/
+        }
 
         // Only retain this type.
-        types.addAll(new SubsetAttributeFilter().getParameterTypes(operator, inPort, valueTypes));
+//        types.addAll(new SubsetAttributeFilter().getParameterTypes(operator, inPort, valueTypes));
 
-        /*type = new ParameterTypeBoolean(PARAMETER_INVERT_SELECTION,
+        type = new ParameterTypeBoolean(PARAMETER_INVERT_SELECTION,
                 io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.invert_selection"), false);
         type.setHidden(true);
         types.add(type);
@@ -563,9 +561,16 @@ public class AttributeSubsetSelector {
                 io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.include_special_attributes"),
                 false);
         type.setHidden(true);
-        types.add(type);*/
+        types.add(type);
 
         return types;
+    }
+
+    /**
+     * Get parameter types that only used in 'SubsetAttributeFilter'
+     */
+    public List<ParameterType> getSubsetAttributeFilterParamTypes() {
+        return new SubsetAttributeFilter().getParameterTypes(operator, inPort, valueTypes);
     }
 
     public Precondition makePrecondition() {

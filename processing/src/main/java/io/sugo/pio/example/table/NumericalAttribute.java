@@ -57,11 +57,6 @@ public class NumericalAttribute extends AbstractAttribute {
 	}
 
 	@Override
-	public String getConstruction() {
-		return null;
-	}
-
-	@Override
 	public boolean isNominal() {
 		return false;
 	}
