@@ -60,14 +60,17 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     protected ResultSet getResultSet() throws OperatorException {
         try {
             this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
-            logger.info("Database data reader connected to database: " + databaseHandler.getDatabaseUrl());
+            if (this.databaseHandler == null) {
+                throw new UserError(this, "pio.error.cannot_connect_database");
+            }
+            logger.info("DatabaseDataReader connected to database: " + databaseHandler.getDatabaseUrl());
 
             String sqle = this.getQuery(this.databaseHandler.getStatementCreator());
             if (sqle == null) {
                 throw new UserError(this, "pio.error.parameter_must_set",
                         new Object[]{"query", "query_file", "table_name"});
             } else {
-                logger.info("Database data reader begin to execute sql: " + sqle);
+                logger.info("DatabaseDataReader begin to execute sql: " + sqle);
                 return this.databaseHandler.executeStatement(sqle, true, this, this.getLogger());
             }
         } catch (SQLException var2) {
@@ -81,7 +84,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 
     public ExampleSet createExampleSet() throws OperatorException {
         ResultSet resultSet = this.getResultSet();
-        logger.info("Database data reader get result set successfully.");
+        logger.info("DatabaseDataReader get result set successfully.");
 
         ExampleSetBuilder builder;
         try {
@@ -93,9 +96,9 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         } finally {
             try {
                 resultSet.close();
-                logger.info("Database data reader closed result set.");
+                logger.info("DatabaseDataReader closed result set.");
             } catch (SQLException var10) {
-                logger.warn("Database data reader error closing result set: " + var10, var10);
+                logger.warn("DatabaseDataReader error closing result set: " + var10, var10);
             }
         }
 
@@ -106,17 +109,23 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         ExampleSetMetaData metaData = new ExampleSetMetaData();
         try {
             this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
-            String query1 = this.getQuery(this.databaseHandler.getStatementCreator());
-            PreparedStatement prepared1 = this.databaseHandler.getConnection().prepareStatement(query1);
-            List attributes = getAttributes(prepared1.getMetaData());
-            Iterator var6 = attributes.iterator();
+            if (this.databaseHandler != null) {
+                String query1 = this.getQuery(this.databaseHandler.getStatementCreator());
+                PreparedStatement prepared1 = this.databaseHandler.getConnection().prepareStatement(query1);
+                List attributes = getAttributes(prepared1.getMetaData());
+                Iterator var6 = attributes.iterator();
 
-            while (var6.hasNext()) {
-                Attribute att = (Attribute) var6.next();
-                metaData.addAttribute(new AttributeMetaData(att));
+                while (var6.hasNext()) {
+                    Attribute att = (Attribute) var6.next();
+                    metaData.addAttribute(new AttributeMetaData(att));
+                }
+
+                prepared1.close();
+            } else {
+                logger.warn("DatabaseDataReader cannot get database connection and cannot generate metadata, " +
+                        "the reason maybe parameter 'database_url' or 'username' or 'password' is empty.");
             }
 
-            prepared1.close();
         } catch (SQLException sqlEx) {
             throw new OperatorException(DatabaseDataReader.class.getSimpleName(), sqlEx);
 //                LogService.getRoot().log(Level.WARNING, I18N.getMessage(LogService.getRoot().getResourceBundle(), "io.sugo.pio.operator.io.DatabaseDataReader.fetching_meta_data_error", new Object[]{var16}), var16);
@@ -135,7 +144,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     }
 
     public static ExampleSetBuilder createExampleTable(ResultSet resultSet, List<Attribute> attributes, int dataManagementType, Operator op) throws SQLException, OperatorException {
-        logger.info("Database data reader begin to create example table through result set....");
+        logger.info("DatabaseDataReader begin to create example table through result set....");
 
         ResultSetMetaData metaData = resultSet.getMetaData();
         Attribute[] attributeArray = (Attribute[]) attributes.toArray(new Attribute[attributes.size()]);
@@ -226,7 +235,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 //            }
         }
 
-        logger.info("Database data reader created [%d] example table successfully.", counter);
+        logger.info("DatabaseDataReader created [%d] example table successfully.", counter);
 
         return builder;
     }

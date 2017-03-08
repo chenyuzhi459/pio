@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.extension.jdbc.tools.jdbc;
 
+import com.google.common.base.Strings;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.ProcessStateListener;
@@ -870,11 +871,13 @@ public class DatabaseHandler implements AutoCloseable {
     }
 
     public static DatabaseHandler getConnectedDatabaseHandler(Operator operator) throws OperatorException, SQLException {
-        return getConnectedDatabaseHandler(
-                operator.getParameterAsString("database_url"),
-                operator.getParameterAsString("username"),
-                operator.getParameterAsString("password"), true
-        );
+        String url = operator.getParameterAsString(PARAMETER_DATABASE_URL);
+        String userName = operator.getParameterAsString(PARAMETER_USERNAME);
+        String password = operator.getParameterAsString(PARAMETER_PASSWORD);
+        if (Strings.isNullOrEmpty(url) || Strings.isNullOrEmpty(userName)  || Strings.isNullOrEmpty(password) ) {
+            return null;
+        }
+        return getConnectedDatabaseHandler(url, userName, password, true);
     }
 
     public static TableName getSelectedTableName(ParameterHandler operator) throws UndefinedParameterError {

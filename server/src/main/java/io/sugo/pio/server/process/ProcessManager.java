@@ -220,7 +220,7 @@ public class ProcessManager {
 
             return process;
         } catch (Throwable e) {
-            log.error(e, "get process %s error", id);
+            log.error(e, "Get process %s error", id);
             throw new RuntimeException(e);
         }
     }

@@ -240,7 +240,9 @@ public class ExecutionUnit implements Serializable {
                 }
             }
         }
-        getInnerSinks().checkPreconditions();
+        if (getInnerSinks() != null) {
+            getInnerSinks().checkPreconditions();
+        }
     }
 
 

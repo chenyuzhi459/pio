@@ -27,6 +27,7 @@ import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
 import io.sugo.pio.operator.preprocessing.normalization.Normalization;
 import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
+import io.sugo.pio.operator.preprocessing.transformation.aggregation.AggregationOperator;
 import io.sugo.pio.server.process.ProcessManager;
 import io.sugo.pio.server.process.ProcessManagerConfig;
 
@@ -45,6 +46,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(ExampleFilter.class, "filter_examples"),
                                 new NamedType(ChangeAttributeRole.class, "set_role"),
                                 new NamedType(Normalization.class, "normalization"),
+                                new NamedType(AggregationOperator.class, "aggregate"),
                                 new NamedType(ParallelDecisionTreeLearner.class, "parallel_decision_tree"),
                                 new NamedType(ParallelRandomForestLearner.class, "random_forest"),
                                 new NamedType(LogisticRegression.class, "logistic_regression"),

@@ -24,7 +24,6 @@ import static io.sugo.pio.parameter.ParameterTypeAttributes.ATTRIBUTE_SEPARATOR_
  * work on a subset of the available attributes. According to the specified parameters, the
  * available methods select the subsets in both meta data and actual data.
  *
- * @author Sebastian Land, Tobias Malbrecht
  */
 public class AttributeSubsetSelector {
 
