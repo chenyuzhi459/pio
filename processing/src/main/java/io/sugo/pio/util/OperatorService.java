@@ -4,6 +4,7 @@ import io.sugo.pio.operator.OperatorCreationException;
 import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.Operator;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -76,7 +77,7 @@ public class OperatorService {
      */
     @SuppressWarnings("unchecked")
     public static <T extends Operator> T createOperator(Class<T> clazz) throws OperatorCreationException {
-        OperatorDescription[] descriptions = getOperatorDescriptions(clazz);
+        /*OperatorDescription[] descriptions = getOperatorDescriptions(clazz);
         if (descriptions.length == 0) {
             throw new OperatorCreationException(OperatorCreationException.NO_DESCRIPTION_ERROR, clazz.getName(), null);
         } else if (descriptions.length > 1) {
@@ -91,6 +92,30 @@ public class OperatorService {
             return (T) nonDeprecated.get(0).createOperatorInstance();
         } else {
             return (T) descriptions[0].createOperatorInstance();
+        }*/
+
+        // Create operator without 'OperatorDescription'
+        Operator operator = null;
+        try {
+            java.lang.reflect.Constructor<? extends Operator> constructor = clazz.getConstructor(new Class[] { });
+            operator = constructor.newInstance(new Object[] { });
+        } catch (NoSuchMethodException e) {
+            throw new OperatorCreationException(OperatorCreationException.NO_CONSTRUCTOR_ERROR,
+                    "(" + clazz.getName() + ")", e);
+        } catch (IllegalAccessException e) {
+            throw new OperatorCreationException(OperatorCreationException.ILLEGAL_ACCESS_ERROR,
+                    "(" + clazz.getName() + ")", e);
+        } catch (InstantiationException e) {
+            throw new OperatorCreationException(OperatorCreationException.INSTANTIATION_ERROR,
+                    "(" + clazz.getName() + ")", e);
+        } catch (InvocationTargetException e) {
+            throw new OperatorCreationException(OperatorCreationException.CONSTRUCTION_ERROR,
+                    "(" + clazz.getName() + ")", e);
+        } catch (Throwable t) {
+            throw new OperatorCreationException(OperatorCreationException.INSTANTIATION_ERROR, "(" + clazz.getName() + ")",
+                    t);
         }
+
+        return (T)operator;
     }
 }

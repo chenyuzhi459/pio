@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.operator.learner.functions.LinearRegressionModel;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMModel;
+import io.sugo.pio.operator.learner.tree.ConfigurableRandomForestModel;
 import io.sugo.pio.operator.learner.tree.TreeModel;
 import io.sugo.pio.ports.OutputPort;
 
@@ -19,13 +20,13 @@ import java.io.Serializable;
  * to be implemented like a usual <code>clone</code> method for IO objects which can be altered
  * after creation. In all other cases the implementation can simply return the same object. Hence,
  * we use the name <code>copy</code> instead of <code>clone</code>.
- *
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "dataType")
 @JsonSubTypes(value = {
         @JsonSubTypes.Type(name = "tree_model", value = TreeModel.class),
         @JsonSubTypes.Type(name = "linear_regression", value = LinearRegressionModel.class),
-        @JsonSubTypes.Type(name = "svm", value = JMySVMModel.class)
+        @JsonSubTypes.Type(name = "svm", value = JMySVMModel.class),
+        @JsonSubTypes.Type(name = "random_forest", value = ConfigurableRandomForestModel.class)
 })
 public interface IOObject extends Serializable {
 
