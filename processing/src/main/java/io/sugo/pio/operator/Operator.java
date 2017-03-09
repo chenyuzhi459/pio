@@ -397,6 +397,17 @@ public abstract class Operator implements ParameterHandler, Serializable {
         }
     }
 
+    /** Called when the process starts. Resets all counters. */
+    public void processStarts() throws OperatorException {
+        applyCount.set(0);
+        applyCountAtLastExecution = 0;
+    }
+
+    /**
+     * Called at the end of the process. The default implementation does nothing.
+     */
+    public void processFinished() throws OperatorException {}
+
     /**
      * Returns the parameter type with the given name. Will return null if this operator does not
      * have a parameter with the given name.

@@ -37,6 +37,9 @@ public abstract class AbstractLearner extends Operator implements Learner {
     public IOContainer getResult() {
         List<IOObject> ioObjects = new ArrayList<>();
         ioObjects.add(modelOutput.getAnyDataOrNull());
+        ioObjects.add(performanceOutput.getAnyDataOrNull());
+        ioObjects.add(weightsOutput.getAnyDataOrNull());
+        ioObjects.add(exampleSetOutput.getAnyDataOrNull());
         return new IOContainer(ioObjects);
     }
 

@@ -18,6 +18,7 @@
  */
 package io.sugo.pio.operator.learner.meta;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.ExampleSetUtilities;
@@ -42,9 +43,13 @@ public class SimpleVoteModel extends SimplePredictionModel implements MetaModel 
 
 	private static final long serialVersionUID = 1089932073805038503L;
 
+	@JsonProperty
 	private List<? extends SimplePredictionModel> baseModels;
 
+	@JsonProperty
 	private boolean labelIsNominal;
+
+	@JsonProperty
 	private List<Double> labelIndices;
 
 	public SimpleVoteModel(ExampleSet exampleSet, List<? extends SimplePredictionModel> baseModels) {

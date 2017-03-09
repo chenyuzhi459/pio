@@ -23,7 +23,6 @@ public abstract class Kernel implements Serializable {
     /**
      * dimension of the examples
      */
-    @JsonProperty
     protected int dim;
 
     /**
@@ -34,19 +33,16 @@ public abstract class Kernel implements Serializable {
     /**
      * Number of elements in cache
      */
-    @JsonProperty
     protected int kernel_cache_size;
 
     /**
      * Size of cache in MB
      */
-    @JsonProperty
     protected int cache_MB;
 
     /**
      * number of examples after shrinking
      */
-    @JsonProperty
     protected int examples_total;
 
     /**

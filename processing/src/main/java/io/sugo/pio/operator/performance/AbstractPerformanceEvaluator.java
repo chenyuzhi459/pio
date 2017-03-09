@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.performance;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.*;
 import io.sugo.pio.i18n.I18N;
@@ -12,6 +13,7 @@ import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.Ontology;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,7 +81,16 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
     /**
      * The currently used performance vector. This is be used for logging / plotting purposes.
      */
+    @JsonProperty
     private PerformanceVector currentPerformanceVector = null;
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(performanceOutput.getAnyDataOrNull());
+        ioObjects.add(exampleSetOutput.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
+    }
 
     public AbstractPerformanceEvaluator() {
         super();

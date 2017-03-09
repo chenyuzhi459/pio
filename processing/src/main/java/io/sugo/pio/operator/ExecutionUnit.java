@@ -279,4 +279,17 @@ public class ExecutionUnit implements Serializable {
         UnitExecutor executor = UnitExecutionFactory.getInstance().getExecutor(this);
         executor.execute(this);
     }
+
+    public void processStarts() throws OperatorException {
+        for (Operator operator : operators) {
+            operator.processStarts();
+        }
+        updateExecutionOrder();
+    }
+
+    public void processFinished() throws OperatorException {
+        for (Operator operator : operators) {
+            operator.processFinished();
+        }
+    }
 }

@@ -212,6 +212,7 @@ public class OperatorProcess {
 
     public final IOContainer run() {
         setStatus(Status.RUNNING);
+        rootOperator.processStarts();
         rootOperator.execute();
         IOContainer result = rootOperator.getResults(false);
         return result;

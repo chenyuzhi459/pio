@@ -58,6 +58,7 @@ public class ConfigurableRandomForestModel extends SimplePredictionModel impleme
     private static final long serialVersionUID = 1L;
 
     /** The wrapped voting meta model. */
+    @JsonProperty
     private final SimplePredictionModel model;
 
     public ConfigurableRandomForestModel(ExampleSet exampleSet, List<? extends TreeModel> models, VotingStrategy strategy) {
@@ -94,11 +95,6 @@ public class ConfigurableRandomForestModel extends SimplePredictionModel impleme
 
     @Override
     public String toString() {
-        return model.toString();
-    }
-
-    @JsonProperty
-    public String getDataModel() {
         return model.toString();
     }
 

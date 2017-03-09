@@ -81,6 +81,7 @@ public abstract class AbstractClusterer extends Operator {
     public IOContainer getResult() {
         List<IOObject> ioObjects = new ArrayList<>();
         ioObjects.add(modelOutput.getAnyDataOrNull());
+        ioObjects.add(exampleSetOutput.getAnyDataOrNull());
         return new IOContainer(ioObjects);
     }
 

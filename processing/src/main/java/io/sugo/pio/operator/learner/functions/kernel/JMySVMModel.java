@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.learner.functions.kernel;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
@@ -44,6 +45,11 @@ public class JMySVMModel extends AbstractMySVMModel {
         } else {
             example.setValue(predLabel, prediction);
         }
+    }
+
+    @JsonProperty
+    public String getKernelModel() {
+        return super.toString();
     }
 
 }

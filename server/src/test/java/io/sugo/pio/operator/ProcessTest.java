@@ -14,11 +14,15 @@ import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
 import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
+import io.sugo.pio.operator.performance.PerformanceVector;
+import io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEvaluator;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter;
+import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
 import io.sugo.pio.ports.Connection;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static io.sugo.pio.operator.clustering.clusterer.KMeans.PARAMETER_K;
@@ -30,9 +34,12 @@ import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARA
 import static io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner.*;
 import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.*;
 import static io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner.*;
+import static io.sugo.pio.operator.performance.AbstractPerformanceEvaluator.PARAMETER_MAIN_CRITERION;
+import static io.sugo.pio.operator.performance.AbstractPerformanceEvaluator.PARAMETER_SKIP_UNDEFINED_LABELS;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_NAME;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_TARGET_ROLE;
 import static io.sugo.pio.operator.preprocessing.filter.ExampleFilter.PARAMETER_FILTERS_LIST;
+import static io.sugo.pio.operator.preprocessing.sampling.SamplingOperator.*;
 import static io.sugo.pio.tools.math.similarity.DistanceMeasures.PARAMETER_MEASURE_TYPES;
 import static io.sugo.pio.tools.math.similarity.DistanceMeasures.PARAMETER_MIXED_MEASURE;
 
@@ -216,7 +223,7 @@ public class ProcessTest {
 
         IOContainer set = process.run();
         set = process.getRootOperator().getResults(true);
-        jsonMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+//        jsonMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(svm.getResult()));
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
@@ -319,8 +326,140 @@ public class ProcessTest {
 
         IOContainer set = process.run();
         set = process.getRootOperator().getResults(true);
-//        jsonMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(kMeans.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    @Test
+    public void sampleTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("k_means_test");
+        process.setDescription("k_means_test");
+
+        DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
+
+        AttributeFilter af = new AttributeFilter();
+        af.setName("operator_attribute_filter");
+        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        process.getRootOperator().getExecutionUnit().addOperator(af);
+
+        ExampleFilter ef = new ExampleFilter();
+        ef.setName("operator_example_filter");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        process.getRootOperator().getExecutionUnit().addOperator(ef);
+
+        SamplingOperator sample = new SamplingOperator();
+        sample.setName("sample");
+//        sample.setParameter(PARAMETER_SAMPLE, "absolute"); // {"absolute", "relative", "probability"}
+//        sample.setParameter(PARAMETER_SAMPLE_SIZE, "100");
+
+//        sample.setParameter(PARAMETER_SAMPLE, "relative");
+//        sample.setParameter(PARAMETER_SAMPLE_RATIO, "0.1");
+//
+        sample.setParameter(PARAMETER_SAMPLE, "probability");
+        sample.setParameter(PARAMETER_SAMPLE_PROBABILITY, "0.2");
+        process.getRootOperator().getExecutionUnit().addOperator(sample);
+
+        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
+        process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
+        process.connect(new Connection("operator_example_filter", "example set output", "sample", "example set input"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sample.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    @Test
+    @Ignore
+    public void performanceClassificationTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("performance classification test");
+        process.setDescription("performance classification test desc");
+
+        DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
+
+        AttributeFilter af = new AttributeFilter();
+        af.setName("operator_attribute_filter");
+        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        process.getRootOperator().getExecutionUnit().addOperator(af);
+
+        ExampleFilter ef = new ExampleFilter();
+        ef.setName("operator_example_filter");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        process.getRootOperator().getExecutionUnit().addOperator(ef);
+
+        ChangeAttributeRole role = new ChangeAttributeRole();
+        role.setName("change_role");
+        role.setParameter(PARAMETER_NAME, "is_default");
+        role.setParameter(PARAMETER_TARGET_ROLE, "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role);
+
+        ParallelDecisionTreeLearner dt = new ParallelDecisionTreeLearner();
+        dt.setName("decision_tree");
+        dt.setParameter(PARAMETER_CRITERION, "gain_ratio");
+        dt.setParameter(PARAMETER_MAXIMAL_DEPTH, "20");
+        dt.setParameter(PARAMETER_PRUNING, "true");
+        dt.setParameter(PARAMETER_CONFIDENCE, "0.25");
+        dt.setParameter(PARAMETER_PRE_PRUNING, "true");
+        dt.setParameter(PARAMETER_MINIMAL_GAIN, "0.1");
+        dt.setParameter(PARAMETER_MINIMAL_LEAF_SIZE, "2");
+        dt.setParameter(PARAMETER_MINIMAL_SIZE_FOR_SPLIT, "4");
+        dt.setParameter(PARAMETER_NUMBER_OF_PREPRUNING_ALTERNATIVES, "3");
+        process.getRootOperator().getExecutionUnit().addOperator(dt);
+
+        ModelApplier modelApplier = new ModelApplier();
+        modelApplier.setName("apply_model");
+        process.getRootOperator().getExecutionUnit().addOperator(modelApplier);
+
+        PolynominalClassificationPerformanceEvaluator pcp = new PolynominalClassificationPerformanceEvaluator();
+        pcp.setName("performance_classification");
+        pcp.setParameter(PARAMETER_MAIN_CRITERION, "first");
+        pcp.setParameter("accuracy", "true");
+        pcp.setParameter(PARAMETER_SKIP_UNDEFINED_LABELS, "true");
+        process.getRootOperator().getExecutionUnit().addOperator(pcp);
+
+        /********* test operator *********/
+        DatabaseDataReader dbReader4test = new DatabaseDataReader();
+        dbReader4test.setParameter("database_url", DB_URL);
+        dbReader4test.setParameter("username", DB_USERNAME);
+        dbReader4test.setParameter("password", DB_PASSWORD);
+        dbReader4test.setParameter("query", "select * from bank_sample");
+        dbReader4test.setName("operator_db_reader_test");
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader4test);
+
+        SamplingOperator sample4test = new SamplingOperator();
+        sample4test.setName("sample_test");
+        sample4test.setParameter(PARAMETER_SAMPLE, "absolute");
+        sample4test.setParameter(PARAMETER_SAMPLE_SIZE, "100");
+        process.getRootOperator().getExecutionUnit().addOperator(sample4test);
+
+        ChangeAttributeRole role4test = new ChangeAttributeRole();
+        role4test.setName("change_role_test");
+        role4test.setParameter(PARAMETER_NAME, "is_default");
+        role4test.setParameter(PARAMETER_TARGET_ROLE, "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role4test);
+
+        /********* test operator end *********/
+
+        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
+        process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
+        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
+        process.connect(new Connection("change_role", "example set output", "decision_tree", "training set"), true);
+        process.connect(new Connection("decision_tree", "model", "apply_model", "model"), true);
+        process.connect(new Connection("apply_model", "labelled data", "performance_classification", "labelled data"), true);
+
+        process.connect(new Connection("operator_db_reader_test", "output", "sample_test", "example set input"), true);
+        process.connect(new Connection("sample_test", "example set output", "change_role_test", "example set input"), true);
+        process.connect(new Connection("change_role_test", "example set output", "apply_model", "unlabelled data"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pcp.getResult()));
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
 

@@ -129,4 +129,22 @@ public abstract class OperatorChain extends Operator {
             unit.updateExecutionOrder();
         }
     }
+
+    /** Invokes the super method and the method for all children. */
+    @Override
+    public void processStarts() throws OperatorException {
+        super.processStarts();
+        for (ExecutionUnit unit : execUnits) {
+            unit.processStarts();
+        }
+    }
+
+    /** Invokes the super method and the method for all children. */
+    @Override
+    public void processFinished() throws OperatorException {
+        super.processFinished();
+        for (ExecutionUnit unit : execUnits) {
+            unit.processFinished();
+        }
+    }
 }
