@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ProcessPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
+import io.sugo.pio.operator.clustering.clusterer.KMeans;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
@@ -20,12 +21,20 @@ import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilte
 import io.sugo.pio.ports.Connection;
 import org.junit.Test;
 
+import static io.sugo.pio.operator.clustering.clusterer.KMeans.PARAMETER_K;
+import static io.sugo.pio.operator.clustering.clusterer.KMeans.PARAMETER_MAX_OPTIMIZATION_STEPS;
+import static io.sugo.pio.operator.clustering.clusterer.KMeans.PARAMETER_MAX_RUNS;
+import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_ADD_AS_LABEL;
+import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_ADD_CLUSTER_ATTRIBUTE;
+import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_REMOVE_UNLABELED;
 import static io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner.*;
 import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.*;
 import static io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner.*;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_NAME;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_TARGET_ROLE;
 import static io.sugo.pio.operator.preprocessing.filter.ExampleFilter.PARAMETER_FILTERS_LIST;
+import static io.sugo.pio.tools.math.similarity.DistanceMeasures.PARAMETER_MEASURE_TYPES;
+import static io.sugo.pio.tools.math.similarity.DistanceMeasures.PARAMETER_MIXED_MEASURE;
 
 public class ProcessTest {
     private static final ObjectMapper jsonMapper = new DefaultObjectMapper();
@@ -260,8 +269,58 @@ public class ProcessTest {
 
         IOContainer set = process.run();
         set = process.getRootOperator().getResults(true);
-        jsonMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+//        jsonMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(randomForest.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    @Test
+    public void kmeansTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("k_means_test");
+        process.setDescription("k_means_test");
+
+        DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
+
+        AttributeFilter af = new AttributeFilter();
+        af.setName("operator_attribute_filter");
+        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        process.getRootOperator().getExecutionUnit().addOperator(af);
+
+        ExampleFilter ef = new ExampleFilter();
+        ef.setName("operator_example_filter");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        process.getRootOperator().getExecutionUnit().addOperator(ef);
+
+        ChangeAttributeRole role = new ChangeAttributeRole();
+        role.setName("change_role");
+        role.setParameter(PARAMETER_NAME, "is_default");
+        role.setParameter(PARAMETER_TARGET_ROLE, "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role);
+
+        KMeans kMeans = new KMeans();
+        kMeans.setName("k_means");
+        kMeans.setParameter(PARAMETER_K, "2");
+        kMeans.setParameter(PARAMETER_MAX_RUNS, "10");
+        kMeans.setParameter(PARAMETER_MAX_OPTIMIZATION_STEPS, "100");
+        kMeans.setParameter(PARAMETER_ADD_CLUSTER_ATTRIBUTE, "true");
+        kMeans.setParameter(PARAMETER_REMOVE_UNLABELED, "false");
+        kMeans.setParameter(PARAMETER_ADD_AS_LABEL, "false");
+        kMeans.setParameter(PARAMETER_MEASURE_TYPES, "MixedMeasures");
+        kMeans.setParameter(PARAMETER_MIXED_MEASURE, "MixedEuclideanDistance");
+        process.getRootOperator().getExecutionUnit().addOperator(kMeans);
+
+        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
+        process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
+        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
+        process.connect(new Connection("change_role", "example set output", "k_means", "example set"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+//        jsonMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(kMeans.getResult()));
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
 

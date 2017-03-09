@@ -23,10 +23,10 @@ public abstract class AbstractAttribute implements Attribute {
 
     private transient List<Attributes> owners = new LinkedList<Attributes>();
 
-    private final List<AttributeTransformation> transformations = new ArrayList<AttributeTransformation>();
-
     /** The basic information about the attribute. Will only be shallowly cloned. */
     private AttributeDescription attributeDescription;
+
+    private final List<AttributeTransformation> transformations = new ArrayList<AttributeTransformation>();
 
     /**
      * Contains all attribute statistics calculation algorithms.
@@ -40,10 +40,10 @@ public abstract class AbstractAttribute implements Attribute {
 
     private Annotations annotations = new Annotations();
 
-    private int tableIndex = Attribute.UNDEFINED_ATTRIBUTE_INDEX;
+//    private int tableIndex = Attribute.UNDEFINED_ATTRIBUTE_INDEX;
     private int valueType;
-    private double defaultValue = 0.0;
-    private int blockType = Ontology.SINGLE_VALUE;
+//    private double defaultValue = 0.0;
+//    private int blockType = Ontology.SINGLE_VALUE;
 
     // --------------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ public abstract class AbstractAttribute implements Attribute {
      * cloned, the other transformations are cloned by reference.
      */
     protected AbstractAttribute(AbstractAttribute attribute) {
-        tableIndex = attribute.tableIndex;
+//        tableIndex = attribute.tableIndex;
         this.attributeDescription = attribute.attributeDescription;
 
         // copy statistics
@@ -90,13 +90,16 @@ public abstract class AbstractAttribute implements Attribute {
         this.attributeDescription = new AttributeDescription(this, name, valueType, Ontology.SINGLE_VALUE, 0.0d,
                 UNDEFINED_ATTRIBUTE_INDEX);
         this.constructionDescription = name;
-        this.valueType = valueType;
+//        this.valueType = valueType;
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         if (owners == null) {
             owners = new LinkedList<Attributes>();
+        }
+        if (annotations == null) {
+            annotations = new Annotations();
         }
     }
 
@@ -125,49 +128,37 @@ public abstract class AbstractAttribute implements Attribute {
             return false;
         }
         AbstractAttribute a = (AbstractAttribute) o;
-        return this.constructionDescription.equals(a.constructionDescription);
+        return this.attributeDescription.equals(a.attributeDescription);
     }
 
     @Override
     public int hashCode() {
-        return constructionDescription.hashCode();
+        return attributeDescription.hashCode();
     }
 
-    /**
-     * Returns the name of the attribute.
-     */
     @Override
-    public String getName() {
-        return this.constructionDescription;
+    public void addTransformation(AttributeTransformation transformation) {
+        transformations.add(transformation);
     }
 
-    /**
-     * Sets the name of the attribute.
-     */
     @Override
-    public void setName(String v) {
-        this.constructionDescription = v;
+    public void clearTransformations() {
+        this.transformations.clear();
     }
 
-    /**
-     * Returns the index in the example table.
-     */
     @Override
-    public int getTableIndex() {
-        return tableIndex;
-    }
-
-    /**
-     * Sets the index in the example table.
-     */
-    @Override
-    public void setTableIndex(int i) {
-        tableIndex = i;
+    public AttributeTransformation getLastTransformation() {
+        int size = this.transformations.size();
+        if (size > 0) {
+            return this.transformations.get(size - 1);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public double getValue(DataRow row) {
-        double result = row.get(getTableIndex(), defaultValue);
+        double result = row.get(getTableIndex(), getDefault());
         if (!transformations.isEmpty()) {
             for (AttributeTransformation transformation : transformations) {
                 result = transformation.transform(this, result);
@@ -187,31 +178,73 @@ public abstract class AbstractAttribute implements Attribute {
                         "Cannot set value for attribute using irreversible transformations. This process will probably work if you deactivate create_view in preprocessing operators.");
             }
         }
-        row.set(getTableIndex(), newValue, defaultValue);
+        row.set(getTableIndex(), newValue, getDefault());
+    }
+
+    /**
+     * Returns the name of the attribute.
+     */
+    @Override
+    public String getName() {
+        return this.attributeDescription.getName();
+    }
+
+    /**
+     * Sets the name of the attribute.
+     */
+    @Override
+    public void setName(String v) {
+        if (v.equals(this.attributeDescription.getName())) {
+            return;
+        }
+        for (Attributes attributes : owners) {
+            attributes.rename(this, v);
+        }
+        this.attributeDescription = (AttributeDescription) this.attributeDescription.clone();
+        this.attributeDescription.setName(v);
+    }
+
+    /**
+     * Returns the index in the example table.
+     */
+    @Override
+    public int getTableIndex() {
+        return this.attributeDescription.getTableIndex();
+    }
+
+    /**
+     * Sets the index in the example table.
+     */
+    @Override
+    public void setTableIndex(int i) {
+        this.attributeDescription = (AttributeDescription) this.attributeDescription.clone();
+        this.attributeDescription.setTableIndex(i);
     }
 
     @Override
-    public void addTransformation(AttributeTransformation transformation) {
-        transformations.add(transformation);
+    public int getBlockType() {
+        return this.attributeDescription.getBlockType();
     }
 
+    /**
+     * Sets the block type of this attribute.
+     *
+     * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_BLOCK_TYPE
+     */
     @Override
-    public void clearTransformations() {
-        this.transformations.clear();
+    public void setBlockType(int b) {
+        this.attributeDescription = (AttributeDescription) this.attributeDescription.clone();
+        this.attributeDescription.setBlockType(b);
     }
 
     /**
      * Returns the value type of this attribute.
      *
-     * @see Ontology#ATTRIBUTE_VALUE_TYPE
+     * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_VALUE_TYPE
      */
     @Override
     public int getValueType() {
-        return valueType;
-    }
-
-    public int getBlockType() {
-        return blockType;
+        return this.attributeDescription.getValueType();
     }
 
     /**
@@ -255,17 +288,18 @@ public abstract class AbstractAttribute implements Attribute {
         return this.attributeDescription.getDefault();
     }
 
+    /** Returns a human readable string that describes this attribute. */
     @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append("#");
-        result.append(tableIndex);
+        result.append(this.attributeDescription.getTableIndex());
         result.append(": ");
-        result.append(getName());
+        result.append(this.attributeDescription.getName());
         result.append(" (");
-        result.append(Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(valueType));
+        result.append(Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(this.attributeDescription.getValueType()));
         result.append("/");
-        result.append(Ontology.ATTRIBUTE_BLOCK_TYPE.mapIndex(getBlockType()));
+        result.append(Ontology.ATTRIBUTE_BLOCK_TYPE.mapIndex(this.attributeDescription.getBlockType()));
         result.append(")");
         return result.toString();
     }

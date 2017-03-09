@@ -15,7 +15,6 @@ import java.util.*;
  * This class is the core data supplier for example sets. Several example sets can use the same data
  * and access the attribute values by reference.
  *
- * @author Ingo Mierswa
  */
 public abstract class AbstractExampleTable implements ExampleTable {
 
@@ -142,8 +141,8 @@ public abstract class AbstractExampleTable implements ExampleTable {
 				attributes.add(a);
 			}
 
-//			a.setTableIndex(index);
-//			original.setTableIndex(index);
+			a.setTableIndex(index);
+			original.setTableIndex(index);
 			return index;
 		}
 

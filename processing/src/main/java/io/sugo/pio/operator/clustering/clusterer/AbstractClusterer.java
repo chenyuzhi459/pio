@@ -3,6 +3,8 @@ package io.sugo.pio.operator.clustering.clusterer;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.operator.IOContainer;
+import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.clustering.ClusterModel;
@@ -12,8 +14,10 @@ import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.metadata.MetaDataTools;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -71,6 +75,13 @@ public abstract class AbstractClusterer extends Operator {
      */
     protected Collection<AttributeMetaData> getAdditionalAttributes() {
         return new LinkedList<AttributeMetaData>();
+    }
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(modelOutput.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
     }
 
     @Override
