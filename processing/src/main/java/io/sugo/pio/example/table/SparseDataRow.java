@@ -5,7 +5,6 @@ package io.sugo.pio.example.table;
  * efficient querying of the non-default values. Please refer to {@link FastExample2SparseTransform}
  * for further information.
  * 
- * @author Ingo Mierswa
  */
 public interface SparseDataRow {
 

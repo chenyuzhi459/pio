@@ -50,6 +50,7 @@ public class Cluster implements Serializable {
      *
      * @return number of examples
      */
+    @JsonProperty
     public int getNumberOfExamples() {
         return exampleIds.size();
     }

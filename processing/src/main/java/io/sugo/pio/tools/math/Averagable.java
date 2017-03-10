@@ -7,8 +7,7 @@ import io.sugo.pio.tools.Tools;
 /**
  * Superclass for all objects which can be averaged. Averagable objects can be stored in a average
  * vector.
- * 
- * @author Ingo Mierswa
+ *
  */
 public abstract class Averagable extends ResultObjectAdapter implements Cloneable, Readable {
 
@@ -61,7 +60,7 @@ public abstract class Averagable extends ResultObjectAdapter implements Cloneabl
 	 * Must be implemented by subclasses such that it copies all values of <code>other</code> to
 	 * <code>this</code>. When this method is called, it is guaranteed, that <code>other</code> is a
 	 * subclass of the class of the object it is called on.
-	 * 
+	 *
 	 * @deprecated Please use copy constructors instead
 	 */
 	@Deprecated

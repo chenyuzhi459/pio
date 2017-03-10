@@ -1,5 +1,6 @@
 package io.sugo.pio.example.set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.datatable.DataTable;
 import io.sugo.pio.datatable.DataTableExampleSetAdapter;
 import io.sugo.pio.example.*;
@@ -16,6 +17,7 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
     private static final long serialVersionUID = 8596141056047402798L;
 
     /** Maps attribute names to list of statistics objects. */
+//    @JsonProperty
     private final Map<String, List<Statistics>> statisticsMap = new HashMap<String, List<Statistics>>();
 
     /** Maps the id values on the line index in the example table. */
@@ -113,11 +115,19 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
             return;
         } else {
             // init statistics
-            resetAttributeStatistics(attributeList);
+//            resetAttributeStatistics(attributeList);
+            // init statistics
+            for (Attribute attribute : attributeList) {
+                Iterator<Statistics> stats = attribute.getAllStatistics();
+                while (stats.hasNext()) {
+                    Statistics statistics = stats.next();
+                    statistics.startCounting(attribute);
+                }
+            }
 
             // calculate statistics
             Attribute weightAttribute = getAttributes().getWeight();
-            if (weightAttribute != null && !weightAttribute.isNumerical()) {
+            if ((weightAttribute != null) && (!weightAttribute.isNumerical())) {
                 weightAttribute = null;
             }
             for (Example example : this) {
@@ -127,16 +137,17 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
                     if (weightAttribute != null) {
                         weight = example.getValue(weightAttribute);
                     }
-                    for (Iterator<Statistics> stats = attribute.getAllStatistics(); stats.hasNext();) {
+                    Iterator<Statistics> stats = attribute.getAllStatistics();
+                    while (stats.hasNext()) {
                         Statistics statistics = stats.next();
                         statistics.count(value, weight);
                     }
                 }
-                if (Thread.currentThread().isInterrupted()) {
+                /*if (Thread.currentThread().isInterrupted()) {
                     // statistics is only partly calculated, reset
                     resetAttributeStatistics(attributeList);
                     return;
-                }
+                }*/
             }
 
             // store cloned statistics
@@ -156,9 +167,9 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
                     Statistics statistics = (Statistics) stats.next().clone();
                     statisticsList.add(statistics);
                 }
-                if (Thread.currentThread().isInterrupted()) {
+                /*if (Thread.currentThread().isInterrupted()) {
                     return;
-                }
+                }*/
             }
         }
     }

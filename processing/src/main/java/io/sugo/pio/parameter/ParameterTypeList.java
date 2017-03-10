@@ -1,6 +1,7 @@
 package io.sugo.pio.parameter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Strings;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -133,15 +134,18 @@ public class ParameterTypeList extends CombinedParameterType {
 
     public static List<String[]> transformString2List(String listString) {
         List<String[]> result = new LinkedList<>();
-        String[] splittedList = listString.split(Character.valueOf(Parameters.RECORD_SEPARATOR).toString());
-        for (String record : splittedList) {
-            if (record.length() > 0) {
-                String[] pair = record.split(Character.valueOf(Parameters.PAIR_SEPARATOR).toString());
-                if (pair.length == 2 && pair[0].length() > 0 && pair[1].length() > 0) {
-                    result.add(new String[]{pair[0], pair[1]});
+        if (!Strings.isNullOrEmpty(listString)) {
+            String[] splittedList = listString.split(Character.valueOf(Parameters.RECORD_SEPARATOR).toString());
+            for (String record : splittedList) {
+                if (record.length() > 0) {
+                    String[] pair = record.split(Character.valueOf(Parameters.PAIR_SEPARATOR).toString());
+                    if (pair.length == 2 && pair[0].length() > 0 && pair[1].length() > 0) {
+                        result.add(new String[]{pair[0], pair[1]});
+                    }
                 }
             }
         }
+
         return result;
     }
 

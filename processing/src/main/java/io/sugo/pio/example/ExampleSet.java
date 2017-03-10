@@ -1,23 +1,34 @@
 package io.sugo.pio.example;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.sugo.pio.example.set.RemappedExampleSet;
 import io.sugo.pio.example.table.ExampleTable;
 import io.sugo.pio.operator.ResultObject;
 
 /**
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "example_set")
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = "remapped_example_set", value = RemappedExampleSet.class)
+})
 public interface ExampleSet extends ResultObject, Cloneable, Iterable<Example> {
 
-    /** necessary since default method was added */
+    /**
+     * necessary since default method was added
+     */
     static final long serialVersionUID = 4100925167567270064L;
 
     // ------------- Misc -----------------------------
 
-    /** Clones the example set. */
+    /**
+     * Clones the example set.
+     */
     public Object clone();
 
     /**
      * Frees unused resources, if supported by the implementation. Does nothing by default.
-     *
+     * <p>
      * Should only be used on freshly {@link #clone}ed {@link ExampleSet}s to ensure that the
      * cleaned up resources are not requested afterwards.
      *
@@ -56,10 +67,14 @@ public interface ExampleSet extends ResultObject, Cloneable, Iterable<Example> {
 
     // ------------------- Statistics ---------------
 
-    /** Recalculate all attribute statistics. */
+    /**
+     * Recalculate all attribute statistics.
+     */
     public void recalculateAllAttributeStatistics();
 
-    /** Recalculate the attribute statistics of the given attribute. */
+    /**
+     * Recalculate the attribute statistics of the given attribute.
+     */
     public void recalculateAttributeStatistics(Attribute attribute);
 
     /**

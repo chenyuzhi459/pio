@@ -11,7 +11,6 @@ import java.io.Serializable;
  * A condition for a split in decision tree, rules etc. Subclasses should also implement a toString
  * method.
  *
- * @author Sebastian Land, Ingo Mierswa
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "splitType")
 @JsonSubTypes(value = {

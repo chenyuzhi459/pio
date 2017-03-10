@@ -15,6 +15,9 @@ import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.PassThroughRule;
 import io.sugo.pio.ports.metadata.SimplePrecondition;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Abstract superclass of all operators modifying an example set, i.e. accepting an
  * {@link ExampleSet} as input and delivering an {@link ExampleSet} as output. The behavior is
@@ -116,6 +119,18 @@ public abstract class AbstractExampleSetProcessing extends Operator {
      * avoid cloning again unnecessarily.
      */
     public abstract ExampleSet apply(ExampleSet exampleSet) throws OperatorException;
+
+    @Override
+    public IOContainer getResult() {
+        IOContainer container = super.getResult();
+
+        List<IOObject> ioObjects = container.getIoObjects();
+//        ioObjects.add(exampleSetInput.getAnyDataOrNull());
+        ioObjects.add(exampleSetOutput.getAnyDataOrNull());
+//        ioObjects.add(originalOutput.getAnyDataOrNull());
+
+        return container;
+    }
 
     /**
      * This method indicates whether the operator will perform a write operation on a cell in an

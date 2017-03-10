@@ -92,7 +92,7 @@ public class FPGrowth extends Operator {
      */
     public static final String PARAMETER_MAX_ITEMS = "max_items";
 
-    private static final String PARAMETER_MUST_CONTAIN = "must_contain";
+    public static final String PARAMETER_MUST_CONTAIN = "must_contain";
 
     private static final String PARAMETER_KEEP_EXAMPLE_SET = "keep_example_set";
 

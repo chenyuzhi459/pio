@@ -73,8 +73,10 @@ public abstract class KernelModel extends PredictionModel {
 
     public abstract SupportVector getSupportVector(int index);
 
+    @JsonProperty
     public abstract int getNumberOfSupportVectors();
 
+    @JsonProperty
     public abstract int getNumberOfAttributes();
 
     public abstract double getAttributeValue(int exampleIndex, int attributeIndex);

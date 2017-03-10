@@ -3,43 +3,54 @@ package io.sugo.pio.operator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ProcessPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.clustering.clusterer.KMeans;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
+import io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
 import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
-import io.sugo.pio.operator.performance.PerformanceVector;
 import io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEvaluator;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter;
+import io.sugo.pio.operator.preprocessing.normalization.Normalization;
 import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
 import io.sugo.pio.ports.Connection;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static io.sugo.pio.operator.clustering.clusterer.KMeans.PARAMETER_K;
-import static io.sugo.pio.operator.clustering.clusterer.KMeans.PARAMETER_MAX_OPTIMIZATION_STEPS;
-import static io.sugo.pio.operator.clustering.clusterer.KMeans.PARAMETER_MAX_RUNS;
+import static io.sugo.pio.operator.clustering.clusterer.KMeans.*;
 import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_ADD_AS_LABEL;
 import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_ADD_CLUSTER_ATTRIBUTE;
 import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_REMOVE_UNLABELED;
+import static io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth.*;
 import static io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner.*;
-import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.*;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_CONFIDENCE;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_CRITERION;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_MAXIMAL_DEPTH;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_MINIMAL_GAIN;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_MINIMAL_LEAF_SIZE;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_MINIMAL_SIZE_FOR_SPLIT;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_NUMBER_OF_PREPRUNING_ALTERNATIVES;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_PRE_PRUNING;
+import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_PRUNING;
 import static io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner.*;
 import static io.sugo.pio.operator.performance.AbstractPerformanceEvaluator.PARAMETER_MAIN_CRITERION;
 import static io.sugo.pio.operator.performance.AbstractPerformanceEvaluator.PARAMETER_SKIP_UNDEFINED_LABELS;
+import static io.sugo.pio.operator.preprocessing.PreprocessingOperator.PARAMETER_CREATE_VIEW;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_NAME;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_TARGET_ROLE;
 import static io.sugo.pio.operator.preprocessing.filter.ExampleFilter.PARAMETER_FILTERS_LIST;
+import static io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter.PARAMETER_ATTRIBUTES;
+import static io.sugo.pio.operator.preprocessing.normalization.Normalization.PARAMETER_NORMALIZATION_METHOD;
 import static io.sugo.pio.operator.preprocessing.sampling.SamplingOperator.*;
+import static io.sugo.pio.tools.AttributeSubsetSelector.PARAMETER_FILTER_TYPE;
 import static io.sugo.pio.tools.math.similarity.DistanceMeasures.PARAMETER_MEASURE_TYPES;
 import static io.sugo.pio.tools.math.similarity.DistanceMeasures.PARAMETER_MIXED_MEASURE;
 
@@ -73,7 +84,7 @@ public class ProcessTest {
 
         AttributeFilter af = new AttributeFilter();
         af.setName("operator_attribute_filter");
-        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
         process.getRootOperator().getExecutionUnit().addOperator(af);
 
         ExampleFilter ef = new ExampleFilter();
@@ -172,6 +183,43 @@ public class ProcessTest {
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
 
+    /*@Test
+    public void logisticRegressionTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("httpSql");
+        process.setDescription("Huangama http sql test.");
+
+        HttpSqlExampleSource httpSqlSource = new HttpSqlExampleSource();
+        httpSqlSource.setParameter("url", "http://192.168.0.212:8000/api/plyql/sql");
+        httpSqlSource.setParameter("sql", "select * from wuxianjiRT limit 10");
+        httpSqlSource.setName("http_sql");
+        process.getRootOperator().getExecutionUnit().addOperator(httpSqlSource);
+
+        ChangeAttributeRole role = new ChangeAttributeRole();
+        role.setName("change_role");
+        role.setParameter("attribute_name", "Nation");
+        role.setParameter("target_role", "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role);
+
+        LogisticRegression logisticRegression = new LogisticRegression();
+        logisticRegression.setParameter("feature_selection", "M5 prime");
+        logisticRegression.setParameter("eliminate_colinear_features", "true");
+        logisticRegression.setParameter("min_tolerance", "0.05");
+        logisticRegression.setParameter("use_bias", "true");
+        logisticRegression.setParameter("ridge", "1.0E-8");
+        logisticRegression.setName("logistic_regression");
+        process.getRootOperator().getExecutionUnit().addOperator(logisticRegression);
+
+        process.connect(new Connection("http_sql", "output", "change_role", "example set input"), true);
+        process.connect(new Connection("change_role", "example set output", "logistic_regression", "training set"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(logisticRegression.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }*/
+
     @Test
     public void svmTest() throws JsonProcessingException {
         OperatorProcess process = new OperatorProcess("svm_test");
@@ -182,7 +230,7 @@ public class ProcessTest {
 
         AttributeFilter af = new AttributeFilter();
         af.setName("operator_attribute_filter");
-        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
         process.getRootOperator().getExecutionUnit().addOperator(af);
 
         ExampleFilter ef = new ExampleFilter();
@@ -238,7 +286,7 @@ public class ProcessTest {
 
         AttributeFilter af = new AttributeFilter();
         af.setName("operator_attribute_filter");
-        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
         process.getRootOperator().getExecutionUnit().addOperator(af);
 
         ExampleFilter ef = new ExampleFilter();
@@ -291,7 +339,7 @@ public class ProcessTest {
 
         AttributeFilter af = new AttributeFilter();
         af.setName("operator_attribute_filter");
-        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
         process.getRootOperator().getExecutionUnit().addOperator(af);
 
         ExampleFilter ef = new ExampleFilter();
@@ -340,7 +388,7 @@ public class ProcessTest {
 
         AttributeFilter af = new AttributeFilter();
         af.setName("operator_attribute_filter");
-        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
         process.getRootOperator().getExecutionUnit().addOperator(af);
 
         ExampleFilter ef = new ExampleFilter();
@@ -383,7 +431,7 @@ public class ProcessTest {
 
         AttributeFilter af = new AttributeFilter();
         af.setName("operator_attribute_filter");
-        af.setParameter(SubsetAttributeFilter.PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
         process.getRootOperator().getExecutionUnit().addOperator(af);
 
         ExampleFilter ef = new ExampleFilter();
@@ -460,6 +508,95 @@ public class ProcessTest {
         IOContainer set = process.run();
         set = process.getRootOperator().getResults(true);
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(pcp.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    @Test
+    public void normalizationTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("normalization_test");
+        process.setDescription("normalization_test");
+
+        DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
+
+        AttributeFilter af = new AttributeFilter();
+        af.setName("operator_attribute_filter");
+        af.setParameter(PARAMETER_ATTRIBUTES, "age;address_year;income");
+        process.getRootOperator().getExecutionUnit().addOperator(af);
+
+        Normalization normalization = new Normalization();
+        normalization.setName("normalization");
+        normalization.setParameter(PARAMETER_NORMALIZATION_METHOD, "0");
+//        normalization.setParameter("min", "1");
+//        normalization.setParameter("max", "10");
+        normalization.setParameter(PARAMETER_CREATE_VIEW, "false");
+        normalization.setParameter(PARAMETER_FILTER_TYPE, "0");
+        normalization.setParameter(PARAMETER_ATTRIBUTES, "age;address_year;income");
+        process.getRootOperator().getExecutionUnit().addOperator(normalization);
+
+        SamplingOperator sample = new SamplingOperator();
+        sample.setName("sample");
+        sample.setParameter(PARAMETER_SAMPLE, "absolute");
+        sample.setParameter(PARAMETER_SAMPLE_SIZE, "100");
+        process.getRootOperator().getExecutionUnit().addOperator(sample);
+
+        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
+        process.connect(new Connection("operator_attribute_filter", "example set output", "normalization", "example set input"), true);
+        process.connect(new Connection("normalization", "example set output", "sample", "example set input"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(normalization.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    @Test
+    @Ignore
+    public void fpgrowthTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("fp_growth_test");
+        process.setDescription("fp_growth_test");
+
+        DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
+
+        AttributeFilter af = new AttributeFilter();
+        af.setName("operator_attribute_filter");
+        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        process.getRootOperator().getExecutionUnit().addOperator(af);
+
+        ExampleFilter ef = new ExampleFilter();
+        ef.setName("operator_example_filter");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        process.getRootOperator().getExecutionUnit().addOperator(ef);
+
+        ChangeAttributeRole role = new ChangeAttributeRole();
+        role.setName("change_role");
+        role.setParameter(PARAMETER_NAME, "is_default");
+        role.setParameter(PARAMETER_TARGET_ROLE, "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role);
+
+        FPGrowth fpGrowth = new FPGrowth();
+        fpGrowth.setName("fp_growth");
+        fpGrowth.setParameter(PARAMETER_MIN_NUMBER_OF_ITEMSETS, "100");
+        fpGrowth.setParameter(PARAMETER_MAX_REDUCTION_STEPS, "10");
+        fpGrowth.setParameter(PARAMETER_POSITIVE_VALUE, "");
+        fpGrowth.setParameter(PARAMETER_MIN_SUPPORT, "0.1");
+        fpGrowth.setParameter(PARAMETER_MAX_ITEMS, "-1");
+        fpGrowth.setParameter(PARAMETER_MUST_CONTAIN, "");
+        process.getRootOperator().getExecutionUnit().addOperator(fpGrowth);
+
+        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
+        process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
+        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
+        process.connect(new Connection("change_role", "example set output", "fp_growth", "example set"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(fpGrowth.getResult()));
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
 

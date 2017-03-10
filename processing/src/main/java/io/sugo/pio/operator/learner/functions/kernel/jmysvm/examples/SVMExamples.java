@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.learner.functions.kernel.jmysvm.examples;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.tools.Tools;
 
@@ -52,11 +53,13 @@ public class SVMExamples implements Serializable {
     /**
      * The dimension of the example set.
      */
+    @JsonProperty
     private int dim;
 
     /**
      * The number of examples.
      */
+    @JsonProperty
     private int train_size;
 
     // sparse representation of examples. public for avoiding invocation of a
@@ -64,6 +67,7 @@ public class SVMExamples implements Serializable {
     /**
      * The known attribute values for each example.
      */
+    @JsonProperty
     public double[][] atts;
 
     /**
@@ -74,22 +78,26 @@ public class SVMExamples implements Serializable {
     /**
      * The ids of all examples.
      */
+    @JsonProperty
     public String[] ids;
 
     /**
      * The SVM alpha values. Will be filled by learning.
      */
+    @JsonProperty
     private double[] alphas;
 
     /**
      * The labels of the examples if known. -1 and +1 for classification or the real value for
      * regression tasks. Will be filled by prediction.
      */
+    @JsonProperty
     private double[] ys;
 
     /**
      * The hyperplane offset.
      */
+    @JsonProperty
     private double b;
 
     /**

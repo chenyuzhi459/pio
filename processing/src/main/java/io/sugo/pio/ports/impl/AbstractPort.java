@@ -73,8 +73,12 @@ public abstract class AbstractPort implements Port {
         } else if (desiredClass.isAssignableFrom(data.getClass())) {
             return desiredClass.cast(data);
         } else {
-            // TODO: Maybe change this to a checked exception
-            throw new RuntimeException("");
+            PortUserError error = new PortUserError(this, "pio.error.operator.exampleset_wrong_input_type",
+                    data.getClass().getName(), this.getName(),
+                    desiredClass.getName());
+            error.setExpectedType(desiredClass);
+            error.setActualType(data.getClass());
+            throw error;
         }
     }
 

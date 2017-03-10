@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.performance;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.tools.Tools;
 import io.sugo.pio.tools.math.Averagable;
 import io.sugo.pio.tools.math.AverageVector;
@@ -127,6 +128,11 @@ public class PerformanceVector extends AverageVector {
         }
         av.cloneAnnotationsFrom(this);
         return av;
+    }
+
+    @JsonProperty
+    public String getDescription() {
+        return toString();
     }
 
     @Override

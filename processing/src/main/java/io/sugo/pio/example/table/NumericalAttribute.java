@@ -1,7 +1,7 @@
 package io.sugo.pio.example.table;
 
 
-import io.sugo.pio.example.AttributeTransformation;
+import io.sugo.pio.example.*;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -9,7 +9,6 @@ import io.sugo.pio.tools.Tools;
  * This class holds all information on a single numerical attribute. In addition to the information
  * of the superclass this is some statistics data like minimum, maximum and average of the values.
  *
- * @author Ingo Mierswa
  */
 public class NumericalAttribute extends AbstractAttribute {
 
@@ -38,6 +37,10 @@ public class NumericalAttribute extends AbstractAttribute {
      */
     /* pp */ NumericalAttribute(String name, int valueType) {
         super(name, valueType);
+        registerStatistics(new NumericalStatistics());
+        registerStatistics(new WeightedNumericalStatistics());
+        registerStatistics(new MinMaxStatistics());
+        registerStatistics(new UnknownStatistics());
     }
 
     /**

@@ -1,7 +1,9 @@
 package io.sugo.pio.example;
 
-import io.sugo.pio.example.table.DataRow;
-import io.sugo.pio.example.table.NominalMapping;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.sugo.pio.example.table.*;
+import io.sugo.pio.example.table.column.ColumnarExampleTable;
 import io.sugo.pio.operator.Annotations;
 
 import java.io.Serializable;
@@ -9,6 +11,14 @@ import java.util.Iterator;
 
 /**
  */
+//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "attribute")
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = "binominal_attribute", value = BinominalAttribute.class),
+        @JsonSubTypes.Type(name = "date_attribute", value = DateAttribute.class),
+        @JsonSubTypes.Type(name = "numerical_attribute", value = NumericalAttribute.class),
+        @JsonSubTypes.Type(name = "polynominal_attribute", value = PolynominalAttribute.class),
+        @JsonSubTypes.Type(name = "view_attribute", value = ViewAttribute.class)
+})
 public interface Attribute extends Cloneable, Serializable {
 
     /** Used to identify that this attribute is not part of any example table. */

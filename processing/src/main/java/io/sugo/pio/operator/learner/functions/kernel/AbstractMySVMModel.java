@@ -29,7 +29,7 @@ public abstract class AbstractMySVMModel extends KernelModel implements FormulaP
 
     private static final int OPERATOR_PROGRESS_STEPS = 5000;
 
-//    @JsonProperty
+    @JsonProperty
     protected SVMExamples model;
 
     private Kernel kernel;

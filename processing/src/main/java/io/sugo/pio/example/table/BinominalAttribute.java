@@ -11,7 +11,6 @@ import io.sugo.pio.tools.Tools;
  * mappings. If one of the methods designed for numerical attributes was invoked a RuntimeException
  * will be thrown.
  * 
- * @author Ingo Mierswa
  */
 public class BinominalAttribute extends NominalAttribute {
 

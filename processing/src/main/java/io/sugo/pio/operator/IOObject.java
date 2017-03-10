@@ -3,12 +3,14 @@ package io.sugo.pio.operator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.example.set.ConditionedExampleSet;
+import io.sugo.pio.operator.clustering.CentroidClusterModel;
 import io.sugo.pio.operator.learner.functions.LinearRegressionModel;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMModel;
 import io.sugo.pio.operator.learner.tree.ConfigurableRandomForestModel;
 import io.sugo.pio.operator.learner.tree.TreeModel;
-import io.sugo.pio.operator.performance.PerformanceVector;
+import io.sugo.pio.operator.performance.*;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.tools.math.Averagable;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,8 +31,15 @@ import java.io.Serializable;
         @JsonSubTypes.Type(name = "linear_regression", value = LinearRegressionModel.class),
         @JsonSubTypes.Type(name = "svm", value = JMySVMModel.class),
         @JsonSubTypes.Type(name = "random_forest", value = ConfigurableRandomForestModel.class),
+        @JsonSubTypes.Type(name = "centroid_cluster", value = CentroidClusterModel.class),
         @JsonSubTypes.Type(name = "performance_vector", value = PerformanceVector.class),
-        @JsonSubTypes.Type(name = "conditioned_example_set", value = ConditionedExampleSet.class)
+        @JsonSubTypes.Type(name = "conditioned_example_set", value = ConditionedExampleSet.class),
+        @JsonSubTypes.Type(name = "multi_class_performance", value = MultiClassificationPerformance.class),
+        @JsonSubTypes.Type(name = "weight_multi_class_performance", value = WeightedMultiClassPerformance.class),
+        @JsonSubTypes.Type(name = "binary_class_performance", value = BinaryClassificationPerformance.class),
+//        @JsonSubTypes.Type(name = "averagable", value = Averagable.class),
+        @JsonSubTypes.Type(name = "rank_correlation", value = RankCorrelation.class)
+
 })
 public interface IOObject extends Serializable {
 

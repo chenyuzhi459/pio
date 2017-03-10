@@ -1,5 +1,6 @@
 package io.sugo.pio.example.table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.*;
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.tools.Ontology;
@@ -24,6 +25,7 @@ public abstract class AbstractAttribute implements Attribute {
     private transient List<Attributes> owners = new LinkedList<Attributes>();
 
     /** The basic information about the attribute. Will only be shallowly cloned. */
+    @JsonProperty
     private AttributeDescription attributeDescription;
 
     private final List<AttributeTransformation> transformations = new ArrayList<AttributeTransformation>();

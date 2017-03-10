@@ -15,7 +15,6 @@ import io.sugo.pio.tools.math.Averagable;
  * maximum.
  * </p>
  * 
- * @author Ingo Mierswa
  */
 public abstract class PerformanceCriterion extends Averagable implements Comparable<PerformanceCriterion> {
 

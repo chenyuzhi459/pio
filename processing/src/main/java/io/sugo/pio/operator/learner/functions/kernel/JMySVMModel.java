@@ -48,7 +48,7 @@ public class JMySVMModel extends AbstractMySVMModel {
     }
 
     @JsonProperty
-    public String getKernelModel() {
+    public String getDescription() {
         return super.toString();
     }
 

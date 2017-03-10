@@ -4,10 +4,7 @@ import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.NonSpecialAttributesExampleSet;
 import io.sugo.pio.i18n.I18N;
-import io.sugo.pio.operator.AbstractModel;
-import io.sugo.pio.operator.Model;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.UserError;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;
 import io.sugo.pio.parameter.UndefinedParameterError;
@@ -18,6 +15,7 @@ import io.sugo.pio.ports.metadata.GenerateModelTransformationRule;
 import io.sugo.pio.tools.AttributeSubsetSelector;
 import io.sugo.pio.tools.Pair;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -192,6 +190,16 @@ public abstract class PreprocessingOperator extends AbstractDataProcessing {
 
         types.addAll(attributeSelector.getParameterTypes());
         return types;
+    }
+
+    @Override
+    public IOContainer getResult() {
+        IOContainer container = super.getResult();
+
+        List<IOObject> ioObjects = container.getIoObjects();
+        ioObjects.add(modelOutput.getAnyDataOrNull());
+
+        return container;
     }
 
     /**

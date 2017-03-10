@@ -31,8 +31,6 @@ import io.sugo.pio.tools.Ontology;
 
 
 /**
- * @author Sebastian Land
- * 
  */
 public abstract class AbstractNormalizationModel extends PreprocessingModel {
 

@@ -87,8 +87,10 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
     @Override
     public IOContainer getResult() {
         List<IOObject> ioObjects = new ArrayList<>();
-        ioObjects.add(performanceOutput.getAnyDataOrNull());
+        ioObjects.add(exampleSetInput.getAnyDataOrNull());
         ioObjects.add(exampleSetOutput.getAnyDataOrNull());
+        ioObjects.add(performanceOutput.getAnyDataOrNull());
+        ioObjects.add(performanceInput.getAnyDataOrNull());
         return new IOContainer(ioObjects);
     }
 

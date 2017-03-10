@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.performance;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
@@ -81,16 +82,19 @@ public class BinaryClassificationPerformance extends MeasuredPerformance {
     /**
      * true label, predicted label. PP = TP, PN = FN, NP = FP, NN = TN.
      */
+    @JsonProperty
     private double[][] counter = new double[2][2];
 
     /**
      * Name of the positive class.
      */
+    @JsonProperty
     private String positiveClassName = "";
 
     /**
      * Name of the negative class.
      */
+    @JsonProperty
     private String negativeClassName = "";
 
     /**

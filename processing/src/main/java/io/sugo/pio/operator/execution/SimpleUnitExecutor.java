@@ -23,12 +23,12 @@ public class SimpleUnitExecutor implements UnitExecutor {
         Operator operator = opIter.hasNext() ? opIter.next() : null;
         while (operator != null) {
             String name = operator.getName();
-            log.info("Begin to execute operator named: %s ...", name);
+            log.info("Begin to execute operator named: <<<%s>>> ...", name);
 
             operator.execute();
             operator.freeMemory();
 
-            log.info("Execute operator named: %s successfully.", name);
+            log.info("Execute operator named: <<<%s>>> successfully.", name);
 
             operator = opIter.hasNext() ? opIter.next() : null;
         }
