@@ -133,6 +133,9 @@ public class FPGrowth extends Operator {
         int maximalNumberOfRetries = shouldFindMinimumNumber ? getParameterAsInt(PARAMETER_MAX_REDUCTION_STEPS) : 1;
         int minimumNumberOfItemsets = shouldFindMinimumNumber ? getParameterAsInt(PARAMETER_MIN_NUMBER_OF_ITEMSETS) : 1;
 
+        logger.info("FPGrowth parameter 'maximalNumberOfRetries':%d.", maximalNumberOfRetries);
+        logger.info("FPGrowth parameter 'minimumNumberOfItemsets':%d.", minimumNumberOfItemsets);
+
         int maxItems = getParameterAsInt(PARAMETER_MAX_ITEMS);
         double currentSupport = getParameterAsDouble(PARAMETER_MIN_SUPPORT);
 

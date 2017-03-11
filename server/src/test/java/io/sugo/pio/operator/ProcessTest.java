@@ -567,7 +567,6 @@ public class ProcessTest {
     }
 
     @Test
-    @Ignore
     public void fpgrowthTest() throws JsonProcessingException {
         OperatorProcess process = new OperatorProcess("fp_growth_test");
         process.setDescription("fp_growth_test");
@@ -576,7 +575,7 @@ public class ProcessTest {
         dbReader.setParameter("database_url", DB_URL);
         dbReader.setParameter("username", DB_USERNAME);
         dbReader.setParameter("password", DB_PASSWORD);
-        dbReader.setParameter("query", "SELECT * from shopping_basket;");
+        dbReader.setParameter("query", "SELECT * from shopping_basket");
         dbReader.setName("operator_db_reader");
         process.getRootOperator().getExecutionUnit().addOperator(dbReader);
 
@@ -604,7 +603,7 @@ public class ProcessTest {
 //        fpGrowth.setParameter(PARAMETER_MIN_NUMBER_OF_ITEMSETS, "100");
 //        fpGrowth.setParameter(PARAMETER_MAX_REDUCTION_STEPS, "10");
         fpGrowth.setParameter(PARAMETER_POSITIVE_VALUE, "true");
-        fpGrowth.setParameter(PARAMETER_MIN_SUPPORT, "0.005");
+        fpGrowth.setParameter(PARAMETER_MIN_SUPPORT, "0.4");
         fpGrowth.setParameter(PARAMETER_MAX_ITEMS, "-1");
         fpGrowth.setParameter(PARAMETER_MUST_CONTAIN, "");
         process.getRootOperator().getExecutionUnit().addOperator(fpGrowth);
@@ -612,7 +611,7 @@ public class ProcessTest {
         AssociationRuleGenerator associationRuleGenerator = new AssociationRuleGenerator();
         associationRuleGenerator.setName("association_rule_generator");
         associationRuleGenerator.setParameter(PARAMETER_CRITERION, "0");
-        associationRuleGenerator.setParameter(PARAMETER_MIN_CONFIDENCE, "0.2");
+        associationRuleGenerator.setParameter(PARAMETER_MIN_CONFIDENCE, "0.4");
         associationRuleGenerator.setParameter(PARAMETER_GAIN_THETA, "2.0");
         associationRuleGenerator.setParameter(PARAMETER_LAPLACE_K, "1.0");
         process.getRootOperator().getExecutionUnit().addOperator(associationRuleGenerator);
