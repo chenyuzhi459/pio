@@ -2,9 +2,7 @@ package io.sugo.pio.operator.learner.associations;
 
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.i18n.I18N;
-import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.OperatorGroup;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeCategory;
@@ -14,6 +12,7 @@ import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.GenerateNewMDRule;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -202,6 +201,14 @@ public class AssociationRuleGenerator extends Operator {
 
     private double getSupport(int frequency, int completeSize) {
         return (double) frequency / (double) completeSize;
+    }
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(rulesOutput.getAnyDataOrNull());
+        ioObjects.add(itemSetsOutput.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
     }
 
     @Override

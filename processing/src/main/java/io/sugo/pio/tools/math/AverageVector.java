@@ -36,7 +36,7 @@ public abstract class AverageVector extends ResultObjectAdapter implements Compa
 
     private static final long serialVersionUID = 6207859713603581755L;
 
-    @JsonProperty
+//    @JsonProperty
     private List<Averagable> averagesList = new ArrayList<Averagable>();
 
     @Override

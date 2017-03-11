@@ -2,6 +2,7 @@ package io.sugo.pio.operator.preprocessing.filter;
 
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.annotation.ResourceConsumptionEstimator;
 import io.sugo.pio.tools.Ontology;
@@ -23,17 +24,17 @@ public class NumericToPolynominal extends NumericToNominal {
 
     @Override
     public String getDefaultFullName() {
-        return null;
+        return I18N.getMessage("pio.NumericToPolynominal.name");
     }
 
     @Override
     public OperatorGroup getGroup() {
-        return null;
+        return OperatorGroup.processing;
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return I18N.getMessage("pio.NumericToPolynominal.description");
     }
 
     @Override

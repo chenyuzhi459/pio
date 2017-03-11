@@ -86,11 +86,6 @@ public class NumericalAttribute extends AbstractAttribute {
     public void setMapping(NominalMapping mapping) {
     }
 
-    @Override
-    public void setBlockType(int b) {
-
-    }
-
     /**
      * Returns a string representation of value. If the numberOfDigits is greater than 0 this number
      * is used to format the string. Otherwise the value of the system property

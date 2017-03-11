@@ -102,11 +102,6 @@ public class DateAttribute extends AbstractAttribute {
     }
 
     @Override
-    public void setBlockType(int b) {
-
-    }
-
-    @Override
     public boolean isDateTime() {
         return true;
     }

@@ -52,50 +52,8 @@ public class BinominalAttribute extends NominalAttribute {
 	}
 
 	@Override
-	public void setBlockType(int b) {
-
-	}
-
-	@Override
-	public boolean isNumerical() {
-		return false;
-	}
-
-	@Override
-	public double getValue(DataRow row) {
-		return 0;
-	}
-
-	@Override
-	public void setValue(DataRow row, double value) {
-
-	}
-
-	@Override
-	public AttributeTransformation getLastTransformation() {
-		return null;
-	}
-
-	@Override
 	public boolean isDateTime() {
 		return false;
 	}
 
-	@Override
-	public String getAsString(double value, int digits, boolean quoteNominal) {
-		if (Double.isNaN(value)) {
-			return "?";
-		} else {
-			try {
-				String result = getMapping().mapIndex((int) value);
-				if (quoteNominal) {
-					result = Tools.escape(result);
-					result = "\"" + result + "\"";
-				}
-				return result;
-			} catch (Throwable e) {
-				return "?";
-			}
-		}
-	}
 }

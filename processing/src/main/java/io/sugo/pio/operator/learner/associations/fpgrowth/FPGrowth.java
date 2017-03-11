@@ -6,10 +6,7 @@ import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.Tools;
 import io.sugo.pio.i18n.I18N;
-import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.operator.ProcessStoppedException;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.io.ExampleSource;
 import io.sugo.pio.operator.learner.associations.BooleanAttributeItem;
 import io.sugo.pio.operator.learner.associations.FrequentItemSet;
@@ -525,6 +522,14 @@ public class FPGrowth extends Operator {
             }
         }
         return true;
+    }
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(exampleSetOutput.getAnyDataOrNull());
+        ioObjects.add(frequentSetsOutput.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
     }
 
     @Override

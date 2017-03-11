@@ -11,7 +11,7 @@ import java.util.Collection;
 
 /**
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "example_table")
+//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "example_table")
 @JsonSubTypes(value = {
         @JsonSubTypes.Type(name = "memory_example_table", value = MemoryExampleTable.class),
         @JsonSubTypes.Type(name = "column_example_table", value = ColumnarExampleTable.class)

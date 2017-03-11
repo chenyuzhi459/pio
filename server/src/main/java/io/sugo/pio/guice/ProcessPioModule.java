@@ -24,6 +24,8 @@ import io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEval
 import io.sugo.pio.operator.performance.RegressionPerformanceEvaluator;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
+import io.sugo.pio.operator.preprocessing.filter.NumericToBinominal;
+import io.sugo.pio.operator.preprocessing.filter.NumericToPolynominal;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
 import io.sugo.pio.operator.preprocessing.normalization.Normalization;
 import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
@@ -47,19 +49,25 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(ChangeAttributeRole.class, "set_role"),
                                 new NamedType(Normalization.class, "normalization"),
                                 new NamedType(AggregationOperator.class, "aggregate"),
+
+                                new NamedType(NumericToBinominal.class, "numeric2binominal"),
+                                new NamedType(NumericToPolynominal.class, "numeric2polynominal"),
+
                                 new NamedType(ParallelDecisionTreeLearner.class, "parallel_decision_tree"),
                                 new NamedType(ParallelRandomForestLearner.class, "random_forest"),
                                 new NamedType(LogisticRegression.class, "logistic_regression"),
                                 new NamedType(LinearRegression.class, "linear_regression"),
                                 new NamedType(KMeans.class, "k_means"),
                                 new NamedType(JMySVMLearner.class, "support_vector_machine"),
+                                new NamedType(FPGrowth.class, "fp_growth"),
+                                new NamedType(AssociationRuleGenerator.class, "create_association_rules"),
+
                                 new NamedType(PolynominalClassificationPerformanceEvaluator.class, "performance_classification"),
                                 new NamedType(BinominalClassificationPerformanceEvaluator.class, "performance_binominal_classification"),
                                 new NamedType(RegressionPerformanceEvaluator.class, "performance_regression"),
-                                new NamedType(FPGrowth.class, "fp_growth"),
-                                new NamedType(AssociationRuleGenerator.class, "create_association_rules"),
                                 new NamedType(SamplingOperator.class, "sample"),
                                 new NamedType(ModelApplier.class, "apply_model"),
+
                                 new NamedType(CSVExampleSource.class, "read_csv"),
                                 new NamedType(HttpSqlExampleSource.class, "http_sql_source"),
                                 new NamedType(SingleViewExampleSource.class, "single_view_source")

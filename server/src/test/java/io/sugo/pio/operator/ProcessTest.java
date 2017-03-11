@@ -9,6 +9,7 @@ import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.clustering.clusterer.KMeans;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
+import io.sugo.pio.operator.learner.associations.AssociationRuleGenerator;
 import io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
 import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
@@ -17,10 +18,12 @@ import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
 import io.sugo.pio.operator.performance.PolynominalClassificationPerformanceEvaluator;
 import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
+import io.sugo.pio.operator.preprocessing.filter.NumericToBinominal;
 import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter;
 import io.sugo.pio.operator.preprocessing.normalization.Normalization;
 import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
+import io.sugo.pio.operator.preprocessing.transformation.aggregation.AggregationOperator;
 import io.sugo.pio.ports.Connection;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,6 +32,9 @@ import static io.sugo.pio.operator.clustering.clusterer.KMeans.*;
 import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_ADD_AS_LABEL;
 import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_ADD_CLUSTER_ATTRIBUTE;
 import static io.sugo.pio.operator.clustering.clusterer.RMAbstractClusterer.PARAMETER_REMOVE_UNLABELED;
+import static io.sugo.pio.operator.learner.associations.AssociationRuleGenerator.PARAMETER_GAIN_THETA;
+import static io.sugo.pio.operator.learner.associations.AssociationRuleGenerator.PARAMETER_LAPLACE_K;
+import static io.sugo.pio.operator.learner.associations.AssociationRuleGenerator.PARAMETER_MIN_CONFIDENCE;
 import static io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth.*;
 import static io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner.*;
 import static io.sugo.pio.operator.learner.tree.AbstractParallelTreeLearner.PARAMETER_CONFIDENCE;
@@ -47,9 +53,14 @@ import static io.sugo.pio.operator.preprocessing.PreprocessingOperator.PARAMETER
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_NAME;
 import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_TARGET_ROLE;
 import static io.sugo.pio.operator.preprocessing.filter.ExampleFilter.PARAMETER_FILTERS_LIST;
+import static io.sugo.pio.operator.preprocessing.filter.NumericToBinominal.PARAMETER_MAX;
+import static io.sugo.pio.operator.preprocessing.filter.NumericToBinominal.PARAMETER_MIN;
 import static io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter.PARAMETER_ATTRIBUTES;
 import static io.sugo.pio.operator.preprocessing.normalization.Normalization.PARAMETER_NORMALIZATION_METHOD;
 import static io.sugo.pio.operator.preprocessing.sampling.SamplingOperator.*;
+import static io.sugo.pio.operator.preprocessing.transformation.aggregation.AggregationOperator.PARAMETER_AGGREGATION_ATTRIBUTES;
+import static io.sugo.pio.operator.preprocessing.transformation.aggregation.AggregationOperator.PARAMETER_GROUP_BY_ATTRIBUTES;
+import static io.sugo.pio.operator.preprocessing.transformation.aggregation.AggregationOperator.PARAMETER_IGNORE_MISSINGS;
 import static io.sugo.pio.tools.AttributeSubsetSelector.PARAMETER_FILTER_TYPE;
 import static io.sugo.pio.tools.math.similarity.DistanceMeasures.PARAMETER_MEASURE_TYPES;
 import static io.sugo.pio.tools.math.similarity.DistanceMeasures.PARAMETER_MIXED_MEASURE;
@@ -148,18 +159,20 @@ public class ProcessTest {
 
     @Test
     public void linearRegressionTest() throws JsonProcessingException {
-        OperatorProcess process = new OperatorProcess("httpSql");
-        process.setDescription("Huangama http sql test.");
+        OperatorProcess process = new OperatorProcess("linear_regression");
+        process.setDescription("linear_regression test.");
 
-        HttpSqlExampleSource httpSqlSource = new HttpSqlExampleSource();
-        httpSqlSource.setParameter("url", "http://192.168.0.212:8000/api/plyql/sql");
-        httpSqlSource.setParameter("sql", "select * from wuxianjiRT limit 10");
-        httpSqlSource.setName("http_sql");
-        process.getRootOperator().getExecutionUnit().addOperator(httpSqlSource);
+        DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
+
+        ExampleFilter ef = new ExampleFilter();
+        ef.setName("operator_example_filter");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         ChangeAttributeRole role = new ChangeAttributeRole();
         role.setName("change_role");
-        role.setParameter("attribute_name", "Nation");
+        role.setParameter("attribute_name", "is_default");
         role.setParameter("target_role", "label");
         process.getRootOperator().getExecutionUnit().addOperator(role);
 
@@ -172,7 +185,8 @@ public class ProcessTest {
         linearRegression.setName("linear_regression");
         process.getRootOperator().getExecutionUnit().addOperator(linearRegression);
 
-        process.connect(new Connection("http_sql", "output", "change_role", "example set input"), true);
+        process.connect(new Connection("operator_db_reader", "output", "operator_example_filter", "example set input"), true);
+        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
         process.connect(new Connection("change_role", "example set output", "linear_regression", "training set"), true);
 
         process.getRootOperator().getExecutionUnit().transformMetaData();
@@ -558,45 +572,89 @@ public class ProcessTest {
         OperatorProcess process = new OperatorProcess("fp_growth_test");
         process.setDescription("fp_growth_test");
 
-        DatabaseDataReader dbReader = getDbReader();
+        DatabaseDataReader dbReader = new DatabaseDataReader();
+        dbReader.setParameter("database_url", DB_URL);
+        dbReader.setParameter("username", DB_USERNAME);
+        dbReader.setParameter("password", DB_PASSWORD);
+        dbReader.setParameter("query", "SELECT * from shopping_basket;");
+        dbReader.setName("operator_db_reader");
         process.getRootOperator().getExecutionUnit().addOperator(dbReader);
 
         AttributeFilter af = new AttributeFilter();
-        af.setName("operator_attribute_filter");
-        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
+        af.setName("attribute_filter");
+        af.setParameter(PARAMETER_ATTRIBUTES, "会员ID;商品_冻肉;商品_啤酒;商品_牛奶;商品_甜食;商品_罐装肉;商品_罐装蔬菜;商品_葡萄酒;商品_蔬菜水果;商品_饮料;商品_鱼;商品_鲜肉");
         process.getRootOperator().getExecutionUnit().addOperator(af);
 
-        ExampleFilter ef = new ExampleFilter();
-        ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
-        process.getRootOperator().getExecutionUnit().addOperator(ef);
+        NumericToBinominal numeric2binominal = new NumericToBinominal();
+        numeric2binominal.setName("numeric2binominal");
+        numeric2binominal.setParameter(PARAMETER_FILTER_TYPE, "2");
+        numeric2binominal.setParameter(PARAMETER_ATTRIBUTES, "商品_冻肉;商品_啤酒;商品_牛奶;商品_甜食;商品_罐装肉;商品_罐装蔬菜;商品_葡萄酒;商品_蔬菜水果;商品_饮料;商品_鱼;商品_鲜肉");
+        numeric2binominal.setParameter(PARAMETER_MIN, "0.0");
+        numeric2binominal.setParameter(PARAMETER_MAX, "0.0");
+        process.getRootOperator().getExecutionUnit().addOperator(numeric2binominal);
 
         ChangeAttributeRole role = new ChangeAttributeRole();
         role.setName("change_role");
-        role.setParameter(PARAMETER_NAME, "is_default");
-        role.setParameter(PARAMETER_TARGET_ROLE, "label");
+        role.setParameter(PARAMETER_NAME, "会员ID");
+        role.setParameter(PARAMETER_TARGET_ROLE, "id");
         process.getRootOperator().getExecutionUnit().addOperator(role);
 
         FPGrowth fpGrowth = new FPGrowth();
         fpGrowth.setName("fp_growth");
-        fpGrowth.setParameter(PARAMETER_MIN_NUMBER_OF_ITEMSETS, "100");
-        fpGrowth.setParameter(PARAMETER_MAX_REDUCTION_STEPS, "10");
-        fpGrowth.setParameter(PARAMETER_POSITIVE_VALUE, "");
-        fpGrowth.setParameter(PARAMETER_MIN_SUPPORT, "0.1");
+//        fpGrowth.setParameter(PARAMETER_MIN_NUMBER_OF_ITEMSETS, "100");
+//        fpGrowth.setParameter(PARAMETER_MAX_REDUCTION_STEPS, "10");
+        fpGrowth.setParameter(PARAMETER_POSITIVE_VALUE, "true");
+        fpGrowth.setParameter(PARAMETER_MIN_SUPPORT, "0.005");
         fpGrowth.setParameter(PARAMETER_MAX_ITEMS, "-1");
         fpGrowth.setParameter(PARAMETER_MUST_CONTAIN, "");
         process.getRootOperator().getExecutionUnit().addOperator(fpGrowth);
 
-        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
-        process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
-        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
+        AssociationRuleGenerator associationRuleGenerator = new AssociationRuleGenerator();
+        associationRuleGenerator.setName("association_rule_generator");
+        associationRuleGenerator.setParameter(PARAMETER_CRITERION, "0");
+        associationRuleGenerator.setParameter(PARAMETER_MIN_CONFIDENCE, "0.2");
+        associationRuleGenerator.setParameter(PARAMETER_GAIN_THETA, "2.0");
+        associationRuleGenerator.setParameter(PARAMETER_LAPLACE_K, "1.0");
+        process.getRootOperator().getExecutionUnit().addOperator(associationRuleGenerator);
+
+        process.connect(new Connection("operator_db_reader", "output", "attribute_filter", "example set input"), true);
+        process.connect(new Connection("attribute_filter", "example set output", "numeric2binominal", "example set input"), true);
+        process.connect(new Connection("numeric2binominal", "example set output", "change_role", "example set input"), true);
         process.connect(new Connection("change_role", "example set output", "fp_growth", "example set"), true);
+        process.connect(new Connection("fp_growth", "frequent sets", "association_rule_generator", "item sets"), true);
 
         process.getRootOperator().getExecutionUnit().transformMetaData();
 
         IOContainer set = process.run();
         set = process.getRootOperator().getResults(true);
-        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(fpGrowth.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(associationRuleGenerator.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    @Test
+    public void aggregateRegressionTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("aggregate");
+        process.setDescription("aggregate test.");
+
+        DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
+
+        AggregationOperator aggregate = new AggregationOperator();
+        aggregate.setName("aggregate");
+//        aggregate.setParameter(PARAMETER_AGGREGATION_ATTRIBUTES, "income:average");
+        aggregate.setParameter(PARAMETER_AGGREGATION_ATTRIBUTES, "income:count");
+//        aggregate.setParameter(PARAMETER_AGGREGATION_ATTRIBUTES, "income:least");
+        aggregate.setParameter(PARAMETER_GROUP_BY_ATTRIBUTES, "education");
+        aggregate.setParameter(PARAMETER_IGNORE_MISSINGS, "true");
+        process.getRootOperator().getExecutionUnit().addOperator(aggregate);
+
+        process.connect(new Connection("operator_db_reader", "output", "aggregate", "example set input"), true);
+
+        process.getRootOperator().getExecutionUnit().transformMetaData();
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(aggregate.getResult()));
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
 
