@@ -3,6 +3,7 @@ package io.sugo.pio.operator.performance;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.tools.math.Averagable;
 
@@ -19,8 +20,9 @@ public class RankCorrelation extends MeasuredPerformance {
     public static final String[] NAMES = {"spearman_rho", "kendall_tau"};
 
     public static final String[] DESCRIPTIONS = {
-            "The rank correlation between the actual and predicted labels, using Spearman's rho.",
-            "The rank correlation between the actual and predicted labels, using Kendall's tau-b."};
+            I18N.getMessage("pio.RankCorrelation.description1"),
+            I18N.getMessage("pio.RankCorrelation.description2")
+    };
 
     public static final int RHO = 0;
     public static final int TAU = 1;

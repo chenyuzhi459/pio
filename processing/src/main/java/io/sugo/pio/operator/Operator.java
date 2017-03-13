@@ -38,6 +38,12 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     private Status status;
     private boolean isRunning = false;
+
+    /**
+     * Record the runtime error message of this operator.
+     */
+    private String errorMsg;
+
     /**
      * The values for this operator. The current value of a Value can be asked by the
      * ProcessLogOperator.
@@ -155,6 +161,15 @@ public abstract class Operator implements ParameterHandler, Serializable {
         } else {
             this.status = Status.QUEUE;
         }
+    }
+
+    @JsonProperty
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 
     /**
@@ -302,10 +317,12 @@ public abstract class Operator implements ParameterHandler, Serializable {
         } catch (OperatorException oe) {
             log.error(oe,"Operator named: %s execute failed.", getName());
             setStatus(Status.FAILED);
+            setErrorMsg(oe.getMessage());
             throw oe;
         } catch (Exception oe) {
             log.error(oe,"Operator named: %s execute failed.", getName());
             setStatus(Status.FAILED);
+            setErrorMsg(oe.getMessage());
             throw oe;
         } finally {
             isRunning = false;

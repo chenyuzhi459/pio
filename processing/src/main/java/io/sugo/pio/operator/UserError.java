@@ -22,7 +22,6 @@ import io.sugo.pio.i18n.I18N;
 
 import java.text.MessageFormat;
 
-
 public class UserError extends OperatorException implements NoBugError {
 
     private static final long serialVersionUID = -8441036860570180869L;
@@ -33,13 +32,27 @@ public class UserError extends OperatorException implements NoBugError {
 
     private transient Operator operator;
 
+    /**
+     * The parameter which caused the error.
+     */
+    private String parameterKey;
+
     private final Object[] arguments;
 
-    public UserError(Operator operator, Throwable cause, String errorId, Object... arguments) {
+    public UserError(Operator operator, String parameterKey, Throwable cause, String errorId, Object... arguments) {
         super(getErrorMessage(errorId, arguments), cause);
         this.errorIdentifier = errorId;
+        this.parameterKey = parameterKey;
         this.operator = operator;
         this.arguments = arguments;
+    }
+
+    public UserError(Operator operator, Throwable cause, String errorId, Object... arguments) {
+        this(operator, null, cause, errorId, arguments);
+    }
+
+    public UserError(Operator operator, String parameterKey, Throwable cause, String errorId) {
+        this(operator, parameterKey, cause, errorId, new Object[0]);
     }
 
     /**
@@ -53,6 +66,10 @@ public class UserError extends OperatorException implements NoBugError {
 
     public UserError(Operator operator, String errorId, Object... arguments) {
         this(operator, null, errorId, arguments);
+    }
+
+    public UserError(Operator operator, String parameterKey, String errorId) {
+        this(operator, parameterKey,null, errorId, new Object[0]);
     }
 
     /**

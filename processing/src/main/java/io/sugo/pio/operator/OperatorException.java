@@ -32,9 +32,6 @@ import java.util.ResourceBundle;
  * .short tag will be used, but this should be changed in future, so adding the other descriptions
  * could be wise.
  * <p>
- * TODO: Change usage to i18n keys.
- *
- * @author Ingo Mierswa, Simon Fischer, Sebastian Land
  */
 public class OperatorException extends RuntimeException {
 

@@ -6,6 +6,7 @@ import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeTypeException;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.parameter.ParameterTypeTuple;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
@@ -822,13 +823,11 @@ public class CustomFilter implements Condition {
      * @param fulfillAllConditions
      * @param macroHandler         the macro handler which will be used to resolve macros for the filter value, can
      *                             be <code>null</code>
-     * @param version              can be used to force old behaviour. If not needed and current implementation is
-     *                             desired, can be set to <code>null</code>
      */
     public CustomFilter(final ExampleSet exampleSet, final List<String[]> conditions, final boolean fulfillAllConditions,
                         final MacroHandler macroHandler) {
         if (conditions == null) {
-            throw new IllegalArgumentException("typeList must not be null!");
+            throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.custom_filters.type_list_must_not_null"));
         }
 
         conditionsOldDateFilter = new boolean[conditions.size()];
@@ -836,13 +835,13 @@ public class CustomFilter implements Condition {
         int counter = 0;
         for (String[] conditionArray : conditions) {
             if (conditionArray.length != CONDITION_ARRAY_REQUIRED_SIZE) {
-                throw new IllegalArgumentException("conditions must only consist of arrays of length 2!");
+                throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.custom_filters.onditions_must_only_2"));
             }
 
             String condition = conditionArray[CONDITION_ARRAY_CONDITION_INDEX];
             String[] conditionTupel = ParameterTypeTuple.transformString2Tupel(condition);
             if (conditionTupel.length != CONDITION_TUPEL_REQUIRED_SIZE) {
-                throw new IllegalArgumentException("Malformed condition tupels! Expected size 3 but was "
+                throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.custom_filters.malformed_condition_tupels")
                         + conditionTupel.length);
             }
 
@@ -858,12 +857,12 @@ public class CustomFilter implements Condition {
             if (filter == null) {
 //                throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
 //                        "custom_filters.filter_not_found", filterSymbol));
-                throw new IllegalArgumentException("custom_filters.filter_not_found");
+                throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.custom_filters.filter_not_found", filterSymbol));
             }
             if (att == null) {
 //                throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
 //                        "custom_filters.attribute_not_found", attName));
-                throw new IllegalArgumentException("custom_filters.attribute_not_found");
+                throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.custom_filters.attribute_not_found", attName));
             }
 
             // special checks for numerical filters
@@ -872,21 +871,24 @@ public class CustomFilter implements Condition {
                 if (att.isNominal()) {
 //                    throw new AttributeTypeException(I18N.getMessageOrNull(I18N.getErrorBundle(),
 //                            "custom_filters.numerical_comparator_type_invalid", filter.getLabel(), att.getName()));
-                    throw new AttributeTypeException("custom_filters.numerical_comparator_type_invalid");
+                    throw new AttributeTypeException(I18N.getErrorMessage("pio.error.custom_filters.numerical_comparator_type_invalid",
+                            filter.getLabel(), att.getName()));
                 }
                 if (att.isDateTime()) {
                     // check if filter value works for date attribute
                     if (filterValue == null || "".equals(filterValue) || !isStringValidDoubleValue(filter, filterValue, att)) {
 //                        throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
 //                                "custom_filters.illegal_date_value", filterValue, att.getName()));
-                        throw new IllegalArgumentException("custom_filters.illegal_date_value");
+                        throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.custom_filters.illegal_date_value",
+                                filterValue, att.getName()));
                     }
                 } else if (att.isNumerical()) {
                     // check if filter value works for numerical attribute
                     if (filterValue == null || "".equals(filterValue) || !isStringValidDoubleValue(filter, filterValue, att)) {
 //                        throw new IllegalArgumentException(I18N.getMessageOrNull(I18N.getErrorBundle(),
 //                                "custom_filters.illegal_numerical_value", filterValue, att.getName()));
-                        throw new IllegalArgumentException("custom_filters.illegal_numerical_value");
+                        throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.custom_filters.illegal_numerical_value",
+                                filterValue, att.getName()));
                     }
                 }
 
@@ -906,7 +908,8 @@ public class CustomFilter implements Condition {
                 if (!att.isNominal()) {
 //                    throw new AttributeTypeException(I18N.getMessageOrNull(I18N.getErrorBundle(),
 //                            "custom_filters.nominal_comparator_type_invalid", filter.getLabel(), att.getName()));
-                    throw new AttributeTypeException("custom_filters.nominal_comparator_type_invalid");
+                    throw new AttributeTypeException(I18N.getErrorMessage("pio.error.custom_filters.nominal_comparator_type_invalid",
+                            filter.getLabel(), att.getName()));
                 }
             }
 

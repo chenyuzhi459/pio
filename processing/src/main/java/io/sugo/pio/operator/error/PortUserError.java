@@ -25,9 +25,7 @@ import io.sugo.pio.ports.Port;
 /**
  * Subclass of a {@link UserError} which is thrown when the cause of the error is a {@link Port}.
  *
- * @author Marco Boeck
  * @since 6.5.0
- *
  */
 public class PortUserError extends UserError {
 

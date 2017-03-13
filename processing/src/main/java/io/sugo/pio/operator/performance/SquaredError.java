@@ -19,7 +19,7 @@ public class SquaredError extends SimpleCriterion {
 
 	@Override
 	public String getName() {
-		return I18N.getMessage("pio.SquaredError.squared_error ");
+		return I18N.getMessage("pio.SquaredError.squared_error");
 	}
 
 	/** Calculates the error for the current example. */

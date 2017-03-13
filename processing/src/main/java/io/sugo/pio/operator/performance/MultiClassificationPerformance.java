@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.tools.Tools;
@@ -46,13 +47,20 @@ public class MultiClassificationPerformance extends MeasuredPerformance {
     /**
      * The names of the criteria.
      */
-    public static final String[] NAMES = {"accuracy", "classification_error", "kappa"};
+    public static final String[] NAMES = {
+            I18N.getMessage("pio.MultiClassificationPerformance.name1"),
+            I18N.getMessage("pio.MultiClassificationPerformance.name2"),
+            I18N.getMessage("pio.MultiClassificationPerformance.name3")
+    };
 
     /**
      * The descriptions of the criteria.
      */
-    public static final String[] DESCRIPTIONS = {"Relative number of correctly classified examples",
-            "Relative number of misclassified examples", "The kappa statistics for the classification"};
+    public static final String[] DESCRIPTIONS = {
+            I18N.getMessage("pio.MultiClassificationPerformance.description1"),
+            I18N.getMessage("pio.MultiClassificationPerformance.description2"),
+            I18N.getMessage("pio.MultiClassificationPerformance.description3")
+    };
 
     /**
      * The counter for true labels and the prediction.

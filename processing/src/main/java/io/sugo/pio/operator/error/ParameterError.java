@@ -8,7 +8,6 @@ import io.sugo.pio.operator.UserError;
  * This exception will be thrown if something is wrong with a parameter. If possible, use the more
  * specific subclasses for improved error handling in the GUI.
  *
- * @author Marco Boeck
  * @since 6.5.0
  */
 public class ParameterError extends UserError {

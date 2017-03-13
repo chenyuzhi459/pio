@@ -66,6 +66,7 @@ public class ProcessPioModule implements PioModule {
                                 new NamedType(PolynominalClassificationPerformanceEvaluator.class, "performance_classification"),
                                 new NamedType(BinominalClassificationPerformanceEvaluator.class, "performance_binominal_classification"),
                                 new NamedType(RegressionPerformanceEvaluator.class, "performance_regression"),
+
                                 new NamedType(SamplingOperator.class, "sample"),
                                 new NamedType(ModelApplier.class, "apply_model"),
 

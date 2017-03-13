@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.tools.Tools;
@@ -41,13 +42,18 @@ public class WeightedMultiClassPerformance extends MeasuredPerformance implement
     /**
      * The names of the criteria.
      */
-    public static final String[] NAMES = {"weighted_mean_recall", "weighted_mean_precision"};
+    public static final String[] NAMES = {
+            I18N.getMessage("pio.WeightedMultiClassPerformance.name1"),
+            I18N.getMessage("pio.WeightedMultiClassPerformance.name2")
+    };
 
     /**
      * The descriptions of the criteria.
      */
-    public static final String[] DESCRIPTIONS = {"The weighted mean of all per class recall measurements.",
-            "The weighted mean of all per class precision measurements."};
+    public static final String[] DESCRIPTIONS = {
+            I18N.getMessage("pio.WeightedMultiClassPerformance.description1"),
+            I18N.getMessage("pio.WeightedMultiClassPerformance.description2")
+    };
 
     /**
      * The counter for true labels and the prediction.

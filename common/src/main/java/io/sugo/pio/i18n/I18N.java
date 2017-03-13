@@ -7,10 +7,13 @@ import com.metamx.common.logger.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.MessageFormat;
 import java.util.Properties;
 
 public class I18N {
     private static final Logger log = new Logger(I18N.class);
+
+    private static final MessageFormat formatter = new MessageFormat("");
 
     private static final String languageResource = "resource_zh_CN.properties";
 
@@ -59,5 +62,20 @@ public class I18N {
             return key;
         }
         return value;
+    }
+
+    public static String getErrorMessage(String key, Object... arguments) {
+        String value = errorProps.getProperty(key);
+        if (value == null || value.trim() == "") {
+            return key;
+        }
+
+        try {
+            formatter.applyPattern(value);
+            String formatted = formatter.format(arguments);
+            return formatted;
+        } catch (Throwable t) {
+            return value;
+        }
     }
 }

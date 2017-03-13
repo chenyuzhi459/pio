@@ -7,7 +7,6 @@ import io.sugo.pio.operator.error.ParameterError;
  * This exception will be thrown if a non-optional parameter has no default value and was not
  * defined by the user.
  *
- * @author Ingo Mierswa
  */
 public class UndefinedParameterError extends ParameterError {
 

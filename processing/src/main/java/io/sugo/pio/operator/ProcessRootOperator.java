@@ -51,13 +51,21 @@ public final class ProcessRootOperator extends OperatorChain {
     }
 
     @JsonIgnore
+    @Override
     public Integer getxPos() {
         return 0;
     }
 
     @JsonIgnore
+    @Override
     public Integer getyPos() {
         return 0;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getErrorMsg() {
+        return null;
     }
 
     /**
