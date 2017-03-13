@@ -3,10 +3,12 @@ package io.sugo.pio.ports;
 /**
  */
 public enum PortType {
+    EXAMPLES("examples", "样本"),
     EXAMPLE_SET("example set", "样本集"),
     EXAMPLE_SET_INPUT("example set input", "样本集输入"),
     EXAMPLE_SET_OUTPUT("example set output", "样本集输出"),
     ORIGINAL("original", "原始样本集"),
+    TRAINING_EXAMPLES("training examples", "训练样本集"),
     UNMATCHED_EXAMPLE_SET("unmatched example set", "未匹配的样本集"),
     ITEM_SETS("item sets", "项集"),
     FREQUENT_SETS("frequent sets", "频繁项集"),

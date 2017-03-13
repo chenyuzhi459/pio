@@ -27,6 +27,7 @@ import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeCategory;
+import io.sugo.pio.ports.PortType;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -68,9 +69,9 @@ public class DenormalizationOperator extends Operator {
 
 	private boolean failOnMissingAttributes;
 
-	private InputPort modelInput = getInputPorts().createPort("model input", AbstractNormalizationModel.class);
-	private OutputPort modelOutput = getOutputPorts().createPort("model output");
-	private OutputPort originalModelOutput = getOutputPorts().createPort("original model output");
+	private InputPort modelInput = getInputPorts().createPort(PortType.MODEL_INPUT, AbstractNormalizationModel.class);
+	private OutputPort modelOutput = getOutputPorts().createPort(PortType.MODEL_OUTPUT);
+	private OutputPort originalModelOutput = getOutputPorts().createPort(PortType.ORIGINAL_MODEL_OUTPUT);
 
 	public DenormalizationOperator() {
 		super();

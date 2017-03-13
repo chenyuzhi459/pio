@@ -14,6 +14,7 @@ import io.sugo.pio.operator.preprocessing.AbstractDataProcessing;
 import io.sugo.pio.operator.tools.ExpressionEvaluationException;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.PassThroughRule;
@@ -110,7 +111,7 @@ public class ExampleFilter extends AbstractDataProcessing {
      */
     public static final String PARAMETER_FILTERS_CHECK_METADATA = "filters_check_metadata";
 
-    private final OutputPort unmatchedOutput = getOutputPorts().createPort("unmatched example set");
+    private final OutputPort unmatchedOutput = getOutputPorts().createPort(PortType.UNMATCHED_EXAMPLE_SET);
 
     public ExampleFilter() {
         getTransformer().addRule(new PassThroughRule(getInputPort(), unmatchedOutput, false) {

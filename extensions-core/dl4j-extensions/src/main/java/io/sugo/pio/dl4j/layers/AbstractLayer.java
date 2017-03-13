@@ -4,14 +4,15 @@ import io.sugo.pio.dl4j.io.LayerSemaphore;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import org.deeplearning4j.nn.conf.layers.Layer;
 
 /**
  */
 public abstract class AbstractLayer extends Operator {
 
-    private final InputPort inPort = getInputPorts().createPort("through");
-    private final OutputPort outPort = getOutputPorts().createPort("through");
+    private final InputPort inPort = getInputPorts().createPort(PortType.THROUGH);
+    private final OutputPort outPort = getOutputPorts().createPort(PortType.THROUGH);
 
     public abstract Layer getLayer();
 

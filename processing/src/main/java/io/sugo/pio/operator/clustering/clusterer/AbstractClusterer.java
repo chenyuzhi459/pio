@@ -10,6 +10,7 @@ import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.clustering.ClusterModel;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.metadata.MetaDataTools;
@@ -27,9 +28,9 @@ public abstract class AbstractClusterer extends Operator {
 
     private static final Logger logger = new Logger(AbstractClusterer.class);
 
-    private InputPort exampleSetInput = getInputPorts().createPort("example set");
-    private OutputPort modelOutput = getOutputPorts().createPort("cluster model");
-    private OutputPort exampleSetOutput = getOutputPorts().createPort("clustered set");
+    private InputPort exampleSetInput = getInputPorts().createPort(PortType.EXAMPLE_SET);
+    private OutputPort modelOutput = getOutputPorts().createPort(PortType.CLUSTER_MODEL);
+    private OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.CLUSTER_SET);
 
     public AbstractClusterer() {
         super();

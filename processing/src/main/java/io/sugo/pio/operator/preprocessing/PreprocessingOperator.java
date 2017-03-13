@@ -9,6 +9,7 @@ import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;
 import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.GenerateModelTransformationRule;
@@ -29,7 +30,7 @@ public abstract class PreprocessingOperator extends AbstractDataProcessing {
 
     private static final Logger logger = new Logger(PreprocessingOperator.class);
 
-    private final OutputPort modelOutput = getOutputPorts().createPort("preprocessing model");
+    private final OutputPort modelOutput = getOutputPorts().createPort(PortType.PREPROCESSING_MODEL);
 
     protected final AttributeSubsetSelector attributeSelector = new AttributeSubsetSelector(this, getExampleSetInputPort(),
             getFilterValueTypes());

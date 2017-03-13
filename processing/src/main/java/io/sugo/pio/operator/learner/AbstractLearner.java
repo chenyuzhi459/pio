@@ -9,6 +9,7 @@ import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.operator.performance.PerformanceVector;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.ParameterService;
 import io.sugo.pio.tools.Tools;
@@ -26,12 +27,12 @@ public abstract class AbstractLearner extends Operator implements Learner {
 
     private static final Logger logger = new Logger(AbstractLearner.class);
 
-    private final InputPort exampleSetInput = getInputPorts().createPort("training set");
-    private final OutputPort modelOutput = getOutputPorts().createPort("model");
-    private final OutputPort performanceOutput = getOutputPorts().createPort("estimated performance",
+    private final InputPort exampleSetInput = getInputPorts().createPort(PortType.TRAINING_SET);
+    private final OutputPort modelOutput = getOutputPorts().createPort(PortType.MODEL);
+    private final OutputPort performanceOutput = getOutputPorts().createPort(PortType.ESTIMATED_PERFORMANCE,
             canEstimatePerformance());
-    private final OutputPort weightsOutput = getOutputPorts().createPort("weights", canCalculateWeights());
-    private final OutputPort exampleSetOutput = getOutputPorts().createPort("exampleSet");
+    private final OutputPort weightsOutput = getOutputPorts().createPort(PortType.WEIGHTS, canCalculateWeights());
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET);
 
     @Override
     public IOContainer getResult() {
