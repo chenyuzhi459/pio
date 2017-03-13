@@ -1,6 +1,6 @@
 package io.sugo.pio.example.table;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
  * Implementation of DataRow that is backed by a float array. Please note that for most applications
@@ -16,7 +16,7 @@ public class FloatArrayDataRow extends DataRow {
     /**
      * Holds the data for all attributes.
      */
-    @JsonProperty
+    @JsonUnwrapped
     private float[] data;
 
     /**

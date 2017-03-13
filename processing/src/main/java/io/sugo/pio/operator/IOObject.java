@@ -2,7 +2,9 @@ package io.sugo.pio.operator;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.sugo.pio.example.AttributeWeights;
 import io.sugo.pio.example.set.ConditionedExampleSet;
+import io.sugo.pio.example.set.MappedExampleSet;
 import io.sugo.pio.operator.clustering.CentroidClusterModel;
 import io.sugo.pio.operator.learner.associations.AssociationRules;
 import io.sugo.pio.operator.learner.associations.FrequentItemSets;
@@ -35,13 +37,16 @@ import java.io.Serializable;
         @JsonSubTypes.Type(name = "random_forest", value = ConfigurableRandomForestModel.class),
         @JsonSubTypes.Type(name = "centroid_cluster", value = CentroidClusterModel.class),
         @JsonSubTypes.Type(name = "performance_vector", value = PerformanceVector.class),
+        @JsonSubTypes.Type(name = "attribute_weights", value = AttributeWeights.class),
         @JsonSubTypes.Type(name = "conditioned_example_set", value = ConditionedExampleSet.class),
         @JsonSubTypes.Type(name = "multi_class_performance", value = MultiClassificationPerformance.class),
         @JsonSubTypes.Type(name = "weight_multi_class_performance", value = WeightedMultiClassPerformance.class),
         @JsonSubTypes.Type(name = "binary_class_performance", value = BinaryClassificationPerformance.class),
 //        @JsonSubTypes.Type(name = "averagable", value = Averagable.class),
+        @JsonSubTypes.Type(name = "mapped_example_set", value = MappedExampleSet.class),
         @JsonSubTypes.Type(name = "frequent_item_sets", value = FrequentItemSets.class),
         @JsonSubTypes.Type(name = "association_rules", value = AssociationRules.class),
+        @JsonSubTypes.Type(name = "absolute_error", value = AbsoluteError.class),
         @JsonSubTypes.Type(name = "rank_correlation", value = RankCorrelation.class)
 
 })

@@ -13,8 +13,8 @@ import io.sugo.pio.operator.io.HttpSqlExampleSource;
 import io.sugo.pio.operator.io.SingleViewExampleSource;
 import io.sugo.pio.operator.learner.associations.AssociationRuleGenerator;
 import io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth;
-import io.sugo.pio.operator.learner.functions.LogisticRegression;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
+import io.sugo.pio.operator.learner.functions.kernel.MyKLRLearner;
 import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
@@ -55,7 +55,8 @@ public class ProcessPioModule implements PioModule {
 
                                 new NamedType(ParallelDecisionTreeLearner.class, "parallel_decision_tree"),
                                 new NamedType(ParallelRandomForestLearner.class, "random_forest"),
-                                new NamedType(LogisticRegression.class, "logistic_regression"),
+//                                new NamedType(LogisticRegression.class, "logistic_regression"),
+                                new NamedType(MyKLRLearner.class, "logistic_regression"),
                                 new NamedType(LinearRegression.class, "linear_regression"),
                                 new NamedType(KMeans.class, "k_means"),
                                 new NamedType(JMySVMLearner.class, "support_vector_machine"),

@@ -1,6 +1,7 @@
 package io.sugo.pio.example;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import io.sugo.pio.tools.Ontology;
 
 import java.io.Serializable;
@@ -18,7 +19,7 @@ public class AttributeDescription implements Serializable {
     /**
      * The name of the attribute.
      */
-    @JsonProperty
+    @JsonUnwrapped
     private String name;
 
     /**

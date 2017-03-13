@@ -1,14 +1,20 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  */
 public class ParameterTypeLong extends ParameterTypeNumber {
+    @JsonProperty
     private long defaultValue = -1;
 
+    @JsonProperty
     private long min = Long.MIN_VALUE;
 
+    @JsonProperty
     private long max = Long.MAX_VALUE;
 
+    @JsonProperty
     private boolean noDefault = true;
 
     public ParameterTypeLong(String key, String description, long min, long max) {

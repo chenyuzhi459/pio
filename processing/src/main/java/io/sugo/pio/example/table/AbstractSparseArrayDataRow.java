@@ -26,21 +26,26 @@ import io.sugo.pio.tools.Tools;
  * Implementation of DataRow that is backed by primitive arrays. Should always be used if more than
  * 50% of the data is sparse. As fast (or even faster than map implementation) but needs
  * considerably less memory.
- *
  */
 public abstract class AbstractSparseArrayDataRow extends DataRow implements SparseDataRow {
 
     private static final long serialVersionUID = 4946925205115859758L;
 
-    /** Stores the used attribute indices. */
+    /**
+     * Stores the used attribute indices.
+     */
     @JsonProperty
     private int[] x;
 
-    /** Number of inserted elements. */
+    /**
+     * Number of inserted elements.
+     */
     @JsonProperty
     private int counter = 0;
 
-    /** Creates an empty sparse array data row with size 0. */
+    /**
+     * Creates an empty sparse array data row with size 0.
+     */
     public AbstractSparseArrayDataRow() {
         this(0);
     }
@@ -50,7 +55,9 @@ public abstract class AbstractSparseArrayDataRow extends DataRow implements Spar
 	 * is meant to be sparse - we never intend to have that many attributes.
 	 */
 
-    /** Creates a sparse array data row of the given size. */
+    /**
+     * Creates a sparse array data row of the given size.
+     */
     public AbstractSparseArrayDataRow(int size) {
         x = new int[size];
         for (int i = 0; i < x.length; i++) {
@@ -81,7 +88,9 @@ public abstract class AbstractSparseArrayDataRow extends DataRow implements Spar
     /* This could be implemented using get() */
     protected abstract double[] getAllValues();
 
-    /** Sorts the arrays in the given range. */
+    /**
+     * Sorts the arrays in the given range.
+     */
     private void sort(int off, int len) {
         // Insertion sort on smallest arrays
         if (len < 7) {
@@ -145,7 +154,9 @@ public abstract class AbstractSparseArrayDataRow extends DataRow implements Spar
         }
     }
 
-    /** Swaps the next n elements from a and b. */
+    /**
+     * Swaps the next n elements from a and b.
+     */
     private void vecswap(int a, int b, int n) {
         for (int i = 0; i < n; i++, a++, b++) {
             swap(a, b);
@@ -166,7 +177,9 @@ public abstract class AbstractSparseArrayDataRow extends DataRow implements Spar
         swapValues(a, b);
     }
 
-    /** Returns the desired data for the given attribute. */
+    /**
+     * Returns the desired data for the given attribute.
+     */
     @Override
     protected double get(int val, double defaultValue) {
         int index = java.util.Arrays.binarySearch(x, val);
@@ -177,7 +190,9 @@ public abstract class AbstractSparseArrayDataRow extends DataRow implements Spar
         }
     }
 
-    /** Sets the given data for the given attribute. */
+    /**
+     * Sets the given data for the given attribute.
+     */
     @Override
     protected synchronized void set(int index, double value, double defaultValue) {
         // first search if it is already available
@@ -235,12 +250,16 @@ public abstract class AbstractSparseArrayDataRow extends DataRow implements Spar
         return getAllValues();
     }
 
-    /** Does nothing. */
+    /**
+     * Does nothing.
+     */
     @Override
     public void ensureNumberOfColumns(int numberOfColumns) {
     }
 
-    /** Trims the data row to the number of actually used elements. */
+    /**
+     * Trims the data row to the number of actually used elements.
+     */
     @Override
     public synchronized void trim() {
         if (counter < x.length) {
@@ -251,7 +270,9 @@ public abstract class AbstractSparseArrayDataRow extends DataRow implements Spar
         }
     }
 
-    /** Returns a string representation of the data row. */
+    /**
+     * Returns a string representation of the data row.
+     */
     @Override
     public String toString() {
         StringBuffer result = new StringBuffer();

@@ -36,7 +36,6 @@ public abstract class AverageVector extends ResultObjectAdapter implements Compa
 
     private static final long serialVersionUID = 6207859713603581755L;
 
-//    @JsonProperty
     private List<Averagable> averagesList = new ArrayList<Averagable>();
 
     @Override
@@ -74,6 +73,11 @@ public abstract class AverageVector extends ResultObjectAdapter implements Compa
     /** Returns the Averagable by index. */
     public Averagable getAveragable(int index) {
         return averagesList.get(index);
+    }
+
+    @JsonProperty
+    public List<Averagable> getAveragable() {
+        return averagesList;
     }
 
     /** Returns the Averagable by name. */

@@ -12,6 +12,7 @@ import io.sugo.pio.operator.io.HttpSqlExampleSource;
 import io.sugo.pio.operator.learner.associations.AssociationRuleGenerator;
 import io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
+import io.sugo.pio.operator.learner.functions.kernel.MyKLRLearner;
 import io.sugo.pio.operator.learner.functions.linear.LinearRegression;
 import io.sugo.pio.operator.learner.tree.ParallelDecisionTreeLearner;
 import io.sugo.pio.operator.learner.tree.ParallelRandomForestLearner;
@@ -197,33 +198,42 @@ public class ProcessTest {
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
 
-    /*@Test
+    @Test
     public void logisticRegressionTest() throws JsonProcessingException {
-        OperatorProcess process = new OperatorProcess("httpSql");
-        process.setDescription("Huangama http sql test.");
+        OperatorProcess process = new OperatorProcess("logistic_regression process");
+        process.setDescription("logistic_regression test.");
 
-        HttpSqlExampleSource httpSqlSource = new HttpSqlExampleSource();
-        httpSqlSource.setParameter("url", "http://192.168.0.212:8000/api/plyql/sql");
-        httpSqlSource.setParameter("sql", "select * from wuxianjiRT limit 10");
-        httpSqlSource.setName("http_sql");
-        process.getRootOperator().getExecutionUnit().addOperator(httpSqlSource);
+        DatabaseDataReader dbReader = new DatabaseDataReader();
+        dbReader.setParameter("database_url", DB_URL);
+        dbReader.setParameter("username", DB_USERNAME);
+        dbReader.setParameter("password", DB_PASSWORD);
+        dbReader.setParameter("query", "SELECT * from lr_sample");
+        dbReader.setName("operator_db_reader");
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);
 
-        ChangeAttributeRole role = new ChangeAttributeRole();
+        AttributeFilter af = new AttributeFilter();
+        af.setName("attribute_filter");
+        af.setParameter(PARAMETER_ATTRIBUTES, "class;attribute_1;attribute_2;attribute_3;attribute_4;attribute_5;attribute_6;attribute_7;attribute_8;attribute_9;attribute_10");
+        process.getRootOperator().getExecutionUnit().addOperator(af);
+
+       ChangeAttributeRole role = new ChangeAttributeRole();
         role.setName("change_role");
-        role.setParameter("attribute_name", "Nation");
+        role.setParameter("attribute_name", "class");
         role.setParameter("target_role", "label");
         process.getRootOperator().getExecutionUnit().addOperator(role);
 
-        LogisticRegression logisticRegression = new LogisticRegression();
-        logisticRegression.setParameter("feature_selection", "M5 prime");
-        logisticRegression.setParameter("eliminate_colinear_features", "true");
-        logisticRegression.setParameter("min_tolerance", "0.05");
-        logisticRegression.setParameter("use_bias", "true");
-        logisticRegression.setParameter("ridge", "1.0E-8");
+        MyKLRLearner logisticRegression = new MyKLRLearner();
+        logisticRegression.setParameter(PARAMETER_KERNEL_TYPE, "0");
+        logisticRegression.setParameter(PARAMETER_KERNEL_CACHE, "200");
+        logisticRegression.setParameter(PARAMETER_C, "1.0");
+        logisticRegression.setParameter(PARAMETER_CONVERGENCE_EPSILON, "0.001");
+        logisticRegression.setParameter(PARAMETER_MAX_ITERATIONS, "100000");
+        logisticRegression.setParameter(PARAMETER_SCALE, "true");
         logisticRegression.setName("logistic_regression");
         process.getRootOperator().getExecutionUnit().addOperator(logisticRegression);
 
-        process.connect(new Connection("http_sql", "output", "change_role", "example set input"), true);
+        process.connect(new Connection("operator_db_reader", "output", "attribute_filter", "example set input"), true);
+        process.connect(new Connection("attribute_filter", "example set output", "change_role", "example set input"), true);
         process.connect(new Connection("change_role", "example set output", "logistic_regression", "training set"), true);
 
         process.getRootOperator().getExecutionUnit().transformMetaData();
@@ -232,7 +242,7 @@ public class ProcessTest {
         set = process.getRootOperator().getResults(true);
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(logisticRegression.getResult()));
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
-    }*/
+    }
 
     @Test
     public void svmTest() throws JsonProcessingException {
@@ -435,7 +445,7 @@ public class ProcessTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void performanceClassificationTest() throws JsonProcessingException {
         OperatorProcess process = new OperatorProcess("performance classification test");
         process.setDescription("performance classification test desc");

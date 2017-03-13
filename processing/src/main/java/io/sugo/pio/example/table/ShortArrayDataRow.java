@@ -1,6 +1,6 @@
 package io.sugo.pio.example.table;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
  * Implementation of DataRow that is backed by a short array. Please note that using this data row
@@ -14,7 +14,7 @@ public class ShortArrayDataRow extends DataRow {
     /**
      * Holds the data for all attributes.
      */
-    @JsonProperty
+    @JsonUnwrapped
     private short[] data;
 
     /**

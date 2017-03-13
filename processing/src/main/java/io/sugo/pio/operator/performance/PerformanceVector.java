@@ -130,12 +130,8 @@ public class PerformanceVector extends AverageVector {
         return av;
     }
 
-    @JsonProperty
-    public String getDescription() {
-        return toString();
-    }
-
     @Override
+    @JsonProperty("description")
     public String toString() {
         StringBuffer result = new StringBuffer(Tools.getLineSeparator() + "PerformanceVector [");
         for (int i = 0; i < size(); i++) {

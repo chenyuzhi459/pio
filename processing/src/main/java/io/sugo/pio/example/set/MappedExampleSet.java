@@ -18,6 +18,7 @@
  */
 package io.sugo.pio.example.set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.*;
 import io.sugo.pio.example.table.ExampleTable;
 import io.sugo.pio.operator.Annotations;
@@ -145,6 +146,7 @@ public class MappedExampleSet extends AbstractExampleSet {
 
     /** Counts the number of examples. */
     @Override
+    @JsonProperty
     public int size() {
         return mapping.length;
     }

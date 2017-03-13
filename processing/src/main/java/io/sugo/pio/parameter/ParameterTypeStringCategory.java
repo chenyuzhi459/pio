@@ -24,7 +24,7 @@ public class ParameterTypeStringCategory extends ParameterTypeSingle {
 	private String defaultValue = null;
 	@JsonProperty
 	private String[] categories = new String[0];
-
+	@JsonProperty
 	private boolean editable = true;
 
 

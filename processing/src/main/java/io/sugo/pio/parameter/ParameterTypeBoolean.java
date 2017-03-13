@@ -1,8 +1,12 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  */
 public class ParameterTypeBoolean extends ParameterTypeSingle {
+
+    @JsonProperty
     private boolean defaultValue = false;
 
     public ParameterTypeBoolean(String key, String description, boolean defaultValue) {

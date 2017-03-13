@@ -35,6 +35,7 @@ import java.util.List;
 /**
  * This operator determines a logistic regression model.
  */
+@Deprecated
 public class LogisticRegression extends AbstractLearner {
 
     private static final Logger logger = new Logger(LogisticRegression.class);

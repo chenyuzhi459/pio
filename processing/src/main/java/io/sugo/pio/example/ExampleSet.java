@@ -1,5 +1,6 @@
 package io.sugo.pio.example;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.example.set.RemappedExampleSet;
@@ -56,6 +57,7 @@ public interface ExampleSet extends ResultObject, Cloneable, Iterable<Example> {
      * Returns the underlying example table. Most operators should operate on the example set and
      * manipulate example to change table data instead of using the table directly.
      */
+    @JsonProperty
     ExampleTable getExampleTable();
 
     /**
