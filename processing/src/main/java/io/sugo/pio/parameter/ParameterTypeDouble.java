@@ -1,14 +1,20 @@
 package io.sugo.pio.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  */
 public class ParameterTypeDouble extends ParameterTypeNumber {
+    @JsonProperty
     private double defaultValue = Double.NaN;
 
+    @JsonProperty
     private double min = Double.NEGATIVE_INFINITY;
 
+    @JsonProperty
     private double max = Double.POSITIVE_INFINITY;
 
+    @JsonProperty
     private boolean noDefault = true;
 
     public ParameterTypeDouble(String key, String description, double min, double max) {

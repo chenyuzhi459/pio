@@ -14,7 +14,6 @@ import java.util.Map;
 /**
  * The tree model is the model created by all decision trees.
  *
- * @author Sebastian Land
  */
 public class TreeModel extends SimplePredictionModel {
 

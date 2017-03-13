@@ -1,6 +1,6 @@
 package io.sugo.pio.operator.extension.jdbc.io;
 
-
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
@@ -28,10 +28,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DatabaseDataReader extends AbstractExampleSource implements ConnectionProvider {
+
+    private static final Logger logger = new Logger(DatabaseDataReader.class);
+
     public static final String PARAMETER_QUERY = "query";
     public static final int DATA_MANAGEMENT = 0;
 
@@ -47,7 +48,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                 try {
                     this.databaseHandler.getConnection().close();
                 } catch (SQLException var9) {
-                    this.getLogger().log(Level.WARNING, "Error closing database connection: " + var9, var9);
+                    logger.warn("Error closing database connection: " + var9, var9);
                 }
             }
 
@@ -59,38 +60,46 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     protected ResultSet getResultSet() throws OperatorException {
         try {
             this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
+            if (this.databaseHandler == null) {
+                throw new UserError(this, "pio.error.cannot_connect_database");
+            }
+            logger.info("DatabaseDataReader connected to database: " + databaseHandler.getDatabaseUrl());
+
             String sqle = this.getQuery(this.databaseHandler.getStatementCreator());
             if (sqle == null) {
-                throw new UserError(this, 202, new Object[]{"query", "query_file", "table_name"});
+                throw new UserError(this, "pio.error.parameter_must_set",
+                        new Object[]{"query", "query_file", "table_name"});
             } else {
+                logger.info("DatabaseDataReader begin to execute sql: " + sqle);
                 return this.databaseHandler.executeStatement(sqle, true, this, this.getLogger());
             }
         } catch (SQLException var2) {
             if (this.databaseHandler != null && this.databaseHandler.isCancelled()) {
                 throw new ProcessStoppedException(this);
             } else {
-                throw new UserError(this, var2, 304, new Object[]{var2.getMessage()});
+                throw new UserError(this, var2, "pio.error.database_error", new Object[]{var2.getMessage()});
             }
         }
     }
 
     public ExampleSet createExampleSet() throws OperatorException {
         ResultSet resultSet = this.getResultSet();
+        logger.info("DatabaseDataReader get result set successfully.");
 
         ExampleSetBuilder builder;
         try {
             List e = getAttributes(resultSet);
 //            builder = createExampleTable(resultSet, e, this.getParameterAsInt("datamanagement"), this.getLogger(), this);
-            builder = createExampleTable(resultSet, e, DATA_MANAGEMENT, this.getLogger(), this);
+            builder = createExampleTable(resultSet, e, DATA_MANAGEMENT, this);
         } catch (SQLException var11) {
-            throw new UserError(this, var11, 304, new Object[]{var11.getMessage()});
+            throw new UserError(this, var11, "pio.error.database_error", new Object[]{var11.getMessage()});
         } finally {
             try {
                 resultSet.close();
+                logger.info("DatabaseDataReader closed result set.");
             } catch (SQLException var10) {
-                this.getLogger().log(Level.WARNING, "DB error closing result set: " + var10, var10);
+                logger.warn("DatabaseDataReader error closing result set: " + var10, var10);
             }
-
         }
 
         return builder.build();
@@ -100,17 +109,23 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         ExampleSetMetaData metaData = new ExampleSetMetaData();
         try {
             this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
-            String query1 = this.getQuery(this.databaseHandler.getStatementCreator());
-            PreparedStatement prepared1 = this.databaseHandler.getConnection().prepareStatement(query1);
-            List attributes = getAttributes(prepared1.getMetaData());
-            Iterator var6 = attributes.iterator();
+            if (this.databaseHandler != null) {
+                String query1 = this.getQuery(this.databaseHandler.getStatementCreator());
+                PreparedStatement prepared1 = this.databaseHandler.getConnection().prepareStatement(query1);
+                List attributes = getAttributes(prepared1.getMetaData());
+                Iterator var6 = attributes.iterator();
 
-            while (var6.hasNext()) {
-                Attribute att = (Attribute) var6.next();
-                metaData.addAttribute(new AttributeMetaData(att));
+                while (var6.hasNext()) {
+                    Attribute att = (Attribute) var6.next();
+                    metaData.addAttribute(new AttributeMetaData(att));
+                }
+
+                prepared1.close();
+            } else {
+                logger.warn("DatabaseDataReader cannot get database connection and cannot generate metadata, " +
+                        "the reason maybe parameter 'database_url' or 'username' or 'password' is empty.");
             }
 
-            prepared1.close();
         } catch (SQLException sqlEx) {
             throw new OperatorException(DatabaseDataReader.class.getSimpleName(), sqlEx);
 //                LogService.getRoot().log(Level.WARNING, I18N.getMessage(LogService.getRoot().getResourceBundle(), "io.sugo.pio.operator.io.DatabaseDataReader.fetching_meta_data_error", new Object[]{var16}), var16);
@@ -120,7 +135,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                     this.databaseHandler.disconnect();
                 }
             } catch (SQLException var15) {
-                this.getLogger().log(Level.WARNING, "DB error closing connection: " + var15, var15);
+                this.getLogger().warn("DB error closing connection: " + var15, var15);
             }
 
         }
@@ -128,7 +143,9 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         return metaData;
     }
 
-    public static ExampleSetBuilder createExampleTable(ResultSet resultSet, List<Attribute> attributes, int dataManagementType, Logger logger, Operator op) throws SQLException, OperatorException {
+    public static ExampleSetBuilder createExampleTable(ResultSet resultSet, List<Attribute> attributes, int dataManagementType, Operator op) throws SQLException, OperatorException {
+        logger.info("DatabaseDataReader begin to create example table through result set....");
+
         ResultSetMetaData metaData = resultSet.getMetaData();
         Attribute[] attributeArray = (Attribute[]) attributes.toArray(new Attribute[attributes.size()]);
         ExampleSetBuilder builder = ExampleSets.from(attributes);
@@ -156,7 +173,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                     }
                 } else if (!Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, 1)) {
                     if (logger != null) {
-                        logger.warning("Unknown column type: " + attribute);
+                        logger.warn("Unknown column type: " + attribute);
                     }
 
                     value = 0.0D / 0.0;
@@ -208,6 +225,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
             }
 
             builder.addDataRow(dataRow);
+
+            counter++;
 //            if(op != null) {
 //                ++counter;
 //                if(counter % 100 == 0) {
@@ -215,6 +234,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 //                }
 //            }
         }
+
+        logger.info("DatabaseDataReader created [%d] example table successfully.", counter);
 
         return builder;
     }
@@ -263,7 +284,8 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         }
 
         if (query == null) {
-            throw new UserError(this, 202, new Object[]{PARAMETER_QUERY, "query_file"});
+            throw new UserError(this, "pio.error.parameter_must_set",
+                    new Object[]{PARAMETER_QUERY, "query_file"});
         } else {
             return query;
         }

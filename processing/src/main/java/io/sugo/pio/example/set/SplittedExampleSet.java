@@ -120,4 +120,19 @@ public class SplittedExampleSet extends AbstractExampleSet {
         return new SplittedExampleSet(exampleSet, partition);
     }
 
+    /** Adds the given subset. */
+    public void selectAdditionalSubset(int index) {
+        partition.selectSubset(index);
+    }
+
+    /** Clears the current selection */
+    public void clearSelection() {
+        partition.clearSelection();
+    }
+
+    /** Returns the index of the example in the parent example set. */
+    public int getActualParentIndex(int index) {
+        return partition.mapIndex(index);
+    }
+
 }

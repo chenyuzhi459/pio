@@ -45,7 +45,7 @@ public class ProcessResource {
         try {
             List<OperatorProcess> processes = processManager.getAll(all);
             return Response.ok(processes).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -64,7 +64,7 @@ public class ProcessResource {
 
             OperatorProcess process = processManager.create(name, description);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -83,7 +83,7 @@ public class ProcessResource {
 
             OperatorProcess process = processManager.update(id, name, description, status);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -95,7 +95,7 @@ public class ProcessResource {
         try {
             OperatorProcess process = processManager.delete(id);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e).build();
         }
     }
@@ -107,7 +107,7 @@ public class ProcessResource {
         try {
             OperatorProcess process = processManager.get(id, all);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -119,7 +119,7 @@ public class ProcessResource {
         try {
             OperatorProcess process = processManager.run(id);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -131,7 +131,7 @@ public class ProcessResource {
         try {
             OperatorProcess process = processManager.getResult(id);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }

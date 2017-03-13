@@ -1,7 +1,7 @@
 package io.sugo.pio.ports;
 
 
-import io.sugo.pio.operator.ProcessSetupError;
+import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.SimpleProcessSetupError;
@@ -45,7 +45,7 @@ public class DummyPortPairExtender extends PortPairExtender {
 				if (!somethingConnected) {
 					PortOwner owner = getManagedPairs().get(0).getInputPort().getPorts().getOwner();
 					owner.getOperator().addError(
-							new SimpleProcessSetupError(ProcessSetupError.Severity.WARNING, owner, "execution_order_undefined"));
+							new SimpleProcessSetupError(ProcessSetupError.Severity.WARNING, owner, "pio.error.process.execution_order_undefined"));
 				}
 			}
 		};

@@ -84,7 +84,7 @@ public abstract class AbstractTreeLearner extends AbstractLearner {
 		Attribute labelAtt = exampleSet.getAttributes().getLabel();
 		exampleSet.recalculateAttributeStatistics(labelAtt);
 		if (exampleSet.getStatistics(labelAtt, Statistics.UNKNOWN) > 0) {
-			throw new UserError(this, 162, labelAtt.getName());
+			throw new UserError(this, "pio.error.operator.label_miss_values", labelAtt.getName());
 		}
 
 		// create tree builder

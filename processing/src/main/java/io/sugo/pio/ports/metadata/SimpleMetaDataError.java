@@ -37,7 +37,7 @@ public class SimpleMetaDataError extends SimpleProcessSetupError implements Meta
 	 * to form the final key.
 	 */
 	public SimpleMetaDataError(Severity severity, Port port, String i18nKey, Object... i18nArgs) {
-		super(severity, port == null ? null : port.getPorts().getOwner(), true, "metadata.error." + i18nKey, i18nArgs);
+		super(severity, port == null ? null : port.getPorts().getOwner(), i18nKey, i18nArgs);
 		this.port = port;
 	}
 

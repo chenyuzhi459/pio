@@ -13,13 +13,10 @@ import io.sugo.pio.operator.UserError;
  */
 public class AttributeNotFoundError extends UserError {
 
-	/** if the attribute could neither be found in regular nor in special attributes */
-	public static final int ATTRIBUTE_NOT_FOUND = 160;
-
-	/** if the attribute could not be found in regular attributes */
-	public static final int ATTRIBUTE_NOT_FOUND_IN_REGULAR = 164;
-
 	private static final long serialVersionUID = 4107157631726397970L;
+
+	/** if the attribute could neither be found in regular nor in special attributes */
+	public static final String ATTRIBUTE_NOT_FOUND = "pio.error.attribute_not_exist";
 
 	private String key;
 	private String attributeName;
@@ -45,15 +42,15 @@ public class AttributeNotFoundError extends UserError {
 	 *
 	 * @param operator
 	 *            the operator in question
-	 * @param code
-	 *            the error code, see class constants
+	 * @param errorId
+	 *            the error id
 	 * @param key
 	 *            the parameter key for which the error occured
 	 * @param attributeName
 	 *            the name of the attribute
 	 */
-	public AttributeNotFoundError(Operator operator, int code, String key, String attributeName) {
-		super(operator, code, attributeName);
+	public AttributeNotFoundError(Operator operator, String errorId, String key, String attributeName) {
+		super(operator, errorId, attributeName);
 		if (attributeName == null) {
 			this.attributeName = "";
 		} else {

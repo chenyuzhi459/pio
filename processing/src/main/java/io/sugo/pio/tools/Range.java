@@ -22,7 +22,6 @@ import java.io.Serializable;
 
 
 /**
- * @author Sebastian Land
  */
 public class Range implements Serializable {
 

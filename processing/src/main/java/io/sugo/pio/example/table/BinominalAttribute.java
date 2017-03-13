@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 
+import io.sugo.pio.example.AttributeTransformation;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -10,7 +11,6 @@ import io.sugo.pio.tools.Tools;
  * mappings. If one of the methods designed for numerical attributes was invoked a RuntimeException
  * will be thrown.
  * 
- * @author Ingo Mierswa
  */
 public class BinominalAttribute extends NominalAttribute {
 
@@ -52,40 +52,8 @@ public class BinominalAttribute extends NominalAttribute {
 	}
 
 	@Override
-	public boolean isNumerical() {
-		return false;
-	}
-
-	@Override
-	public double getValue(DataRow row) {
-		return 0;
-	}
-
-	@Override
-	public void setValue(DataRow row, double value) {
-
-	}
-
-	@Override
 	public boolean isDateTime() {
 		return false;
 	}
 
-	@Override
-	public String getAsString(double value, int digits, boolean quoteNominal) {
-		if (Double.isNaN(value)) {
-			return "?";
-		} else {
-			try {
-				String result = getMapping().mapIndex((int) value);
-				if (quoteNominal) {
-					result = Tools.escape(result);
-					result = "\"" + result + "\"";
-				}
-				return result;
-			} catch (Throwable e) {
-				return "?";
-			}
-		}
-	}
 }

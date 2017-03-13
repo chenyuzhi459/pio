@@ -1,5 +1,6 @@
 package io.sugo.pio.parameter.conditions;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.parameter.ParameterHandler;
 import io.sugo.pio.parameter.UndefinedParameterError;
 import org.w3c.dom.Element;
@@ -17,7 +18,9 @@ public class EqualTypeCondition extends ParameterCondition {
 	private static final String ELEMENT_FULFILLING_OPTION = "FulfillingOption";
 	private static final String ELEMENT_FULFILLING_OPTIONS = "FulfillingOptions";
 
+	@JsonProperty
 	private int[] fulfillingOptions;
+	@JsonProperty
 	private String[] possibleOptions;
 
 	public EqualTypeCondition(ParameterHandler handler, String conditionParameter, String[] options,

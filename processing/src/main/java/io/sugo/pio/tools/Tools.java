@@ -783,7 +783,7 @@ public class Tools {
             // if process was stopped because of an error, set exit value to -1
             exitValue = -1;
         }
-        throw new UserError(operator, 306, new Object[]{name, exitValue});
+        throw new UserError(operator, "pio.error.external_tool_error", new Object[]{name, exitValue});
     }
 
 

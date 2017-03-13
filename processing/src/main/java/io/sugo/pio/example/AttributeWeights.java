@@ -44,7 +44,6 @@ import java.util.*;
  * delivered by several feature weighting algorithms or learning schemes. The use of a linked hash
  * map ensures that the added features are stored in the same sequence they were added.
  * 
- * @author Ingo Mierswa
  */
 public class AttributeWeights extends AverageVector {
 

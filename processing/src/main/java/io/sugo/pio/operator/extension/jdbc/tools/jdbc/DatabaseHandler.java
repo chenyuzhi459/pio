@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.extension.jdbc.tools.jdbc;
 
-
+import com.google.common.base.Strings;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.ProcessStateListener;
 import io.sugo.pio.example.Attribute;
@@ -28,7 +29,6 @@ import io.sugo.pio.tools.Tools;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
-import java.util.logging.Logger;
 
 public class DatabaseHandler implements AutoCloseable {
     public static final String PARAMETER_DEFINE_CONNECTION = "define_connection";
@@ -871,11 +871,13 @@ public class DatabaseHandler implements AutoCloseable {
     }
 
     public static DatabaseHandler getConnectedDatabaseHandler(Operator operator) throws OperatorException, SQLException {
-        return getConnectedDatabaseHandler(
-                operator.getParameterAsString("database_url"),
-                operator.getParameterAsString("username"),
-                operator.getParameterAsString("password"), true
-        );
+        String url = operator.getParameterAsString(PARAMETER_DATABASE_URL);
+        String userName = operator.getParameterAsString(PARAMETER_USERNAME);
+        String password = operator.getParameterAsString(PARAMETER_PASSWORD);
+        if (Strings.isNullOrEmpty(url) || Strings.isNullOrEmpty(userName)  || Strings.isNullOrEmpty(password) ) {
+            return null;
+        }
+        return getConnectedDatabaseHandler(url, userName, password, true);
     }
 
     public static TableName getSelectedTableName(ParameterHandler operator) throws UndefinedParameterError {
@@ -1022,14 +1024,16 @@ public class DatabaseHandler implements AutoCloseable {
                             prepared.setDouble(i + 1, Double.parseDouble(replacementValue));
                         } catch (NumberFormatException var21) {
                             prepared.close();
-                            throw new UserError(parameterHandler, 158, new Object[]{replacementValue, sqlType});
+                            throw new UserError(parameterHandler, "pio.error.database_wrong_sql_type",
+                                    new Object[]{replacementValue, sqlType});
                         }
                     } else if ("LONG".equals(sqlType)) {
                         try {
                             prepared.setLong(i + 1, Long.parseLong(replacementValue));
                         } catch (NumberFormatException var20) {
                             prepared.close();
-                            throw new UserError(parameterHandler, 158, new Object[]{replacementValue, sqlType});
+                            throw new UserError(parameterHandler, "pio.error.database_wrong_sql_type",
+                                    new Object[]{replacementValue, sqlType});
                         }
                     } else {
                         if (!"INTEGER".equals(sqlType)) {
@@ -1041,7 +1045,8 @@ public class DatabaseHandler implements AutoCloseable {
                             prepared.setInt(i + 1, Integer.parseInt(replacementValue));
                         } catch (NumberFormatException var19) {
                             prepared.close();
-                            throw new UserError(parameterHandler, 158, new Object[]{replacementValue, sqlType});
+                            throw new UserError(parameterHandler, "pio.error.database_wrong_sql_type",
+                                    new Object[]{replacementValue, sqlType});
                         }
                     }
                 }
@@ -1063,7 +1068,7 @@ public class DatabaseHandler implements AutoCloseable {
                 }
             }
         } finally {
-            logger.fine("Query executed.");
+            logger.debug("Query executed.");
             if (!isQuery && statement != null) {
                 ((Statement) statement).close();
             }
@@ -1092,7 +1097,8 @@ public class DatabaseHandler implements AutoCloseable {
 
     public void updateTable(Operator operator, ExampleSet exampleSet, TableName selectedTableName, Set<Attribute> idAttributes, Logger logger) throws SQLException, OperatorException {
         if (exampleSet.getAttributes().size() == 0 && exampleSet.getAttributes().getId() == null) {
-            throw new UserError(operator, 125, new Object[]{Integer.valueOf(0), Integer.valueOf(1)});
+            throw new UserError(operator, "pio.error.operator.exampleset_too_few_attributes",
+                    new Object[]{Integer.valueOf(0), Integer.valueOf(1)});
         } else {
             StatementCreator sc = new StatementCreator(this.getConnection());
             List allColumnNames = this.getAllColumnNames(selectedTableName, this.getConnection().getMetaData());
@@ -1262,7 +1268,7 @@ public class DatabaseHandler implements AutoCloseable {
                             int var119 = 0;
                             if (attCount > 0) {
                                 if (logger != null) {
-                                    logger.fine(prepUpdateStatement.toString());
+                                    logger.debug(prepUpdateStatement.toString());
                                 }
 
                                 var119 = this.executeUpdate(prepUpdateStatement, operator);
@@ -1295,7 +1301,7 @@ public class DatabaseHandler implements AutoCloseable {
 
                             if (var119 <= 0) {
                                 if (logger != null) {
-                                    logger.fine(prepInsertStatement.toString());
+                                    logger.debug(prepInsertStatement.toString());
                                 }
 
                                 this.executeUpdate(prepInsertStatement, operator);

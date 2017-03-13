@@ -1,5 +1,9 @@
 package io.sugo.pio.parameter;
 
+import io.sugo.pio.operator.UserError;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -115,6 +119,18 @@ public interface  ParameterHandler {
      * exception since there are no non-optional boolean parameters.
      */
     boolean getParameterAsBoolean(String key);
+
+    /**
+     * Returns a single named parameter and casts it to File. This file is already resolved against
+     * the process definition file. If the parameter name defines a non-optional parameter which is
+     * not set and has no default value, a UndefinedParameterError will be thrown. If the parameter
+     * is optional and was not set this method returns null. Operators should always use this method
+     * instead of directly using the method {@link Process#resolveFileName(String)}.
+     *
+     * @throws DirectoryCreationError
+     * @throws UserError
+     */
+    public java.io.File getParameterAsFile(String key) throws UserError;
 
     /**
      * Returns a single named parameter and casts it to List. The list returned by this method

@@ -200,7 +200,7 @@ public class DiscretizationModel extends PreprocessingModel {
 				}
 
 				if (!valid) {
-					throw new UserError(null, 938);
+					throw new UserError(null, "pio.error.impossible_num_range");
 				}
 			} else {
 				if (numberOfDigits > 0) {

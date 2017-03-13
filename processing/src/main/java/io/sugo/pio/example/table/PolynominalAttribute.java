@@ -1,5 +1,6 @@
 package io.sugo.pio.example.table;
 
+import io.sugo.pio.example.AttributeTransformation;
 import io.sugo.pio.tools.Ontology;
 
 import java.util.Iterator;
@@ -19,7 +20,6 @@ import java.util.Iterator;
  * internally very efficient, this class allows an arbitrary number of nominal values and uses a
  * {@link PolynominalMapping} for the internal representation mapping.
  * 
- * @author Ingo Mierswa Exp $
  */
 public class PolynominalAttribute extends NominalAttribute {
 
@@ -60,6 +60,11 @@ public class PolynominalAttribute extends NominalAttribute {
 	}
 
 	@Override
+	public AttributeTransformation getLastTransformation() {
+		return null;
+	}
+
+	@Override
 	public NominalMapping getMapping() {
 		return this.nominalMapping;
 	}
@@ -67,6 +72,11 @@ public class PolynominalAttribute extends NominalAttribute {
 	@Override
 	public void setMapping(NominalMapping newMapping) {
 		this.nominalMapping = new PolynominalMapping();
+	}
+
+	@Override
+	public void setBlockType(int b) {
+
 	}
 
 	@Override
@@ -78,35 +88,31 @@ public class PolynominalAttribute extends NominalAttribute {
 	// string and result methods
 	// ================================================================================
 
-//	@Override
-//	public String toString() {
-//		StringBuffer result = new StringBuffer(super.toString());
-//		result.append("/values=[");
-//		Iterator<String> i = this.nominalMapping.getValues().iterator();
-//		int index = 0;
-//		while (i.hasNext()) {
-//			if (index >= MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES) {
-//				result.append(", ... (" + (this.nominalMapping.getValues().size() - MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES)
-//						+ " values) ...");
-//				break;
-//			}
-//			if (index != 0) {
-//				result.append(", ");
-//			}
-//			result.append(i.next());
-//			index++;
-//		}
-//		result.append("]");
-//		return result.toString();
-//	}
+	@Override
+	public String toString() {
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append("/values=[");
+		Iterator<String> i = this.nominalMapping.getValues().iterator();
+		int index = 0;
+		while (i.hasNext()) {
+			if (index >= MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES) {
+				result.append(", ... (" + (this.nominalMapping.getValues().size() - MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES)
+						+ " values) ...");
+				break;
+			}
+			if (index != 0) {
+				result.append(", ");
+			}
+			result.append(i.next());
+			index++;
+		}
+		result.append("]");
+		return result.toString();
+	}
 
 	@Override
 	public boolean isDateTime() {
 		return false;
 	}
 
-//	@Override
-	public String getAsString(double value, int digits, boolean quoteNominal) {
-		return null;
-	}
 }

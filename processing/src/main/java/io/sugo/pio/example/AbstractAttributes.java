@@ -81,6 +81,22 @@ public abstract class AbstractAttributes implements Attributes {
     }
 
     @Override
+    public void clearSpecial() {
+        List<AttributeRole> toRemove = new LinkedList<AttributeRole>();
+        Iterator<AttributeRole> i = allAttributeRoles();
+        while (i.hasNext()) {
+            AttributeRole role = i.next();
+            if (role.isSpecial()) {
+                toRemove.add(role);
+            }
+        }
+
+        for (AttributeRole role : toRemove) {
+            remove(role);
+        }
+    }
+
+    @Override
     public Attribute get(String name) {
         return get(name, true);
     }

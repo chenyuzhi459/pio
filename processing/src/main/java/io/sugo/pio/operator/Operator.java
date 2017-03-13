@@ -3,7 +3,9 @@ package io.sugo.pio.operator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.impl.InputPortsImpl;
@@ -12,16 +14,19 @@ import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MDTransformer;
 import io.sugo.pio.ports.metadata.SimpleProcessSetupError;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "operatorType")
 @JsonSubTypes(value = {
         @JsonSubTypes.Type(name = ProcessRootOperator.TYPE, value = ProcessRootOperator.class)
 })
 public abstract class Operator implements ParameterHandler, Serializable {
+
+    private transient static final Logger log = new Logger(Operator.class);
+
     private String name;
     protected String fullName;
     private Integer xPos;
@@ -33,6 +38,12 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     private Status status;
     private boolean isRunning = false;
+
+    /**
+     * Record the runtime error message of this operator.
+     */
+    private String errorMsg;
+
     /**
      * The values for this operator. The current value of a Value can be asked by the
      * ProcessLogOperator.
@@ -46,8 +57,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * Number of times the operator was applied.
      */
     private AtomicInteger applyCount = new AtomicInteger();
-
-    private transient final Logger logger = Logger.getLogger(Operator.class.getName());
 
 //    private OperatorVersion compatibilityLevel;
 
@@ -154,6 +163,15 @@ public abstract class Operator implements ParameterHandler, Serializable {
         }
     }
 
+    @JsonProperty
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
     /**
      * Adds an implementation of Value.
      */
@@ -187,7 +205,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
     }
 
     /**
-     * @see OperatorVersion
      */
 //    public void setCompatibilityLevel(OperatorVersion compatibilityLevel) {
 //        this.compatibilityLevel = compatibilityLevel;
@@ -287,7 +304,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * Performs the actual work of the operator and must be implemented by subclasses. Replaces the
      * old method <code>apply()</code>.
      */
-    public void doWork() {
+    public void doWork() throws OperatorException {
     }
 
     public void execute() {
@@ -298,7 +315,14 @@ public abstract class Operator implements ParameterHandler, Serializable {
             doWork();
             setStatus(Status.SUCCESS);
         } catch (OperatorException oe) {
+            log.error(oe,"Operator named: %s execute failed.", getName());
             setStatus(Status.FAILED);
+            setErrorMsg(oe.getMessage());
+            throw oe;
+        } catch (Exception oe) {
+            log.error(oe,"Operator named: %s execute failed.", getName());
+            setStatus(Status.FAILED);
+            setErrorMsg(oe.getMessage());
             throw oe;
         } finally {
             isRunning = false;
@@ -336,13 +360,13 @@ public abstract class Operator implements ParameterHandler, Serializable {
                 boolean parameterSet = getParameters().isSet(type.getKey());
                 if (type.getDefaultValue() == null && !parameterSet) {
                     addError(new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, portOwner,
-                            "undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
+                            "pio.error.process.undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
                     errorCount++;
                 } else if (type instanceof ParameterTypeAttribute && parameterSet) {
                     try {
                         if ("".equals(getParameter(type.getKey()))) {
                             addError(new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, portOwner,
-                                    "undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
+                                    "pio.error.process.undefined_parameter", new Object[]{type.getKey().replace('_', ' ')}));
                             errorCount++;
                         }
                     } catch (UndefinedParameterError e) {
@@ -353,12 +377,21 @@ public abstract class Operator implements ParameterHandler, Serializable {
             if (!optional && type instanceof ParameterTypeDate) {
                 String value = getParameters().getParameter(type.getKey());
                 if (value != null && !ParameterTypeDate.isValidDate(value)) {
-                    addError(new SimpleProcessSetupError(ProcessSetupError.Severity.WARNING, portOwner, "invalid_date_format",
+                    addError(new SimpleProcessSetupError(ProcessSetupError.Severity.WARNING, portOwner, "pio.error.process.invalid_date_format",
                             new Object[]{type.getKey().replace('_', ' '), value}));
                 }
             }
         }
         return errorCount;
+    }
+
+    /**
+     * This method should be called within long running loops of an operator to check if the user
+     * has canceled the execution in the mean while. This then will throw a
+     * {@link ProcessStoppedException} to cancel the execution.
+     */
+    public final void checkForStop() throws ProcessStoppedException {
+        // TODO
     }
 
     /**
@@ -375,11 +408,22 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     public Logger getLogger() {
         if (getProcess() == null) {
-            return logger;
+            return log;
         } else {
             return getProcess().getLogger();
         }
     }
+
+    /** Called when the process starts. Resets all counters. */
+    public void processStarts() throws OperatorException {
+        applyCount.set(0);
+        applyCountAtLastExecution = 0;
+    }
+
+    /**
+     * Called at the end of the process. The default implementation does nothing.
+     */
+    public void processFinished() throws OperatorException {}
 
     /**
      * Returns the parameter type with the given name. Will return null if this operator does not
@@ -423,6 +467,15 @@ public abstract class Operator implements ParameterHandler, Serializable {
             parameters = new Parameters(getParameterTypes());
         }
         return parameters;
+    }
+
+    public boolean isParameterExist(String key) {
+        return parameters != null && parameters.isSpecified(key);
+    }
+
+//    @Override
+    public ParameterHandler getParameterHandler() {
+        return this;
     }
 
     /**
@@ -572,6 +625,77 @@ public abstract class Operator implements ParameterHandler, Serializable {
         return false; // cannot happen
     }
 
+    /**
+     * Returns a single named parameter and casts it to File. This file is already resolved against
+     * the process definition file but missing directories will not be created. If the parameter
+     * name defines a non-optional parameter which is not set and has no default value, a
+     * UndefinedParameterError will be thrown. If the parameter is optional and was not set this
+     * method returns null. Operators should always use this method instead of directly using the
+     * method {@link Process#resolveFileName(String)}.
+     */
+    @Override
+    public java.io.File getParameterAsFile(String key) throws UserError {
+        return getParameterAsFile(key, false);
+    }
+
+    /**
+     * Returns a single named parameter and casts it to File. This file is already resolved against
+     * the process definition file and missing directories will be created. If the parameter name
+     * defines a non-optional parameter which is not set and has no default value, a
+     * UndefinedParameterError will be thrown. If the parameter is optional and was not set this
+     * method returns null. Operators should always use this method instead of directly using the
+     * method {@link Process#resolveFileName(String)}.
+     *
+     * @throws DirectoryCreationError
+     */
+//    @Override
+    public java.io.File getParameterAsFile(String key, boolean createMissingDirectories) throws UserError {
+        String fileName = getParameter(key);
+        if (fileName == null) {
+            return null;
+        }
+
+        /*Process process = getProcess();
+        if (process != null) {
+            File result = process.resolveFileName(fileName);
+            if (createMissingDirectories) {
+                File parent = result.getParentFile();
+                if (parent != null) {
+                    if (!parent.exists()) {
+                        boolean isDirectoryCreated = parent.mkdirs();
+                        if (!isDirectoryCreated) {
+                            throw new UserError(null, "io.dir_creation_fail", parent.getAbsolutePath());
+                        }
+                    }
+                }
+            }
+            return result;
+        } else {*/
+        getLogger().debug(getName() + " is not attached to a process. Trying '" + fileName + "' as absolute filename.");
+        File result = new File(fileName);
+        if (createMissingDirectories) {
+            if (result.isDirectory()) {
+                boolean isDirectoryCreated = result.mkdirs();
+                if (!isDirectoryCreated) {
+                    throw new UserError(null, "io.dir_creation_fail", result.getAbsolutePath());
+                }
+            } else {
+                File parent = result.getParentFile();
+                if (parent != null) {
+                    if (!parent.exists()) {
+                        boolean isDirectoryCreated = parent.mkdirs();
+                        if (!isDirectoryCreated) {
+                            throw new UserError(null, "io.dir_creation_fail", parent.getAbsolutePath());
+                        }
+                    }
+
+                }
+            }
+        }
+        return result;
+//        }
+    }
+
     public void addError(ProcessSetupError error) {
         errorList.add(error);
     }
@@ -677,7 +801,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
         }
     }
 
-    public IOContainer getResult(){
+    public IOContainer getResult() {
         return new IOContainer(new ArrayList<>());
     }
 }

@@ -1,12 +1,20 @@
 package io.sugo.pio.ports.impl;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.Ports;
 
 public class OutputPortImpl extends AbstractOutputPort {
+
+    private static final Logger logger = new Logger(OutputPortImpl.class);
+
     protected OutputPortImpl(Ports<? extends Port> owner, String name) {
         super(owner, name);
+    }
+
+    protected OutputPortImpl(Ports<? extends Port> owner, String name, String description) {
+        super(owner, name, description);
     }
 
     @Override
@@ -27,7 +35,8 @@ public class OutputPortImpl extends AbstractOutputPort {
         setData(object);
         if (isConnected()) {
             getDestination().receive(object);
-            System.out.println(String.format("deliver data from %s to %s", getName(), getDestination().getName()));
+            logger.info("Deliver data from %s[%s] to %s[%s]", getPorts().getOwner().getOperator().getName(),
+                    getName(), getDestination().getPorts().getOwner().getOperator().getName(), getDestination().getName());
         }
     }
 }

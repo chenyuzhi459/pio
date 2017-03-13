@@ -7,6 +7,7 @@ import io.sugo.pio.parameter.ParameterTypeInt;
 import io.sugo.pio.ports.InputPorts;
 import io.sugo.pio.tools.ParameterService;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -50,13 +51,34 @@ public final class ProcessRootOperator extends OperatorChain {
     }
 
     @JsonIgnore
+    @Override
     public Integer getxPos() {
         return 0;
     }
 
     @JsonIgnore
+    @Override
     public Integer getyPos() {
         return 0;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getErrorMsg() {
+        return null;
+    }
+
+    /**
+     * Called at the beginning of the process. Notifies all listeners and the children operators
+     * (super method).
+     */
+    @Override
+    public void processStarts() throws OperatorException {
+        super.processStarts();
+        /*Iterator i = getListenerListCopy().iterator();
+        while (i.hasNext()) {
+            ((ProcessListener) i.next()).processStarts(this.process);
+        }*/
     }
 
     /**

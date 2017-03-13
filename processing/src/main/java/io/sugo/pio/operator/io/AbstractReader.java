@@ -12,7 +12,7 @@ import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.MetaDataError;
 import io.sugo.pio.ports.metadata.SimpleMetaDataError;
 import io.sugo.pio.tools.io.Encoding;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
                         }
                         // will be added below
                         cachedError = new SimpleMetaDataError(Severity.WARNING, outputPort,
-                                "cannot_create_exampleset_metadata", new Object[] { msg });
+                                "pio.error.metadata.cannot_create_exampleset_metadata", new Object[] { msg });
                     }
                     if (cachedMetaData != null) {
                         cachedMetaData.addToHistory(outputPort);
@@ -76,10 +76,10 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
     /**
      * Creates (or reads) the ExampleSet that will be returned by {@link #apply()}.
      */
-    public abstract T read();
+    public abstract T read() throws OperatorException;
 
     @Override
-    public void doWork() {
+    public void doWork() throws OperatorException {
         final T result = read();
         outputPort.deliver(result);
     }

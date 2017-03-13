@@ -1,7 +1,9 @@
 package io.sugo.pio.example;
 
-import io.sugo.pio.example.table.DataRow;
-import io.sugo.pio.example.table.NominalMapping;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.sugo.pio.example.table.*;
+import io.sugo.pio.example.table.column.ColumnarExampleTable;
 import io.sugo.pio.operator.Annotations;
 
 import java.io.Serializable;
@@ -9,6 +11,14 @@ import java.util.Iterator;
 
 /**
  */
+//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "attribute")
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = "binominal_attribute", value = BinominalAttribute.class),
+        @JsonSubTypes.Type(name = "date_attribute", value = DateAttribute.class),
+        @JsonSubTypes.Type(name = "numerical_attribute", value = NumericalAttribute.class),
+        @JsonSubTypes.Type(name = "polynominal_attribute", value = PolynominalAttribute.class),
+        @JsonSubTypes.Type(name = "view_attribute", value = ViewAttribute.class)
+})
 public interface Attribute extends Cloneable, Serializable {
 
     /** Used to identify that this attribute is not part of any example table. */
@@ -69,6 +79,8 @@ public interface Attribute extends Cloneable, Serializable {
 
     public void addTransformation(AttributeTransformation transformation);
 
+    public AttributeTransformation getLastTransformation();
+
     /** Clear all transformations. */
     public void clearTransformations();
 
@@ -77,6 +89,9 @@ public interface Attribute extends Cloneable, Serializable {
      * Additional statistics can be registered via {@link #registerStatistics(Statistics)}.
      */
     public Iterator<Statistics> getAllStatistics();
+
+    /** Returns the construction description. */
+    public String getConstruction();
 
     /** Registers the attribute statistics. */
     public void registerStatistics(Statistics statistics);
@@ -100,6 +115,25 @@ public interface Attribute extends Cloneable, Serializable {
      */
     void setMapping(NominalMapping nominalMapping);
 
+    /**
+     * Returns the block type of this attribute.
+     *
+     * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_BLOCK_TYPE
+     */
+    public int getBlockType();
+
+    /**
+     * Sets the block type of this attribute.
+     *
+     * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_BLOCK_TYPE
+     */
+    public void setBlockType(int b);
+
+    /** Sets the default value for this attribute. */
+    public void setDefault(double value);
+
+    /** Returns the default value for this attribute. */
+    public double getDefault();
 
     /**
      * Returns true if the attribute is nominal.

@@ -2,6 +2,7 @@ package io.sugo.pio.operator.preprocessing.filter.attributes;
 
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.set.ConditionCreationException;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.ParameterHandler;
@@ -28,7 +29,8 @@ public class SingleAttributeFilter extends AbstractAttributeFilterCondition {
 	public void init(ParameterHandler operator) throws UserError, ConditionCreationException {
 		attributeName = operator.getParameterAsString(PARAMETER_ATTRIBUTE);
 		if (attributeName == null || attributeName.length() == 0) {
-			throw new UserError(operator instanceof Operator ? (Operator) operator : null, 111);
+			throw new UserError(operator instanceof Operator ? (Operator) operator : null,
+					"pio.error.no_attribute_selected");
 		}
 	}
 
@@ -54,7 +56,8 @@ public class SingleAttributeFilter extends AbstractAttributeFilterCondition {
 	@Override
 	public List<ParameterType> getParameterTypes(ParameterHandler operator, InputPort inPort, int... valueTypes) {
 		List<ParameterType> types = new LinkedList<>();
-		ParameterType type = new ParameterTypeAttribute(PARAMETER_ATTRIBUTE, "The attribute which should be chosen.",
+		ParameterType type = new ParameterTypeAttribute(PARAMETER_ATTRIBUTE,
+				I18N.getMessage("pio.SingleAttributeFilter.attribute"),
 				inPort, true, valueTypes);
 		types.add(type);
 		return types;

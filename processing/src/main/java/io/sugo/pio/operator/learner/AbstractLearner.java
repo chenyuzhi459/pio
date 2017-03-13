@@ -1,9 +1,11 @@
 package io.sugo.pio.operator.learner;
 
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.AttributeWeights;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.*;
+import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.operator.performance.PerformanceVector;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
@@ -19,9 +21,10 @@ import java.util.List;
  * method. New learning schemes should extend this class to support the same parameters as other
  * RapidMiner learners. The main purpose of this class is to perform some compatibility checks.
  *
- * @author Ingo Mierswa
  */
 public abstract class AbstractLearner extends Operator implements Learner {
+
+    private static final Logger logger = new Logger(AbstractLearner.class);
 
     private final InputPort exampleSetInput = getInputPorts().createPort("training set");
     private final OutputPort modelOutput = getOutputPorts().createPort("model");
@@ -31,13 +34,18 @@ public abstract class AbstractLearner extends Operator implements Learner {
     private final OutputPort exampleSetOutput = getOutputPorts().createPort("exampleSet");
 
     @Override
-    public IOContainer getResult(){
+    public IOContainer getResult() {
         List<IOObject> ioObjects = new ArrayList<>();
         ioObjects.add(modelOutput.getAnyDataOrNull());
+        ioObjects.add(performanceOutput.getAnyDataOrNull());
+        ioObjects.add(weightsOutput.getAnyDataOrNull());
+        ioObjects.add(exampleSetOutput.getAnyDataOrNull());
         return new IOContainer(ioObjects);
     }
 
-    /** Creates a new abstract */
+    /**
+     * Creates a new abstract
+     */
     public AbstractLearner() {
         exampleSetInput.addPrecondition(new LearnerPrecondition(this, exampleSetInput));
         getTransformer().addRule(
@@ -116,16 +124,18 @@ public abstract class AbstractLearner extends Operator implements Learner {
     @Override
     public void doWork() throws OperatorException {
         ExampleSet exampleSet = exampleSetInput.getData(ExampleSet.class);
+        logger.info("Abstract learner begin to learn through example set[%s], which has size[%d]",
+                exampleSet.getName(), exampleSet.size());
 
         // some checks
         if (exampleSet.getAttributes().getLabel() == null) {
-            throw new UserError(this, 105);
+            throw new UserError(this, "pio.error.operator.exampleset_miss_label");
         }
         if (exampleSet.getAttributes().size() == 0) {
-            throw new UserError(this, 106);
+            throw new UserError(this, "pio.error.operator.exampleset_no_attributes");
         }
         if (exampleSet.size() == 0) {
-            throw new UserError(this, 117);
+            throw new UserError(this, "pio.error.operator.exampleset_empty");
         }
 
         // check capabilities and produce errors if they are not fulfilled
@@ -162,6 +172,9 @@ public abstract class AbstractLearner extends Operator implements Learner {
         }
 
         exampleSetOutput.deliver(exampleSet);
+
+        logger.info("Abstract learner learn through example set[%s] and deliver to the next operator finished.",
+                exampleSet.getName(), exampleSet.size());
     }
 
     /**
@@ -170,8 +183,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      * estimated performance. The default implementation returns false.
      *
      * @deprecated This method is not used any longer. Performance is estimated iff
-     *             {@link #canEstimatePerformance()} returns true and the corresponding port is
-     *             connected.
+     * {@link #canEstimatePerformance()} returns true and the corresponding port is
+     * connected.
      */
     @Override
     @Deprecated
@@ -194,8 +207,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      * The default implementation returns false.
      *
      * @deprecated This method is not used any longer. Weights are computed iff
-     *             {@link #canCalculateWeights()} returns true and the corresponding port is
-     *             connected.
+     * {@link #canCalculateWeights()} returns true and the corresponding port is
+     * connected.
      */
     @Override
     @Deprecated
@@ -212,7 +225,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
     }
 
     public MetaDataError getWeightCalculationError(OutputPort weightPort) {
-        return new SimpleMetaDataError(ProcessSetupError.Severity.ERROR, weightPort, "parameters.incompatible_for_delivering",
+        return new SimpleMetaDataError(ProcessSetupError.Severity.ERROR, weightPort,
+                "pio.error.metadata.parameters.incompatible_for_delivering",
                 "AttributeWeights");
     }
 
@@ -232,7 +246,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      */
     @Override
     public PerformanceVector getEstimatedPerformance() throws OperatorException {
-        throw new UserError(this, 912, getName(), "estimation of performance not supported.");
+        throw new UserError(this, "pio.error.operator.learner_cannot_estimate",
+                getName(), "estimation of performance not supported.");
     }
 
     /**
@@ -241,7 +256,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      * implementation throws an exception.
      */
     public PerformanceVector getOptimizationPerformance() throws OperatorException {
-        throw new UserError(this, 912, getName(), "delivering the original optimization performance is not supported.");
+        throw new UserError(this, "pio.error.operator.learner_cannot_estimate",
+                getName(), "delivering the original optimization performance is not supported.");
     }
 
     /**
@@ -250,7 +266,8 @@ public abstract class AbstractLearner extends Operator implements Learner {
      */
     @Override
     public AttributeWeights getWeights(ExampleSet exampleSet) throws OperatorException {
-        throw new UserError(this, 916, getName(), "calculation of weights not supported.");
+        throw new UserError(this, "pio.error.operator.learner_cannot_weights",
+                getName(), "calculation of weights not supported.");
     }
 
     public boolean onlyWarnForNonSufficientCapabilities() {

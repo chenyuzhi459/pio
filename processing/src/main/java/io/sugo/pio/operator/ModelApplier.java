@@ -1,6 +1,9 @@
 package io.sugo.pio.operator;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
+import io.sugo.pio.operator.error.UnsupportedApplicationParameterError;
 import io.sugo.pio.operator.preprocessing.PreprocessingOperator;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;
@@ -20,16 +23,26 @@ public class ModelApplier extends Operator {
 //
 //    }
 
-    /** The parameter name for &quot;key&quot; */
+    private static final Logger logger = new Logger(ModelApplier.class);
+
+    /**
+     * The parameter name for &quot;key&quot;
+     */
     public static final String PARAMETER_KEY = "key";
 
-    /** The parameter name for &quot;value&quot; */
+    /**
+     * The parameter name for &quot;value&quot;
+     */
     public static final String PARAMETER_VALUE = "value";
 
-    /** The possible parameters used by the model during application time. */
+    /**
+     * The possible parameters used by the model during application time.
+     */
     public static final String PARAMETER_APPLICATION_PARAMETERS = "application_parameters";
 
-    /** Indicates if preprocessing models should create a view instead of changing the data. */
+    /**
+     * Indicates if preprocessing models should create a view instead of changing the data.
+     */
     private static final String PARAMETER_CREATE_VIEW = "create_view";
 
     private final InputPort modelInput = getInputPorts().createPort("model");
@@ -47,18 +60,13 @@ public class ModelApplier extends Operator {
     }
 
     @Override
-    public String getName() {
-        return "modelApplier";
-    }
-
-    @Override
     public String getDefaultFullName() {
-        return "modelApplier";
+        return I18N.getMessage("pio.ModelApplier.name");
     }
 
     @Override
     public String getDescription() {
-        return "modelApplier";
+        return I18N.getMessage("pio.ModelApplier.description");
     }
 
     @Override
@@ -74,6 +82,9 @@ public class ModelApplier extends Operator {
     public void doWork() throws OperatorException {
         ExampleSet inputExampleSet = exampleSetInput.getData(ExampleSet.class);
         Model model = modelInput.getData(Model.class);
+
+        logger.info("Begin to apply model[%s]...", model.getName());
+
         if (AbstractModel.class.isAssignableFrom(model.getClass())) {
             ((AbstractModel) model).setOperator(this);
             ((AbstractModel) model).setShowProgress(true);
@@ -104,6 +115,7 @@ public class ModelApplier extends Operator {
         ExampleSet result = inputExampleSet;
         try {
             result = model.apply(inputExampleSet);
+            logger.info("Apply model[%s] to example set[%s]", model.getName(), inputExampleSet.getName());
         } catch (UserError e) {
             if (e.getOperator() == null) {
                 e.setOperator(this);
@@ -133,11 +145,20 @@ public class ModelApplier extends Operator {
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
         types.add(new ParameterTypeList(PARAMETER_APPLICATION_PARAMETERS,
-                "Model parameters for application (usually not needed).",
-                new ParameterTypeString(PARAMETER_KEY, "The model parameter key."),
-                new ParameterTypeString(PARAMETER_VALUE, "This key's value")));
+                I18N.getMessage("pio.ModelApplier.application_parameters"),
+//                "Model parameters for application (usually not needed).",
+                new ParameterTypeString(PARAMETER_KEY,
+                        I18N.getMessage("pio.ModelApplier.key")
+//                        "The model parameter key."
+                ),
+                new ParameterTypeString(PARAMETER_VALUE,
+                        I18N.getMessage("pio.ModelApplier.value")
+//                        "This key's value"
+                )
+        ));
         types.add(new ParameterTypeBoolean(PARAMETER_CREATE_VIEW,
-                "Indicates that models should create a new view on the data where possible. Then, instead of changing the data itself, the results are calculated on the fly if needed.",
+                I18N.getMessage("pio.ModelApplier.create_view"),
+//                "Indicates that models should create a new view on the data where possible. Then, instead of changing the data itself, the results are calculated on the fly if needed.",
                 false));
         return types;
     }

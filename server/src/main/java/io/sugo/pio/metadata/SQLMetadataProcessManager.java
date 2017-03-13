@@ -2,6 +2,7 @@ package io.sugo.pio.metadata;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -12,6 +13,7 @@ import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.guice.annotations.Json;
+import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.operator.Status;
 import io.sugo.pio.ports.Connection;
@@ -45,6 +47,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
             SQLMetadataConnector connector
     ) {
         this.jsonMapper = jsonMapper;
+        this.jsonMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         this.dbTables = dbTables;
         this.connector = connector;
         this.dbi = connector.getDBI();
@@ -109,6 +112,12 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     process.setStatus(Status.valueOf(r.getString("status")));
                                     process.setCreateTime(new DateTime(r.getString("created_date")));
                                     process.setUpdateTime(new DateTime(r.getString("update_date")));
+
+                                    // when a single process first loaded, then transform the metadata
+                                    process.getRootOperator().getExecutionUnit().transformMetaData();
+
+                                    log.info("Get process named %s[id:%s] from database successfully.", process.getName(), id);
+
                                     return process;
                                 } catch (IOException e) {
                                     throw Throwables.propagate(e);
@@ -164,6 +173,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     process.setUpdateTime(new DateTime(r.getString("update_date")));
                                     return process;
                                 } catch (IOException e) {
+                                    log.error("Deserialized process error: %s", e);
                                     throw Throwables.propagate(e);
                                 }
                             }
@@ -211,6 +221,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
                                     .bind("connections", jsonMapper.writeValueAsBytes(process.getConnections()))
                                     .execute();
+
+                            log.info("Insert process named %s[id:%s] to database successfully.", process.getName(), process.getId());
+
                             return null;
                         }
                     }
@@ -240,6 +253,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     .bind("operators", jsonMapper.writeValueAsBytes(process.getRootOperator()))
                                     .bind("connections", jsonMapper.writeValueAsBytes(process.getConnections()))
                                     .execute();
+
+                            log.info("Update process named %s[id:%s] to database successfully.", process.getName(), process.getId());
+
                             return null;
                         }
                     }

@@ -18,6 +18,7 @@
  */
 package io.sugo.pio.operator.learner.functions;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.*;
@@ -34,7 +35,10 @@ import java.util.List;
 /**
  * This operator determines a logistic regression model.
  */
+@Deprecated
 public class LogisticRegression extends AbstractLearner {
+
+    private static final Logger logger = new Logger(LogisticRegression.class);
 
     /**
      * The parameter name for &quot;Determines whether to include an intercept.&quot;
@@ -119,6 +123,8 @@ public class LogisticRegression extends AbstractLearner {
 
     @Override
     public Model learn(ExampleSet exampleSet) throws OperatorException {
+        logger.info("Logistic regression begin to learn through example set[%s]...", exampleSet.getName());
+
         RandomGenerator random = RandomGenerator.getRandomGenerator(this);
         LogisticRegressionOptimization optimization = new LogisticRegressionOptimization(exampleSet,
                 getParameterAsBoolean(PARAMETER_ADD_INTERCEPT), getParameterAsInt(PARAMETER_START_POPULATION_TYPE),
@@ -144,7 +150,8 @@ public class LogisticRegression extends AbstractLearner {
                 return estimatedPerformance;
             }
         }
-        throw new UserError(this, 912, getName(), "could not deliver optimization performance.");
+        throw new UserError(this, "pio.error.operator.learner_cannot_estimate",
+                getName(), "could not deliver optimization performance.");
     }
 
     @Override

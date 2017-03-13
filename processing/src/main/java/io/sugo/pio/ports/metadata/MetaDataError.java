@@ -1,7 +1,7 @@
 package io.sugo.pio.ports.metadata;
 
 
-import io.sugo.pio.operator.ProcessSetupError;
+import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.ports.Port;
 
 /**

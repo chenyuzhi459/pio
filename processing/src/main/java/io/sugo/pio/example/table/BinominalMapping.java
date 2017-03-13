@@ -85,6 +85,11 @@ public class BinominalMapping implements NominalMapping {
         return null;
     }
 
+    @Override
+    public void setMapping(String nominalValue, int index) {
+
+    }
+
     /**
      * Returns the index of the first value if this attribute is a classification attribute, i.e. if
      * it is binominal.

@@ -2,6 +2,7 @@ package io.sugo.pio.operator.preprocessing.filter.attributes;
 
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.set.ConditionCreationException;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.ParameterHandler;
 import io.sugo.pio.parameter.ParameterType;
@@ -90,12 +91,14 @@ public class ValueTypeAttributeFilter extends AbstractAttributeFilterCondition {
 		String[] exceptValueTypeNames = new String[valueTypeSet.size()];
 		exceptValueTypeNames = valueTypeSet.toArray(valueTypeNames);
 
-		types.add(new ParameterTypeCategory(PARAMETER_VALUE_TYPE, "The value type of the attributes.", valueTypeNames, 0));
+		types.add(new ParameterTypeCategory(PARAMETER_VALUE_TYPE, I18N.getMessage("pio.ValueTypeAttributeFilter.value_type"),
+				valueTypeNames, 0));
 		types.add(new ParameterTypeBoolean(
 				PARAMETER_ADD_EXCEPTION,
-				"If enabled, an exception to the specified value type might be specified. Attributes of this type will be filtered out, although matching the first specified type.",
+				I18N.getMessage("pio.ValueTypeAttributeFilter.use_value_type_exception"),
 				false));
-		ParameterType type = new ParameterTypeCategory(PARAMETER_EXCEPT_VALUE_TYPE, "Except this value type.",
+		ParameterType type = new ParameterTypeCategory(PARAMETER_EXCEPT_VALUE_TYPE,
+				I18N.getMessage("pio.ValueTypeAttributeFilter.except_value_type"),
 				exceptValueTypeNames, exceptValueTypeNames.length - 1);
 		type.registerDependencyCondition(new BooleanParameterCondition(operator, PARAMETER_ADD_EXCEPTION, true, true));
 		types.add(type);

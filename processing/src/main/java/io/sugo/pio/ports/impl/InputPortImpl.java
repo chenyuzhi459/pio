@@ -11,6 +11,10 @@ public class InputPortImpl extends AbstractInputPort {
         super(owner, name);
     }
 
+    protected InputPortImpl(Ports<? extends Port> owner, String name, String description) {
+        super(owner, name, description);
+    }
+
     @Override
     public void receive(IOObject object) {
         setData(object);

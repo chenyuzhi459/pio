@@ -24,6 +24,8 @@ public interface Port extends Serializable {
      */
     String getName();
 
+    String getDescription();
+
     /**
      * Returns true if connected to another Port.
      */

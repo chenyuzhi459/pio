@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.preprocessing.filter;
 
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
@@ -49,6 +50,8 @@ import java.util.List;
  * </p>
  */
 public class ChangeAttributeRole extends AbstractDataProcessing {
+
+    private static final Logger logger = new Logger(ChangeAttributeRole.class);
 
     /**
      * The parameter name for &quot;The name of the attribute of which the type should be
@@ -146,6 +149,8 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
 
     @Override
     public ExampleSet apply(ExampleSet exampleSet) throws OperatorException {
+        logger.info("Change attribute role begin to apply example set[%s]...", exampleSet.getName());
+
         String name = getParameterAsString(PARAMETER_NAME);
         String newRole = getParameterAsString(PARAMETER_TARGET_ROLE);
 
@@ -177,14 +182,16 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
             exampleSet.getAttributes().addRegular(attribute);
         } else {
 //            if (getCompatibilityLevel().compareTo(VERSION_BEFORE_KEEPING_SPECIAL_ATT_WHEN_IT_LOSE_ROLE) > 0) {
-                Attribute oldOne = exampleSet.getAttributes().getSpecial(newRole);
-                if (oldOne != null) {
-                    exampleSet.getAttributes().remove(oldOne);
-                    exampleSet.getAttributes().addRegular(oldOne);
-                }
+            Attribute oldOne = exampleSet.getAttributes().getSpecial(newRole);
+            if (oldOne != null) {
+                exampleSet.getAttributes().remove(oldOne);
+                exampleSet.getAttributes().addRegular(oldOne);
+            }
 //            }
             exampleSet.getAttributes().setSpecialAttribute(attribute, newRole);
         }
+
+        logger.info("Change attribute role set new role[%s] of example set[%s] successfully!", newRole, exampleSet.getName());
     }
 
     @Override

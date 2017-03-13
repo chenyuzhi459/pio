@@ -1,41 +1,48 @@
 package io.sugo.pio.ports.metadata;
 
-import io.sugo.pio.operator.ProcessSetupError;
+import io.sugo.pio.i18n.I18N;
+import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.ports.PortOwner;
 
+import java.text.MessageFormat;
 
 public class SimpleProcessSetupError implements ProcessSetupError {
 
-	private String i18nKey;
-	private final Object[] i18nArgs;
-	private final PortOwner owner;
-	private final Severity severity;
+    private static final MessageFormat formatter = new MessageFormat("");
 
-	public SimpleProcessSetupError(Severity severity, PortOwner owner, String i18nKey, Object... i18nArgs) {
-		this(severity, owner, false, i18nKey, i18nArgs);
-	}
+    private String i18nKey;
+    private final Object[] i18nArgs;
+    private final PortOwner owner;
+    private final Severity severity;
 
-	public SimpleProcessSetupError(Severity severity, PortOwner portOwner,
-                                   boolean absoluteKey, String i18nKey, Object... i18nArgs) {
-		super();
-		if (absoluteKey) {
-			this.i18nKey = i18nKey;
-		} else {
-			this.i18nKey = "process.error." + i18nKey;
-		}
-		this.i18nArgs = i18nArgs;
-		this.owner = portOwner;
-		this.severity = severity;
-	}
+    public SimpleProcessSetupError(Severity severity, PortOwner owner, String i18nKey, Object... i18nArgs) {
+        super();
+        this.i18nKey = i18nKey;
+        this.i18nArgs = i18nArgs;
+        this.owner = owner;
+        this.severity = severity;
+    }
 
-	@Override
-	public final PortOwner getOwner() {
-		return owner;
-	}
+    @Override
+    public final String getMessage() {
+        String message = I18N.getErrorMessage(i18nKey);
+        try {
+            formatter.applyPattern(message);
+            String formatted = formatter.format(i18nArgs);
+            return formatted;
+        } catch (Throwable t) {
+            return message;
+        }
+    }
 
-	@Override
-	public final Severity getSeverity() {
-		return severity;
-	}
+    @Override
+    public final PortOwner getOwner() {
+        return owner;
+    }
+
+    @Override
+    public final Severity getSeverity() {
+        return severity;
+    }
 
 }

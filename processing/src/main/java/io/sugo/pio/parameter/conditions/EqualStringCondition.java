@@ -1,6 +1,7 @@
 package io.sugo.pio.parameter.conditions;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.parameter.ParameterHandler;
 import io.sugo.pio.parameter.UndefinedParameterError;
 
@@ -13,6 +14,8 @@ public class EqualStringCondition extends ParameterCondition {
 
 	private static final String ELEMENT_VALUES = "Values";
 	private static final String ELEMENT_VALUE = "Value";
+
+	@JsonProperty
 	private String[] types;
 
 	public EqualStringCondition(ParameterHandler handler, String conditionParameter, boolean becomeMandatory,

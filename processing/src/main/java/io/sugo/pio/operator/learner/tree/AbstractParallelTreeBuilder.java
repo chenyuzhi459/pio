@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.learner.tree;
 
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.Operator;
@@ -15,7 +16,7 @@ import java.util.*;
  * examples and attributes at a node are represented by numbers coming from numbering all examples
  * and attributes at the beginning. In this numbering all nominal attributes come before all
  * numerical attributes. During the tree growing process the nodes are split into smaller ones.
- *
+ * <p>
  * This class should be extended to specify if and how the calculations should be parallelized. By
  * implementing the method {@link #startTree} using {@link #splitNode} one can decide if and in
  * which direction the process of splitting the nodes should be parallelized. By implementing the
@@ -23,384 +24,390 @@ import java.util.*;
  * selection of the examples should be done in parallel. (Note that this only has an effect if there
  * are numerical attributes.)
  *
- * @author Ingo Mierswa, Gisa Schaefer
  */
 public abstract class AbstractParallelTreeBuilder {
 
-	final protected Operator operator;
+    private static final Logger logger = new Logger(AbstractParallelTreeBuilder.class);
 
-	final protected ColumnTerminator minLeafSizeTerminator;
+    final protected Operator operator;
 
-	final protected List<ColumnTerminator> otherTerminators;
+    final protected ColumnTerminator minLeafSizeTerminator;
 
-	final protected int minSizeForSplit;
+    final protected List<ColumnTerminator> otherTerminators;
 
-	final protected ColumnCriterion criterion;
+    final protected int minSizeForSplit;
 
-	protected BenefitCalculator benefitCalculator;
+    final protected ColumnCriterion criterion;
 
-	protected SelectionCreator selectionCreator;
+    protected BenefitCalculator benefitCalculator;
 
-	final protected AttributePreprocessing preprocessing;
+    protected SelectionCreator selectionCreator;
 
-	final protected Pruner pruner;
+    final protected AttributePreprocessing preprocessing;
 
-	final protected ParallelDecisionTreeLeafCreator leafCreator = new ParallelDecisionTreeLeafCreator();
+    final protected Pruner pruner;
 
-	protected int numberOfPrepruningAlternatives = 0;
+    final protected ParallelDecisionTreeLeafCreator leafCreator = new ParallelDecisionTreeLeafCreator();
 
-	final protected boolean usePrePruning;
+    protected int numberOfPrepruningAlternatives = 0;
 
-	protected ColumnExampleTable columnTable;
+    final protected boolean usePrePruning;
 
-	final protected boolean parallelAllowed;
+    protected ColumnExampleTable columnTable;
 
-	/**
-	 * Initializes the fields.
-	 *
-	 */
-	public AbstractParallelTreeBuilder(Operator operator, ColumnCriterion criterion,
-									   List<ColumnTerminator> terminationCriteria, Pruner pruner, AttributePreprocessing preprocessing,
-									   boolean prePruning, int numberOfPrepruningAlternatives, int minSizeForSplit, int minLeafSize,
-									   boolean parallelAllowed) {
-		this.operator = operator;
+    final protected boolean parallelAllowed;
 
-		this.minLeafSizeTerminator = new ColumnMinSizeTermination(minLeafSize);
+    /**
+     * Initializes the fields.
+     */
+    public AbstractParallelTreeBuilder(Operator operator, ColumnCriterion criterion,
+                                       List<ColumnTerminator> terminationCriteria, Pruner pruner, AttributePreprocessing preprocessing,
+                                       boolean prePruning, int numberOfPrepruningAlternatives, int minSizeForSplit, int minLeafSize,
+                                       boolean parallelAllowed) {
+        this.operator = operator;
 
-		if (terminationCriteria == null) {
-			throw new IllegalArgumentException("terminationCriteria must not be null!");
-		}
-		this.otherTerminators = terminationCriteria;
-		if (prePruning) {
-			this.otherTerminators.add(this.minLeafSizeTerminator);
-		}
+        this.minLeafSizeTerminator = new ColumnMinSizeTermination(minLeafSize);
 
-		this.usePrePruning = prePruning;
-		if (prePruning) {
-			this.numberOfPrepruningAlternatives = Math.max(0, numberOfPrepruningAlternatives);
-		}
-		this.minSizeForSplit = minSizeForSplit;
+        if (terminationCriteria == null) {
+            throw new IllegalArgumentException("terminationCriteria must not be null!");
+        }
+        this.otherTerminators = terminationCriteria;
+        if (prePruning) {
+            this.otherTerminators.add(this.minLeafSizeTerminator);
+        }
 
-		if (criterion == null) {
-			throw new IllegalArgumentException("criterion must not be null!");
-		}
-		this.criterion = criterion;
-		this.pruner = pruner;
-		this.preprocessing = preprocessing;
-		this.parallelAllowed = parallelAllowed;
-	}
+        this.usePrePruning = prePruning;
+        if (prePruning) {
+            this.numberOfPrepruningAlternatives = Math.max(0, numberOfPrepruningAlternatives);
+        }
+        this.minSizeForSplit = minSizeForSplit;
 
-	/**
-	 * Creates a copy of the example set in form of the {@link ColumnExampleTable}, starts the tree
-	 * growing procedure and prunes the finished tree.
-	 *
-	 * @param exampleSet
-	 * @return
-	 * @throws OperatorException
-	 */
-	public Tree learnTree(ExampleSet exampleSet) throws OperatorException {
+        if (criterion == null) {
+            throw new IllegalArgumentException("criterion must not be null!");
+        }
+        this.criterion = criterion;
+        this.pruner = pruner;
+        this.preprocessing = preprocessing;
+        this.parallelAllowed = parallelAllowed;
 
-		// preprocess example set before creating the table
-		exampleSet = preprocessExampleSet(exampleSet);
+        logger.info("Initialize parallel tree builder successfully!");
+    }
 
-		columnTable = new ColumnExampleTable(exampleSet, operator, parallelAllowed);
-		benefitCalculator = new BenefitCalculator(columnTable, criterion, operator);
-		selectionCreator = new SelectionCreator(columnTable);
+    /**
+     * Creates a copy of the example set in form of the {@link ColumnExampleTable}, starts the tree
+     * growing procedure and prunes the finished tree.
+     *
+     * @param exampleSet
+     * @return
+     * @throws OperatorException
+     */
+    public Tree learnTree(ExampleSet exampleSet) throws OperatorException {
 
-		Map<Integer, int[]> allSelectedExamples = createExampleStartSelection();
-		int[] selectedExamples = SelectionCreator.getArbitraryValue(allSelectedExamples);
-		int[] selectedAttributes = selectionCreator.createFullArray(columnTable.getTotalNumberOfRegularAttributes());
+        logger.info("Parallel tree builder start generate tree through example set[%s]", exampleSet.getName());
 
-		// grow tree
-		Tree root = new Tree(null);
-		if (shouldStop(selectedExamples, selectedAttributes, 0)) {
-			leafCreator.changeTreeToLeaf(root, columnTable, selectedExamples);
-		} else {
-			startTree(root, allSelectedExamples, selectedAttributes, 1);
-		}
+        // preprocess example set before creating the table
+        exampleSet = preprocessExampleSet(exampleSet);
 
-		// prune
-		if (pruner != null) {
-			pruner.prune(root);
-		}
+        columnTable = new ColumnExampleTable(exampleSet, operator, parallelAllowed);
+        benefitCalculator = new BenefitCalculator(columnTable, criterion, operator);
+        selectionCreator = new SelectionCreator(columnTable);
 
-		return root;
-	}
+        Map<Integer, int[]> allSelectedExamples = createExampleStartSelection();
+        int[] selectedExamples = SelectionCreator.getArbitraryValue(allSelectedExamples);
+        int[] selectedAttributes = selectionCreator.createFullArray(columnTable.getTotalNumberOfRegularAttributes());
 
-	/**
-	 * Hook for preprocessing the example set before building the {@link ColumnExampleTable}.
-	 *
-	 * @param exampleSet
-	 * @return
-	 */
-	protected ExampleSet preprocessExampleSet(ExampleSet exampleSet) {
-		return exampleSet;
-	}
+        // grow tree
+        Tree root = new Tree(null);
+        if (shouldStop(selectedExamples, selectedAttributes, 0)) {
+            leafCreator.changeTreeToLeaf(root, columnTable, selectedExamples);
+            logger.info("Parallel tree builder changed tree to leaf.");
+        } else {
+            logger.info("Parallel tree builder start tree build process...");
+            startTree(root, allSelectedExamples, selectedAttributes, 1);
+        }
 
-	/**
-	 * Creates for every numerical attribute a sorted start selection, possibly in parallel.
-	 *
-	 * @return
-	 * @throws OperatorException
-	 */
-	protected Map<Integer, int[]> createExampleStartSelection() throws OperatorException {
-		Map<Integer, int[]> allSelectedExamples;
-		if (doStartSelectionInParallel() && operator != null) {
-			allSelectedExamples = selectionCreator.getStartSelectionParallel(operator);
-		} else {
-			allSelectedExamples = selectionCreator.getStartSelection();
-		}
-		return allSelectedExamples;
-	}
+        // prune
+        if (pruner != null) {
+            logger.info("Parallel tree builder prune the tree.");
+            pruner.prune(root);
+        }
 
-	/**
-	 * Decides whether the start selection should be created in parallel.
-	 *
-	 * @return
-	 */
-	abstract boolean doStartSelectionInParallel();
+        return root;
+    }
 
-	/**
-	 * Starts the tree building process for the given parameters.
-	 *
-	 * @param root
-	 * @param allSelectedExamples
-	 * @param selectedAttributes
-	 * @param depth
-	 * @throws OperatorException
-	 */
-	abstract void startTree(Tree root, Map<Integer, int[]> allSelectedExamples, int[] selectedAttributes, int depth)
-			throws OperatorException;
+    /**
+     * Hook for preprocessing the example set before building the {@link ColumnExampleTable}.
+     *
+     * @param exampleSet
+     * @return
+     */
+    protected ExampleSet preprocessExampleSet(ExampleSet exampleSet) {
+        return exampleSet;
+    }
 
-	/**
-	 * Splits the node given by the nodeData by calculating the attribute with the best benefit.
-	 *
-	 * @param nodeData
-	 * @param attributeParallel
-	 *            if <code>true</code> the calculation of the benefits is done in parallel by
-	 *            attributes
-	 * @return
-	 * @throws OperatorException
-	 */
-	protected Collection<NodeData> splitNode(NodeData nodeData, boolean attributeParallel) throws OperatorException {
-		// check if operator was stopped
-		if (operator != null) {
-			Resources.getConcurrencyContext(operator).checkStatus();
-		}
+    /**
+     * Creates for every numerical attribute a sorted start selection, possibly in parallel.
+     *
+     * @return
+     * @throws OperatorException
+     */
+    protected Map<Integer, int[]> createExampleStartSelection() throws OperatorException {
+        Map<Integer, int[]> allSelectedExamples;
+        if (doStartSelectionInParallel() && operator != null) {
+            allSelectedExamples = selectionCreator.getStartSelectionParallel(operator);
+        } else {
+            allSelectedExamples = selectionCreator.getStartSelection();
+        }
+        return allSelectedExamples;
+    }
 
-		Map<Integer, int[]> allSelectedExamples = nodeData.getAllSelectedExamples();
-		int[] selectedAttributes = nodeData.getSelectedAttributes();
-		Tree current = nodeData.getTree();
-		int depth = nodeData.getDepth();
+    /**
+     * Decides whether the start selection should be created in parallel.
+     *
+     * @return
+     */
+    abstract boolean doStartSelectionInParallel();
 
-		// terminate
-		int[] selectedExamples = SelectionCreator.getArbitraryValue(allSelectedExamples);
-		if (shouldStop(selectedExamples, selectedAttributes, depth)) {
-			leafCreator.changeTreeToLeaf(current, columnTable, selectedExamples);
-			return Collections.emptyList();
-		}
+    /**
+     * Starts the tree building process for the given parameters.
+     *
+     * @param root
+     * @param allSelectedExamples
+     * @param selectedAttributes
+     * @param depth
+     * @throws OperatorException
+     */
+    abstract void startTree(Tree root, Map<Integer, int[]> allSelectedExamples, int[] selectedAttributes, int depth)
+            throws OperatorException;
 
-		// preprocessing
-		if (preprocessing != null && depth > 1) {
-			selectedAttributes = preprocessing.preprocess(selectedAttributes);
-		}
+    /**
+     * Splits the node given by the nodeData by calculating the attribute with the best benefit.
+     *
+     * @param nodeData
+     * @param attributeParallel if <code>true</code> the calculation of the benefits is done in parallel by
+     *                          attributes
+     * @return
+     * @throws OperatorException
+     */
+    protected Collection<NodeData> splitNode(NodeData nodeData, boolean attributeParallel) throws OperatorException {
+        // check if operator was stopped
+        if (operator != null) {
+            Resources.getConcurrencyContext(operator).checkStatus();
+        }
 
-		// calculate all benefits
-		List<ParallelBenefit> benefits = getBenefits(allSelectedExamples, selectedAttributes, attributeParallel);
-		// sort all benefits
-		Collections.sort(benefits);
+        Map<Integer, int[]> allSelectedExamples = nodeData.getAllSelectedExamples();
+        int[] selectedAttributes = nodeData.getSelectedAttributes();
+        Tree current = nodeData.getTree();
+        int depth = nodeData.getDepth();
 
-		// try at most k benefits and check if prepruning is fulfilled
-		boolean splitFound = false;
-		for (int a = 0; a < numberOfPrepruningAlternatives + 1; a++) {
-			// break if no benefits are left
-			if (benefits.size() <= 0) {
-				break;
-			}
+        // terminate
+        int[] selectedExamples = SelectionCreator.getArbitraryValue(allSelectedExamples);
+        if (shouldStop(selectedExamples, selectedAttributes, depth)) {
+            leafCreator.changeTreeToLeaf(current, columnTable, selectedExamples);
+            return Collections.emptyList();
+        }
 
-			// search current best
-			ParallelBenefit bestBenefit = benefits.remove(0);
+        // preprocessing
+        if (preprocessing != null && depth > 1) {
+            selectedAttributes = preprocessing.preprocess(selectedAttributes);
+        }
 
-			// check if minimum gain was reached when using prepruning and if the benefit results in
-			// a split with more than one child
-			if (usePrePruning && bestBenefit.getBenefit() <= 0 || !usePrePruning
-					&& !(bestBenefit.getBenefit() > Double.NEGATIVE_INFINITY)) {
-				break;
-			}
+        // calculate all benefits
+        List<ParallelBenefit> benefits = getBenefits(allSelectedExamples, selectedAttributes, attributeParallel);
+        // sort all benefits
+        Collections.sort(benefits);
 
-			// split by best attribute
-			int bestAttribute = bestBenefit.getAttributeNumber();
+        // try at most k benefits and check if prepruning is fulfilled
+        boolean splitFound = false;
+        for (int a = 0; a < numberOfPrepruningAlternatives + 1; a++) {
+            // break if no benefits are left
+            if (benefits.size() <= 0) {
+                break;
+            }
 
-			double bestSplitValue = bestBenefit.getSplitValue();
-			Collection<Map<Integer, int[]>> splits = selectionCreator.getSplits(allSelectedExamples, bestAttribute,
-					bestSplitValue);
+            // search current best
+            ParallelBenefit bestBenefit = benefits.remove(0);
 
-			// if all have minimum size --> remove nominal attribute and recursive call for each
-			// subset
-			if (isSplitOK(selectedAttributes, depth, splits)) {
-				int[] remainingAttributes = selectionCreator.updateRemainingAttributes(selectedAttributes, bestAttribute);
+            // check if minimum gain was reached when using prepruning and if the benefit results in
+            // a split with more than one child
+            if (usePrePruning && bestBenefit.getBenefit() <= 0 || !usePrePruning
+                    && !(bestBenefit.getBenefit() > Double.NEGATIVE_INFINITY)) {
+                break;
+            }
 
-				LinkedList<NodeData> children = new LinkedList<>();
+            // split by best attribute
+            int bestAttribute = bestBenefit.getAttributeNumber();
 
-				int i = 0;
-				for (Map<Integer, int[]> split : splits) {
-					if (SelectionCreator.getArbitraryValue(split).length > 0) {
-						Tree child = new Tree(null);
-						addToParentTree(current, child, bestAttribute, bestSplitValue,
-								SelectionCreator.getArbitraryValue(split), i);
-						NodeData newNode = new NodeData(child, split, remainingAttributes, depth + 1);
-						children.add(newNode);
-						i++;
-					}
-				}
+            double bestSplitValue = bestBenefit.getSplitValue();
+            Collection<Map<Integer, int[]>> splits = selectionCreator.getSplits(allSelectedExamples, bestAttribute,
+                    bestSplitValue);
 
-				// end loop
-				return children;
-			}
-			// no valid split found - try again
-		}
+            // if all have minimum size --> remove nominal attribute and recursive call for each
+            // subset
+            if (isSplitOK(selectedAttributes, depth, splits)) {
+                int[] remainingAttributes = selectionCreator.updateRemainingAttributes(selectedAttributes, bestAttribute);
 
-		// no split found --> change to leaf and return
-		if (!splitFound) {
-			leafCreator.changeTreeToLeaf(current, columnTable, selectedExamples);
-		}
-		return Collections.emptyList();
-	}
+                LinkedList<NodeData> children = new LinkedList<>();
 
-	/**
-	 * Checks if the tree building should stop. The terminators are checked and, when prepruning is
-	 * activated, the minimal size for a split is checked as well.
-	 *
-	 * @param selectedExamples
-	 * @param selectedAttributes
-	 * @param depth
-	 * @return
-	 */
-	protected boolean shouldStop(int[] selectedExamples, int[] selectedAttributes, int depth) {
-		if (usePrePruning && selectedExamples.length < minSizeForSplit) {
-			return true;
-		} else {
-			for (ColumnTerminator terminator : otherTerminators) {
-				if (terminator.shouldStop(selectedExamples, selectedAttributes, columnTable, depth)) {
-					return true;
-				}
-			}
-			return false;
-		}
-	}
+                int i = 0;
+                for (Map<Integer, int[]> split : splits) {
+                    if (SelectionCreator.getArbitraryValue(split).length > 0) {
+                        Tree child = new Tree(null);
+                        addToParentTree(current, child, bestAttribute, bestSplitValue,
+                                SelectionCreator.getArbitraryValue(split), i);
+                        NodeData newNode = new NodeData(child, split, remainingAttributes, depth + 1);
+                        children.add(newNode);
+                        i++;
+                    }
+                }
 
-	/**
-	 * For each attribute calculate the benefit for splitting there, possibly in parallel if
-	 * attributeParalle is <code>true</code>.
-	 *
-	 * @param allSelectedExamples
-	 * @param selectedAttributes
-	 * @param attributeParallel
-	 * @return
-	 * @throws OperatorException
-	 */
-	protected List<ParallelBenefit> getBenefits(Map<Integer, int[]> allSelectedExamples, int[] selectedAttributes,
-			boolean attributeParallel) throws OperatorException {
-		List<ParallelBenefit> benefits;
-		if (attributeParallel && operator != null) {
-			benefits = benefitCalculator.calculateAllBenefitsParallel(allSelectedExamples, selectedAttributes);
-		} else {
-			benefits = benefitCalculator.calculateAllBenefits(allSelectedExamples, selectedAttributes);
-		}
-		return benefits;
-	}
+                // end loop
+                return children;
+            }
+            // no valid split found - try again
+        }
 
-	/**
-	 * Checks in the case of prepruning whether the minimal leaf size is satisfied.
-	 *
-	 * @param selectedAttributes
-	 * @param depth
-	 * @param splits
-	 * @return
-	 */
-	private boolean isSplitOK(int[] selectedAttributes, int depth, Collection<Map<Integer, int[]>> splits) {
-		// check if children all have the minimum size
-		boolean splitOK = true;
-		if (usePrePruning) {
-			for (Map<Integer, int[]> splitinfo : splits) {
-				int[] split = SelectionCreator.getArbitraryValue(splitinfo);
-				if (split.length > 0 && minLeafSizeTerminator.shouldStop(split, selectedAttributes, columnTable, depth)) {
-					splitOK = false;
-					break;
-				}
-			}
-		}
-		return splitOK;
-	}
+        // no split found --> change to leaf and return
+        if (!splitFound) {
+            leafCreator.changeTreeToLeaf(current, columnTable, selectedExamples);
+        }
+        return Collections.emptyList();
+    }
 
-	/**
-	 * Adds the child tree to the parent tree via an edge describing the split.
-	 *
-	 * @param parent
-	 * @param bestAttribute
-	 * @param bestSplitValue
-	 * @param counter
-	 * @param split
-	 * @param child
-	 */
-	private void addToParentTree(Tree parent, Tree child, int bestAttribute, double bestSplitValue, int[] split, int counter) {
-		SplitCondition condition = null;
-		if (columnTable.representsNominalAttribute(bestAttribute)) {
-			// find the attribute value we are splitting
-			Attribute best = columnTable.getNominalAttribute(bestAttribute);
-			final byte index = columnTable.getNominalAttributeColumn(bestAttribute)[split[0]];
-			String splitValueName;
-			// NaNs are represented by the number mapping size
-			if (index == best.getMapping().size()) {
-				splitValueName = null;
-			} else {
-				splitValueName = best.getMapping().mapIndex(index);
-			}
-			condition = new NominalSplitCondition(best, splitValueName);
-		} else {
-			if (counter == 0) {
-				condition = new LessEqualsSplitCondition(columnTable.getNumericalAttribute(bestAttribute), bestSplitValue);
-			} else if (counter == 1) {
-				condition = new GreaterSplitCondition(columnTable.getNumericalAttribute(bestAttribute), bestSplitValue);
-			} else {
-				condition = new NumericalMissingSplitCondition(columnTable.getNumericalAttribute(bestAttribute));
-			}
-		}
-		parent.addChild(child, condition);
-	}
+    /**
+     * Checks if the tree building should stop. The terminators are checked and, when prepruning is
+     * activated, the minimal size for a split is checked as well.
+     *
+     * @param selectedExamples
+     * @param selectedAttributes
+     * @param depth
+     * @return
+     */
+    protected boolean shouldStop(int[] selectedExamples, int[] selectedAttributes, int depth) {
+        if (usePrePruning && selectedExamples.length < minSizeForSplit) {
+            return true;
+        } else {
+            for (ColumnTerminator terminator : otherTerminators) {
+                if (terminator.shouldStop(selectedExamples, selectedAttributes, columnTable, depth)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 
-	/**
-	 * Class to bundle the parameters of {@link AbstractParallelTreeBuilder#splitNode(NodeData)}.
-	 */
-	protected class NodeData {
+    /**
+     * For each attribute calculate the benefit for splitting there, possibly in parallel if
+     * attributeParalle is <code>true</code>.
+     *
+     * @param allSelectedExamples
+     * @param selectedAttributes
+     * @param attributeParallel
+     * @return
+     * @throws OperatorException
+     */
+    protected List<ParallelBenefit> getBenefits(Map<Integer, int[]> allSelectedExamples, int[] selectedAttributes,
+                                                boolean attributeParallel) throws OperatorException {
+        List<ParallelBenefit> benefits;
+        if (attributeParallel && operator != null) {
+            benefits = benefitCalculator.calculateAllBenefitsParallel(allSelectedExamples, selectedAttributes);
+        } else {
+            benefits = benefitCalculator.calculateAllBenefits(allSelectedExamples, selectedAttributes);
+        }
+        return benefits;
+    }
 
-		Tree tree;
-		Map<Integer, int[]> allSelectedExamples;
-		int[] selectedAttributes;
-		int depth;
+    /**
+     * Checks in the case of prepruning whether the minimal leaf size is satisfied.
+     *
+     * @param selectedAttributes
+     * @param depth
+     * @param splits
+     * @return
+     */
+    private boolean isSplitOK(int[] selectedAttributes, int depth, Collection<Map<Integer, int[]>> splits) {
+        // check if children all have the minimum size
+        boolean splitOK = true;
+        if (usePrePruning) {
+            for (Map<Integer, int[]> splitinfo : splits) {
+                int[] split = SelectionCreator.getArbitraryValue(splitinfo);
+                if (split.length > 0 && minLeafSizeTerminator.shouldStop(split, selectedAttributes, columnTable, depth)) {
+                    splitOK = false;
+                    break;
+                }
+            }
+        }
+        return splitOK;
+    }
 
-		NodeData(Tree tree, Map<Integer, int[]> allSelectedExamples, int[] selectedAttributes, int depth) {
-			this.tree = tree;
-			this.allSelectedExamples = allSelectedExamples;
-			this.selectedAttributes = selectedAttributes;
-			this.depth = depth;
-		}
+    /**
+     * Adds the child tree to the parent tree via an edge describing the split.
+     *
+     * @param parent
+     * @param bestAttribute
+     * @param bestSplitValue
+     * @param counter
+     * @param split
+     * @param child
+     */
+    private void addToParentTree(Tree parent, Tree child, int bestAttribute, double bestSplitValue, int[] split, int counter) {
+        SplitCondition condition = null;
+        if (columnTable.representsNominalAttribute(bestAttribute)) {
+            // find the attribute value we are splitting
+            Attribute best = columnTable.getNominalAttribute(bestAttribute);
+            final byte index = columnTable.getNominalAttributeColumn(bestAttribute)[split[0]];
+            String splitValueName;
+            // NaNs are represented by the number mapping size
+            if (index == best.getMapping().size()) {
+                splitValueName = null;
+            } else {
+                splitValueName = best.getMapping().mapIndex(index);
+            }
+            condition = new NominalSplitCondition(best, splitValueName);
+        } else {
+            if (counter == 0) {
+                condition = new LessEqualsSplitCondition(columnTable.getNumericalAttribute(bestAttribute), bestSplitValue);
+            } else if (counter == 1) {
+                condition = new GreaterSplitCondition(columnTable.getNumericalAttribute(bestAttribute), bestSplitValue);
+            } else {
+                condition = new NumericalMissingSplitCondition(columnTable.getNumericalAttribute(bestAttribute));
+            }
+        }
+        parent.addChild(child, condition);
+    }
 
-		Tree getTree() {
-			return tree;
-		}
+    /**
+     * Class to bundle the parameters of {@link AbstractParallelTreeBuilder#splitNode(NodeData)}.
+     */
+    protected class NodeData {
 
-		Map<Integer, int[]> getAllSelectedExamples() {
-			return allSelectedExamples;
-		}
+        Tree tree;
+        Map<Integer, int[]> allSelectedExamples;
+        int[] selectedAttributes;
+        int depth;
 
-		int[] getSelectedAttributes() {
-			return selectedAttributes;
-		}
+        NodeData(Tree tree, Map<Integer, int[]> allSelectedExamples, int[] selectedAttributes, int depth) {
+            this.tree = tree;
+            this.allSelectedExamples = allSelectedExamples;
+            this.selectedAttributes = selectedAttributes;
+            this.depth = depth;
+        }
 
-		int getDepth() {
-			return depth;
-		}
-	}
+        Tree getTree() {
+            return tree;
+        }
+
+        Map<Integer, int[]> getAllSelectedExamples() {
+            return allSelectedExamples;
+        }
+
+        int[] getSelectedAttributes() {
+            return selectedAttributes;
+        }
+
+        int getDepth() {
+            return depth;
+        }
+    }
 
 }

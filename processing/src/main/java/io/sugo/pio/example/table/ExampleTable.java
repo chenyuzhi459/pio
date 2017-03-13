@@ -1,12 +1,21 @@
 package io.sugo.pio.example.table;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.sugo.pio.example.Attribute;
+import io.sugo.pio.example.table.column.ColumnarExampleTable;
+import io.sugo.pio.operator.learner.tree.TreeModel;
 
 import java.io.Serializable;
 import java.util.Collection;
 
 /**
  */
+//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "example_table")
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(name = "memory_example_table", value = MemoryExampleTable.class),
+        @JsonSubTypes.Type(name = "column_example_table", value = ColumnarExampleTable.class)
+})
 public interface ExampleTable extends Serializable {
 
     /** Returns the number of examples. */
@@ -66,4 +75,12 @@ public interface ExampleTable extends Serializable {
      * mind, that some of these attributes may be null.
      */
     public int getNumberOfAttributes();
+
+    /**
+     * Returns the number of non null attributes. <b>Attention</b>: Since there might be null
+     * attributes in the table, the return value of this method must not be used in a for-loop!
+     *
+     * @see ExampleTable#getNumberOfAttributes().
+     */
+    public int getAttributeCount();
 }

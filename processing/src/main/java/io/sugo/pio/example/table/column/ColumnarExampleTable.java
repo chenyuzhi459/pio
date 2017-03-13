@@ -16,7 +16,6 @@ import java.util.List;
  * Caution: This class is not part of the official API. Please do not use it, instead use methods
  * provided in {@link ExampleSets}.
  *
- * @author Michael Knopf
  * @see Column
  * @since 7.3
  */

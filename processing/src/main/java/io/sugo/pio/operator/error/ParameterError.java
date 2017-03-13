@@ -8,7 +8,6 @@ import io.sugo.pio.operator.UserError;
  * This exception will be thrown if something is wrong with a parameter. If possible, use the more
  * specific subclasses for improved error handling in the GUI.
  *
- * @author Marco Boeck
  * @since 6.5.0
  */
 public class ParameterError extends UserError {
@@ -18,21 +17,12 @@ public class ParameterError extends UserError {
 	/** the parameter key which caused the error */
 	private String key;
 
-	public ParameterError(Operator operator, int code, String parameterkey, String additionalText) {
-		this(operator, code, parameterkey, new Object[] { parameterkey, additionalText });
+	public ParameterError(Operator operator, String errorId, String parameterkey, String additionalText) {
+		this(operator, errorId, parameterkey, new Object[] { parameterkey, additionalText });
 	}
 
-	public ParameterError(Operator operator, int code, String parameterkey, Object... arguments) {
-		super(operator, code, arguments);
-		this.key = parameterkey;
-	}
-
-	public ParameterError(Operator operator, String code, String parameterkey, String additionalText) {
-		this(operator, code, parameterkey, new Object[] { parameterkey, additionalText });
-	}
-
-	public ParameterError(Operator operator, String code, String parameterkey, Object... arguments) {
-		super(operator, code, arguments);
+	public ParameterError(Operator operator, String errorId, String parameterkey, Object... arguments) {
+		super(operator, errorId, arguments);
 		this.key = parameterkey;
 	}
 

@@ -5,7 +5,7 @@ import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.ProcessSetupError.Severity;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.learner.CapabilityCheck;
 import io.sugo.pio.operator.learner.CapabilityProvider;
@@ -81,7 +81,7 @@ public abstract class AbstractWeighting extends Operator implements CapabilityPr
 				}
 				if (AbstractWeighting.this.checkForLabel
 						&& metaData.containsSpecialAttribute(Attributes.LABEL_NAME) != MetaDataInfo.YES) {
-					addError(new SimpleMetaDataError(Severity.WARNING, exampleSetInput, "missing_role", "label"));
+					addError(new SimpleMetaDataError(Severity.WARNING, exampleSetInput, "pio.error.metadata.exampleset.missing_role", "label"));
 				}
 				return super.modifyExampleSet(metaData);
 			}
@@ -111,7 +111,7 @@ public abstract class AbstractWeighting extends Operator implements CapabilityPr
 		ExampleSet exampleSet = isExampleSetMandatory() ? exampleSetInput.getData(ExampleSet.class) : exampleSetInput
 				.<ExampleSet> getDataOrNull(ExampleSet.class);
 		if (checkForLabel && exampleSet.getAttributes().getLabel() == null) {
-			throw new UserError(this, 105);
+			throw new UserError(this, "pio.error.operator.exampleset_miss_label");
 		}
 		AttributeWeights weights = calculateWeights(exampleSet);
 		if (getParameterAsBoolean(PARAMETER_NORMALIZE_WEIGHTS)) {

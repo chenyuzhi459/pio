@@ -13,6 +13,6 @@ public class MalformedRepositoryLocationException extends OperatorException {
 	}
 
 	public UserError makeUserError(Operator operator) {
-		return new UserError(operator, this, 319, this.getMessage());
+		return new UserError(operator, this, "pio.error.repository_location_malformed", this.getMessage());
 	}
 }

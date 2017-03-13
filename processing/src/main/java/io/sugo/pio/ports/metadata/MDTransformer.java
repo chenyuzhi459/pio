@@ -1,5 +1,6 @@
 package io.sugo.pio.ports.metadata;
 
+import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
@@ -34,6 +35,11 @@ public class MDTransformer {
     /** Convenience method to generate a {@link PassThroughRule}. */
     public void addPassThroughRule(InputPort input, OutputPort output) {
         addRule(new PassThroughRule(input, output, false));
+    }
+
+    /** Convenience method to generate a {@link GenerateNewMDRule}. */
+    public void addGenerationRule(OutputPort output, Class<? extends IOObject> clazz) {
+        addRule(new GenerateNewMDRule(output, clazz));
     }
 
 }

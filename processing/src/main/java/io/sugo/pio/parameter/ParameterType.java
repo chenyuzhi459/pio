@@ -11,6 +11,7 @@ import io.sugo.pio.parameter.extension.jdbc.ParameterTypeSQLQuery;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "paramType")
@@ -27,6 +28,7 @@ import java.util.LinkedList;
         @JsonSubTypes.Type(name = "param_type_attributes", value = ParameterTypeAttributes.class),
         @JsonSubTypes.Type(name = "param_type_category", value = ParameterTypeCategory.class),
         @JsonSubTypes.Type(name = "param_type_string_category", value = ParameterTypeStringCategory.class),
+        @JsonSubTypes.Type(name = "param_type_dynamic_category", value = ParameterTypeDynamicCategory.class),
         @JsonSubTypes.Type(name = "param_type_configuration", value = ParameterTypeConfiguration.class),
         @JsonSubTypes.Type(name = "param_type_enum", value = ParameterTypeEnumeration.class),
         @JsonSubTypes.Type(name = "param_type_filter", value = ParameterTypeFilter.class),
@@ -51,10 +53,22 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
     private String key;
 
     /**
+     * The full name of this parameter.
+     */
+    @JsonProperty
+    private String fullName;
+
+    /**
      * The documentation. Used as tooltip text...
      */
     @JsonProperty
     private String description;
+
+    /**
+     * Indicates if this is a parameter only viewable in expert mode. Mandatory parameters are
+     * always viewable. The default value is true.
+     */
+    private boolean expert = true;
 
     /**
      * Indicates if this parameter is hidden and is not shown in the GUI. May be used in conjunction
@@ -75,18 +89,19 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
      */
     private boolean isDeprecated = false;
 
-
     /**
      * Creates a new ParameterType.
      */
-    public ParameterType(String key, String description) {
+    public ParameterType(String key, String fullName) {
         this.key = key;
-        this.description = description;
+        this.fullName = fullName;
+        this.description = fullName;
     }
 
     /**
      * This collection assembles all conditions to be met to show this parameter within the gui.
      */
+    @JsonProperty
     private final Collection<ParameterCondition> conditions = new LinkedList<>();
 
 
@@ -99,6 +114,23 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
      * Sets the default value.
      */
     public abstract void setDefaultValue(Object defaultValue);
+
+    /**
+     * Returns true if this parameter can only be seen in expert mode. The default implementation
+     * returns true if the parameter is optional. It is ensured that an non-optional parameter is
+     * never expert!
+     */
+    public boolean isExpert() {
+        return expert && isOptional;
+    }
+
+    /**
+     * Sets if this parameter can be seen in expert mode (true) or beginner mode (false).
+     *
+     */
+    public void setExpert(boolean expert) {
+        this.expert = expert;
+    }
 
     /**
      * Returns true if this parameter is hidden or not all dependency conditions are fulfilled. Then
@@ -114,6 +146,10 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
             conditionsMet &= condition.dependencyMet();
         }
         return isDeprecated || isHidden || !conditionsMet;
+    }
+
+    public Collection<ParameterCondition> getConditions() {
+        return Collections.unmodifiableCollection(conditions);
     }
 
     /**
@@ -206,6 +242,14 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     /**

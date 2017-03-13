@@ -106,7 +106,7 @@ public class ColumnExampleTable {
 
 		exampleSet.recalculateAttributeStatistics(label);
 		if (exampleSet.getStatistics(label, Statistics.UNKNOWN) > 0) {
-			throw new UserError(operator, 162, label.getName());
+			throw new UserError(operator, "pio.error.operator.label_miss_values", label.getName());
 		}
 
 		// split regular attributes into nominal and numerical and store in arrays

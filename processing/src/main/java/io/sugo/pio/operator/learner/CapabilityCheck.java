@@ -54,12 +54,14 @@ public class CapabilityCheck {
 			if (ExampleTools.containsValueType(exampleSet, Ontology.NOMINAL)) {
 				if (ExampleTools.containsValueType(exampleSet, Ontology.BINOMINAL)) {
 					if (!capabilityProvider.supportsCapability(OperatorCapability.BINOMINAL_ATTRIBUTES)) {
-						throw new UserError(learningOperator, 501, learningOperator.getName(),
+						throw new UserError(learningOperator, "pio.error.operator.insufficient_capability",
+								learningOperator.getName(),
 								OperatorCapability.BINOMINAL_ATTRIBUTES.getDescription());
 					}
 				} else {
 					if (!capabilityProvider.supportsCapability(OperatorCapability.POLYNOMINAL_ATTRIBUTES)) {
-						throw new UserError(learningOperator, 501, learningOperator.getName(),
+						throw new UserError(learningOperator, "pio.error.operator.insufficient_capability",
+								learningOperator.getName(),
 								OperatorCapability.POLYNOMINAL_ATTRIBUTES.getDescription());
 					}
 				}
@@ -68,7 +70,8 @@ public class CapabilityCheck {
 			// numerical attributes
 			if ((ExampleTools.containsValueType(exampleSet, Ontology.NUMERICAL))
 					&& !capabilityProvider.supportsCapability(OperatorCapability.NUMERICAL_ATTRIBUTES)) {
-				throw new UserError(learningOperator, 501, learningOperator.getName(),
+				throw new UserError(learningOperator, "pio.error.operator.insufficient_capability",
+						learningOperator.getName(),
 						OperatorCapability.NUMERICAL_ATTRIBUTES.getDescription());
 			}
 
@@ -78,17 +81,19 @@ public class CapabilityCheck {
 				if (labelAttribute.isNominal()) {
 					if (labelAttribute.getMapping().size() == 1) {
 						if (!(capabilityProvider.supportsCapability(OperatorCapability.ONE_CLASS_LABEL))) {
-							throw new UserError(learningOperator, 502, learningOperator.getName());
+							throw new UserError(learningOperator, "pio.error.operator.only_one_label", learningOperator.getName());
 						}
 					} else {
 						if (labelAttribute.getMapping().size() == 2) {
 							if (!capabilityProvider.supportsCapability(OperatorCapability.BINOMINAL_LABEL)) {
-								throw new UserError(learningOperator, 501, learningOperator.getName(),
+								throw new UserError(learningOperator, "pio.error.operator.insufficient_capability",
+										learningOperator.getName(),
 										OperatorCapability.BINOMINAL_LABEL.getDescription());
 							}
 						} else {
 							if (!capabilityProvider.supportsCapability(OperatorCapability.POLYNOMINAL_LABEL)) {
-								throw new UserError(learningOperator, 501, learningOperator.getName(),
+								throw new UserError(learningOperator, "pio.error.operator.insufficient_capability",
+										learningOperator.getName(),
 										OperatorCapability.POLYNOMINAL_LABEL.getDescription());
 							}
 						}
@@ -96,13 +101,15 @@ public class CapabilityCheck {
 				} else {
 					if (labelAttribute.isNumerical()
 							&& !capabilityProvider.supportsCapability(OperatorCapability.NUMERICAL_LABEL)) {
-						throw new UserError(learningOperator, 501, learningOperator.getName(),
+						throw new UserError(learningOperator, "pio.error.operator.insufficient_capability",
+								learningOperator.getName(),
 								OperatorCapability.NUMERICAL_LABEL.getDescription());
 					}
 				}
 			} else {
 				if (!(capabilityProvider.supportsCapability(OperatorCapability.NO_LABEL))) {
-					throw new UserError(learningOperator, 501, learningOperator.getName(),
+					throw new UserError(learningOperator, "pio.error.operator.insufficient_capability",
+							learningOperator.getName(),
 							OperatorCapability.NO_LABEL.getDescription());
 				}
 			}
