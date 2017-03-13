@@ -22,6 +22,9 @@ public abstract class AbstractPort implements Port {
     @JsonProperty
     private String name;
 
+    @JsonProperty
+    private String description;
+
     private static final ReferenceCache<IOObject> IOO_REFERENCE_CACHE = new ReferenceCache<>(20);
     private ReferenceCache<IOObject>.Reference weakDataReference;
 
@@ -32,6 +35,12 @@ public abstract class AbstractPort implements Port {
     public AbstractPort(Ports<? extends Port> owner, String name) {
         this.name = name;
         this.ports = owner;
+    }
+
+    public AbstractPort(Ports<? extends Port> owner, String name, String description) {
+        this.name = name;
+        this.ports = owner;
+        this.description = description;
     }
 
     protected final void setData(IOObject object) {
@@ -93,6 +102,11 @@ public abstract class AbstractPort implements Port {
     @Override
     public final String getName() {
         return name;
+    }
+
+    @Override
+    public final String getDescription() {
+        return description;
     }
 
     /** Don't use this method. Use {@link Ports#renamePort(Port,String)}. */

@@ -20,6 +20,10 @@ public abstract class AbstractInputPort extends AbstractPort implements InputPor
         super(owner, name);
     }
 
+    protected AbstractInputPort(Ports<? extends Port> owner, String name, String description) {
+        super(owner, name, description);
+    }
+
     private final Collection<Precondition> preconditions = new LinkedList<>();
 
     private MetaData metaData;

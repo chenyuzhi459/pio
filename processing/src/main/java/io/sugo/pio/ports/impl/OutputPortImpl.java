@@ -13,6 +13,10 @@ public class OutputPortImpl extends AbstractOutputPort {
         super(owner, name);
     }
 
+    protected OutputPortImpl(Ports<? extends Port> owner, String name, String description) {
+        super(owner, name, description);
+    }
+
     @Override
     public void deliver(IOObject object) {
         // registering history of object

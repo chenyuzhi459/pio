@@ -2,10 +2,7 @@ package io.sugo.pio.ports.impl;
 
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
-import io.sugo.pio.ports.InputPort;
-import io.sugo.pio.ports.InputPorts;
-import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortOwner;
+import io.sugo.pio.ports.*;
 import io.sugo.pio.ports.metadata.MetaData;
 
 import java.util.List;
@@ -31,8 +28,22 @@ public class InputPortsImpl extends AbstractPorts<InputPort> implements InputPor
     }
 
     @Override
+    public InputPort createPort(PortType type) {
+        return createPort(type,true);
+    }
+
+    @Override
     public InputPort createPort(String name, boolean add) {
         InputPort in = new InputPortImpl(this, name);
+        if (add) {
+            addPort(in);
+        }
+        return in;
+    }
+
+    @Override
+    public InputPort createPort(PortType type, boolean add) {
+        InputPort in = new InputPortImpl(this, type.getName(), type.getDescription());
         if (add) {
             addPort(in);
         }
@@ -45,14 +56,32 @@ public class InputPortsImpl extends AbstractPorts<InputPort> implements InputPor
     }
 
     @Override
+    public InputPort createPort(PortType type, Class<? extends IOObject> clazz) {
+        return createPort(type, new MetaData(clazz));
+    }
+
+    @Override
     public InputPort createPort(String name, MetaData metaData) {
         InputPort in = createPort(name);
         return in;
     }
 
     @Override
+    public InputPort createPort(PortType type, MetaData metaData) {
+        InputPort in = createPort(type);
+        return in;
+    }
+
+    @Override
     public InputPort createPassThroughPort(String name) {
         InputPort in = new InputPortImpl(this, name);
+        addPort(in);
+        return in;
+    }
+
+    @Override
+    public InputPort createPassThroughPort(PortType type) {
+        InputPort in = new InputPortImpl(this, type.getName(), type.getDescription());
         addPort(in);
         return in;
     }

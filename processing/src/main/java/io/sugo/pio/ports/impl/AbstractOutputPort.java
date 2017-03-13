@@ -10,6 +10,10 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
         super(owner, name);
     }
 
+    protected AbstractOutputPort(Ports<? extends Port> owner, String name, String description) {
+        super(owner, name, description);
+    }
+
     private InputPort connectedTo;
 
     private MetaData metaData;
