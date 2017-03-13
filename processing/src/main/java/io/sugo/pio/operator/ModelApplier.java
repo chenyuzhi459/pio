@@ -11,6 +11,7 @@ import io.sugo.pio.parameter.ParameterTypeList;
 import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 
 import java.util.Iterator;
@@ -45,10 +46,10 @@ public class ModelApplier extends Operator {
      */
     private static final String PARAMETER_CREATE_VIEW = "create_view";
 
-    private final InputPort modelInput = getInputPorts().createPort("model");
-    private final InputPort exampleSetInput = getInputPorts().createPort("unlabelled data");
-    private final OutputPort exampleSetOutput = getOutputPorts().createPort("labelled data");
-    private final OutputPort modelOutput = getOutputPorts().createPort("model");
+    private final InputPort modelInput = getInputPorts().createPort(PortType.MODEL);
+    private final InputPort exampleSetInput = getInputPorts().createPort(PortType.UNLABELLED_DATA);
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.LABELLED_DATA);
+    private final OutputPort modelOutput = getOutputPorts().createPort(PortType.MODEL);
 
     public ModelApplier() {
 //        super("modelApplier");

@@ -11,19 +11,15 @@ import java.util.Observer;
  */
 public interface Ports<T> extends Serializable {
     /** Creates a new port and adds it to these Ports. */
-    public T createPort(String name);
-
     public T createPort(PortType type);
 
     /** Creates a new port and adds it to these Ports if add is true.. */
-    public T createPort(String name, boolean add);
-
     public T createPort(PortType type, boolean add);
 
     /** Creates (and adds) a new port whose {@link Port#simulatesStack()} returns false. */
-    public T createPassThroughPort(String name);
-
     public T createPassThroughPort(PortType type);
+
+    public T createPassThroughPort(String name);
 
     /**
      * This is a backport method to generate IOContainers containing all output objects of the given

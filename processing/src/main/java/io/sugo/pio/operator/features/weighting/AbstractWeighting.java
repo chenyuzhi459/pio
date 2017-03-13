@@ -16,6 +16,7 @@ import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.ParameterService;
 import io.sugo.pio.tools.Tools;
@@ -30,9 +31,9 @@ import java.util.List;
  */
 public abstract class AbstractWeighting extends Operator implements CapabilityProvider {
 
-	private InputPort exampleSetInput = getInputPorts().createPort("example set");
-	private OutputPort weightsOutput = getOutputPorts().createPort("weights");
-	private OutputPort exampleSetOutput = getOutputPorts().createPort("example set");
+	private InputPort exampleSetInput = getInputPorts().createPort(PortType.EXAMPLE_SET);
+	private OutputPort weightsOutput = getOutputPorts().createPort(PortType.WEIGHTS);
+	private OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET);
 	private boolean checkForLabel;
 
 	private static final String[] SORT_DIRECTIONS = new String[] { "ascending", "descending" };

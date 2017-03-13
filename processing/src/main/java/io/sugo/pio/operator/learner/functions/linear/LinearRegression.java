@@ -33,6 +33,7 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.parameter.conditions.EqualTypeCondition;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.OperatorResourceConsumptionHandler;
 import io.sugo.pio.tools.Tools;
@@ -109,7 +110,7 @@ public class LinearRegression extends AbstractLearner {
     /** Attribute selection method: Iterative T-Test method */
     public static final int ITERATIVE_T_TEST = 4;
 
-    private OutputPort weightOutput = getOutputPorts().createPort("weights");
+    private OutputPort weightOutput = getOutputPorts().createPort(PortType.WEIGHTS);
 
     public LinearRegression() {
         getTransformer().addGenerationRule(weightOutput, AttributeWeights.class);

@@ -10,6 +10,7 @@ import io.sugo.pio.operator.learner.CapabilityProvider;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.Ontology;
 
@@ -73,10 +74,10 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
      */
     private static final String PARAMETER_USE_EXAMPLE_WEIGHTS = "use_example_weights";
 
-    private InputPort exampleSetInput = getInputPorts().createPort("labelled data");
-    private InputPort performanceInput = getInputPorts().createPort("performance");
-    private OutputPort performanceOutput = getOutputPorts().createPort("performance");
-    private OutputPort exampleSetOutput = getOutputPorts().createPort("example set");
+    private InputPort exampleSetInput = getInputPorts().createPort(PortType.LABELLED_DATA);
+    private InputPort performanceInput = getInputPorts().createPort(PortType.PERFORMANCE);
+    private OutputPort performanceOutput = getOutputPorts().createPort(PortType.PERFORMANCE);
+    private OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET);
 
     /**
      * The currently used performance vector. This is be used for logging / plotting purposes.

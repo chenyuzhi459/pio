@@ -16,6 +16,7 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.ExampleSetPrecondition;
 import io.sugo.pio.tools.Ontology;
 
@@ -93,10 +94,10 @@ public class FPGrowth extends Operator {
 
     private static final String PARAMETER_KEEP_EXAMPLE_SET = "keep_example_set";
 
-    private final InputPort exampleSetInput = getInputPorts().createPort("example set");
+    private final InputPort exampleSetInput = getInputPorts().createPort(PortType.EXAMPLE_SET);
 
-    private final OutputPort exampleSetOutput = getOutputPorts().createPort("example set");
-    private final OutputPort frequentSetsOutput = getOutputPorts().createPort("frequent sets");
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET);
+    private final OutputPort frequentSetsOutput = getOutputPorts().createPort(PortType.FREQUENT_SETS);
 
     public FPGrowth() {
         super();

@@ -10,6 +10,7 @@ import io.sugo.pio.parameter.ParameterTypeDouble;
 import io.sugo.pio.parameter.conditions.EqualTypeCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.GenerateNewMDRule;
 
 import java.util.ArrayList;
@@ -34,9 +35,9 @@ public class AssociationRuleGenerator extends Operator {
 
     private static final Logger logger = new Logger(AssociationRuleGenerator.class);
 
-    private InputPort itemSetsInput = getInputPorts().createPort("item sets", FrequentItemSets.class);
-    private OutputPort rulesOutput = getOutputPorts().createPort("rules");
-    private OutputPort itemSetsOutput = getOutputPorts().createPort("item sets");
+    private InputPort itemSetsInput = getInputPorts().createPort(PortType.ITEM_SETS, FrequentItemSets.class);
+    private OutputPort rulesOutput = getOutputPorts().createPort(PortType.RULES);
+    private OutputPort itemSetsOutput = getOutputPorts().createPort(PortType.ITEM_SETS);
 
     public static final String PARAMETER_CRITERION = "criterion";
 
