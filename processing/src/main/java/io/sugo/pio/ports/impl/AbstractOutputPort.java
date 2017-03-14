@@ -6,9 +6,6 @@ import io.sugo.pio.ports.metadata.MetaData;
 /**
  */
 public abstract class AbstractOutputPort extends AbstractPort implements OutputPort {
-    protected AbstractOutputPort(Ports<? extends Port> owner, String name) {
-        super(owner, name);
-    }
 
     protected AbstractOutputPort(Ports<? extends Port> owner, String name, String description) {
         super(owner, name, description);

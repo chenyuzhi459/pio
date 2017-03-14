@@ -9,10 +9,6 @@ public class OutputPortImpl extends AbstractOutputPort {
 
     private static final Logger logger = new Logger(OutputPortImpl.class);
 
-    protected OutputPortImpl(Ports<? extends Port> owner, String name) {
-        super(owner, name);
-    }
-
     protected OutputPortImpl(Ports<? extends Port> owner, String name, String description) {
         super(owner, name, description);
     }
