@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Implementation of DataRow that is backed by a byte array. Please note that using this data row is
@@ -14,7 +15,6 @@ public class ByteArrayDataRow extends DataRow {
     /**
      * Holds the data for all attributes.
      */
-    @JsonUnwrapped
     private byte[] data;
 
     /**
@@ -22,6 +22,11 @@ public class ByteArrayDataRow extends DataRow {
      */
     public ByteArrayDataRow(byte[] data) {
         this.data = data;
+    }
+
+    @JsonValue
+    public byte[] getData() {
+        return data;
     }
 
     /**

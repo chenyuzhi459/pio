@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.AttributeRole;
 import io.sugo.pio.example.ExampleSet;
@@ -29,7 +30,6 @@ public abstract class AbstractExampleTable implements ExampleTable {
      * entries do not move up, but the entry is replaced by a null entry and this index is added to
      * {@link AbstractExampleTable#unusedColumnList} as an Integer.
      */
-    @JsonProperty
     private List<Attribute> attributes = new ArrayList<>();
 
     /**
@@ -37,7 +37,6 @@ public abstract class AbstractExampleTable implements ExampleTable {
      * were used within a validation chain but are not needed any longer. Any of the columns in this
      * list may be used when a new attribute is created. The list is used as a queue.
      */
-//    @JsonProperty
     private List<Integer> unusedColumnList = new LinkedList<>();
 
     /**
@@ -65,11 +64,25 @@ public abstract class AbstractExampleTable implements ExampleTable {
     /**
      * Returns a new array containing all {@link Attribute}s.
      */
-//	@Override
+	@Override
     public Attribute[] getAttributes() {
         Attribute[] attribute = new Attribute[attributes.size()];
         attributes.toArray(attribute);
         return attribute;
+    }
+
+    /**
+     * Returns an array of the attribute names(just used for output of the result to web page)
+     */
+    @JsonProperty
+    public String[] getAttributeNames() {
+        int length = attributes.size();
+        String[] attrNames = new String[length];
+        for (int i = 0; i < length; i++) {
+            attrNames[i] = attributes.get(i).getName();
+        }
+
+        return attrNames;
     }
 
     /**
@@ -280,6 +293,7 @@ public abstract class AbstractExampleTable implements ExampleTable {
     // ------------------------------------------------------------
 
     @Override
+    @JsonProperty("description")
     public String toString() {
         return "ExampleTable, " + attributes.size() + " attributes, " + size() + " data rows," + Tools.getLineSeparator()
                 + "attributes: " + attributes;

@@ -14,6 +14,7 @@ import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,6 +59,14 @@ public class ModelApplier extends Operator {
         exampleSetInput.addPrecondition(new SimplePrecondition(exampleSetInput, new ExampleSetMetaData()));
         getTransformer().addRule(new ModelApplicationRule(exampleSetInput, exampleSetOutput, modelInput, false));
         getTransformer().addRule(new PassThroughRule(modelInput, modelOutput, false));
+    }
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(exampleSetOutput.getAnyDataOrNull());
+        ioObjects.add(modelOutput.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package io.sugo.pio.operator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 

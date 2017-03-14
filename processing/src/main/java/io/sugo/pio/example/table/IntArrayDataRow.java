@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Implementation of DataRow that is backed by an integer array.
@@ -12,7 +13,6 @@ public class IntArrayDataRow extends DataRow {
     /**
      * Holds the data for all attributes.
      */
-    @JsonUnwrapped
     private int[] data;
 
     /**
@@ -20,6 +20,11 @@ public class IntArrayDataRow extends DataRow {
      */
     public IntArrayDataRow(int[] data) {
         this.data = data;
+    }
+
+    @JsonValue
+    public int[] getData() {
+        return data;
     }
 
     @Override
