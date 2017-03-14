@@ -20,6 +20,7 @@ import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.Status;
 import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
+import io.sugo.pio.server.http.dto.OperatorParamDto;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -328,15 +329,19 @@ public class ProcessManager {
         }
     }
 
-    public Operator updateParameter(String processId, String operatorId, String key, String value) {
+    public Operator updateParameter(String processId, String operatorId, List<OperatorParamDto> paramList) {
         OperatorProcess process = get(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             Operator operator = process.getOperator(operatorId);
-            operator.setParameter(key, value);
+            if (!paramList.isEmpty()) {
+                paramList.forEach(param -> {
+                    operator.setParameter(param.getKey(), param.getValue());
+                });
+            }
             metadataProcessManager.update(process);
 
-            log.info("The process named %s[id:%s] update parameter[key:%s;value:%s] successfully.",
-                    process.getName(), processId, key, value);
+            log.info("The process named %s[id:%s] update parameter[%s] successfully.",
+                    process.getName(), processId, paramList);
 
             return operator;
         } else {

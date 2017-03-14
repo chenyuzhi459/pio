@@ -34,7 +34,6 @@ import java.util.Map;
 /**
  * A class holding information about syntactical configuration for parsing CSV files
  *
- * @author Simon Fischer
  */
 public class CSVResultSetConfiguration implements DataResultSetFactory {
 
@@ -71,9 +70,9 @@ public class CSVResultSetConfiguration implements DataResultSetFactory {
 		// if (csvExampleSource.isParameterSet(CSVExampleSource.PARAMETER_CSV_FILE)) {
 		// setCsvFile(csvExampleSource.getParameterAsString(CSVExampleSource.PARAMETER_CSV_FILE));
 		// }
-		/*if (csvExampleSource.isFileSpecified()) {
+		if (csvExampleSource.isFileSpecified()) {
 			setCsvFile(csvExampleSource.getSelectedFile().getAbsolutePath());
-		}*/
+		}
 		setSkipComments(csvExampleSource.getParameterAsBoolean(CSVExampleSource.PARAMETER_SKIP_COMMENTS));
 		setUseQuotes(csvExampleSource.getParameterAsBoolean(CSVExampleSource.PARAMETER_USE_QUOTES));
 		// setFirstRowAsAttributeNames(csvExampleSource.getParameterAsBoolean(CSVExampleSource.PARAMETER_USE_FIRST_ROW_AS_ATTRIBUTE_NAMES));
@@ -248,7 +247,7 @@ public class CSVResultSetConfiguration implements DataResultSetFactory {
 		return getCsvFile();
 	}
 
-//	@Override
+	@Override
 	public ExampleSetMetaData makeMetaData() {
 		return new ExampleSetMetaData();
 	}

@@ -603,12 +603,12 @@ public abstract class Operator implements ParameterHandler, Serializable {
     public double getParameterAsDouble(String key) {
         String value = getParameter(key);
         if (value == null) {
-            throw new RuntimeException("");
+            throw new UndefinedParameterError(key, this);
         }
         try {
             return Double.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Expected real number but found '" + value + "'.");
+            throw new UndefinedParameterError(key, this, "Expected real number but found '" + value + "'.");
         }
     }
 

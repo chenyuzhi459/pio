@@ -1,6 +1,7 @@
 package io.sugo.pio.server.http;
 
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
@@ -10,19 +11,21 @@ import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
+import io.sugo.pio.server.http.dto.OperatorParamDto;
 import io.sugo.pio.server.process.ProcessManager;
-import io.sugo.pio.server.utils.JsonUtil;
-import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/pio/operator/")
 public class OperatorResource {
     private static final Logger log = new Logger(OperatorResource.class);
     private final ObjectMapper jsonMapper;
     private final ProcessManager processManager;
+    private final JavaType javaType;
 
     @Inject
     public OperatorResource(
@@ -31,6 +34,7 @@ public class OperatorResource {
     ) {
         this.jsonMapper = jsonMapper;
         this.processManager = processManager;
+        this.javaType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, OperatorParamDto.class);
     }
 
     @GET
@@ -141,15 +145,11 @@ public class OperatorResource {
     public Response updateParameter(
             @PathParam("processId") final String processId,
             @PathParam("operatorId") final String operatorId,
-            String query
+            String keyValues
     ) {
         try {
-            JSONObject jsonObject = new JSONObject(query);
-
-            String key = JsonUtil.getString(jsonObject, "key");
-            String value = JsonUtil.getString(jsonObject, "value");
-
-            Operator operator = processManager.updateParameter(processId, operatorId, key, value);
+            List<OperatorParamDto> paramList = jsonMapper.readValue(keyValues, javaType);
+            Operator operator = processManager.updateParameter(processId, operatorId, paramList);
             return Response.ok(operator).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
