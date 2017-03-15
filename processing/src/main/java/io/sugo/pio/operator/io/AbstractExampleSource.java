@@ -9,7 +9,6 @@ import io.sugo.pio.ports.metadata.MetaData;
 /**
  * Super class of all operators requiring no input and creating an {@link ExampleSet}.
  *
- * @author Simon Fischer
  */
 public abstract class AbstractExampleSource extends AbstractReader<ExampleSet> {
 

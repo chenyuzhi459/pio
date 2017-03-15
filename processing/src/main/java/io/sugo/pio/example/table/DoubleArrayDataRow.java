@@ -1,7 +1,6 @@
 package io.sugo.pio.example.table;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Implementation of DataRow that is backed by a double array.
@@ -13,7 +12,6 @@ public class DoubleArrayDataRow extends DataRow {
     /**
      * Holds the data for all attributes.
      */
-    @JsonUnwrapped
     private double[] data;
 
     /**
@@ -27,6 +25,7 @@ public class DoubleArrayDataRow extends DataRow {
         this.data = dataRow.getData();
     }
 
+    @JsonValue
     public double[] getData() {
         return data;
     }

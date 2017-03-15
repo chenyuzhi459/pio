@@ -7,9 +7,6 @@ import io.sugo.pio.ports.Port;
 /**
  */
 public class InputPortImpl extends AbstractInputPort {
-    protected InputPortImpl(Ports<? extends Port> owner, String name) {
-        super(owner, name);
-    }
 
     protected InputPortImpl(Ports<? extends Port> owner, String name, String description) {
         super(owner, name, description);

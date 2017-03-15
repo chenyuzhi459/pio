@@ -5,17 +5,23 @@ import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.DataRowFactory;
 import io.sugo.pio.operator.Annotations;
+import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.io.AbstractDataReader;
-import io.sugo.pio.operator.io.AbstractReader;
+import io.sugo.pio.operator.io.AbstractExampleSource;
 import io.sugo.pio.operator.nio.file.FileInputPortHandler;
+import io.sugo.pio.operator.nio.file.FileObject;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.PortType;
+import io.sugo.pio.ports.metadata.ExampleSetMetaData;
+import io.sugo.pio.ports.metadata.MetaData;
+import io.sugo.pio.ports.metadata.SimplePrecondition;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -27,10 +33,8 @@ import static io.sugo.pio.operator.nio.model.DataResultSetTranslationConfigurati
 /**
  * This class uses DataResultSets to load data from file and then delivers the data as an example
  * set.
- *
- * @author Sebastian Land
  */
-public abstract class AbstractDataResultSetReader extends AbstractReader<ExampleSet> {
+public abstract class AbstractDataResultSetReader extends AbstractExampleSource {
 
     private static final Logger logger = new Logger(AbstractDataResultSetReader.class);
 
@@ -60,21 +64,37 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
     private FileInputPortHandler filePortHandler = new FileInputPortHandler(this, fileInputPort, this.getFileParameterName());
 
     public AbstractDataResultSetReader() {
-        super(ExampleSet.class);
+        super();
+        fileInputPort.addPrecondition(new SimplePrecondition(fileInputPort, new MetaData(FileObject.class)) {
+
+            @Override
+            protected boolean isMandatory() {
+                return false;
+            }
+        });
+    }
+
+    public InputPort getFileInputPort() {
+        return fileInputPort;
     }
 
     @Override
-    public ExampleSet read() throws OperatorException {
+    public ExampleSet createExampleSet() throws OperatorException {
         logger.info("AbstractDataResultSetReader begin to load data result set...");
 
         // loading data result set
-        ExampleSet exampleSet = null;
+        final ExampleSet exampleSet;
         try (DataResultSetFactory dataResultSetFactory = getDataResultSetFactory();
              DataResultSet dataResultSet = dataResultSetFactory.makeDataResultSet(this)) {
-            try {
-                exampleSet = transformDataResultSet(dataResultSet);
-            } catch (OperatorException e) {
-                throw new RuntimeException(e);
+            exampleSet = transformDataResultSet(dataResultSet);
+        }
+        if (fileInputPort.isConnected()) {
+            IOObject fileObject = fileInputPort.getDataOrNull(IOObject.class);
+            if (fileObject != null) {
+                String sourceAnnotation = fileObject.getAnnotations().getAnnotation(Annotations.KEY_SOURCE);
+                if (sourceAnnotation != null) {
+                    exampleSet.getAnnotations().setAnnotation(Annotations.KEY_SOURCE, sourceAnnotation);
+                }
             }
         }
         return exampleSet;
@@ -132,6 +152,21 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
             translator.guessValueTypes(configuration, dataResultSet, 3);
         }
         return translator.read(dataResultSet, configuration, false);
+    }
+
+   /* @Override
+    public MetaData getGeneratedMetaData() throws OperatorException {
+        try (DataResultSetFactory dataResultSetFactory = getDataResultSetFactory()) {
+            ExampleSetMetaData result = dataResultSetFactory.makeMetaData();
+            DataResultSetTranslationConfiguration configuration = new DataResultSetTranslationConfiguration(this);
+            configuration.addColumnMetaData(result);
+            return result;
+        }
+    }*/
+
+    @Override
+    public MetaData getGeneratedMetaData() throws OperatorException {
+        return getParameters().getExternalMetaData();
     }
 
     @Override
@@ -200,6 +235,15 @@ public abstract class AbstractDataResultSetReader extends AbstractReader<Example
      */
     protected boolean isSupportingFirstRowAsNames() {
         return true;
+    }
+
+    /**
+     * Returns either the selected file referenced by the value of the parameter with the name
+     * {@link #getFileParameterName()} or the file delivered at {@link #fileInputPort}. Which of
+     * these options is chosen is determined by the parameter {@link #PARAMETER_DESTINATION_TYPE}.
+     * */
+    public File getSelectedFile() throws OperatorException {
+        return filePortHandler.getSelectedFile();
     }
 
     /**

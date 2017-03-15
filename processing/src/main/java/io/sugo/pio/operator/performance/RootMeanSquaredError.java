@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.performance;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.i18n.I18N;
 
 /**
@@ -10,38 +11,43 @@ import io.sugo.pio.i18n.I18N;
  * test cases in which the prediction error is larger than the others. If this number is
  * significantly greater than the mean absolute error, it means that there are test cases in which
  * the prediction error is significantly greater than the average prediction error.
- * 
  */
 public class RootMeanSquaredError extends SimpleCriterion {
 
-	private static final long serialVersionUID = -4425511584684855855L;
+    private static final long serialVersionUID = -4425511584684855855L;
 
-	public RootMeanSquaredError() {}
+    public RootMeanSquaredError() {
+    }
 
-	public RootMeanSquaredError(RootMeanSquaredError sc) {
-		super(sc);
-	}
+    public RootMeanSquaredError(RootMeanSquaredError sc) {
+        super(sc);
+    }
 
-	@Override
-	public String getName() {
-		return I18N.getMessage("pio.RootMeanSquaredError.root_mean_squared_error");
-	}
+    @Override
+    @JsonProperty
+    public String getName() {
+        return I18N.getMessage("pio.RootMeanSquaredError.root_mean_squared_error");
+    }
 
-	/** Calculates the error for the current example. */
-	@Override
-	public double countExample(double label, double predictedLabel) {
-		double dif = label - predictedLabel;
-		return dif * dif;
-	}
+    /**
+     * Calculates the error for the current example.
+     */
+    @Override
+    public double countExample(double label, double predictedLabel) {
+        double dif = label - predictedLabel;
+        return dif * dif;
+    }
 
-	/** Applies a square root to the given value. */
-	@Override
-	public double transform(double value) {
-		return Math.sqrt(value);
-	}
+    /**
+     * Applies a square root to the given value.
+     */
+    @Override
+    public double transform(double value) {
+        return Math.sqrt(value);
+    }
 
-	@Override
-	public String getDescription() {
-		return "Averaged root-mean-squared error";
-	}
+    @Override
+    public String getDescription() {
+        return "Averaged root-mean-squared error";
+    }
 }

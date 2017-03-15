@@ -112,6 +112,7 @@ public class SoftMarginLoss extends MeasuredPerformance {
     }
 
     @Override
+    @JsonProperty
     public String getName() {
         return I18N.getMessage("pio.SoftMarginLoss.soft_margin_loss");
     }

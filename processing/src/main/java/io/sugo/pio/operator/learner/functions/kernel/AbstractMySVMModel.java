@@ -294,6 +294,7 @@ public abstract class AbstractMySVMModel extends KernelModel implements FormulaP
      * method always returns the same instance.)
      */
     @Override
+    @JsonProperty("description")
     public synchronized String toString() {
         return super.toString();
     }

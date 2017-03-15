@@ -19,7 +19,11 @@ import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.Status;
 import io.sugo.pio.ports.Connection;
+import io.sugo.pio.ports.metadata.AttributeMetaData;
+import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.server.http.dto.OperatorDto;
+import io.sugo.pio.server.http.dto.OperatorMetadataDto;
+import io.sugo.pio.server.http.dto.OperatorParamDto;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -328,15 +332,19 @@ public class ProcessManager {
         }
     }
 
-    public Operator updateParameter(String processId, String operatorId, String key, String value) {
+    public Operator updateParameter(String processId, String operatorId, List<OperatorParamDto> paramList) {
         OperatorProcess process = get(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             Operator operator = process.getOperator(operatorId);
-            operator.setParameter(key, value);
+            if (!paramList.isEmpty()) {
+                paramList.forEach(param -> {
+                    operator.setParameter(param.getKey(), param.getValue());
+                });
+            }
             metadataProcessManager.update(process);
 
-            log.info("The process named %s[id:%s] update parameter[key:%s;value:%s] successfully.",
-                    process.getName(), processId, key, value);
+            log.info("The process named %s[id:%s] update parameter[%s] successfully.",
+                    process.getName(), processId, paramList);
 
             return operator;
         } else {
@@ -362,6 +370,28 @@ public class ProcessManager {
 
             log.info("The process named %s[id:%s] update operator[id:%s] successfully.",
                     process.getName(), processId, operatorId);
+
+            return operator;
+        } else {
+            return null;
+        }
+    }
+
+    public Operator updateMetadata(String processId, String operatorId, List<OperatorMetadataDto> metadataList) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            Operator operator = process.getOperator(operatorId);
+            if (!metadataList.isEmpty()) {
+                ExampleSetMetaData exampleSetMetaData = new ExampleSetMetaData();
+                metadataList.forEach(metadata -> {
+                    AttributeMetaData attribute = new AttributeMetaData(metadata.getAttrName(), metadata.getAttrType());
+                    exampleSetMetaData.addAttribute(attribute);
+                });
+                operator.getParameters().setExternalMetaData(exampleSetMetaData);
+
+                log.info("The process named %s[id:%s] update metadata[%s] successfully.",
+                        process.getName(), processId, metadataList);
+            }
 
             return operator;
         } else {

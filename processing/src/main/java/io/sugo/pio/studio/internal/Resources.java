@@ -11,12 +11,11 @@ import io.sugo.pio.studio.concurrency.internal.StudioConcurrencyContext;
  * Provides utility methods to access feature from the new API that cannot be injected directly yet.
  * Note that this class is supposed to be removed once the injection is implemented.
  *
- * @author Gisa Schaefer, Michael Knopf
  * @since 6.2.0
  */
 public class Resources {
 
-	private static final String USER_DATA_KEY = "com.rapidminer.core.concurrency.ContextUserData";
+	private static final String USER_DATA_KEY = "io.sugo.pio.core.concurrency.ContextUserData";
 
 	/**
 	 * Wrapper to store {@link ConcurrencyContext} within the root operator of a process.
