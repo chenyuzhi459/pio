@@ -154,14 +154,19 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         return translator.read(dataResultSet, configuration, false);
     }
 
-    @Override
+   /* @Override
     public MetaData getGeneratedMetaData() throws OperatorException {
         try (DataResultSetFactory dataResultSetFactory = getDataResultSetFactory()) {
             ExampleSetMetaData result = dataResultSetFactory.makeMetaData();
             DataResultSetTranslationConfiguration configuration = new DataResultSetTranslationConfiguration(this);
-//            configuration.addColumnMetaData(result);
+            configuration.addColumnMetaData(result);
             return result;
         }
+    }*/
+
+    @Override
+    public MetaData getGeneratedMetaData() throws OperatorException {
+        return getParameters().getExternalMetaData();
     }
 
     @Override

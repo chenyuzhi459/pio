@@ -76,13 +76,17 @@ public abstract class AbstractExampleTable implements ExampleTable {
      */
     @JsonProperty
     public String[] getAttributeNames() {
-        int length = attributes.size();
-        String[] attrNames = new String[length];
-        for (int i = 0; i < length; i++) {
-            attrNames[i] = attributes.get(i).getName();
+        if (attributes != null) {
+            int length = attributes.size();
+            String[] attrNames = new String[length];
+            for (int i = 0; i < length; i++) {
+                attrNames[i] = attributes.get(i) == null ? null : attributes.get(i).getName();
+            }
+
+            return attrNames;
         }
 
-        return attrNames;
+        return new String[0];
     }
 
     /**

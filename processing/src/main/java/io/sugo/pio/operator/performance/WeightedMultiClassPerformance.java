@@ -283,6 +283,7 @@ public class WeightedMultiClassPerformance extends MeasuredPerformance implement
      * Returns the name.
      */
     @Override
+    @JsonProperty
     public String getName() {
         return NAMES[type];
     }

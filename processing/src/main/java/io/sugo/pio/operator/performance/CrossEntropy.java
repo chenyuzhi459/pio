@@ -99,6 +99,7 @@ public class CrossEntropy extends MeasuredPerformance {
     }
 
     @Override
+    @JsonProperty
     public String getName() {
         return I18N.getMessage("pio.CrossEntropy.cross_entropy");
     }

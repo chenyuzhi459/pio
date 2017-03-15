@@ -1,6 +1,8 @@
 package io.sugo.pio.parameter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.tools.AbstractObservable;
 
 import java.util.*;
@@ -24,6 +26,16 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
      * Maps parameter keys (i.e. Strings) to their <code>ParameterType</code>.
      */
     private final Map<String, ParameterType> keyToTypeMap = new LinkedHashMap<String, ParameterType>();
+
+    /**
+     * The example set input from external
+     */
+    private transient ExampleSet externalExampleSet;
+
+    /**
+     * The metadata input from external
+     */
+    private transient MetaData externalMetaData;
 
     /**
      * Creates an empty parameters object without any parameter types.
@@ -171,5 +183,21 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
      */
     public boolean isSpecified(String key) {
         return keyToValueMap.containsKey(key);
+    }
+
+    public ExampleSet getExternalExampleSet() {
+        return externalExampleSet;
+    }
+
+    public void setExternalExampleSet(ExampleSet externalExampleSet) {
+        this.externalExampleSet = externalExampleSet;
+    }
+
+    public MetaData getExternalMetaData() {
+        return externalMetaData;
+    }
+
+    public void setExternalMetaData(MetaData externalMetaData) {
+        this.externalMetaData = externalMetaData;
     }
 }

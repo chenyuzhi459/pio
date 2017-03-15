@@ -13,13 +13,9 @@ import java.util.*;
 /**
  * This class stores detailed meta data information about ExampleSets.
  *
- * @author Simon Fischer, Sebastian Land
  */
 public class ExampleSetMetaData extends MetaData {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private SetRelation attributesRelation = SetRelation.EQUAL;

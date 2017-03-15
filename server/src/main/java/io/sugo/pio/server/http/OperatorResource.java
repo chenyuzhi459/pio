@@ -11,6 +11,7 @@ import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
+import io.sugo.pio.server.http.dto.OperatorMetadataDto;
 import io.sugo.pio.server.http.dto.OperatorParamDto;
 import io.sugo.pio.server.process.ProcessManager;
 
@@ -25,7 +26,8 @@ public class OperatorResource {
     private static final Logger log = new Logger(OperatorResource.class);
     private final ObjectMapper jsonMapper;
     private final ProcessManager processManager;
-    private final JavaType javaType;
+    private final JavaType operatorParamType;
+    private final JavaType operatorMetadataType;
 
     @Inject
     public OperatorResource(
@@ -34,7 +36,8 @@ public class OperatorResource {
     ) {
         this.jsonMapper = jsonMapper;
         this.processManager = processManager;
-        this.javaType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, OperatorParamDto.class);
+        this.operatorParamType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, OperatorParamDto.class);
+        this.operatorMetadataType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, OperatorMetadataDto.class);
     }
 
     @GET
@@ -148,7 +151,7 @@ public class OperatorResource {
             String keyValues
     ) {
         try {
-            List<OperatorParamDto> paramList = jsonMapper.readValue(keyValues, javaType);
+            List<OperatorParamDto> paramList = jsonMapper.readValue(keyValues, operatorParamType);
             Operator operator = processManager.updateParameter(processId, operatorId, paramList);
             return Response.ok(operator).build();
         } catch (Exception e) {
@@ -183,6 +186,24 @@ public class OperatorResource {
         try {
             Operator operator = processManager.getOperator(processId, operatorId);
             return Response.ok(operator.getResult()).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/metadata/{processId}/{operatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response updateMetadata(
+            @PathParam("processId") final String processId,
+            @PathParam("operatorId") final String operatorId,
+            String metadata
+    ) {
+        try {
+            List<OperatorMetadataDto> metadataList = jsonMapper.readValue(metadata, operatorMetadataType);
+            Operator operator = processManager.updateMetadata(processId, operatorId, metadataList);
+            return Response.ok(operator).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }

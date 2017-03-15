@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.performance;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.i18n.I18N;
 
 /**
@@ -18,6 +19,7 @@ public class SquaredError extends SimpleCriterion {
 	}
 
 	@Override
+	@JsonProperty
 	public String getName() {
 		return I18N.getMessage("pio.SquaredError.squared_error");
 	}
