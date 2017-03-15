@@ -1,6 +1,5 @@
 package io.sugo.pio.dl4j.layers;
 
-import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import org.deeplearning4j.nn.conf.Updater;
