@@ -326,6 +326,15 @@ public class OperatorProcess {
                 return input;
             }
         }
+
+        // Continue search end ports, if the operator chain have
+        List<InputPort> endPorts = getEndPorts(toOperator);
+        for (InputPort input : endPorts) {
+            if (input.getName().equals(toOperator)) {
+                return input;
+            }
+        }
+
         return null;
     }
 
@@ -336,6 +345,30 @@ public class OperatorProcess {
                 return output;
             }
         }
+
+        // Continue search start ports, if the operator chain have
+        List<OutputPort> startPorts = getStartPorts(fromOperator);
+        for (OutputPort output : startPorts) {
+            if (output.getName().equals(fromPort)) {
+                return output;
+            }
+        }
+
         return null;
     }
+
+    /**
+     * Return the inner source ports
+     */
+    private List<OutputPort> getStartPorts(Operator operator) {
+        return operator.getExecutionUnit().getInnerSources().getAllPorts();
+    }
+
+    /**
+     * Return the inner sink ports
+     */
+    private List<InputPort> getEndPorts(Operator operator) {
+        return operator.getExecutionUnit().getInnerSinks().getAllPorts();
+    }
+
 }

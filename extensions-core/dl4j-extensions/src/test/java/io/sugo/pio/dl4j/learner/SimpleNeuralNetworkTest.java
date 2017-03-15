@@ -2,8 +2,10 @@ package io.sugo.pio.dl4j.learner;
 
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.dl4j.layers.DenseLayer;
+import io.sugo.pio.dl4j.layers.OutputLayer;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
 import io.sugo.pio.ports.Connection;
+import io.sugo.pio.ports.PortType;
 import org.junit.Test;
 
 /**
@@ -23,17 +25,24 @@ public class SimpleNeuralNetworkTest {
         DatabaseDataReader dbReader = getDbReader();
         process.getRootOperator().getExecutionUnit().addOperator(dbReader);
 
-//        SimpleNeuralNetwork simpleNeuralNetwork = new SimpleNeuralNetwork();
-//        simpleNeuralNetwork.setName("simpleNetwork");
+        SimpleNeuralNetwork simpleNeuralNetwork = new SimpleNeuralNetwork();
+        simpleNeuralNetwork.setName("simpleNetwork");
+        process.getRootOperator().getExecutionUnit().addOperator(simpleNeuralNetwork);
+
+        /*DenseLayer input = new DenseLayer();
+        input.setName("input");
+        simpleNeuralNetwork.getExecutionUnit(0).addOperator(input);*/
+
+        OutputLayer outputLayer = new OutputLayer();
+        outputLayer.setName("output");
+        simpleNeuralNetwork.getExecutionUnit(0).addOperator(outputLayer);
+
+        outputLayer.getProcess().connect(new Connection("simpleNetwork", "start", "output", "through"), true);
+//        input.getProcess().connect(new Connection("input", "through", "output", "through"), true);
 //
-//        DenseLayer input = new DenseLayer();
-//        input.setName("input");
-//        simpleNeuralNetwork.getExecutionUnit(0).addOperator(input);
-////
-//        process.getRootOperator().getExecutionUnit().addOperator(simpleNeuralNetwork);
-////
-//        process.connect(new Connection("operator_db_reader", "output", "simpleNetwork", "training examples"), true);
-//        process.run();
+//
+        process.connect(new Connection("operator_db_reader", "output", "simpleNetwork", "training examples"), true);
+        process.run();
     }
 
     private DatabaseDataReader getDbReader() {
