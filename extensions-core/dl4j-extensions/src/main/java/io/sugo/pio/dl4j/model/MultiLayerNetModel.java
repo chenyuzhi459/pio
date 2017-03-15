@@ -1,6 +1,8 @@
 package io.sugo.pio.dl4j.model;
 
 import io.sugo.pio.dl4j.DL4JConvert;
+import io.sugo.pio.dl4j.layers.DenseLayer;
+import io.sugo.pio.dl4j.layers.OutputLayer;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
@@ -10,9 +12,13 @@ import io.sugo.pio.example.table.NominalMapping;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.learner.PredictionModel;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
+import org.deeplearning4j.nn.conf.layers.RBM;
+import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.DataSet;
+import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +50,18 @@ import java.util.List;
  * @author Anson Chen
  * @version 0.3.1
  */
-public class MultiLayerNetModel extends PredictionModel {
+@SuppressWarnings("serial")
+public class MultiLayerNetModel extends PredictionModel{
+
+    /**
+     * The list of name of each layer.
+     */
+    private List<String> names;
+
     /**
      * The multilayer network model.
      */
     private MultiLayerNetwork model;
-
 
     /**
      * The list stores feature names.
@@ -71,6 +83,21 @@ public class MultiLayerNetModel extends PredictionModel {
      */
     private MultiLayerConfiguration configuration;
 
+	/*
+	 * The transfer matrices (weights and bias) represented in 2d-arrays.
+	 * Designed as a quick alternative to access the weights and bias than access it via model.
+	 * Currently not used in the implementation, thus not implemented.
+	 */
+//	private List<INDArray> transferMatrices;
+
+    /**
+     * Constructor.
+     *
+     * @param exampleSet the training exampleset
+     *
+     * Notice this constructor does not train a model on the training examples,
+     * but simply record the feature names of the training examples.
+     */
     public MultiLayerNetModel(ExampleSet exampleSet) {
         super(exampleSet,ExampleSetUtilities.SetsCompareOption.ALLOW_SUPERSET, ExampleSetUtilities.TypesCompareOption.ALLOW_SAME_PARENTS);
 
@@ -86,24 +113,20 @@ public class MultiLayerNetModel extends PredictionModel {
     }
 
     /**
-     * Train the data.
-     *
-     * @param exampleSet the training exampleset
-     * @param shuffle whether to shuffle the examples;
-     *        I may not include this boolean in later version as RM has its own shuffle method in split operator
-     * @param normalization whether to normalize each column
+     * Retrieve the names of the features.
+     * @return a list of the feature names
      */
-    public void train(ExampleSet exampleSet, boolean shuffle, boolean normalization){
-        this.model = new MultiLayerNetwork(configuration);
-        model.init();
-        DataSet data = null;
-
-        // train the model
-        model.fit(data);
+    public List<String> getFeaturName(){
+        return featureNames;
     }
 
-    public MultiLayerNetModel clone(){
-        return null;
+    /**
+     * Retrieve the name of the label attribute.
+     * Notice it is NOT the names of the nominal values of the labels.
+     * @return the name of the label attribute
+     */
+    public Attribute getLabel(){
+        return getTrainingHeader().getAttributes().getLabel();
     }
 
     /**
@@ -122,8 +145,53 @@ public class MultiLayerNetModel extends PredictionModel {
         return getLabelMapping().getValues();
     }
 
+    /**
+     * Retrieve the trained multilayer network model.
+     * @return the multilayer network model
+     */
+    public MultiLayerNetwork getModel(){
+        return model;
+    }
+
+    /**
+     * Retrieve the configuration of the multilayer network model.
+     * @return the configuration of the multilayer network model
+     */
+    public MultiLayerConfiguration getConfiguration(){
+        return configuration;
+    }
+
+    /**
+     * Overwrite the names of the features of this model.
+     * @param names the names of the features to specify
+     */
+    public void setFeatureNames(List<String> names){
+        this.featureNames = names;
+    }
+
+    /**
+     * Overwrite the model.
+     * @param model the model
+     */
+    public void setMultiLayerNetwork(MultiLayerNetwork model){
+        this.model = model;
+        this.configuration = model.getLayerWiseConfigurations();
+    }
+
+    /**
+     * Overwrite the configuration of this model
+     * @param configuration the configuration
+     */
+    public void setMultiLayerConfiguration(MultiLayerConfiguration configuration){
+        this.configuration = configuration;
+    }
+
+    /**
+     * Perform prediction and write the results to a specified attribute name.
+     */
     @Override
     public ExampleSet performPrediction(ExampleSet exampleSet, Attribute predictedLabel) throws OperatorException {
+
         if (exampleSet.getAttributes().getPredictedLabel() != predictedLabel){
             exampleSet.getAttributes().setPredictedLabel(predictedLabel);
         }
@@ -146,7 +214,7 @@ public class MultiLayerNetModel extends PredictionModel {
         INDArray features = org.nd4j.linalg.factory.Nd4j.create(featuresMatrix);
 
         // normalize features in the same way that the training data is normalized.
-        if (columnMeans != null && columnStds != null){
+        if (this.columnMeans != null && this.columnStds != null){
             features = features.subiRowVector(columnMeans);
             features = features.diviRowVector(columnStds);
         }
@@ -174,5 +242,65 @@ public class MultiLayerNetModel extends PredictionModel {
         }
 
         return exampleSet;
+    }
+
+    /**
+     * Train the data.
+     *
+     * @param exampleSet the training exampleset
+     * @param shuffle whether to shuffle the examples;
+     *        I may not include this boolean in later version as RM has its own shuffle method in split operator
+     * @param normalization whether to normalize each column
+     */
+    public void train(ExampleSet exampleSet, boolean shuffle, boolean normalization){
+
+        this.model = new MultiLayerNetwork(configuration);
+        model.init();
+        DataSet data = DL4JConvert.convert2DataSet(exampleSet);
+
+		/*
+		 * Haven't check version 3.8, but in version 3.7, shuffle() is not correctly implemented
+		 * in DL4J, so currently we shuffle the examples before they enter learners.
+		 */
+
+//		if (shuffle){
+//			data.shuffle();
+//		}
+
+        // normalize the training data and record the mean and standard deviation
+        if (normalization){
+            this.columnMeans = data.getFeatures().mean(0);
+            this.columnStds = data.getFeatureMatrix().std(0);
+            data.setFeatures(data.getFeatures().subiRowVector(columnMeans));
+            this.columnStds.addi(Nd4j.scalar(Nd4j.EPS_THRESHOLD));
+            data.setFeatures(data.getFeatures().diviRowVector(columnStds));
+        } else {
+            this.columnMeans = org.nd4j.linalg.factory.Nd4j.zeros(data.getFeatures().columns());
+            this.columnStds = org.nd4j.linalg.factory.Nd4j.ones(data.getFeatures().columns());
+        }
+
+        // train the model
+        model.fit(data);
+    }
+
+    /**
+     * Train the multilayer network model with a refined configurations
+     * This method is only used if the configuration of the model is not defined (as null) when the model is constructed.
+     * This method may be deprecated later
+     */
+    public void train(ExampleSet exampleSet, MultiLayerConfiguration configuration,
+                      boolean shuffle, boolean normalization, List<String> layerNames){
+        this.configuration = configuration;
+        this.names = layerNames;
+        train(exampleSet, shuffle, normalization);
+    }
+
+    /**
+     * Clone the model with full information
+     * This method is not used implemented and may be deprecated later.
+     * Not used in current implementation, thus not implemented.
+     */
+    public MultiLayerNetModel clone(){
+        return null;
     }
 }

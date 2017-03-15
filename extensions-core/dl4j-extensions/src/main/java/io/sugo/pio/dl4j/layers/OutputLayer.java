@@ -1,10 +1,8 @@
 package io.sugo.pio.dl4j.layers;
 
 import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.parameter.ParameterType;
-import io.sugo.pio.parameter.ParameterTypeCategory;
-import io.sugo.pio.parameter.ParameterTypeInt;
-import io.sugo.pio.parameter.ParameterTypeString;
+import io.sugo.pio.parameter.*;
+import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -14,10 +12,25 @@ import java.util.List;
 /**
  */
 public class OutputLayer extends AbstractLayer {
+    private String name = "";
+
+    private boolean specifyNumNodes = false;
+
+    private int numNodes = 0;
+
+    private String activation = null;
+
+    private LossFunctions.LossFunction loss = null;
+
     /**
      * The parameter name for &quot;Name of this layer.&quot;
      */
     public static final String PARAMETER_NAME = "name";
+
+    /**
+     * Indicate whether we specify the number of nodes in the output layer manually or compute it via the operator one.
+     */
+    public static final String PARAMETER_SPECIFY_NUM_OUTPUT = "whether_to_specify_the_number_of_nodes_manully";
 
     /**
      * The parameter name for &quot;Number of nodes of this layer.&quot;
@@ -42,6 +55,7 @@ public class OutputLayer extends AbstractLayer {
             ,"maxout"
             ,"softsign"
             ,"softplus"
+//	        ,"linear"
     };
 
     /**
@@ -61,34 +75,74 @@ public class OutputLayer extends AbstractLayer {
             ,"squared Loss"
             ,"reconstruction cross entropy"
             ,"negative log likelihood"
+//			,"custom"
     };
 
-    private int numNodes;
-
     @Override
-    public Layer getLayer() {
-        return generateBuilder().build();
+    public String getDefaultFullName() {
+        return OutputLayer.class.getSimpleName();
     }
 
     @Override
-    public Layer getLayer(int i) {
-        org.deeplearning4j.nn.conf.layers.OutputLayer.Builder builder =
-                generateBuilder().nIn(i);
-        return builder.build();
+    public String getDescription() {
+        return OutputLayer.class.getSimpleName();
     }
 
-    public org.deeplearning4j.nn.conf.layers.OutputLayer.Builder generateBuilder() {
-        String name = getParameterAsString(PARAMETER_NAME);
+    @Override
+    public List<ParameterType> getParameterTypes() {
 
+        List<ParameterType> types = super.getParameterTypes();
+
+        ParameterType type = null;
+
+        types.add(new ParameterTypeString(PARAMETER_NAME,
+                "The name of this layer",
+                "Output Layer"
+        ));
+
+        types.add(new ParameterTypeBoolean(PARAMETER_SPECIFY_NUM_OUTPUT,
+                "Whether to specify the number of nodes",
+                false
+        ));
+
+        type = new ParameterTypeInt(PARAMETER_NUMEBR_OF_NODE,
+                "The number of nodes in this layer",
+                1,Integer.MAX_VALUE,10
+        );
+        type.registerDependencyCondition(
+                new BooleanParameterCondition(this,
+                        PARAMETER_SPECIFY_NUM_OUTPUT,
+                        false, true));
+        types.add(type);
+
+        types.add(new ParameterTypeCategory(PARAMETER_ACTIVATION_FUNCTION,
+                "The activation function of this layer",
+                ACTIVATION_FUNCTION_NAMES,
+                3));
+
+        types.add(new ParameterTypeCategory(PARAMETER_LOSS_FUNCTION,
+                "The loss function of this layer",
+                LOSS_FUNCTION_NAMES,
+                0));
+
+        return types;
+    }
+
+    public org.deeplearning4j.nn.conf.layers.OutputLayer.Builder generateBuilder()
+            throws UndefinedParameterError{
+
+        name = getParameterAsString(PARAMETER_NAME);
+
+        specifyNumNodes = getParameterAsBoolean(PARAMETER_SPECIFY_NUM_OUTPUT);
         numNodes = getParameterAsInt(PARAMETER_NUMEBR_OF_NODE);
-        String activation = getParameterAsString(PARAMETER_ACTIVATION_FUNCTION);
+
+        activation = getParameterAsString(PARAMETER_ACTIVATION_FUNCTION);
 
         int lossIndex = getParameterAsInt(PARAMETER_LOSS_FUNCTION);
-        LossFunctions.LossFunction loss = getLossFunction(lossIndex);
+        loss = getLossFunction(lossIndex);
 
         org.deeplearning4j.nn.conf.layers.OutputLayer.Builder builder =
                 new org.deeplearning4j.nn.conf.layers.OutputLayer.Builder(loss)
-                        .name(name)
                         .nOut(numNodes)
                         .activation(activation)
                         .lossFunction(loss)
@@ -97,10 +151,46 @@ public class OutputLayer extends AbstractLayer {
         return builder;
     }
 
+    @Override
+    public Layer getLayer() throws UndefinedParameterError {
+        return generateBuilder().build();
+    }
+
+    @Override
+    public Layer getLayer(int i) throws UndefinedParameterError {
+        org.deeplearning4j.nn.conf.layers.OutputLayer.Builder builder =
+                generateBuilder().nIn(i);
+        return builder.build();
+    }
+
+    /**
+     * Mostly used in CNN with isNumIn = false
+     */
+
+    /**
+     *
+     * @param isNumIn
+     * @param i
+     * @return
+     * @throws UndefinedParameterError
+     */
+    public Layer getLayer(boolean isNumIn, int i) throws UndefinedParameterError{
+
+        if (isNumIn){
+            org.deeplearning4j.nn.conf.layers.OutputLayer.Builder builder =
+                    generateBuilder().nIn(i);
+            return builder.build();
+        } else {
+            org.deeplearning4j.nn.conf.layers.OutputLayer.Builder builder =
+                    generateBuilder().nOut(i);
+            return builder.build();
+        }
+    }
+
     /**
      * This method will be mostly used
      */
-    public Layer getLayer(int in, int out) {
+    public Layer getLayer(int in, int out) throws UndefinedParameterError {
         org.deeplearning4j.nn.conf.layers.OutputLayer.Builder builder =
                 generateBuilder()
                         .nIn(in)
@@ -131,53 +221,16 @@ public class OutputLayer extends AbstractLayer {
         }
     }
 
-
+    /**
+     * Never used!
+     */
     @Override
-    public int getNumNodes() {
-        return numNodes;
+    public int getNumNodes() throws UndefinedParameterError {
+        return 0;
     }
 
     @Override
-    public String getDefaultFullName() {
-        return OutputLayer.class.getSimpleName();
-    }
-
-    @Override
-    public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
-    }
-
-    @Override
-    public String getDescription() {
-        return OutputLayer.class.getSimpleName();
-    }
-
-    @Override
-    public List<ParameterType> getParameterTypes() {
-        List<ParameterType> types = super.getParameterTypes();
-        ParameterType type = null;
-
-        types.add(new ParameterTypeString(PARAMETER_NAME,
-                "The name of this layer",
-                "Output Layer"
-        ));
-
-        type = new ParameterTypeInt(PARAMETER_NUMEBR_OF_NODE,
-                "The number of nodes in this layer",
-                1,Integer.MAX_VALUE,10
-        );
-        types.add(type);
-
-        types.add(new ParameterTypeCategory(PARAMETER_ACTIVATION_FUNCTION,
-                "The activation function of this layer",
-                ACTIVATION_FUNCTION_NAMES,
-                3));
-
-        types.add(new ParameterTypeCategory(PARAMETER_LOSS_FUNCTION,
-                "The loss function of this layer",
-                LOSS_FUNCTION_NAMES,
-                0));
-
-        return types;
+    public String getLayerName() {
+        return name;
     }
 }

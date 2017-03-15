@@ -31,6 +31,7 @@ public enum PortType {
     WEIGHTS("weights", "权重"),
     OUTPUT("output", "输出"),
     FILE("file", "文件"),
+    VECTOR("vector", "向量")
     ;
 
     private PortType(String name, String description) {
