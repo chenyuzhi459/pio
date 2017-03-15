@@ -44,7 +44,6 @@ import java.util.List;
  * various other parameters.
  * </p>
  *
- * @author Ingo Mierswa, Tobias Malbrecht, Sebastian Loh, Sebastian Land, Simon Fischer
  */
 public class CSVExampleSource extends AbstractDataResultSetReader {
 

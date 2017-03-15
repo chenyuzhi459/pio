@@ -12,8 +12,6 @@ import java.util.List;
 
 /**
  * 
- * @author Simon Fischer
- * 
  */
 public class PredictionModelMetaData extends ModelMetaData {
 

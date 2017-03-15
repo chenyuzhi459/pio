@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Implementation of DataRow that is backed by primitive arrays. Should always be used if more than
@@ -15,7 +16,6 @@ public class LongSparseArrayDataRow extends AbstractSparseArrayDataRow {
     /**
      * Stores the used attribute values.
      */
-    @JsonProperty
     private long[] values;
 
     /**
@@ -31,6 +31,11 @@ public class LongSparseArrayDataRow extends AbstractSparseArrayDataRow {
     public LongSparseArrayDataRow(int size) {
         super(size);
         values = new long[size];
+    }
+
+    @JsonValue
+    public long[] getValues() {
+        return values;
     }
 
     /**

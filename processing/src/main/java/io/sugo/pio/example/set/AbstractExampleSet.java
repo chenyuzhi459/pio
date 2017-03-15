@@ -1,12 +1,11 @@
 package io.sugo.pio.example.set;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.datatable.DataTable;
 import io.sugo.pio.datatable.DataTableExampleSetAdapter;
 import io.sugo.pio.example.*;
 import io.sugo.pio.operator.IOContainer;
-import io.sugo.pio.operator.error.MissingIOObjectException;
 import io.sugo.pio.operator.ResultObjectAdapter;
+import io.sugo.pio.operator.error.MissingIOObjectException;
 
 import java.util.*;
 
@@ -16,11 +15,15 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
 
     private static final long serialVersionUID = 8596141056047402798L;
 
-    /** Maps attribute names to list of statistics objects. */
+    /**
+     * Maps attribute names to list of statistics objects.
+     */
 //    @JsonProperty
     private final Map<String, List<Statistics>> statisticsMap = new HashMap<String, List<Statistics>>();
 
-    /** Maps the id values on the line index in the example table. */
+    /**
+     * Maps the id values on the line index in the example table.
+     */
     private Map<Double, int[]> idMap = new HashMap<Double, int[]>();
 
     /**
@@ -32,8 +35,8 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
     public ExampleSet clone() {
         try {
             Class<? extends AbstractExampleSet> clazz = getClass();
-            java.lang.reflect.Constructor cloneConstructor = clazz.getConstructor(new Class[] { clazz });
-            AbstractExampleSet result = (AbstractExampleSet) cloneConstructor.newInstance(new Object[] { this });
+            java.lang.reflect.Constructor cloneConstructor = clazz.getConstructor(new Class[]{clazz});
+            AbstractExampleSet result = (AbstractExampleSet) cloneConstructor.newInstance(new Object[]{this});
             result.idMap = idMap;
             return result;
         } catch (IllegalAccessException e) {
@@ -178,12 +181,11 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
     /**
      * Resets the statistics for all attributes from attributeList.
      *
-     * @param attributeList
-     *            the attributes for which to reset the statistics
+     * @param attributeList the attributes for which to reset the statistics
      */
     private void resetAttributeStatistics(List<Attribute> attributeList) {
         for (Attribute attribute : attributeList) {
-            for (Iterator<Statistics> stats = attribute.getAllStatistics(); stats.hasNext();) {
+            for (Iterator<Statistics> stats = attribute.getAllStatistics(); stats.hasNext(); ) {
                 Statistics statistics = stats.next();
                 statistics.startCounting(attribute);
             }

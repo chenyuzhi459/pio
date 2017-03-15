@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Implementation of DataRow that is backed by a long array.
@@ -12,7 +13,6 @@ public class LongArrayDataRow extends DataRow {
     /**
      * Holds the data for all attributes.
      */
-    @JsonUnwrapped
     private long[] data;
 
     /**
@@ -20,6 +20,11 @@ public class LongArrayDataRow extends DataRow {
      */
     public LongArrayDataRow(long[] data) {
         this.data = data;
+    }
+
+    @JsonValue
+    public long[] getData() {
+        return data;
     }
 
     @Override

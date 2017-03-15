@@ -103,6 +103,7 @@ public class RankCorrelation extends MeasuredPerformance {
     }
 
     @Override
+    @JsonProperty
     public String getName() {
         return NAMES[type];
     }

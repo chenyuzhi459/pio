@@ -2,6 +2,7 @@ package io.sugo.pio.example.table;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.util.ExampleSets;
 

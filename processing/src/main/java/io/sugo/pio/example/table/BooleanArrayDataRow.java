@@ -1,6 +1,7 @@
 package io.sugo.pio.example.table;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Implementation of DataRow that is backed up by a boolean array. Please note that for almost no
@@ -14,7 +15,6 @@ public class BooleanArrayDataRow extends DataRow {
     /**
      * Holds the data for all attributes.
      */
-    @JsonUnwrapped
     private boolean[] data;
 
     /**
@@ -22,6 +22,11 @@ public class BooleanArrayDataRow extends DataRow {
      */
     public BooleanArrayDataRow(boolean[] data) {
         this.data = data;
+    }
+
+    @JsonValue
+    public boolean[] getData() {
+        return data;
     }
 
     /**

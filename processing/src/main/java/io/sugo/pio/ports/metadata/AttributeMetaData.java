@@ -23,8 +23,6 @@ import java.util.TreeSet;
 /**
  * Meta data about an attribute
  *
- * @author Simon Fischer
- *
  */
 public class AttributeMetaData implements Serializable {
 

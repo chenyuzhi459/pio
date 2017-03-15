@@ -279,6 +279,7 @@ public class MultiClassificationPerformance extends MeasuredPerformance {
      * Returns the name.
      */
     @Override
+    @JsonProperty
     public String getName() {
         return NAMES[type];
     }

@@ -250,7 +250,9 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
     public boolean canCalculateWeights() {
         try {
             return getParameterAsInt(PARAMETER_KERNEL_TYPE) == KERNEL_DOT;
-        } catch (UndefinedParameterError e) {
+        } /*catch (UndefinedParameterError e) {
+            return false;
+        } */catch (RuntimeException e) {
             return false;
         }
     }

@@ -159,6 +159,7 @@ public class CorrelationCriterion extends MeasuredPerformance {
     }
 
     @Override
+    @JsonProperty
     public String getName() {
         return I18N.getMessage("pio.CorrelationCriterion.correlation");
     }

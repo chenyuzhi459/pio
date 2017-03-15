@@ -16,9 +16,6 @@ import java.util.logging.Level;
 /**
  */
 public abstract class AbstractInputPort extends AbstractPort implements InputPort {
-    protected AbstractInputPort(Ports<? extends Port> owner, String name) {
-        super(owner, name);
-    }
 
     protected AbstractInputPort(Ports<? extends Port> owner, String name, String description) {
         super(owner, name, description);
