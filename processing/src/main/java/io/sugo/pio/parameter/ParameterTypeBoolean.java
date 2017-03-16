@@ -19,6 +19,12 @@ public class ParameterTypeBoolean extends ParameterTypeSingle {
         setExpert(expert);
     }
 
+    public ParameterTypeBoolean(String key, String description, boolean defaultValue, boolean expert, boolean hidden) {
+        this(key, description, defaultValue);
+        setExpert(expert);
+        setHidden(hidden);
+    }
+
     @Override
     public Object getDefaultValue() {
         return defaultValue;

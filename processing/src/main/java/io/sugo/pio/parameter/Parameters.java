@@ -28,9 +28,9 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
     private final Map<String, ParameterType> keyToTypeMap = new LinkedHashMap<String, ParameterType>();
 
     /**
-     * The example set input from external
+     * The data input from external
      */
-    private transient ExampleSet externalExampleSet;
+    private transient List<String> externalData = new ArrayList<>();
 
     /**
      * The metadata input from external
@@ -185,12 +185,12 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
         return keyToValueMap.containsKey(key);
     }
 
-    public ExampleSet getExternalExampleSet() {
-        return externalExampleSet;
+    public List<String> getExternalData() {
+        return externalData;
     }
 
-    public void setExternalExampleSet(ExampleSet externalExampleSet) {
-        this.externalExampleSet = externalExampleSet;
+    public void setExternalData(List<String> externalData) {
+        this.externalData = externalData;
     }
 
     public MetaData getExternalMetaData() {

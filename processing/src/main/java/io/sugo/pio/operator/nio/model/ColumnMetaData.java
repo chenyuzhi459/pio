@@ -1,5 +1,8 @@
 package io.sugo.pio.operator.nio.model;
 
+import io.sugo.pio.example.Attributes;
+import io.sugo.pio.ports.metadata.AttributeMetaData;
+
 import java.util.Observable;
 import java.util.Observer;
 
@@ -109,14 +112,14 @@ public class ColumnMetaData extends Observable {
 				+ getAttributeValueType() + " " + (isSelected() ? "x" : "-");
 	}
 
-//	public AttributeMetaData getAttributeMetaData() {
-//		String roleId = getRole();
-//		if (!Attributes.ATTRIBUTE_NAME.equals(roleId)) {
-//			return new AttributeMetaData(getUserDefinedAttributeName(), getAttributeValueType(), roleId);
-//		} else {
-//			return new AttributeMetaData(getUserDefinedAttributeName(), getAttributeValueType());
-//		}
-//	}
+	public AttributeMetaData getAttributeMetaData() {
+		String roleId = getRole();
+		if (!Attributes.ATTRIBUTE_NAME.equals(roleId)) {
+			return new AttributeMetaData(getUserDefinedAttributeName(), getAttributeValueType(), roleId);
+		} else {
+			return new AttributeMetaData(getUserDefinedAttributeName(), getAttributeValueType());
+		}
+	}
 
 	/** Returns whether the user specified a name different from the default. */
 	public boolean isAttributeNameSpecified() {

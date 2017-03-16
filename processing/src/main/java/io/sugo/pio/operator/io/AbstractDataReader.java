@@ -644,13 +644,14 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 		// hidden param
 		ParameterTypeList typeList = new ParameterTypeList(PARAMETER_META_DATA, "The meta data information",
 				new ParameterTypeInt(PARAMETER_COLUMN_INDEX, "The column index", 0, 9999), //
-				new ParameterTypeTuple(PARAMETER_COLUMN_META_DATA, "the meta data information of one column", //
+				new ParameterTypeTupel(PARAMETER_COLUMN_META_DATA, "the meta data information of one column", //
 						new ParameterTypeString(PARAMETER_COLUMN_NAME, "Describes the attributes name.", ""), //
 						new ParameterTypeBoolean(PARAMETER_COLUMN_SELECTED, "Indicates if a column is selected", true), //
 						new ParameterTypeCategory(PARAMETER_COLUM_VALUE_TYPE, "Indicates the value type of an attribute",
 								Ontology.VALUE_TYPE_NAMES, Ontology.NOMINAL), //
 						new ParameterTypeStringCategory(PARAMETER_COLUM_ROLE, "Indicates the role of an attribute", roles,
 								AttributeColumn.REGULAR)));
+		typeList.setHidden(true);
 		types.add(typeList);
 
 		// hidden param
@@ -1087,7 +1088,7 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 				}
 
 				tuple = map[1];
-				metadata = ParameterTypeTuple.transformString2Tupel(tuple);
+				metadata = ParameterTypeTupel.transformString2Tupel(tuple);
 
 				// return the parameter
 				return metadata[parameterIndex];
@@ -1158,7 +1159,7 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 					metadata = new String[4];
 				} else {
 					tuple = map[1];
-					metadata = ParameterTypeTuple.transformString2Tupel(tuple);
+					metadata = ParameterTypeTupel.transformString2Tupel(tuple);
 				}
 				// create new entries with default values
 				metadata[NAME_PARAMETER] = name;
@@ -1170,7 +1171,7 @@ public abstract class AbstractDataReader extends AbstractReader<ExampleSet> {
 				metadata[ROLE_PARAMETER] = role;
 
 				// write everything back
-				tuple = ParameterTypeTuple.transformTupel2String(metadata);
+				tuple = ParameterTypeTupel.transformTupel2String(metadata);
 				map[1] = tuple;
 
 				// list.set(index, map);

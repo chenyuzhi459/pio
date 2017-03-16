@@ -156,8 +156,8 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
         types.add(type);
 
         // Numberformats
-        types.addAll(StrictDecimalFormat.getParameterTypes(this, true));
-        types.addAll(DateParser.getParameterTypes(this));
+//        types.addAll(StrictDecimalFormat.getParameterTypes(this, true));
+//        types.addAll(DateParser.getParameterTypes(this));
 
         types.addAll(super.getParameterTypes());
         return types;

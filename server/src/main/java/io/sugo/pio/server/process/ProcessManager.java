@@ -343,8 +343,8 @@ public class ProcessManager {
             }
             metadataProcessManager.update(process);
 
-            log.info("The process named %s[id:%s] update parameter[%s] successfully.",
-                    process.getName(), processId, paramList);
+            log.info("The process named %s[id:%s] update operator[%s] parameter[%s] successfully.",
+                    process.getName(), processId, operator.getName(), paramList);
 
             return operator;
         } else {
@@ -384,13 +384,30 @@ public class ProcessManager {
             if (!metadataList.isEmpty()) {
                 ExampleSetMetaData exampleSetMetaData = new ExampleSetMetaData();
                 metadataList.forEach(metadata -> {
-                    AttributeMetaData attribute = new AttributeMetaData(metadata.getAttrName(), metadata.getAttrType());
+                    AttributeMetaData attribute = new AttributeMetaData(metadata.getAttrName(), metadata.getAttrType(), metadata.getRole());
                     exampleSetMetaData.addAttribute(attribute);
                 });
                 operator.getParameters().setExternalMetaData(exampleSetMetaData);
 
-                log.info("The process named %s[id:%s] update metadata[%s] successfully.",
-                        process.getName(), processId, metadataList);
+                log.info("The process named %s[id:%s] update operator[%s] metadata[%s] successfully.",
+                        process.getName(), processId, operator.getName(), metadataList);
+            }
+
+            return operator;
+        } else {
+            return null;
+        }
+    }
+
+    public Operator updateExampleData(String processId, String operatorId, List<String> dataList) {
+        OperatorProcess process = get(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            Operator operator = process.getOperator(operatorId);
+            if (!dataList.isEmpty()) {
+                operator.getParameters().setExternalData(dataList);
+
+                log.info("The process named %s[id:%s] update operator[%s] example data[%s] successfully.",
+                        process.getName(), processId, operator.getName(), dataList);
             }
 
             return operator;

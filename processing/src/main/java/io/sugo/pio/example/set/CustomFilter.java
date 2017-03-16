@@ -7,7 +7,7 @@ import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeTypeException;
 import io.sugo.pio.i18n.I18N;
-import io.sugo.pio.parameter.ParameterTypeTuple;
+import io.sugo.pio.parameter.ParameterTypeTupel;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.Tools;
 
@@ -839,7 +839,7 @@ public class CustomFilter implements Condition {
             }
 
             String condition = conditionArray[CONDITION_ARRAY_CONDITION_INDEX];
-            String[] conditionTupel = ParameterTypeTuple.transformString2Tupel(condition);
+            String[] conditionTupel = ParameterTypeTupel.transformString2Tupel(condition);
             if (conditionTupel.length != CONDITION_TUPEL_REQUIRED_SIZE) {
                 throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.custom_filters.malformed_condition_tupels")
                         + conditionTupel.length);
@@ -963,7 +963,7 @@ public class CustomFilter implements Condition {
         for (String[] conditionArray : conditions) {
             // we checked for malformed conditions in the constructor so no need to do it again
             String condition = conditionArray[CONDITION_ARRAY_CONDITION_INDEX];
-            String[] conditionTupel = ParameterTypeTuple.transformString2Tupel(condition);
+            String[] conditionTupel = ParameterTypeTupel.transformString2Tupel(condition);
             String attName = conditionTupel[CONDITION_TUPEL_ATT_INDEX];
             Attribute att = e.getAttributes().get(attName);
             String filterSymbol = conditionTupel[CONDITION_TUPEL_FILTER_INDEX];

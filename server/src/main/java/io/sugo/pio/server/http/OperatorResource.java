@@ -208,4 +208,21 @@ public class OperatorResource {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
+
+    @POST
+    @Path("/data/{processId}/{operatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response updateExampleData(
+            @PathParam("processId") final String processId,
+            @PathParam("operatorId") final String operatorId,
+            List<String> dataList
+    ) {
+        try {
+            Operator operator = processManager.updateExampleData(processId, operatorId, dataList);
+            return Response.ok(operator).build();
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
 }

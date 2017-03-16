@@ -3,7 +3,12 @@ package io.sugo.pio.operator.nio.model;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.table.DataRowFactory;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.io.ExampleSource;
 import io.sugo.pio.parameter.ParameterTypeList;
+import io.sugo.pio.parameter.ParameterTypeTupel;
+import io.sugo.pio.parameter.UndefinedParameterError;
+import io.sugo.pio.ports.metadata.ExampleSetMetaData;
+import io.sugo.pio.ports.metadata.MDInteger;
 import io.sugo.pio.tools.Ontology;
 
 import java.text.DateFormat;
@@ -12,13 +17,14 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static io.sugo.pio.operator.nio.model.AbstractDataResultSetReader.PARAMETER_META_DATA;
+
 
 /**
  * This class holds information how a DataResultSet is translated into an ExampleSet. Therefore it
  * holds information about the final name, the value type, role and if the column is selected at
  * all.
  *
- * @author Sebastian Land, Simon Fischer
  */
 public class DataResultSetTranslationConfiguration {
 
@@ -88,16 +94,47 @@ public class DataResultSetTranslationConfiguration {
     public void reconfigure(AbstractDataResultSetReader readerOperator) {
         // reading parameter settings
         if (readerOperator != null) {
-            dataManagementType = readerOperator.getParameterAsInt(PARAMETER_DATAMANAGEMENT);
-//			dataManagementType = DataRowFactory.TYPE_DOUBLE_ARRAY;
+            try {
+                dataManagementType = readerOperator.getParameterAsInt(ExampleSource.PARAMETER_DATAMANAGEMENT);
+            } catch (UndefinedParameterError e1) {
+                dataManagementType = DataRowFactory.TYPE_DOUBLE_ARRAY;
+            }
 
             boolean firstRowAsNames = readerOperator.getParameterAsBoolean(PARAMETER_FIRST_ROW_AS_NAMES);
             if (firstRowAsNames) {
                 annotationsMap.put(0, ANNOTATION_NAME);
+            } else {
+                List<String[]> annotations;
+                try {
+                    annotations = readerOperator.getParameterList(PARAMETER_ANNOTATIONS);
+                } catch (UndefinedParameterError e) {
+                    annotations = Collections.emptyList();
+                }
+                for (String[] annotation : annotations) {
+                    annotationsMap.put(Integer.parseInt(annotation[0]), annotation[1]);
+                }
             }
 
             // reading date format settings
-            setDatePattern(readerOperator.getParameterAsString(PARAMETER_DATE_FORMAT));
+            try {
+                setDatePattern(readerOperator.getParameterAsString(PARAMETER_DATE_FORMAT));
+            } catch (UndefinedParameterError e) {
+                setDatePattern("");
+            }
+
+            /*try {
+                int localeIndex;
+                localeIndex = readerOperator.getParameterAsInt(PARAMETER_LOCALE);
+                if (localeIndex >= 0 && localeIndex < AbstractDateDataProcessing.availableLocales.size()) {
+                    locale = AbstractDateDataProcessing.availableLocales.get(localeIndex);
+                }
+            } catch (UndefinedParameterError e) {
+                locale = Locale.getDefault();
+            }*/
+            locale = Locale.getDefault();
+
+            columnMetaData = readColumnMetaData(readerOperator);
+            setFaultTolerant(readerOperator.getParameterAsBoolean(AbstractDataResultSetReader.PARAMETER_ERROR_TOLERANT));
         } else {
             annotationsMap.put(0, ANNOTATION_NAME);
         }
@@ -134,11 +171,11 @@ public class DataResultSetTranslationConfiguration {
             tupel[1] = String.valueOf(cmd.isSelected());
             tupel[2] = Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(cmd.getAttributeValueType());
             tupel[3] = cmd.getRole();
-//			String encodedTupel = ParameterTypeTupel.transformTupel2String(tupel);
-//			metaDataList.add(new String[] { String.valueOf(index), encodedTupel });
+			String encodedTupel = ParameterTypeTupel.transformTupel2String(tupel);
+			metaDataList.add(new String[] { String.valueOf(index), encodedTupel });
             index++;
         }
-//		operator.getParameters().setParameter(PARAMETER_META_DATA, ParameterTypeList.transformList2String(metaDataList));
+		operator.getParameters().setParameter(PARAMETER_META_DATA, ParameterTypeList.transformList2String(metaDataList));
 
         // annotations
         List<String[]> annotationList = new LinkedList<>();
@@ -147,8 +184,8 @@ public class DataResultSetTranslationConfiguration {
         }
         operator.setParameter(PARAMETER_ANNOTATIONS, ParameterTypeList.transformList2String(annotationList));
 
-//		operator.getParameters().setParameter(AbstractDataResultSetReader.PARAMETER_ERROR_TOLERANT,
-//				String.valueOf(isFaultTolerant()));
+		operator.getParameters().setParameter(AbstractDataResultSetReader.PARAMETER_ERROR_TOLERANT,
+				String.valueOf(isFaultTolerant()));
         operator.getParameters().setParameter(PARAMETER_FIRST_ROW_AS_NAMES, "false");
     }
 
@@ -261,6 +298,16 @@ public class DataResultSetTranslationConfiguration {
         return "Annotations: " + annotationsMap + "; columns: " + Arrays.toString(columnMetaData);
     }
 
+    public void addColumnMetaData(ExampleSetMetaData emd) {
+        MDInteger numberOfExamples = emd.getNumberOfExamples();
+        numberOfExamples.subtract(annotationsMap.size());
+        for (ColumnMetaData cmd : columnMetaData) {
+            if (cmd.isSelected()) {
+                emd.addAttribute(cmd.getAttributeMetaData());
+            }
+        }
+    }
+
     /**
      * Returns true if meta data is manually set.
      */
@@ -278,6 +325,61 @@ public class DataResultSetTranslationConfiguration {
 
     public int getDataManagementType() {
         return dataManagementType;
+    }
+
+    /**
+     * @param readerOperator
+     *            the operator to retrieve the parameter from
+     */
+    public static ColumnMetaData[] readColumnMetaData(AbstractDataResultSetReader readerOperator) {
+        // initializing data structures
+        List<String[]> metaDataSettings;
+        if (readerOperator.isParameterSet(PARAMETER_META_DATA)) {
+            try {
+                metaDataSettings = readerOperator.getParameterList(PARAMETER_META_DATA);
+            } catch (UndefinedParameterError e) {
+                metaDataSettings = Collections.emptyList();
+            }
+        } else {
+            metaDataSettings = Collections.emptyList();
+        }
+
+        // find largest used column index
+        int maxUsedColumnIndex = -1;
+        for (String[] metaDataDefinition : metaDataSettings) {
+            int columnIndex = Integer.parseInt(metaDataDefinition[0]);
+            maxUsedColumnIndex = Math.max(maxUsedColumnIndex, columnIndex);
+        }
+        // initialize with values from settings
+        ColumnMetaData[] columnMetaData = new ColumnMetaData[maxUsedColumnIndex + 1];
+        for (String[] metaDataDefinition : metaDataSettings) {
+            int currentColumn = Integer.parseInt(metaDataDefinition[0]);
+            String[] metaDataDefintionValues = ParameterTypeTupel.transformString2Tupel(metaDataDefinition[1]);
+            columnMetaData[currentColumn] = new ColumnMetaData();
+            final ColumnMetaData cmd = columnMetaData[currentColumn];
+            cmd.setSelected(Boolean.parseBoolean(metaDataDefintionValues[1]));
+            if (cmd.isSelected()) { // otherwise details don't matter
+                cmd.setRole(metaDataDefintionValues[3].trim());
+                cmd.setUserDefinedAttributeName(metaDataDefintionValues[0].trim());
+
+                int valueType = Ontology.ATTRIBUTE_VALUE_TYPE.mapName(metaDataDefintionValues[2]);
+                // fallback for old processes where attribute value type was saved as index
+                // rather than as string
+                if (valueType == -1) {
+                    cmd.setAttributeValueType(Integer.parseInt(metaDataDefintionValues[2]));
+                } else {
+                    cmd.setAttributeValueType(valueType);
+                }
+            }
+        }
+        // replace those which were not specified in the list by an empty ColumnMetaData (so it
+        // is at least not null)
+        for (int i = 0; i < columnMetaData.length; i++) {
+            if (columnMetaData[i] == null) {
+                columnMetaData[i] = new ColumnMetaData();
+            }
+        }
+        return columnMetaData;
     }
 
 }

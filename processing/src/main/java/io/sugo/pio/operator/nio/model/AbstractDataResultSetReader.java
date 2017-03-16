@@ -3,7 +3,6 @@ package io.sugo.pio.operator.nio.model;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
-import io.sugo.pio.example.table.DataRowFactory;
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.OperatorException;
@@ -15,19 +14,18 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.PortType;
+import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.SimplePrecondition;
 import io.sugo.pio.tools.Ontology;
-import io.sugo.pio.tools.Tools;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import static io.sugo.pio.operator.nio.model.DataResultSetTranslationConfiguration.*;
 
 
 /**
@@ -38,7 +36,10 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
 
     private static final Logger logger = new Logger(AbstractDataResultSetReader.class);
 
-    public static final String PARAMETER_ANNOTATIONS = "annotations";
+    /**
+     * Pseudo-annotation to be used for attribute names.
+     */
+    public static final String ANNOTATION_NAME = "Name";
 
     /**
      * This parameter holds the hole information about the attribute columns. I.e. which attributes
@@ -52,7 +53,20 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
     public static final String PARAMETER_COLUMN_VALUE_TYPE = "attribute_value_type";
     public static final String PARAMETER_COLUMN_ROLE = "attribute_role";
 
+    public static final String PARAMETER_DATE_FORMAT = "date_format";
+    public static final String PARAMETER_TIME_ZONE = "time_zone";
+    public static final String PARAMETER_LOCALE = "locale";
+
     public static final String PARAMETER_ATTRIBUTES = "attributes";
+
+    /**
+     * The parameter name for &quot;Determines, how the data is represented internally.&quot;
+     */
+    public static final String PARAMETER_DATAMANAGEMENT = "datamanagement";
+    public static final String PARAMETER_FIRST_ROW_AS_NAMES = "first_row_as_names";
+    public static final String PARAMETER_ANNOTATIONS = "annotations";
+
+    public static final String PARAMETER_ERROR_TOLERANT = "read_not_matching_values_as_missings";
 
 //    private InputPort fileInputPort = getInputPorts().createPort("file");
 
@@ -97,6 +111,8 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
                 }
             }
         }
+
+        logger.info("AbstractDataResultSetReader load data of size[%d].", exampleSet.size());
         return exampleSet;
     }
 
@@ -136,6 +152,7 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
 
         // loading configuration
         DataResultSetTranslationConfiguration configuration = new DataResultSetTranslationConfiguration(this);
+//        configuration.setParameters(this);
         final boolean configComplete = !configuration.isComplete();
         if (configComplete) {
             configuration.reconfigure(dataResultSet);
@@ -154,7 +171,20 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         return translator.read(dataResultSet, configuration, false);
     }
 
-   /* @Override
+    @Override
+    public MetaData getGeneratedMetaData() throws OperatorException {
+        ExampleSetMetaData result = (ExampleSetMetaData) getParameters().getExternalMetaData();
+        DataResultSetTranslationConfiguration configuration = new DataResultSetTranslationConfiguration(this);
+        ColumnMetaData[] columnMetaDatas = buildColumnMetadataInfo(result);
+        configuration.setColumnMetaData(columnMetaDatas);
+        if (columnMetaDatas != null) {
+            configuration.setParameters(this);
+        }
+
+        return result;
+    }
+
+    /*@Override
     public MetaData getGeneratedMetaData() throws OperatorException {
         try (DataResultSetFactory dataResultSetFactory = getDataResultSetFactory()) {
             ExampleSetMetaData result = dataResultSetFactory.makeMetaData();
@@ -164,9 +194,28 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         }
     }*/
 
-    @Override
-    public MetaData getGeneratedMetaData() throws OperatorException {
-        return getParameters().getExternalMetaData();
+    private ColumnMetaData[] buildColumnMetadataInfo(ExampleSetMetaData exampleSetMetaData) {
+        if (exampleSetMetaData != null) {
+            Iterator<AttributeMetaData> it = exampleSetMetaData.getAllAttributes().iterator();
+            int size = exampleSetMetaData.getAllAttributes().size();
+            ColumnMetaData[] columnMetaDatas = new ColumnMetaData[size];
+            int i = 0;
+            while (it.hasNext()) {
+                AttributeMetaData attrMetadata = it.next();
+                ColumnMetaData columnMetaData = new ColumnMetaData();
+//                columnMetaData.setOriginalAttributeName(attrMetadata.getName());
+                columnMetaData.setUserDefinedAttributeName(attrMetadata.getName());
+                columnMetaData.setAttributeValueType(attrMetadata.getValueType());
+                columnMetaData.setRole(attrMetadata.getRole());
+                columnMetaData.setSelected(true);
+
+                columnMetaDatas[i++] = columnMetaData;
+            }
+
+            return columnMetaDatas;
+        }
+
+        return null;
     }
 
     @Override
@@ -177,7 +226,7 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
             types.add(new ParameterTypeBoolean(
                     PARAMETER_FIRST_ROW_AS_NAMES,
                     "Indicates if the first row should be used for the attribute names. If activated no annotations can be used.",
-                    true));
+                    true, false, true));
         }
 
         List<String> annotations = new LinkedList<>();
@@ -192,14 +241,14 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         }
         types.add(type);
 
-        type = new ParameterTypeDateFormat(PARAMETER_DATE_FORMAT,
-                "The parse format of the date values, for example \"yyyy/MM/dd\".", "yyyy/MM/dd");
-        types.add(type);
+//        type = new ParameterTypeDateFormat(PARAMETER_DATE_FORMAT,
+//                "The parse format of the date values, for example \"yyyy/MM/dd\".", "yyyy/MM/dd");
+//        types.add(type);
 
-        type = new ParameterTypeCategory(PARAMETER_TIME_ZONE,
-                "The time zone used for the date objects if not specified in the date string itself.",
-                Tools.getAllTimeZones(), Tools.getPreferredTimeZoneIndex());
-        types.add(type);
+//        type = new ParameterTypeCategory(PARAMETER_TIME_ZONE,
+//                "The time zone used for the date objects if not specified in the date string itself.",
+//                Tools.getAllTimeZones(), Tools.getPreferredTimeZoneIndex());
+//        types.add(type);
 
 //        type = new ParameterTypeCategory(PARAMETER_LOCALE,
 //                "The used locale for date texts, for example \"Wed\" (English) in contrast to \"Mi\" (German).",
@@ -210,7 +259,7 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
 
         type = new ParameterTypeList(PARAMETER_META_DATA, "The meta data information", //
                 new ParameterTypeInt(PARAMETER_COLUMN_INDEX, "The column index", 0, Integer.MAX_VALUE), //
-                new ParameterTypeTuple(PARAMETER_COLUMN_META_DATA, "The meta data definition of one column", //
+                new ParameterTypeTupel(PARAMETER_COLUMN_META_DATA, "The meta data definition of one column", //
                         new ParameterTypeString(PARAMETER_COLUMN_NAME, "Describes the attributes name.", ""), //
                         new ParameterTypeBoolean(PARAMETER_COLUMN_SELECTED, "Indicates if a column is selected", true), //
                         new ParameterTypeCategory(PARAMETER_COLUMN_VALUE_TYPE, "Indicates the value type of an attribute",
@@ -222,9 +271,9 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
 //        types.add(new ParameterTypeBoolean(PARAMETER_ERROR_TOLERANT,
 //                "Values which does not match to the specified value typed are considered as missings.", true, true));
 
-        types.add(new ParameterTypeCategory(PARAMETER_DATAMANAGEMENT,
-                "Determines, how the data is represented internally.", DataRowFactory.TYPE_NAMES,
-                DataRowFactory.TYPE_DOUBLE_ARRAY));
+//        types.add(new ParameterTypeCategory(PARAMETER_DATAMANAGEMENT,
+//                "Determines, how the data is represented internally.", DataRowFactory.TYPE_NAMES,
+//                DataRowFactory.TYPE_DOUBLE_ARRAY));
 
         return types;
     }
@@ -241,7 +290,7 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
      * Returns either the selected file referenced by the value of the parameter with the name
      * {@link #getFileParameterName()} or the file delivered at {@link #fileInputPort}. Which of
      * these options is chosen is determined by the parameter {@link #PARAMETER_DESTINATION_TYPE}.
-     * */
+     */
     public File getSelectedFile() throws OperatorException {
         return filePortHandler.getSelectedFile();
     }

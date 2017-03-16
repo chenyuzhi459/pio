@@ -997,7 +997,7 @@ public class DatabaseHandler implements AutoCloseable {
         LinkedList types = new LinkedList();
         ParameterTypeBoolean prepareParam = new ParameterTypeBoolean("prepare_statement", "If checked, the statement is prepared, and \'?\'-parameters can be filled in using the parameter \'parameters\'.", false);
         types.add(prepareParam);
-        ParameterTypeTuple argumentType = new ParameterTypeTuple("parameter", "Parameter to insert when statement is prepared", new ParameterType[]{new ParameterTypeCategory("type", "SQL type to use for insertion.", SQL_TYPES, 0), new ParameterTypeString("parameter", "Parameter")});
+        ParameterTypeTupel argumentType = new ParameterTypeTupel("parameter", "Parameter to insert when statement is prepared", new ParameterType[]{new ParameterTypeCategory("type", "SQL type to use for insertion.", SQL_TYPES, 0), new ParameterTypeString("parameter", "Parameter")});
         ParameterTypeEnumeration paramsParam = new ParameterTypeEnumeration("parameters", "Parameters to insert into \'?\' placeholders when statement is prepared.", argumentType);
         paramsParam.registerDependencyCondition(new BooleanParameterCondition(handler, "prepare_statement", false, true));
         types.add(paramsParam);
@@ -1014,7 +1014,7 @@ public class DatabaseHandler implements AutoCloseable {
                 String[] parameters = ParameterTypeEnumeration.transformString2Enumeration(parameterHandler.getParameterAsString("parameters"));
 
                 for (int i = 0; i < parameters.length; ++i) {
-                    String[] argDescription = ParameterTypeTuple.transformString2Tupel(parameters[i]);
+                    String[] argDescription = ParameterTypeTupel.transformString2Tupel(parameters[i]);
                     String sqlType = argDescription[0];
                     String replacementValue = argDescription[1];
                     if ("VARCHAR".equals(sqlType)) {

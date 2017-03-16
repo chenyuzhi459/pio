@@ -35,7 +35,7 @@ import java.util.LinkedList;
         @JsonSubTypes.Type(name = "param_type_list", value = ParameterTypeList.class),
         @JsonSubTypes.Type(name = "param_type_password", value = ParameterTypePassword.class),
         @JsonSubTypes.Type(name = "param_type_regexp", value = ParameterTypeRegexp.class),
-        @JsonSubTypes.Type(name = "param_type_tuple", value = ParameterTypeTuple.class),
+        @JsonSubTypes.Type(name = "param_type_tuple", value = ParameterTypeTupel.class),
         @JsonSubTypes.Type(name = "param_type_repository", value = ParameterTypeRepositoryLocation.class),
         @JsonSubTypes.Type(name = "param_type_file", value = ParameterTypeFile.class),
 

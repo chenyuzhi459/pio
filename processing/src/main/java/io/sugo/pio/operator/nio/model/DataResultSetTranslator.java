@@ -27,7 +27,6 @@ import java.util.List;
  * This class encapsulates the translation step from a {@link DataResultSetTranslator} to an
  * {@link ExampleSet} which is controlled by the {@link DataResultSetTranslationConfiguration}.
  *
- * @author Sebastian Land
  */
 public class DataResultSetTranslator {
 
@@ -104,7 +103,7 @@ public class DataResultSetTranslator {
         int numberOfAvailableColumns = dataResultSet.getNumberOfColumns();
         for (int attributeColumn : attributeColumns) {
             if (attributeColumn >= numberOfAvailableColumns) {
-                throw new UserError(null, "data_import.specified_more_columns_than_exist",
+                throw new UserError(operator, "pio.error.data_import.specified_more_columns_than_exist.name",
                         configuration.getColumnMetaData(attributeColumn).getUserDefinedAttributeName(), attributeColumn);
             }
         }
@@ -120,20 +119,21 @@ public class DataResultSetTranslator {
 
         // detect if this is executed in a process
         boolean isRunningInProcess = false;
-        if (operator != null) {
-//			Process process = operator.getProcess();
-//			if (process != null && process.getProcessState() == Process.PROCESS_STATE_RUNNING) {
-//				isRunningInProcess = true;
-//			}
-        }
+        /*if (operator != null) {
+			Process process = operator.getProcess();
+			if (process != null && process.getProcessState() == Process.PROCESS_STATE_RUNNING) {
+				isRunningInProcess = true;
+			}
+        }*/
 
         while (dataResultSet.hasNext() && !shouldStop && (currentRow < maxRows || maxRows < 0)) {
             if (isRunningInProcess) {
-//				operator.checkForStop();
+				operator.checkForStop();
             }
             if (cancelLoadingRequested) {
                 break;
             }
+            dataResultSet.next();
             // checking for annotation
             String currentAnnotation;
             if (currentRow <= maxAnnotatedRow) {
@@ -180,7 +180,7 @@ public class DataResultSetTranslator {
                         String annotationValue = getString(dataResultSet, exampleIndex, attributeColumns[attributeIndex],
                                 isFaultTolerant);
                         if (annotationValue != null && !annotationValue.isEmpty()) {
-//							attribute.getAnnotations().put(currentAnnotation, annotationValue);
+							attribute.getAnnotations().put(currentAnnotation, annotationValue);
                         }
                     }
                     attributeNames.add(attribute.getName());
@@ -257,7 +257,7 @@ public class DataResultSetTranslator {
 
             String roleId = cmd.getRole();
             if (!Attributes.ATTRIBUTE_NAME.equals(roleId)) {
-//				exampleSet.getAttributes().setSpecialAttribute(attribute, roleId);
+				exampleSet.getAttributes().setSpecialAttribute(attribute, roleId);
             }
             attributeIndex++;
             attributeNames.add(attribute.getName());
