@@ -11,7 +11,6 @@ import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
-import io.sugo.pio.server.http.dto.OperatorMetadataDto;
 import io.sugo.pio.server.http.dto.OperatorParamDto;
 import io.sugo.pio.server.process.ProcessManager;
 
@@ -27,7 +26,6 @@ public class OperatorResource {
     private final ObjectMapper jsonMapper;
     private final ProcessManager processManager;
     private final JavaType operatorParamType;
-    private final JavaType operatorMetadataType;
 
     @Inject
     public OperatorResource(
@@ -37,7 +35,6 @@ public class OperatorResource {
         this.jsonMapper = jsonMapper;
         this.processManager = processManager;
         this.operatorParamType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, OperatorParamDto.class);
-        this.operatorMetadataType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, OperatorMetadataDto.class);
     }
 
     @GET
@@ -148,10 +145,10 @@ public class OperatorResource {
     public Response updateParameter(
             @PathParam("processId") final String processId,
             @PathParam("operatorId") final String operatorId,
-            String keyValues
+            List<OperatorParamDto> paramList
     ) {
         try {
-            List<OperatorParamDto> paramList = jsonMapper.readValue(keyValues, operatorParamType);
+//            List<OperatorParamDto> paramList = jsonMapper.readValue(keyValues, operatorParamType);
             Operator operator = processManager.updateParameter(processId, operatorId, paramList);
             return Response.ok(operator).build();
         } catch (Exception e) {

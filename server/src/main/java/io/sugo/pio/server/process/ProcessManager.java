@@ -19,10 +19,7 @@ import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.Status;
 import io.sugo.pio.ports.Connection;
-import io.sugo.pio.ports.metadata.AttributeMetaData;
-import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.server.http.dto.OperatorDto;
-import io.sugo.pio.server.http.dto.OperatorMetadataDto;
 import io.sugo.pio.server.http.dto.OperatorParamDto;
 import org.joda.time.DateTime;
 
@@ -384,8 +381,8 @@ public class ProcessManager {
             if (!dataList.isEmpty()) {
                 operator.getParameters().setExternalData(dataList);
 
-                log.info("The process named %s[id:%s] update operator[%s] example data[%s] successfully.",
-                        process.getName(), processId, operator.getName(), dataList);
+                log.info("The process named %s[id:%s] update operator[%s] example data successfully.",
+                        process.getName(), processId, operator.getName());
             }
 
             return operator;
