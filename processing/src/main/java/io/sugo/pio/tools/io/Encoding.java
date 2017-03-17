@@ -29,14 +29,14 @@ public class Encoding {
     public static final String[] AVALIABLE_CHARSETS = new String[]{"UTF-8", "GBK", "GB2312", "US-ASCII"};
 
     static {
-        CHARSETS = new String[Charset.availableCharsets().size() + 1];
+        /*CHARSETS = new String[Charset.availableCharsets().size() + 1];
         CHARSETS[0] = SYSTEM_ENCODING_NAME;
         int i = 0;
-//		for (String charSet : Charset.availableCharsets().keySet()) {
-        for (String charSet : AVALIABLE_CHARSETS) {
+		for (String charSet : Charset.availableCharsets().keySet()) {
             CHARSETS[i + 1] = charSet;
             i++;
-        }
+        }*/
+        CHARSETS = AVALIABLE_CHARSETS;
     }
 
     public static Charset getEncoding(Operator handler) throws UndefinedParameterError, UserError {

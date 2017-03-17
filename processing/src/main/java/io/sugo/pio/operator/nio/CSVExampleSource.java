@@ -19,18 +19,16 @@
 package io.sugo.pio.operator.nio;
 
 import io.sugo.pio.i18n.I18N;
-import io.sugo.pio.operator.IOObject;
-import io.sugo.pio.operator.OperatorDescription;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.operator.io.AbstractReader;
 import io.sugo.pio.operator.nio.model.AbstractDataResultSetReader;
 import io.sugo.pio.operator.nio.model.CSVResultSetConfiguration;
 import io.sugo.pio.operator.nio.model.DataResultSetFactory;
-import io.sugo.pio.parameter.*;
+import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeBoolean;
+import io.sugo.pio.parameter.ParameterTypeCsvFile;
+import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
-import io.sugo.pio.tools.DateParser;
-import io.sugo.pio.tools.LineParser;
 import io.sugo.pio.tools.StrictDecimalFormat;
 
 import java.text.NumberFormat;
@@ -111,7 +109,7 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
 		type.setExpert(false);
 		types.add(type);
 		types.add(makeFileParameterType());*/
-        ParameterType type = new ParameterTypeFile(PARAMETER_CSV_FILE,
+        ParameterType type = new ParameterTypeCsvFile(PARAMETER_CSV_FILE,
                 I18N.getMessage("pio.CSVExampleSource.csv_file"),
                 "csv", false);
         types.add(type);
@@ -121,27 +119,27 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
                 I18N.getMessage("pio.CSVExampleSource.column_separators"),
 //				"Column separators for data files (regular expression)",
                 ";", false));
-        types.add(new ParameterTypeBoolean(
+        /*types.add(new ParameterTypeBoolean(
                 PARAMETER_TRIM_LINES,
                 I18N.getMessage("pio.CSVExampleSource.trim_lines"),
-//				"Indicates if lines should be trimmed (empty spaces are removed at the beginning and the end) before the column split is performed. This option might be problematic if TABs are used as a seperator.",
-                false));
+				"Indicates if lines should be trimmed (empty spaces are removed at the beginning and the end) before the column split is performed. This option might be problematic if TABs are used as a seperator.",
+                false));*/
         // Quotes
-        types.add(new ParameterTypeBoolean(PARAMETER_USE_QUOTES,
+        /*types.add(new ParameterTypeBoolean(PARAMETER_USE_QUOTES,
                 I18N.getMessage("pio.CSVExampleSource.use_quotes"),
-//				"Indicates if quotes should be regarded.",
+				"Indicates if quotes should be regarded.",
                 true, false));
         type = new ParameterTypeChar(PARAMETER_QUOTES_CHARACTER,
                 I18N.getMessage("pio.CSVExampleSource.quotes_character"),
-//				"The quotes character.",
+				"The quotes character.",
                 LineParser.DEFAULT_QUOTE_CHARACTER, false);
         type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_USE_QUOTES, false, true));
         types.add(type);
         type = new ParameterTypeChar(PARAMETER_ESCAPE_CHARACTER,
                 I18N.getMessage("pio.CSVExampleSource.escape_character"),
-//				"The character that is used to escape quotes and column seperators",
+				"The character that is used to escape quotes and column seperators",
                 LineParser.DEFAULT_QUOTE_ESCAPE_CHARACTER, true);
-        types.add(type);
+        types.add(type);*/
 
         // Comments
         types.add(new ParameterTypeBoolean(PARAMETER_SKIP_COMMENTS,

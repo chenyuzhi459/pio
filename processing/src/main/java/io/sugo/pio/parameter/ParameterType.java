@@ -38,6 +38,7 @@ import java.util.LinkedList;
         @JsonSubTypes.Type(name = "param_type_tuple", value = ParameterTypeTupel.class),
         @JsonSubTypes.Type(name = "param_type_repository", value = ParameterTypeRepositoryLocation.class),
         @JsonSubTypes.Type(name = "param_type_file", value = ParameterTypeFile.class),
+        @JsonSubTypes.Type(name = "param_type_csv_file", value = ParameterTypeCsvFile.class),
 
         @JsonSubTypes.Type(name = "param_type_db_connection", value = ParameterTypeDatabaseConnection.class),
         @JsonSubTypes.Type(name = "param_type_db_schema", value = ParameterTypeDatabaseSchema.class),

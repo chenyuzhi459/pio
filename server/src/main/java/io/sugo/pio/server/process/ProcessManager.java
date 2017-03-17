@@ -377,28 +377,6 @@ public class ProcessManager {
         }
     }
 
-    public Operator updateMetadata(String processId, String operatorId, List<OperatorMetadataDto> metadataList) {
-        OperatorProcess process = get(processId);
-        if (process != null && !Status.DELETED.equals(process.getStatus())) {
-            Operator operator = process.getOperator(operatorId);
-            if (!metadataList.isEmpty()) {
-                ExampleSetMetaData exampleSetMetaData = new ExampleSetMetaData();
-                metadataList.forEach(metadata -> {
-                    AttributeMetaData attribute = new AttributeMetaData(metadata.getAttrName(), metadata.getAttrType(), metadata.getRole());
-                    exampleSetMetaData.addAttribute(attribute);
-                });
-                operator.getParameters().setExternalMetaData(exampleSetMetaData);
-
-                log.info("The process named %s[id:%s] update operator[%s] metadata[%s] successfully.",
-                        process.getName(), processId, operator.getName(), metadataList);
-            }
-
-            return operator;
-        } else {
-            return null;
-        }
-    }
-
     public Operator updateExampleData(String processId, String operatorId, List<String> dataList) {
         OperatorProcess process = get(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {

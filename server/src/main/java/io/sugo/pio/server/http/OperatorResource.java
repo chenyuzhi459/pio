@@ -192,24 +192,6 @@ public class OperatorResource {
     }
 
     @POST
-    @Path("/metadata/{processId}/{operatorId}")
-    @Produces({MediaType.APPLICATION_JSON})
-    @Consumes({MediaType.APPLICATION_JSON})
-    public Response updateMetadata(
-            @PathParam("processId") final String processId,
-            @PathParam("operatorId") final String operatorId,
-            String metadata
-    ) {
-        try {
-            List<OperatorMetadataDto> metadataList = jsonMapper.readValue(metadata, operatorMetadataType);
-            Operator operator = processManager.updateMetadata(processId, operatorId, metadataList);
-            return Response.ok(operator).build();
-        } catch (Exception e) {
-            return Response.serverError().entity(e.getMessage()).build();
-        }
-    }
-
-    @POST
     @Path("/data/{processId}/{operatorId}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})

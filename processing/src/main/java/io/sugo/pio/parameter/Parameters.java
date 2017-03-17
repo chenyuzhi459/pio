@@ -33,11 +33,6 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
     private transient List<String> externalData = new ArrayList<>();
 
     /**
-     * The metadata input from external
-     */
-    private transient MetaData externalMetaData;
-
-    /**
      * Creates an empty parameters object without any parameter types.
      */
     public Parameters() {
@@ -191,13 +186,5 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
 
     public void setExternalData(List<String> externalData) {
         this.externalData = externalData;
-    }
-
-    public MetaData getExternalMetaData() {
-        return externalMetaData;
-    }
-
-    public void setExternalMetaData(MetaData externalMetaData) {
-        this.externalMetaData = externalMetaData;
     }
 }
