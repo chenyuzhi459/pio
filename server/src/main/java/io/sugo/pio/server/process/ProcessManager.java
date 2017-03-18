@@ -337,11 +337,14 @@ public class ProcessManager {
                 paramList.forEach(param -> {
                     operator.setParameter(param.getKey(), param.getValue());
                 });
+
+                process.getRootOperator().getExecutionUnit().transformMetaData();
             }
             metadataProcessManager.update(process);
 
             log.info("The process named %s[id:%s] update operator[%s] parameter[%s] successfully.",
                     process.getName(), processId, operator.getName(), paramList);
+
 
             return operator;
         } else {

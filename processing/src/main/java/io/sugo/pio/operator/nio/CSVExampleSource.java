@@ -118,7 +118,7 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
         types.add(new ParameterTypeString(PARAMETER_COLUMN_SEPARATORS,
                 I18N.getMessage("pio.CSVExampleSource.column_separators"),
 //				"Column separators for data files (regular expression)",
-                ";", false));
+                ",", false));
         /*types.add(new ParameterTypeBoolean(
                 PARAMETER_TRIM_LINES,
                 I18N.getMessage("pio.CSVExampleSource.trim_lines"),
