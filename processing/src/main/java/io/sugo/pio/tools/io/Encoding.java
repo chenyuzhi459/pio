@@ -69,9 +69,11 @@ public class Encoding {
     public static List<ParameterType> getParameterTypes(ParameterHandler handler) {
         List<ParameterType> types = new LinkedList<ParameterType>();
 
-        String encoding = SYSTEM_ENCODING_NAME;
+        /*String encoding = SYSTEM_ENCODING_NAME;
         types.add(new ParameterTypeStringCategory(PARAMETER_ENCODING, I18N.getMessage("pio.Encoding.encoding"),
-                CHARSETS, encoding, false));
+                CHARSETS, encoding, false));*/
+        types.add(new ParameterTypeStringCategory(PARAMETER_ENCODING, I18N.getMessage("pio.Encoding.encoding"),
+                CHARSETS, "UTF-8", false));
 
         return types;
     }

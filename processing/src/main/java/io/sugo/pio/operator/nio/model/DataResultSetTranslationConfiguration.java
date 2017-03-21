@@ -363,11 +363,13 @@ public class DataResultSetTranslationConfiguration {
                 int valueType = Ontology.ATTRIBUTE_VALUE_TYPE.mapName(metaDataDefintionValues[2]);
                 // fallback for old processes where attribute value type was saved as index
                 // rather than as string
-                if (valueType == -1) {
-                    cmd.setAttributeValueType(Integer.parseInt(metaDataDefintionValues[2]));
-                } else {
-                    cmd.setAttributeValueType(valueType);
-                }
+                try {
+                    if (valueType == -1) {
+                        cmd.setAttributeValueType(Integer.parseInt(metaDataDefintionValues[2]));
+                    } else {
+                        cmd.setAttributeValueType(valueType);
+                    }
+                } catch (Exception ignore) {}
             }
         }
         // replace those which were not specified in the list by an empty ColumnMetaData (so it

@@ -20,6 +20,8 @@ import io.sugo.pio.operator.preprocessing.sampling.sequences.SamplingSequenceGen
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.parameter.conditions.EqualTypeCondition;
+import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.OperatorResourceConsumptionHandler;
@@ -42,7 +44,14 @@ public class SamplingOperator extends AbstractSamplingOperator {
 
     public static final String PARAMETER_SAMPLE = "sample";
 
-    public static String[] SAMPLE_MODES = {"absolute", "relative", "probability"};
+    private final OutputPort remainedExampleSetOutput = getOutputPorts().createPort(PortType.REMAINED_EXAMPLE_SET_OUTPUT);
+
+//    public static String[] SAMPLE_MODES = {"absolute", "relative", "probability"};
+    public static String[] SAMPLE_MODES = {
+            I18N.getMessage("pio.SamplingOperator.sample_modes.absolute"),
+            I18N.getMessage("pio.SamplingOperator.sample_modes.relative"),
+            I18N.getMessage("pio.SamplingOperator.sample_modes.probability")
+    };
 
     public static final int SAMPLE_ABSOLUTE = 0;
 
@@ -272,6 +281,11 @@ public class SamplingOperator extends AbstractSamplingOperator {
     }
 
     @Override
+    public void deliverRemainExampleSet() {
+        remainedExampleSetOutput.deliver(null);
+    }
+
+    @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
         ParameterType type = new ParameterTypeCategory(PARAMETER_SAMPLE, I18N.getMessage("pio.SamplingOperator.sample"),
@@ -280,29 +294,30 @@ public class SamplingOperator extends AbstractSamplingOperator {
         types.add(type);
         type = new ParameterTypeBoolean(PARAMETER_BALANCE_DATA,
                 I18N.getMessage("pio.SamplingOperator.balance_data"), false, true);
+        type.setHidden(true);
         types.add(type);
 
         type = new ParameterTypeInt(PARAMETER_SAMPLE_SIZE, I18N.getMessage("pio.SamplingOperator.sample_size"), 1,
                 Integer.MAX_VALUE, 100);
         type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_SAMPLE, SAMPLE_MODES, true, SAMPLE_ABSOLUTE));
-        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
+//        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
         type.setExpert(false);
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_SAMPLE_RATIO, I18N.getMessage("pio.SamplingOperator.sample_ratio"), 0.0d,
                 1.0d, 0.1d);
         type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_SAMPLE, SAMPLE_MODES, true, SAMPLE_RELATIVE));
-        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
+//        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
         type.setExpert(false);
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_SAMPLE_PROBABILITY, I18N.getMessage("pio.SamplingOperator.sample_probability"), 0.0d, 1.0d,
                 0.1d);
         type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_SAMPLE, SAMPLE_MODES, true,
                 SAMPLE_PROBABILITY));
-        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
+//        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
         type.setExpert(false);
         types.add(type);
 
-        type = new ParameterTypeList(PARAMETER_SAMPLE_SIZE_LIST, I18N.getMessage("pio.SamplingOperator.sample_size_per_class"),
+       /* type = new ParameterTypeList(PARAMETER_SAMPLE_SIZE_LIST, I18N.getMessage("pio.SamplingOperator.sample_size_per_class"),
                 new ParameterTypeString("class", I18N.getMessage("pio.SamplingOperator.class")),
                 new ParameterTypeInt("size", I18N.getMessage("pio.SamplingOperator.size"), 0, Integer.MAX_VALUE));
         type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_SAMPLE, SAMPLE_MODES, true, SAMPLE_ABSOLUTE));
@@ -325,7 +340,7 @@ public class SamplingOperator extends AbstractSamplingOperator {
         type.setExpert(false);
         types.add(type);
 
-        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));
+        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));*/
         return types;
     }
 

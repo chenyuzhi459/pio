@@ -21,7 +21,6 @@ import java.util.*;
  * constructed from several conditions of the type {@link CustomFilters} which either must all be
  * fulfilled (AND) or only one must be fulfilled (OR).
  *
- * @author Marco Boeck
  */
 public class CustomFilter implements Condition {
 
@@ -30,7 +29,8 @@ public class CustomFilter implements Condition {
      */
     public static enum CustomFilters {
 
-        EQUALS_NUMERICAL("gui.comparator.numerical.equals", "eq", Ontology.NUMERICAL) {
+        EQUALS_NUMERICAL("gui.comparator.numerical.equals", "eq", Ontology.NUMERICAL,
+                I18N.getMessage("pio.CustomFilter.comparator.numerical.equals")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 // special case to handle missing values
@@ -50,7 +50,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        NOT_EQUALS_NUMERICAL("gui.comparator.numerical.not_equals", "ne", Ontology.NUMERICAL) {
+        NOT_EQUALS_NUMERICAL("gui.comparator.numerical.not_equals", "ne", Ontology.NUMERICAL,
+                I18N.getMessage("pio.CustomFilter.comparator.numerical.not_equals")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 // special case to handle missing values
@@ -70,7 +71,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        LESS("gui.comparator.numerical.less", "lt", Ontology.NUMERICAL) {
+        LESS("gui.comparator.numerical.less", "lt", Ontology.NUMERICAL,
+                I18N.getMessage("pio.CustomFilter.comparator.numerical.less")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return input < filter;
@@ -86,7 +88,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        LESS_EQUALS("gui.comparator.numerical.less_equals", "le", Ontology.NUMERICAL) {
+        LESS_EQUALS("gui.comparator.numerical.less_equals", "le", Ontology.NUMERICAL,
+                I18N.getMessage("pio.CustomFilter.comparator.numerical.less_equals")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return input <= filter;
@@ -102,7 +105,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        GREATER_EQUALS("gui.comparator.numerical.greater_equals", "ge", Ontology.NUMERICAL) {
+        GREATER_EQUALS("gui.comparator.numerical.greater_equals", "ge", Ontology.NUMERICAL,
+                I18N.getMessage("pio.CustomFilter.comparator.numerical.greater_equals")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return input >= filter;
@@ -118,7 +122,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        GREATER("gui.comparator.numerical.greater", "gt", Ontology.NUMERICAL) {
+        GREATER("gui.comparator.numerical.greater", "gt", Ontology.NUMERICAL,
+                I18N.getMessage("pio.CustomFilter.comparator.numerical.greater")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return input > filter;
@@ -135,7 +140,8 @@ public class CustomFilter implements Condition {
             }
         },
 
-        EQUALS_NOMINAL("gui.comparator.nominal.equals", "equals", Ontology.NOMINAL) {
+        EQUALS_NOMINAL("gui.comparator.nominal.equals", "equals", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.equals")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -151,7 +157,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        NOT_EQUALS_NOMINAL("gui.comparator.nominal.not_equals", "does_not_equal", Ontology.NOMINAL) {
+        NOT_EQUALS_NOMINAL("gui.comparator.nominal.not_equals", "does_not_equal", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.not_equals")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -167,7 +174,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        IS_IN_NOMINAL("gui.comparator.nominal.is_in", "is_in", Ontology.NOMINAL) {
+        IS_IN_NOMINAL("gui.comparator.nominal.is_in", "is_in", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.is_in")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -189,7 +197,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        IS_NOT_IN_NOMINAL("gui.comparator.nominal.is_not_in", "is_not_in", Ontology.NOMINAL) {
+        IS_NOT_IN_NOMINAL("gui.comparator.nominal.is_not_in", "is_not_in", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.is_not_in")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -211,7 +220,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        CONTAINS("gui.comparator.nominal.contains", "contains", Ontology.NOMINAL) {
+        CONTAINS("gui.comparator.nominal.contains", "contains", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.contains")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -227,7 +237,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        NOT_CONTAINS("gui.comparator.nominal.not_contains", "does_not_contain", Ontology.NOMINAL) {
+        NOT_CONTAINS("gui.comparator.nominal.not_contains", "does_not_contain", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.not_contains")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -243,7 +254,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        STARTS_WITH("gui.comparator.nominal.starts_with", "starts_with", Ontology.NOMINAL) {
+        STARTS_WITH("gui.comparator.nominal.starts_with", "starts_with", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.starts_with")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -259,7 +271,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        ENDS_WITH("gui.comparator.nominal.ends_with", "ends_with", Ontology.NOMINAL) {
+        ENDS_WITH("gui.comparator.nominal.ends_with", "ends_with", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.ends_with")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -275,7 +288,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        REGEX("gui.comparator.nominal.regex", "matches", Ontology.NOMINAL) {
+        REGEX("gui.comparator.nominal.regex", "matches", Ontology.NOMINAL,
+                I18N.getMessage("pio.CustomFilter.comparator.nominal.regex")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -291,7 +305,8 @@ public class CustomFilter implements Condition {
                 return false;
             }
         },
-        MISSING("gui.comparator.special.is_missing", "is_missing", -1) {
+        MISSING("gui.comparator.special.is_missing", "is_missing", -1,
+                I18N.getMessage("pio.CustomFilter.comparator.special.is_missing")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -307,7 +322,8 @@ public class CustomFilter implements Condition {
                 return Double.isNaN(input);
             }
         },
-        NOT_MISSING("gui.comparator.special.is_not_missing", "is_not_missing", -1) {
+        NOT_MISSING("gui.comparator.special.is_not_missing", "is_not_missing", -1,
+                I18N.getMessage("pio.CustomFilter.comparator.special.is_not_missing")) {
             @Override
             public boolean isNumericalConditionFulfilled(final double input, final double filter) {
                 return false;
@@ -441,6 +457,11 @@ public class CustomFilter implements Condition {
         private int valueType;
 
         /**
+         * the description for this filter
+         */
+        private String desc;
+
+        /**
          * Creates a new {@link CustomFilters} instance which is represented by the specified symbol
          * and accepts the given {@link ValueType}.
          *
@@ -449,11 +470,12 @@ public class CustomFilter implements Condition {
          * @param valueType the applicable {@link Ontology#ATTRIBUTE_VALUE_TYPE}. If set to -1, denotes a
          *                  special filter which is not restricted to any value type
          */
-        private CustomFilters(final String key, final String symbol, final int valueType) {
+        private CustomFilters(final String key, final String symbol, final int valueType, final String desc) {
             this.symbol = symbol;
             this.label = key + ".label";//I18N.getMessage(I18N.getGUIBundle(), key + ".label");
             this.helptext = key + ".tip";//I18N.getMessage(I18N.getGUIBundle(), key + ".tip");
             this.valueType = valueType;
+            this.desc = desc;
         }
 
         /**
@@ -485,6 +507,10 @@ public class CustomFilter implements Condition {
          */
         public String getHelptext() {
             return helptext;
+        }
+
+        public String getDesc() {
+            return desc;
         }
 
         /**

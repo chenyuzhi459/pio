@@ -109,6 +109,7 @@ public abstract class AbstractExampleSetProcessing extends Operator {
         ExampleSet result = apply(applySet);
         originalOutput.deliver(inputExampleSet);
         exampleSetOutput.deliver(result);
+        deliverRemainExampleSet();
 
         logger.info("Process example set [%s] and deliver to the next operator successfully!",
                 inputExampleSet.getName());
@@ -120,6 +121,14 @@ public abstract class AbstractExampleSetProcessing extends Operator {
      * avoid cloning again unnecessarily.
      */
     public abstract ExampleSet apply(ExampleSet exampleSet) throws OperatorException;
+
+    /**
+     * If current operator need to deliver the remained example set to the next operator, then override
+     * this method and implement the deliver logistic. Otherwise this method do nothing.
+     */
+    public void deliverRemainExampleSet() {
+
+    }
 
     @Override
     public IOContainer getResult() {

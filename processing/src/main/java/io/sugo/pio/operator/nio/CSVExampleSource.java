@@ -103,6 +103,12 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
     }
 
     @Override
+    public void processFinished() throws OperatorException {
+	    super.processFinished();
+	    this.getParameters().clearExternalData();
+    }
+
+    @Override
     public List<ParameterType> getParameterTypes() {
         LinkedList<ParameterType> types = new LinkedList<>();
         /*ParameterType type = new ParameterTypeConfiguration(CSVExampleSourceConfigurationWizardCreator.class, this);

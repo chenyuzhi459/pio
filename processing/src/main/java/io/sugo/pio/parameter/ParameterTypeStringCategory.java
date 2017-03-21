@@ -7,88 +7,97 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Additionally users can define other strings than these given in as pre-defined categories.
  * Operators ask for the defined String with the method
  * {@link io.sugo.pio.operator.Operator#getParameterAsString(String)}.
- *
  */
 public class ParameterTypeStringCategory extends ParameterTypeSingle {
 
-	private static final long serialVersionUID = 1620216625117563601L;
+    private static final long serialVersionUID = 1620216625117563601L;
 
-	protected static final String ELEMENT_DEFAULT = "default";
+    protected static final String ELEMENT_DEFAULT = "default";
 
-	protected static final String ELEMENT_VALUES = "Values";
+    protected static final String ELEMENT_VALUES = "Values";
 
-	protected static final String ELEMENT_VALUE = "Value";
+    protected static final String ELEMENT_VALUE = "Value";
 
-	protected static final String ATTRIBUTE_IS_EDITABLE = "is-editable";
-	@JsonProperty
-	private String defaultValue = null;
-	@JsonProperty
-	private String[] categories = new String[0];
-	@JsonProperty
-	private boolean editable = true;
+    protected static final String ATTRIBUTE_IS_EDITABLE = "is-editable";
+    @JsonProperty
+    private String defaultValue = null;
+    @JsonProperty
+    private String[] categories = new String[0];
+    @JsonProperty
+    private String[] categoriesDesc = new String[0];
+    @JsonProperty
+    private boolean editable = true;
 
 
-	public ParameterTypeStringCategory(String key, String description, String[] categories) {
-		this(key, description, categories, null);
-	}
+    public ParameterTypeStringCategory(String key, String description, String[] categories) {
+        this(key, description, categories, null);
+    }
 
-	public ParameterTypeStringCategory(String key, String description, String[] categories, String defaultValue) {
-		this(key, description, categories, defaultValue, true);
-	}
+    public ParameterTypeStringCategory(String key, String description, String[] categories, String defaultValue) {
+        this(key, description, categories, defaultValue, true);
+    }
 
-	public ParameterTypeStringCategory(String key, String description, String[] categories, String defaultValue,
-									   boolean editable) {
-		super(key, description);
-		this.categories = categories;
-		this.defaultValue = defaultValue;
-		this.editable = editable;
-		setOptional(defaultValue != null);
-	}
+    public ParameterTypeStringCategory(String key, String description, String[] categories, String defaultValue,
+                                       boolean editable) {
+        this(key, description, categories, categories, defaultValue, editable);
+    }
 
-	public void setEditable(boolean editable) {
-		this.editable = editable;
-	}
+    public ParameterTypeStringCategory(String key, String description, String[] categories, String[] categoriesDesc, String defaultValue,
+                                       boolean editable) {
+        super(key, description);
+        this.categories = categories;
+        this.categoriesDesc = categoriesDesc;
+        this.defaultValue = defaultValue;
+        this.editable = editable;
+        setOptional(defaultValue != null);
+    }
 
-	public boolean isEditable() {
-		return editable;
-	}
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
 
-	@Override
-	public Object getDefaultValue() {
-		return defaultValue;
-	}
+    public boolean isEditable() {
+        return editable;
+    }
 
-	@Override
-	public void setDefaultValue(Object defaultValue) {
-		this.defaultValue = (String) defaultValue;
-	}
+    @Override
+    public Object getDefaultValue() {
+        return defaultValue;
+    }
 
-	@Override
-	public String toString(Object value) {
-		return (String) value;
-	}
+    @Override
+    public void setDefaultValue(Object defaultValue) {
+        this.defaultValue = (String) defaultValue;
+    }
 
-	public String[] getValues() {
-		return categories;
-	}
+    @Override
+    public String toString(Object value) {
+        return (String) value;
+    }
 
-	/** Returns false. */
-	@Override
-	public boolean isNumerical() {
-		return false;
-	}
+    public String[] getValues() {
+        return categories;
+    }
 
-	@Override
-	public String getRange() {
-		StringBuffer values = new StringBuffer();
-		for (int i = 0; i < categories.length; i++) {
-			if (i > 0) {
-				values.append(", ");
-			}
-			values.append(categories[i]);
-		}
-		values.append(defaultValue != null ? "; default: '" + defaultValue + "'" : "");
-		return values.toString();
-	}
+    /**
+     * Returns false.
+     */
+    @Override
+    public boolean isNumerical() {
+        return false;
+    }
+
+    @Override
+    public String getRange() {
+        StringBuffer values = new StringBuffer();
+        for (int i = 0; i < categories.length; i++) {
+            if (i > 0) {
+                values.append(", ");
+            }
+            values.append(categories[i]);
+        }
+        values.append(defaultValue != null ? "; default: '" + defaultValue + "'" : "");
+        return values.toString();
+    }
 
 }

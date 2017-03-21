@@ -30,7 +30,7 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
     /**
      * The data input from external
      */
-    private transient List<String> externalData = new ArrayList<>();
+    private transient List<String> externalData;
 
     /**
      * Creates an empty parameters object without any parameter types.
@@ -181,10 +181,17 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
     }
 
     public List<String> getExternalData() {
+        if (externalData == null) {
+            externalData =  new ArrayList<>();
+        }
         return externalData;
     }
 
     public void setExternalData(List<String> externalData) {
         this.externalData = externalData;
+    }
+
+    public void clearExternalData() {
+        this.externalData = null;
     }
 }
