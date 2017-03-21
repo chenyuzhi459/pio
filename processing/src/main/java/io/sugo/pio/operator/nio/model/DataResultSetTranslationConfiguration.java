@@ -24,7 +24,6 @@ import static io.sugo.pio.operator.nio.model.AbstractDataResultSetReader.PARAMET
  * This class holds information how a DataResultSet is translated into an ExampleSet. Therefore it
  * holds information about the final name, the value type, role and if the column is selected at
  * all.
- *
  */
 public class DataResultSetTranslationConfiguration {
 
@@ -96,7 +95,7 @@ public class DataResultSetTranslationConfiguration {
         if (readerOperator != null) {
             try {
                 dataManagementType = readerOperator.getParameterAsInt(ExampleSource.PARAMETER_DATAMANAGEMENT);
-            } catch (UndefinedParameterError e1) {
+            } catch (Exception e1) {
                 dataManagementType = DataRowFactory.TYPE_DOUBLE_ARRAY;
             }
 
@@ -171,11 +170,11 @@ public class DataResultSetTranslationConfiguration {
             tupel[1] = String.valueOf(cmd.isSelected());
             tupel[2] = Ontology.ATTRIBUTE_VALUE_TYPE.mapIndex(cmd.getAttributeValueType());
             tupel[3] = cmd.getRole();
-			String encodedTupel = ParameterTypeTupel.transformTupel2String(tupel);
-			metaDataList.add(new String[] { String.valueOf(index), encodedTupel });
+            String encodedTupel = ParameterTypeTupel.transformTupel2String(tupel);
+            metaDataList.add(new String[]{String.valueOf(index), encodedTupel});
             index++;
         }
-		operator.getParameters().setParameter(PARAMETER_META_DATA, ParameterTypeList.transformList2String(metaDataList));
+        operator.getParameters().setParameter(PARAMETER_META_DATA, ParameterTypeList.transformList2String(metaDataList));
 
         // annotations
         List<String[]> annotationList = new LinkedList<>();
@@ -184,8 +183,8 @@ public class DataResultSetTranslationConfiguration {
         }
         operator.setParameter(PARAMETER_ANNOTATIONS, ParameterTypeList.transformList2String(annotationList));
 
-		operator.getParameters().setParameter(AbstractDataResultSetReader.PARAMETER_ERROR_TOLERANT,
-				String.valueOf(isFaultTolerant()));
+        operator.getParameters().setParameter(AbstractDataResultSetReader.PARAMETER_ERROR_TOLERANT,
+                String.valueOf(isFaultTolerant()));
         operator.getParameters().setParameter(PARAMETER_FIRST_ROW_AS_NAMES, "false");
     }
 
@@ -328,8 +327,7 @@ public class DataResultSetTranslationConfiguration {
     }
 
     /**
-     * @param readerOperator
-     *            the operator to retrieve the parameter from
+     * @param readerOperator the operator to retrieve the parameter from
      */
     public static ColumnMetaData[] readColumnMetaData(AbstractDataResultSetReader readerOperator) {
         // initializing data structures
@@ -365,11 +363,13 @@ public class DataResultSetTranslationConfiguration {
                 int valueType = Ontology.ATTRIBUTE_VALUE_TYPE.mapName(metaDataDefintionValues[2]);
                 // fallback for old processes where attribute value type was saved as index
                 // rather than as string
-                if (valueType == -1) {
-                    cmd.setAttributeValueType(Integer.parseInt(metaDataDefintionValues[2]));
-                } else {
-                    cmd.setAttributeValueType(valueType);
-                }
+                try {
+                    if (valueType == -1) {
+                        cmd.setAttributeValueType(Integer.parseInt(metaDataDefintionValues[2]));
+                    } else {
+                        cmd.setAttributeValueType(valueType);
+                    }
+                } catch (Exception ignore) {}
             }
         }
         // replace those which were not specified in the list by an empty ColumnMetaData (so it

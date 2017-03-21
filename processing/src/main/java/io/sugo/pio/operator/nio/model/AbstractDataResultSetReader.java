@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.nio.model;
 
+import com.google.common.base.Strings;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
@@ -14,7 +15,6 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.PortType;
-import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.SimplePrecondition;
@@ -23,7 +23,6 @@ import io.sugo.pio.tools.Ontology;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -88,13 +87,14 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         });
     }
 
-    public InputPort getFileInputPort() {
-        return fileInputPort;
-    }
-
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
         logger.info("AbstractDataResultSetReader begin to load data result set...");
+
+        String metaData = getParameterAsString(PARAMETER_META_DATA);
+        if (Strings.isNullOrEmpty(metaData)) {
+            throw new OperatorException("pio.error.file_metadata_not_set");
+        }
 
         // loading data result set
         final ExampleSet exampleSet;
@@ -114,31 +114,6 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
 
         logger.info("AbstractDataResultSetReader load data of size[%d].", exampleSet.size());
         return exampleSet;
-    }
-
-    protected abstract DataResultSetFactory getDataResultSetFactory();
-
-    /**
-     * Returns the configured number format or null if a default number format should be used.
-     */
-    protected abstract NumberFormat getNumberFormat() throws OperatorException;
-
-    /**
-     * Returns the name of the {@link ParameterTypeFile} to be added through which the user can
-     * specify the file name.
-     */
-    protected abstract String getFileParameterName();
-
-    /**
-     * Returns the allowed file extension.
-     */
-    protected abstract String getFileExtension();
-
-    /**
-     * Returns the allowed file extensions.
-     */
-    protected String[] getFileExtensions() {
-        return new String[]{getFileExtension()};
     }
 
     /**
@@ -173,12 +148,14 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
 
     @Override
     public MetaData getGeneratedMetaData() throws OperatorException {
-        ExampleSetMetaData result = (ExampleSetMetaData) getParameters().getExternalMetaData();
-        DataResultSetTranslationConfiguration configuration = new DataResultSetTranslationConfiguration(this);
-        ColumnMetaData[] columnMetaDatas = buildColumnMetadataInfo(result);
-        configuration.setColumnMetaData(columnMetaDatas);
-        if (columnMetaDatas != null) {
-            configuration.setParameters(this);
+//        this.getParameters().setParameter(PARAMETER_META_DATA, "0:NO.true.integer.id;1:category.true.polynominal.label;2:attribute_1.true.real.attribute;3:attribute_2.true.real.attribute;4:attribute_3.true.real.attribute;5:attribute_4.true.real.attribute;6:attribute_5.true.real.attribute;7:attribute_6.true.real.attribute;8:attribute_7.true.real.attribute;9:attribute_8.true.real.attribute;10:attribute_9.true.real.attribute;11:attribute_10.true.real.attribute");
+//        this.getParameters().setParameter("csv_file", "F:/lr.csv");
+        ExampleSetMetaData result = new ExampleSetMetaData();
+        ColumnMetaData[] columnMetaDatas = DataResultSetTranslationConfiguration.readColumnMetaData(this);
+        if (columnMetaDatas.length > 0) {
+            for (ColumnMetaData columnMetaData : columnMetaDatas) {
+                result.addAttribute(columnMetaData.getAttributeMetaData());
+            }
         }
 
         return result;
@@ -194,28 +171,33 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         }
     }*/
 
-    private ColumnMetaData[] buildColumnMetadataInfo(ExampleSetMetaData exampleSetMetaData) {
-        if (exampleSetMetaData != null) {
-            Iterator<AttributeMetaData> it = exampleSetMetaData.getAllAttributes().iterator();
-            int size = exampleSetMetaData.getAllAttributes().size();
-            ColumnMetaData[] columnMetaDatas = new ColumnMetaData[size];
-            int i = 0;
-            while (it.hasNext()) {
-                AttributeMetaData attrMetadata = it.next();
-                ColumnMetaData columnMetaData = new ColumnMetaData();
-//                columnMetaData.setOriginalAttributeName(attrMetadata.getName());
-                columnMetaData.setUserDefinedAttributeName(attrMetadata.getName());
-                columnMetaData.setAttributeValueType(attrMetadata.getValueType());
-                columnMetaData.setRole(attrMetadata.getRole());
-                columnMetaData.setSelected(true);
+    public InputPort getFileInputPort() {
+        return fileInputPort;
+    }
 
-                columnMetaDatas[i++] = columnMetaData;
-            }
+    protected abstract DataResultSetFactory getDataResultSetFactory();
 
-            return columnMetaDatas;
-        }
+    /**
+     * Returns the configured number format or null if a default number format should be used.
+     */
+    protected abstract NumberFormat getNumberFormat() throws OperatorException;
 
-        return null;
+    /**
+     * Returns the name of the {@link ParameterTypeFile} to be added through which the user can
+     * specify the file name.
+     */
+    protected abstract String getFileParameterName();
+
+    /**
+     * Returns the allowed file extension.
+     */
+    protected abstract String getFileExtension();
+
+    /**
+     * Returns the allowed file extensions.
+     */
+    protected String[] getFileExtensions() {
+        return new String[]{getFileExtension()};
     }
 
     @Override
@@ -262,10 +244,10 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
                 new ParameterTypeTupel(PARAMETER_COLUMN_META_DATA, "The meta data definition of one column", //
                         new ParameterTypeString(PARAMETER_COLUMN_NAME, "Describes the attributes name.", ""), //
                         new ParameterTypeBoolean(PARAMETER_COLUMN_SELECTED, "Indicates if a column is selected", true), //
-                        new ParameterTypeCategory(PARAMETER_COLUMN_VALUE_TYPE, "Indicates the value type of an attribute",
-                                Ontology.VALUE_TYPE_NAMES, Ontology.NOMINAL), //
+                        new ParameterTypeStringCategory(PARAMETER_COLUMN_VALUE_TYPE, "Indicates the value type of an attribute",
+                                Ontology.VALUE_TYPE_NAMES, "attribute_value"), //
                         new ParameterTypeStringCategory(PARAMETER_COLUMN_ROLE, "Indicates the role of an attribute",
-                                Attributes.KNOWN_ATTRIBUTE_TYPES, AbstractDataReader.AttributeColumn.REGULAR)));
+                                Attributes.KNOWN_ATTRIBUTE_TYPES, Attributes.ATTRIBUTE_NAME)));
 
         types.add(type);
 //        types.add(new ParameterTypeBoolean(PARAMETER_ERROR_TOLERANT,
@@ -289,7 +271,7 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
     /**
      * Returns either the selected file referenced by the value of the parameter with the name
      * {@link #getFileParameterName()} or the file delivered at {@link #fileInputPort}. Which of
-     * these options is chosen is determined by the parameter {@link #PARAMETER_DESTINATION_TYPE}.
+     * these options is chosen is determined by the parameter {@link #}.
      */
     public File getSelectedFile() throws OperatorException {
         return filePortHandler.getSelectedFile();

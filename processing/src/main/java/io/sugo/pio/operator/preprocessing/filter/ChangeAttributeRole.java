@@ -11,7 +11,10 @@ import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.operator.error.AttributeNotFoundError;
 import io.sugo.pio.operator.preprocessing.AbstractDataProcessing;
-import io.sugo.pio.parameter.*;
+import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeAttribute;
+import io.sugo.pio.parameter.ParameterTypeStringCategory;
+import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.AttributeSetPrecondition;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
@@ -22,7 +25,7 @@ import java.util.List;
 /**
  * <p>
  * This operator can be used to change the attribute type of an attribute of the input example set.
- * If you want to change the attribute name you should use the {@link ChangeAttributeName} operator.
+ * If you want to change the attribute name you should use the {@link } operator.
  * </p>
  * <p>
  * <p>
@@ -68,9 +71,14 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
     public static final String PARAMETER_CHANGE_ATTRIBUTES = "set_additional_roles";
 
     private static final String REGULAR_NAME = "regular";
+    private static final String REGULAR_NAME_DESC = I18N.getMessage("pio.ChangeAttributeRole.regular_name");
 
+    /*private static final String[] TARGET_ROLES = new String[]{REGULAR_NAME, Attributes.ID_NAME, Attributes.LABEL_NAME,
+            Attributes.PREDICTION_NAME, Attributes.CLUSTER_NAME, Attributes.WEIGHT_NAME, Attributes.BATCH_NAME};*/
     private static final String[] TARGET_ROLES = new String[]{REGULAR_NAME, Attributes.ID_NAME, Attributes.LABEL_NAME,
-            Attributes.PREDICTION_NAME, Attributes.CLUSTER_NAME, Attributes.WEIGHT_NAME, Attributes.BATCH_NAME};
+            Attributes.PREDICTION_NAME};
+    private static final String[] TARGET_ROLES_DESC = new String[]{REGULAR_NAME_DESC, Attributes.ID_NAME_DESC,
+            Attributes.LABEL_NAME_DESC, Attributes.PREDICTION_NAME_DESC};
 
 //    private final OperatorVersion VERSION_BEFORE_KEEPING_SPECIAL_ATT_WHEN_IT_LOSE_ROLE = new OperatorVersion(5, 3, 13);
 
@@ -201,19 +209,19 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
                 I18N.getMessage("pio.ChangeAttributeRole.attribute_name"),
                 getExampleSetInputPort(), false, false));
         ParameterType type = new ParameterTypeStringCategory(PARAMETER_TARGET_ROLE,
-                I18N.getMessage("pio.ChangeAttributeRole.target_role"), TARGET_ROLES,
-                TARGET_ROLES[0]);
+                I18N.getMessage("pio.ChangeAttributeRole.target_role"), TARGET_ROLES, TARGET_ROLES_DESC,
+                TARGET_ROLES[0], true);
 //		type.setExpert(false);
         types.add(type);
 
-        types.add(new ParameterTypeList(PARAMETER_CHANGE_ATTRIBUTES,
+        /*types.add(new ParameterTypeList(PARAMETER_CHANGE_ATTRIBUTES,
                 I18N.getMessage("pio.ChangeAttributeRole.set_additional_roles"),
                 new ParameterTypeAttribute(PARAMETER_NAME,
                         I18N.getMessage("pio.ChangeAttributeRole.attribute_name"),
                         getExampleSetInputPort(), false, false),
                 new ParameterTypeStringCategory(PARAMETER_TARGET_ROLE,
                         I18N.getMessage("pio.ChangeAttributeRole.target_role"),
-                        TARGET_ROLES, TARGET_ROLES[0])));
+                        TARGET_ROLES, TARGET_ROLES[0])));*/
         return types;
     }
 

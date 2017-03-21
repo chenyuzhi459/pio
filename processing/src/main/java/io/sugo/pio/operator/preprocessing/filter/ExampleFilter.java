@@ -247,7 +247,7 @@ public class ExampleFilter extends AbstractDataProcessing {
         List<CompareTuple> compareOpts = new ArrayList<>();
         CustomFilter.CustomFilters[] filters = CustomFilter.CustomFilters.values();
         for (CustomFilter.CustomFilters filter : filters) {
-            compareOpts.add(new CompareTuple(filter.getSymbol(), filter.getValueType()));
+            compareOpts.add(new CompareTuple(filter.getSymbol(), filter.getValueType(), filter.getDesc()));
         }
         type = new ParameterTypeCompare(PARAMETER_FILTERS_LIST, I18N.getMessage("pio.ExampleFilter.filters_list"), getInputPort(), compareOpts);
         types.add(type);

@@ -328,13 +328,16 @@ public class WeightedMultiClassPerformance extends MeasuredPerformance implement
         StringBuffer result = new StringBuffer(super.toString());
         result.append(", weights: ");
         boolean first = true;
-        for (double w : this.classWeights) {
-            if (!first) {
-                result.append(", ");
+        if (this.classWeights != null) {
+            for (double w : this.classWeights) {
+                if (!first) {
+                    result.append(", ");
+                }
+                result.append(Tools.formatIntegerIfPossible(w));
+                first = false;
             }
-            result.append(Tools.formatIntegerIfPossible(w));
-            first = false;
         }
+
         return result.toString();
     }
 
@@ -344,16 +347,19 @@ public class WeightedMultiClassPerformance extends MeasuredPerformance implement
     public String toString() {
         StringBuffer result = new StringBuffer(toWeightString() + "");
         result.append(Tools.getLineSeparator() + "ConfusionMatrix:" + Tools.getLineSeparator() + "True:");
-        for (int i = 0; i < this.counter.length; i++) {
-            result.append("\t" + classNames[i]);
-        }
+        if (this.counter != null) {
+            for (int i = 0; i < this.counter.length; i++) {
+                result.append("\t" + classNames[i]);
+            }
 
-        for (int i = 0; i < this.counter.length; i++) {
-            result.append(Tools.getLineSeparator() + classNames[i] + ":");
-            for (int j = 0; j < this.counter[i].length; j++) {
-                result.append("\t" + Tools.formatIntegerIfPossible(this.counter[j][i]));
+            for (int i = 0; i < this.counter.length; i++) {
+                result.append(Tools.getLineSeparator() + classNames[i] + ":");
+                for (int j = 0; j < this.counter[i].length; j++) {
+                    result.append("\t" + Tools.formatIntegerIfPossible(this.counter[j][i]));
+                }
             }
         }
+
         return result.toString();
     }
 

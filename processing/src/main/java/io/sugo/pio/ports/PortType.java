@@ -9,6 +9,7 @@ public enum PortType {
     EXAMPLE_SET("example set", I18N.getMessage("pio.PortType.example_set")),
     EXAMPLE_SET_INPUT("example set input", I18N.getMessage("pio.PortType.example_set_input")),
     EXAMPLE_SET_OUTPUT("example set output", I18N.getMessage("pio.PortType.example_set_output")),
+    REMAINED_EXAMPLE_SET_OUTPUT("remained example set output", I18N.getMessage("pio.PortType.remained_example_set_output")),
     ORIGINAL("original", I18N.getMessage("pio.PortType.original")),
     TRAINING_EXAMPLES("training examples", I18N.getMessage("pio.PortType.training_examples")),
     UNMATCHED_EXAMPLE_SET("unmatched example set", I18N.getMessage("pio.PortType.unmatched_example_set")),

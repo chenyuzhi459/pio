@@ -35,7 +35,6 @@ import java.util.Map;
 
 /**
  * A class holding information about syntactical configuration for parsing CSV files
- *
  */
 public class CSVResultSetConfiguration implements DataResultSetFactory {
 
@@ -72,13 +71,10 @@ public class CSVResultSetConfiguration implements DataResultSetFactory {
      * This constructor reads all settings from the parameters of the given operator.
      */
     public CSVResultSetConfiguration(CSVExampleSource csvExampleSource) throws OperatorException {
-        // if (csvExampleSource.isParameterSet(CSVExampleSource.PARAMETER_CSV_FILE)) {
-        // setCsvFile(csvExampleSource.getParameterAsString(CSVExampleSource.PARAMETER_CSV_FILE));
-        // }
-        if (csvExampleSource.isFileSpecified()) {
-			setCsvFile(csvExampleSource.getSelectedFile().getAbsolutePath());
-        }
-//        setCsvFile("F:\\lr.csv");
+        /*if (csvExampleSource.isFileSpecified()) {
+            setCsvFile(csvExampleSource.getSelectedFile().getAbsolutePath());
+        }*/
+        setCsvFile(csvExampleSource.getParameterAsString(CSVExampleSource.PARAMETER_CSV_FILE));
         setSkipComments(csvExampleSource.getParameterAsBoolean(CSVExampleSource.PARAMETER_SKIP_COMMENTS));
         setUseQuotes(csvExampleSource.getParameterAsBoolean(CSVExampleSource.PARAMETER_USE_QUOTES));
         // setFirstRowAsAttributeNames(csvExampleSource.getParameterAsBoolean(CSVExampleSource.PARAMETER_USE_FIRST_ROW_AS_ATTRIBUTE_NAMES));
@@ -116,9 +112,13 @@ public class CSVResultSetConfiguration implements DataResultSetFactory {
 
     @Override
     public DataResultSet makeDataResultSet(Operator operator) throws OperatorException {
-        if (Strings.isNullOrEmpty(csvFile)) {
-            logger.info("CSVResultSetConfiguration not found csv file, and initiate the mode that read csv from memory.");
+        if (!operator.getParameters().getExternalData().isEmpty()) {
+            logger.info("CSVResultSetConfiguration found csv content in memory, and initiate the mode that read csv from memory.");
             return new CSVMemoryResultSet(this, operator);
+        }
+
+        if (Strings.isNullOrEmpty(csvFile)) {
+            throw new OperatorException("pio.error.file_not_specfied");
         }
 
         logger.info("CSVResultSetConfiguration found csv file[%s], and initiate the mode that read csv from file.", csvFile);
