@@ -82,7 +82,7 @@ public final class ResultSetAdapterUtils {
 	 * @throws DataSetException
 	 *             if the meta data fetching fails
 	 */
-	public static DataSetMetaData createMetaData(DataResultSet resultSet, NumberFormat numberFormat, int startingRowIndex,
+	/*public static DataSetMetaData createMetaData(DataResultSet resultSet, NumberFormat numberFormat, int startingRowIndex,
 												 int headerRowIndex) throws HeaderRowNotFoundException, StartRowNotFoundException,
 			HeaderRowBehindStartRowException, DataSetException, ParseException {
 
@@ -103,7 +103,7 @@ public final class ResultSetAdapterUtils {
 			throw new DataSetException(e.getMessage(), e);
 		}
 
-	}
+	}*/
 
 	/**
 	 * Checks if the start row is contained in the resultSet.
@@ -115,7 +115,7 @@ public final class ResultSetAdapterUtils {
 	 * @throws OperatorException
 	 *             in case the underlying file could not be read
 	 */
-	private static void checkStartRow(DataResultSet resultSet, int startingRowIndex)
+	/*private static void checkStartRow(DataResultSet resultSet, int startingRowIndex)
 			throws StartRowNotFoundException, OperatorException {
 		while (resultSet.getCurrentRow() < startingRowIndex) {
 			if (!resultSet.hasNext()) {
@@ -124,7 +124,7 @@ public final class ResultSetAdapterUtils {
 //			resultSet.next(null);
 			resultSet.next();
 		}
-	}
+	}*/
 
 	/**
 	 * Reads the column names from the resultSet given the configuration.
@@ -146,7 +146,7 @@ public final class ResultSetAdapterUtils {
 	 * @throws OperatorException
 	 *             if reading the resultSet failed
 	 */
-	private static String[] getColumnNames(DataResultSet resultSet, int headerRowIndex, int startingRowIndex,
+	/*private static String[] getColumnNames(DataResultSet resultSet, int headerRowIndex, int startingRowIndex,
 			int numberOfColumns) throws HeaderRowNotFoundException, OperatorException, StartRowNotFoundException {
 //		resultSet.reset(null);
 		String[] defaultNames = resultSet.getColumnNames();
@@ -198,14 +198,14 @@ public final class ResultSetAdapterUtils {
 		checkStartRow(resultSet, startingRowIndex);
 		return columnNames;
 
-	}
+	}*/
 
 	/**
 	 * Guesses column types by using the
 	 * {@link DataResultSetTranslator#guessValueTypes(DataResultSetTranslationConfiguration, DataResultSet, ProgressListener)}
 	 * logic and transforming the guessed value types into {@link ColumnType}s.
 	 */
-	private static List<ColumnType> guessColumnTypes(DataResultSet dataResultSet, int startingRow, int headerRow,
+	/*private static List<ColumnType> guessColumnTypes(DataResultSet dataResultSet, int startingRow, int headerRow,
 			int numberOfColumns, NumberFormat numberFormat) throws DataSetException, ParseException {
 
 		try {
@@ -219,12 +219,12 @@ public final class ResultSetAdapterUtils {
 		} catch (OperatorException e) {
 			throw new DataSetException(e.getMessage(), e);
 		}
-	}
+	}*/
 
 	/**
 	 * Transforms a {@link Ontology#ATTRIBUTE_VALUE_TYPE} into a {@link ColumnType}.
 	 */
-	public static ColumnType transformValueType(int valueType) {
+	/*public static ColumnType transformValueType(int valueType) {
 		switch (valueType) {
 			case Ontology.TIME:
 				return ColumnType.TIME;
@@ -242,12 +242,12 @@ public final class ResultSetAdapterUtils {
 			default:
 				return ColumnType.CATEGORICAL;
 		}
-	}
+	}*/
 
 	/**
 	 * Transforms a {@link ColumnType} into a {@link Ontology#ATTRIBUTE_VALUE_TYPE} .
 	 */
-	public static int transformColumnType(ColumnType columnType) {
+	/*public static int transformColumnType(ColumnType columnType) {
 		switch (columnType) {
 			case DATETIME:
 				return Ontology.DATE_TIME;
@@ -266,7 +266,7 @@ public final class ResultSetAdapterUtils {
 				return Ontology.POLYNOMINAL;
 
 		}
-	}
+	}*/
 
 	/**
 	 * Uses the {@link DataResultSetTranslator} to guess the valueTypes.
@@ -286,7 +286,7 @@ public final class ResultSetAdapterUtils {
 	 * @throws OperatorException
 	 *             if the guessing failed because of an IOException
 	 */
-	private static int[] getValueTypes(DataResultSet dataResultSet, int startingRow, int headerRow, int numberOfColumns,
+	/*private static int[] getValueTypes(DataResultSet dataResultSet, int startingRow, int headerRow, int numberOfColumns,
 			NumberFormat numberFormat) throws OperatorException, ParseException {
 
 		// generate a DataResultSetTranslationConfiguration
@@ -306,7 +306,7 @@ public final class ResultSetAdapterUtils {
 		}
 
 		return valueTypes;
-	}
+	}*/
 
 	/**
 	 * Creates a list of annotations used by the {@link DataResultSet} to define comment and name
@@ -318,7 +318,7 @@ public final class ResultSetAdapterUtils {
 	 *            the header row index
 	 * @return the annotations associated to the configuration
 	 */
-	private static List<String> getAnnotations(int startingRow, int headerRow) {
+	/*private static List<String> getAnnotations(int startingRow, int headerRow) {
 		int lastCommentRow = startingRow - 1;
 		int max = Math.max(headerRow, lastCommentRow);
 		List<String> annotations = new ArrayList<>(max + 1);
@@ -332,6 +332,6 @@ public final class ResultSetAdapterUtils {
 			}
 		}
 		return annotations;
-	}
+	}*/
 
 }

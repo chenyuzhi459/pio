@@ -1,5 +1,7 @@
 package io.sugo.pio.example;
 
+import io.sugo.pio.i18n.I18N;
+
 import java.io.Serializable;
 import java.util.Iterator;
 
@@ -15,40 +17,55 @@ public interface Attributes extends Iterable<Attribute>, Cloneable, Serializable
 
     /** The name of the confidence special attributes. */
     public static final String CONFIDENCE_NAME = "confidence";
+    public static final String CONFIDENCE_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.confidence");
 
     /** The name of the special attribute label. */
     public static final String LABEL_NAME = "label";
+    public static final String LABEL_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.label");
 
     /** The name of the special attribute id. */
     public static final String ID_NAME = "id";
+    public static final String ID_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.id");
 
     /** The name of the special attribute prediction. */
     public static final String PREDICTION_NAME = "prediction";
+    public static final String PREDICTION_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.prediction");
 
     /** The name of regular attributes. */
     public static final String ATTRIBUTE_NAME = "attribute";
+    public static final String ATTRIBUTE_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.attribute");
 
     /** The name of the special attribute outlier. */
     public static final String OUTLIER_NAME = "outlier";
+    public static final String OUTLIER_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.outlier");
 
     /** The name of the classification cost special attribute. */
     public static final String CLASSIFICATION_COST = "cost";
+    public static final String CLASSIFICATION_COST_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.cost");
 
     /** The name of the classification cost special attribute. */
     public static final String BASE_VALUE = "base_value";
+    public static final String BASE_VALUE_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.base_value");
 
     /** The name of the special attribute cluster. */
     public static final String CLUSTER_NAME = "cluster";
+    public static final String CLUSTER_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.cluster");
 
     /** The name of the special attribute weight (example weights). */
     public static final String WEIGHT_NAME = "weight";
+    public static final String WEIGHT_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.weight");
 
     /** The name of the special attribute batch. */
     public static final String BATCH_NAME = "batch";
+    public static final String BATCH_NAME_DESC = I18N.getMessage("pio.Attributes.known_attribute_types.batch");
 
     /** All known names of regular and special attribute types as an array. */
-    public static final String[] KNOWN_ATTRIBUTE_TYPES = new String[] { ATTRIBUTE_NAME, LABEL_NAME, ID_NAME,
-            BATCH_NAME, CLUSTER_NAME, PREDICTION_NAME, OUTLIER_NAME, CLASSIFICATION_COST, BASE_VALUE };
+    /*public static final String[] KNOWN_ATTRIBUTE_TYPES = new String[] { ATTRIBUTE_NAME, LABEL_NAME, ID_NAME,
+            BATCH_NAME, CLUSTER_NAME, PREDICTION_NAME, OUTLIER_NAME, CLASSIFICATION_COST, BASE_VALUE };*/
+    public static final String[] KNOWN_ATTRIBUTE_TYPES = new String[] { ATTRIBUTE_NAME_DESC, LABEL_NAME_DESC, ID_NAME_DESC,
+            PREDICTION_NAME_DESC };
+    public static final String[] KNOWN_ATTRIBUTE_TYPES_VALUE = new String[] { ATTRIBUTE_NAME, LABEL_NAME, ID_NAME,
+            PREDICTION_NAME };
 
     /** Returns a clone of this attribute set. */
     public Object clone();

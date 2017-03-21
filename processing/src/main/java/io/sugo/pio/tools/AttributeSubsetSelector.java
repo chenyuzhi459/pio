@@ -40,8 +40,18 @@ public class AttributeSubsetSelector {
 
     public static final String PARAMETER_INCLUDE_SPECIAL_ATTRIBUTES = "include_special_attributes";
 
-    public static String[] CONDITION_NAMES = new String[]{"all", "single", "subset", "regular_expression", "value_type",
-            "block_type", "no_missing_values", "numeric_value_filter"};
+    /*public static String[] CONDITION_NAMES = new String[]{"all", "single", "subset", "regular_expression", "value_type",
+            "block_type", "no_missing_values", "numeric_value_filter"};*/
+    public static String[] CONDITION_NAMES = new String[]{
+            io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.condition_names.all"),
+            io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.condition_names.single"),
+            io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.condition_names.subset"),
+            io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.condition_names.regular_expression"),
+            io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.condition_names.value_type"),
+            io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.condition_names.block_type"),
+            io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.condition_names.no_missing_values"),
+            io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.condition_names.numeric_value_filter")
+    };
 
     private static Class<?>[] CONDITION_IMPLEMENTATIONS = {TransparentAttributeFilter.class, SingleAttributeFilter.class,
             SubsetAttributeFilter.class, RegexpAttributeFilter.class, ValueTypeAttributeFilter.class,

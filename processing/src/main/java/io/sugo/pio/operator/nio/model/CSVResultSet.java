@@ -240,7 +240,9 @@ public class CSVResultSet implements DataResultSet {
         try {
             URL url = new URL(configuration.getCsvFile());
             try {
-                return WebServiceTools.openStreamFromURL(url);
+                InputStream inputStream = WebServiceTools.openStreamFromURL(url);
+                log.info("CSVResultSet read csv file from url[%s].", configuration.getCsvFile());
+                return inputStream;
             } catch (IOException e) {
                 throw new UserError(operator, "pio.error.file_not_found", e, configuration.getCsvFile());
             }
@@ -249,10 +251,13 @@ public class CSVResultSet implements DataResultSet {
             try {
                 String csvFile = configuration.getCsvFile();
                 if (csvFile == null) {
-                    throw new UserError(this.operator, "file_consumer.no_file_defined");
+                    throw new UserError(this.operator, "pio.error.file_not_specfied");
                 }
 
-                return new FileInputStream(csvFile);
+                InputStream inputStream = new FileInputStream(csvFile);
+                log.info("CSVResultSet read csv file from local file[%s].", csvFile);
+
+                return inputStream;
             } catch (FileNotFoundException e1) {
                 throw new UserError(operator, "pio.error.file_not_found", e1, configuration.getCsvFile());
             }

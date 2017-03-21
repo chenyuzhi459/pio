@@ -143,7 +143,7 @@ public class CSVDataSource extends FileDataSource {
 	 *             in case the starting row or header row do not exist or the specified CSV file
 	 *             could not be read because of IO issues
 	 */
-	void createMetaData() throws DataSetException, ParseException {
+	/*void createMetaData() throws DataSetException, ParseException {
 
 		// create a new CSV ResultSet configuration which reads the whole selected file
 		// we cannot call getData() here as it might already skip the first lines
@@ -170,7 +170,7 @@ public class CSVDataSource extends FileDataSource {
 				throw new DataSetException(e.getMessage(), e);
 			}
 		}
-	}
+	}*/
 
 	@Override
 	public DataSourceConfiguration getConfiguration() {

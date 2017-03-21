@@ -106,10 +106,16 @@ public class NumericToBinominal extends NumericToNominal {
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
-        types.add(new ParameterTypeDouble(PARAMETER_MIN, I18N.getMessage("pio.NumericToBinominal.min"),
-                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0d));
-        types.add(new ParameterTypeDouble(PARAMETER_MAX, I18N.getMessage("pio.NumericToBinominal.max"),
-                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0d));
+        ParameterTypeDouble minType = new ParameterTypeDouble(PARAMETER_MIN, I18N.getMessage("pio.NumericToBinominal.min"),
+                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0d);
+        minType.setHidden(true);
+        types.add(minType);
+
+        ParameterTypeDouble maxType = new ParameterTypeDouble(PARAMETER_MAX, I18N.getMessage("pio.NumericToBinominal.max"),
+                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0d);
+        maxType.setHidden(true);
+        types.add(maxType);
+
         return types;
     }
 
