@@ -1,12 +1,15 @@
 package io.sugo.pio.dl4j.learner;
 
 import io.sugo.pio.OperatorProcess;
-import io.sugo.pio.dl4j.layers.DenseLayer;
 import io.sugo.pio.dl4j.layers.OutputLayer;
+import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole;
 import io.sugo.pio.ports.Connection;
-import io.sugo.pio.ports.PortType;
 import org.junit.Test;
+
+import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_NAME;
+import static io.sugo.pio.operator.preprocessing.filter.ChangeAttributeRole.PARAMETER_TARGET_ROLE;
 
 /**
  */
@@ -25,6 +28,12 @@ public class SimpleNeuralNetworkTest {
         DatabaseDataReader dbReader = getDbReader();
         process.getRootOperator().getExecutionUnit().addOperator(dbReader);
 
+        ChangeAttributeRole role = new ChangeAttributeRole();
+        role.setName("change_role");
+        role.setParameter(PARAMETER_NAME, "is_default");
+        role.setParameter(PARAMETER_TARGET_ROLE, "label");
+        process.getRootOperator().getExecutionUnit().addOperator(role);
+
         SimpleNeuralNetwork simpleNeuralNetwork = new SimpleNeuralNetwork();
         simpleNeuralNetwork.setName("simpleNetwork");
         process.getRootOperator().getExecutionUnit().addOperator(simpleNeuralNetwork);
@@ -38,11 +47,13 @@ public class SimpleNeuralNetworkTest {
         simpleNeuralNetwork.getExecutionUnit(0).addOperator(outputLayer);
 
         outputLayer.getProcess().connect(new Connection("simpleNetwork", "start", "output", "through"), true);
-//        input.getProcess().connect(new Connection("input", "through", "output", "through"), true);
-//
-//
-        process.connect(new Connection("operator_db_reader", "output", "simpleNetwork", "training examples"), true);
+
+        process.connect(new Connection("operator_db_reader", "output", "change_role", "example set input"), true);
+        process.connect(new Connection("change_role", "example set output", "simpleNetwork", "training examples"), true);
         process.run();
+
+        IOContainer result = simpleNeuralNetwork.getResult();
+        System.out.println(result);
     }
 
     private DatabaseDataReader getDbReader() {

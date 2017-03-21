@@ -7,9 +7,7 @@ import io.sugo.pio.dl4j.layers.SubSamplingLayer;
 import io.sugo.pio.dl4j.model.MultiLayerNetModel;
 import io.sugo.pio.dl4j.modeling.prediction.AbstractDLModelLearner;
 import io.sugo.pio.example.ExampleSet;
-import io.sugo.pio.operator.Model;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.OperatorGroup;
+import io.sugo.pio.operator.*;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -135,5 +133,12 @@ public class SimpleNeuralNetwork extends AbstractDLModelLearner {
         MultiLayerConfiguration config = listBuilder.build();
         model.train(exampleSet, config, shuffle, normalize, layerNames);
         return model;
+    }
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(modelPort.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
     }
 }

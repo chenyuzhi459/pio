@@ -24,11 +24,11 @@ public class Word2VecModel extends AbstractModel {
     }
 
     public Word2Vec getModel(){
-        return this.vec;
+        return vec;
     }
 
     public ExampleSet getResult(){
-        return this.resultTable;
+        return resultTable;
     }
 
     @Override
