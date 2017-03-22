@@ -129,8 +129,9 @@ public class ProcessManager {
         }
     }
 
-    public OperatorProcess create(String name, String description) {
+    public OperatorProcess create(String tenantId, String name, String description) {
         OperatorProcess process = new OperatorProcess(name);
+        process.setTenantId(tenantId);
         process.setDescription(description);
         processCache.put(process.getId(), process);
         metadataProcessManager.insert(process);
@@ -194,8 +195,8 @@ public class ProcessManager {
         }
     }
 
-    public List<OperatorProcess> getAll(boolean all) {
-        List<OperatorProcess> processes = metadataProcessManager.getAll(all);
+    public List<OperatorProcess> getAll(String tenantId, boolean all) {
+        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, all);
         if (processes == null || processes.isEmpty()) {
             return new ArrayList<>();
         }

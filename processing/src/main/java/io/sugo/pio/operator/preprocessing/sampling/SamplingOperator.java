@@ -8,9 +8,7 @@ import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.MappedExampleSet;
 import io.sugo.pio.example.set.SplittedExampleSet;
 import io.sugo.pio.i18n.I18N;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.operator.UserError;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.annotation.ResourceConsumptionEstimator;
 import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.operator.preprocessing.sampling.sequences.AbsoluteSamplingSequenceGenerator;
@@ -79,6 +77,8 @@ public class SamplingOperator extends AbstractSamplingOperator {
 
     public static final String PARAMETER_SAMPLE_PROBABILITY_LIST = "sample_probability_per_class";
 
+    private ExampleSet unusedExampleSet;
+
     public SamplingOperator() {
         super();
 
@@ -102,6 +102,16 @@ public class SamplingOperator extends AbstractSamplingOperator {
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.SamplingOperator.description");
+    }
+
+    @Override
+    public IOContainer getResult() {
+        IOContainer container = super.getResult();
+
+        List<IOObject> ioObjects = container.getIoObjects();
+        ioObjects.add(remainedExampleSetOutput.getAnyDataOrNull());
+
+        return container;
     }
 
     @Override
@@ -156,6 +166,8 @@ public class SamplingOperator extends AbstractSamplingOperator {
     public ExampleSet apply(ExampleSet originalSet) throws OperatorException {
         int resultSize = 0;
         int[] usedIndices = new int[originalSet.size()];
+        int unusedResultSize = 0;
+        int[] unusedIndices = new int[originalSet.size()];
 
         SplittedExampleSet perLabelSets = null;
         int numberOfIterations = 1; // if sampling not per class, just one iteration
@@ -269,7 +281,10 @@ public class SamplingOperator extends AbstractSamplingOperator {
                         usedIndices[resultSize] = j;
                     }
                     resultSize++;
+                } else {
+                    unusedIndices[unusedResultSize++] = j;
                 }
+
             }
         }
 
@@ -277,12 +292,17 @@ public class SamplingOperator extends AbstractSamplingOperator {
         int[] resultIndices = new int[resultSize];
         System.arraycopy(usedIndices, 0, resultIndices, 0, resultSize);
 
+        // create new filtered unused example set
+        int[] unusedResultIndices = new int[unusedResultSize];
+        System.arraycopy(unusedIndices, 0, unusedResultIndices, 0, unusedResultSize);
+        unusedExampleSet = new MappedExampleSet(originalSet, unusedResultIndices, true, true);
+
         return new MappedExampleSet(originalSet, resultIndices, true, true);
     }
 
     @Override
     public void deliverRemainExampleSet() {
-        remainedExampleSetOutput.deliver(null);
+        remainedExampleSetOutput.deliver(unusedExampleSet);
     }
 
     @Override

@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/pio/process/drain")
+@Path("/pio/process/drain/")
 public class DrainWarning {
     private static final Logger log = new Logger(DrainWarning.class);
     private final ObjectMapper jsonMapper;
@@ -41,7 +41,7 @@ public class DrainWarning {
     @Path("/param/{type}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response updateParameter(@PathParam("processId") final String type, List<OperatorParamDto> paramList) {
+    public Response updateParameter(@PathParam("type") final String type, List<OperatorParamDto> paramList) {
         String operatorId;
         if ("train".equals(type)) {
             operatorId = OPERATOR_ID_CSV_TRAIN;
@@ -61,7 +61,7 @@ public class DrainWarning {
     @Path("/data{type}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response updateExampleData(@PathParam("processId") final String type, List<String> dataList) {
+    public Response updateExampleData(@PathParam("type") final String type, List<String> dataList) {
         String operatorId;
         if ("train".equals(type)) {
             operatorId = OPERATOR_ID_CSV_TRAIN;

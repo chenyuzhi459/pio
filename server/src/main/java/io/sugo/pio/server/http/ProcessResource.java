@@ -39,11 +39,11 @@ public class ProcessResource {
     }
 
     @GET
-    @Path("/")
+    @Path("/list/{tenantId}")
     @Produces({MediaType.APPLICATION_JSON})
-    public Response getAll(@QueryParam("all") boolean all) {
+    public Response getAll(@PathParam("tenantId") final String tenantId, @QueryParam("all") boolean all) {
         try {
-            List<OperatorProcess> processes = processManager.getAll(all);
+            List<OperatorProcess> processes = processManager.getAll(tenantId, all);
             return Response.ok(processes).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
@@ -51,10 +51,10 @@ public class ProcessResource {
     }
 
     @POST
-    @Path("/")
+    @Path("/{tenantId}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response create(String query) {
+    public Response create(@PathParam("tenantId") final String tenantId, String query) {
         try {
             JSONObject jsonObject = new JSONObject(query);
 
@@ -62,7 +62,7 @@ public class ProcessResource {
             String description = JsonUtil.getString(jsonObject, "description");
             Preconditions.checkNotNull(name, "process name cannot be null");
 
-            OperatorProcess process = processManager.create(name, description);
+            OperatorProcess process = processManager.create(tenantId, name, description);
             return Response.ok(process).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();

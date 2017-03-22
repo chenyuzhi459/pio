@@ -121,8 +121,7 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
             }
             Object defaultValue = type.getDefaultValue();
             if ((defaultValue == null) && !type.isOptional()) {
-                //TODO: Maybe change to a checked exception
-                throw new RuntimeException("");
+                throw new UndefinedParameterError(null,"pio.error.parameter_not_set_no_default_value", key, "");
             }
             if (defaultValue == null) {
                 return null;

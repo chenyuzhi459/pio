@@ -21,6 +21,7 @@ import java.util.*;
 public class OperatorProcess {
 
     private String id;
+    private String tenantId;
     private String name;
     private String description;
     private Status status = Status.INIT;
@@ -65,6 +66,11 @@ public class OperatorProcess {
     }
 
     @JsonProperty
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    @JsonProperty
     public String getName() {
         return name;
     }
@@ -91,6 +97,10 @@ public class OperatorProcess {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     public void setName(String name) {
