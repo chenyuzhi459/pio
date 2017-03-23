@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.annotations.Json;
+import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.Status;
 import io.sugo.pio.server.http.dto.OperatorParamDto;
@@ -24,6 +25,7 @@ public class DrainWarning {
 
     private static final String PROCESS_ID = "ef26b0f9-131a-4d7f-8417-b013a1123383";
     private static final String OPERATOR_ID_APPLY_MODEL = "apply_model-a035a434-b36b-47f3-8929-6ca5e917455d";
+    private static final String OPERATOR_ID_PERFORMANCE_CLASSIFICATION = "performance_classification-956b5b58-4f48-4611-befd-61c44c19f138";
     private static final String OPERATOR_ID_SELECT_ATTRIBUTES = "select_attributes-56a88b68-95d0-4ede-8cd0-fb449f3156c2";
     private static final String OPERATOR_ID_CSV_TRAIN = "read_csv-dce6ea3a-79cd-4a46-a6f6-e61b9e5decc7";
     private static final String OPERATOR_ID_CSV_PREDICT = "read_csv-0e5bcebf-0bc2-4a5e-b4c0-61169b01cba3";
@@ -94,8 +96,13 @@ public class DrainWarning {
     @Produces({MediaType.APPLICATION_JSON})
     public Response getResult() {
         try {
-            Operator operator = processManager.getOperator(PROCESS_ID, OPERATOR_ID_APPLY_MODEL);
-            return Response.ok(operator.getResult()).build();
+            Operator applyModelOperator = processManager.getOperator(PROCESS_ID, OPERATOR_ID_APPLY_MODEL);
+            Operator performanceOperator = processManager.getOperator(PROCESS_ID, OPERATOR_ID_PERFORMANCE_CLASSIFICATION);
+
+            IOContainer container = applyModelOperator.getResult();
+            container.getIoObjects().addAll(performanceOperator.getResult().getIoObjects());
+
+            return Response.ok(container).build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
         }

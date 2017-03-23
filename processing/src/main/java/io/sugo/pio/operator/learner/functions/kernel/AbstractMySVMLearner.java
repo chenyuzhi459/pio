@@ -111,8 +111,18 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
     /**
      * The kernels which can be used from RapidMiner for the mySVM / myKLR.
      */
-    public static final String[] KERNEL_TYPES = {"dot", "radial", "polynomial", "neural", "anova", "epachnenikov",
-            "gaussian_combination", "multiquadric"};
+    /*public static final String[] KERNEL_TYPES = {"dot", "radial", "polynomial", "neural", "anova", "epachnenikov",
+            "gaussian_combination", "multiquadric"};*/
+    public static final String[] KERNEL_TYPES = {
+            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.dot"),
+            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.radial"),
+            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.polynomial"),
+            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.neural"),
+            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.anova"),
+//            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.epachnenikov"),
+            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.gaussian_combination"),
+            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.multiquadric")
+    };
 
     /**
      * Indicates a linear kernel.

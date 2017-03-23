@@ -538,7 +538,8 @@ public class AttributeSubsetSelector {
         List<ParameterType> types = new LinkedList<>();
         ParameterType type = new ParameterTypeCategory(PARAMETER_FILTER_TYPE,
                 io.sugo.pio.i18n.I18N.getMessage("pio.AttributeSubsetSelector.attribute_filter_type"),
-                CONDITION_NAMES, 0);
+                CONDITION_NAMES, 2);
+        type.setHidden(true);
         types.add(type);
 
         for (int i = 0; i < CONDITION_IMPLEMENTATIONS.length; i++) {

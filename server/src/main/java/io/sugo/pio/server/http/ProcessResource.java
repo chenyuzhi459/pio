@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.annotations.Json;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.server.process.ProcessManager;
 import io.sugo.pio.server.utils.JsonUtil;
 import org.codehaus.jettison.json.JSONObject;
@@ -43,6 +44,7 @@ public class ProcessResource {
     @Produces({MediaType.APPLICATION_JSON})
     public Response getAll(@PathParam("tenantId") final String tenantId, @QueryParam("all") boolean all) {
         try {
+            Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
             List<OperatorProcess> processes = processManager.getAll(tenantId, all);
             return Response.ok(processes).build();
         } catch (Throwable e) {
@@ -60,7 +62,8 @@ public class ProcessResource {
 
             String name = JsonUtil.getString(jsonObject, "name");
             String description = JsonUtil.getString(jsonObject, "description");
-            Preconditions.checkNotNull(name, "process name cannot be null");
+            Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.name_can_not_null"));
+            Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
 
             OperatorProcess process = processManager.create(tenantId, name, description);
             return Response.ok(process).build();

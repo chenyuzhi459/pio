@@ -21,6 +21,7 @@ package io.sugo.pio.operator.preprocessing.normalization;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.ports.InputPort;
@@ -42,7 +43,6 @@ import java.util.HashMap;
 /**
  * This is the normalization method for interquartile range.
  * 
- * @author Brendon Bolin, Sebastian Land
  */
 public class IQRNormalizationMethod extends AbstractNormalizationMethod {
 
@@ -97,6 +97,11 @@ public class IQRNormalizationMethod extends AbstractNormalizationMethod {
 	@Override
 	public String getName() {
 		return "interquartile range";
+	}
+
+	@Override
+	public String getDisplayName() {
+		return I18N.getMessage("pio.IQRNormalizationMethod.display_name");
 	}
 
 }

@@ -67,8 +67,8 @@ public class Ontology {
 
     public static final int TIME = 11;
 
-    /*public static final String[] VALUE_TYPE_NAMES = { "attribute_value", "nominal", "numeric", "integer", "real", "text",
-        "binominal", "polynominal", "file_path", "date_time", "date", "time" };*/
+    public static final String[] VALUE_TYPE_NAMES_VALUE = { "attribute_value", "nominal", "numeric", "integer", "real", "text",
+        "binominal", "polynominal", "file_path", "date_time", "date", "time" };
     public static final String[] VALUE_TYPE_NAMES = {
             io.sugo.pio.i18n.I18N.getMessage("pio.Ontology.value_type_names.attribute_value"),
             io.sugo.pio.i18n.I18N.getMessage("pio.Ontology.value_type_names.nominal"),

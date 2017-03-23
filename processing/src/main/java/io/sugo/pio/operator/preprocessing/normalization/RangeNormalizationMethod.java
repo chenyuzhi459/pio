@@ -46,7 +46,6 @@ import java.util.List;
  * This is the transformation method for transforming the data of an attribute into a certain
  * interval.
  * 
- * @author Sebastian Land
  */
 public class RangeNormalizationMethod extends AbstractNormalizationMethod {
 
@@ -92,6 +91,11 @@ public class RangeNormalizationMethod extends AbstractNormalizationMethod {
 	@Override
 	public String getName() {
 		return "range transformation";
+	}
+
+	@Override
+	public String getDisplayName() {
+		return I18N.getMessage("pio.RangeNormalizationMethod.display_name");
 	}
 
 	@Override

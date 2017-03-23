@@ -245,9 +245,9 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
                         new ParameterTypeString(PARAMETER_COLUMN_NAME, "Describes the attributes name.", ""), //
                         new ParameterTypeBoolean(PARAMETER_COLUMN_SELECTED, "Indicates if a column is selected", true), //
                         new ParameterTypeStringCategory(PARAMETER_COLUMN_VALUE_TYPE, "Indicates the value type of an attribute",
-                                Ontology.VALUE_TYPE_NAMES, "attribute_value"), //
+                                Ontology.VALUE_TYPE_NAMES_VALUE, Ontology.VALUE_TYPE_NAMES, "attribute_value", true), //
                         new ParameterTypeStringCategory(PARAMETER_COLUMN_ROLE, "Indicates the role of an attribute",
-                                Attributes.KNOWN_ATTRIBUTE_TYPES, Attributes.ATTRIBUTE_NAME)));
+                                Attributes.KNOWN_ATTRIBUTE_TYPES_VALUE, Attributes.KNOWN_ATTRIBUTE_TYPES, Attributes.ATTRIBUTE_NAME, true)));
 
         types.add(type);
 //        types.add(new ParameterTypeBoolean(PARAMETER_ERROR_TOLERANT,

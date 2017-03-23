@@ -21,7 +21,6 @@ import java.util.List;
  * This is the abstract super class for all decision tree learners that can learn in parallel. The
  * actual type of the tree is determined by the criterion, e.g. using gain_ratio or Gini for CART /
  * C4.5 and chi_squared for CHAID.
- *
  */
 public abstract class AbstractParallelTreeLearner extends AbstractLearner {
 
@@ -69,6 +68,13 @@ public abstract class AbstractParallelTreeLearner extends AbstractLearner {
 
     public static final String[] CRITERIA_NAMES = {"gain_ratio", "information_gain", "gini_index", "accuracy"};
 
+    public static final String[] CRITERIA_NAMES_DESC = {
+            I18N.getMessage("pio.AbstractParallelTreeLearner.criteria_names_desc.gain_ratio"),
+            I18N.getMessage("pio.AbstractParallelTreeLearner.criteria_names_desc.information_gain"),
+            I18N.getMessage("pio.AbstractParallelTreeLearner.criteria_names_desc.gini_index"),
+            I18N.getMessage("pio.AbstractParallelTreeLearner.criteria_names_desc.accuracy")
+    };
+
     public static final Class<?>[] CRITERIA_CLASSES = {GainRatioColumnCriterion.class, InfoGainColumnCriterion.class,
             GiniIndexColumnCriterion.class, AccuracyColumnCriterion.class};
 
@@ -103,7 +109,7 @@ public abstract class AbstractParallelTreeLearner extends AbstractLearner {
      * random subset selections. The default implementation of this method always returns
      * <code>null</code> independent of the seed.
      *
-     * @param seed the seed for the {@link RandomGenerator} used for random subset selection. Not
+     * @param seed the seed for the { RandomGenerator} used for random subset selection. Not
      *             used in the default implementation.
      * @return
      */
@@ -151,7 +157,7 @@ public abstract class AbstractParallelTreeLearner extends AbstractLearner {
         ParameterType type = new ParameterTypeStringCategory(PARAMETER_CRITERION,
                 I18N.getMessage("pio.ParallelDecisionTreeLearner.criterion"),
 //				"Specifies the used criterion for selecting attributes and numerical splits.",
-                CRITERIA_NAMES,
+                CRITERIA_NAMES, CRITERIA_NAMES_DESC,
                 CRITERIA_NAMES[CRITERION_GAIN_RATIO], false);
         types.add(type);
 

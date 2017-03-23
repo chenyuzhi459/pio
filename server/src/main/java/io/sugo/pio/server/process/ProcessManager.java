@@ -256,6 +256,7 @@ public class ProcessManager {
             operator.setName(meta.getName() + "-" + UUID.randomUUID().toString());
             operator.setxPos(dto.getxPos());
             operator.setyPos(dto.getyPos());
+            operator.setFullName(dto.getFullName());
             process.getRootOperator().getExecutionUnit().addOperator(operator);
             process.setUpdateTime(new DateTime());
             metadataProcessManager.update(process);

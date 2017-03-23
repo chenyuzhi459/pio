@@ -29,8 +29,6 @@ import java.util.List;
  * This is an abstract class for all normalization methods. It returns just an empty list of
  * {@link ParameterType}s and does not perform any init code.
  * 
- * @author Sebastian Land
- * 
  */
 public abstract class AbstractNormalizationMethod implements NormalizationMethod {
 
