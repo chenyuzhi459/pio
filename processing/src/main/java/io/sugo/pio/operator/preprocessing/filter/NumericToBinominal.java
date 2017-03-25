@@ -41,6 +41,8 @@ public class NumericToBinominal extends NumericToNominal {
      */
     public static final String PARAMETER_MAX = "max";
 
+    private static final String PARAMETER_ATTRIBUTES = "attributes";
+
     public NumericToBinominal() {
         super();
     }
@@ -115,6 +117,13 @@ public class NumericToBinominal extends NumericToNominal {
                 Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0d);
         maxType.setHidden(true);
         types.add(maxType);
+
+        types.forEach(parameterType -> {
+            if (PARAMETER_ATTRIBUTES.equals(parameterType.getKey())) {
+                parameterType.setDescription(I18N.getMessage("pio.NumericToBinominal.attributes_desc"));
+                parameterType.setFullName(I18N.getMessage("pio.NumericToBinominal.attributes_desc"));
+            }
+        });
 
         return types;
     }

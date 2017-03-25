@@ -51,6 +51,8 @@ public class Normalization extends PreprocessingOperator {
 
     private static final Logger logger = new Logger(Normalization.class);
 
+    private static final String PARAMETER_ATTRIBUTES = "attributes";
+
     private static final ArrayList<NormalizationMethod> METHODS = new ArrayList<NormalizationMethod>();
 
     static {
@@ -145,6 +147,13 @@ public class Normalization extends PreprocessingOperator {
             }
             i++;
         }
+
+        types.forEach(parameterType -> {
+            if (PARAMETER_ATTRIBUTES.equals(parameterType.getKey())) {
+                parameterType.setDescription(I18N.getMessage("pio.Normalization.attributes_desc"));
+                parameterType.setFullName(I18N.getMessage("pio.Normalization.attributes_desc"));
+            }
+        });
         return types;
     }
 

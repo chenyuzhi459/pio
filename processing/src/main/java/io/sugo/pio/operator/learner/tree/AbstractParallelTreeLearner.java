@@ -159,6 +159,7 @@ public abstract class AbstractParallelTreeLearner extends AbstractLearner {
 //				"Specifies the used criterion for selecting attributes and numerical splits.",
                 CRITERIA_NAMES, CRITERIA_NAMES_DESC,
                 CRITERIA_NAMES[CRITERION_GAIN_RATIO], false);
+        type.setOptional(false);
         types.add(type);
 
         type = new ParameterTypeInt(PARAMETER_MAXIMAL_DEPTH,
@@ -166,6 +167,7 @@ public abstract class AbstractParallelTreeLearner extends AbstractLearner {
 //				"The maximum tree depth (-1: no bound)",
                 -1, Integer.MAX_VALUE,
                 20);
+        type.setOptional(false);
         types.add(type);
 
         type = new ParameterTypeBoolean(PARAMETER_PRUNING,

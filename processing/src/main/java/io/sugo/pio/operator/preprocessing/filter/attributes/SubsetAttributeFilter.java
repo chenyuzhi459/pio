@@ -20,7 +20,6 @@ import static io.sugo.pio.parameter.ParameterTypeAttributes.ATTRIBUTE_SEPARATOR_
 /**
  * A filter condition for subsets of attributes.
  * 
- * @author Tobias Malbrecht
  */
 public class SubsetAttributeFilter extends AbstractAttributeFilterCondition {
 
@@ -67,7 +66,7 @@ public class SubsetAttributeFilter extends AbstractAttributeFilterCondition {
 	public List<ParameterType> getParameterTypes(ParameterHandler operator, final InputPort inPort, int... valueTypes) {
 		List<ParameterType> types = new LinkedList<ParameterType>();
 		ParameterType type = new ParameterTypeAttributes(PARAMETER_ATTRIBUTES, I18N.getMessage("pio.AttributeFilter.subset.attributes"),
-				inPort, valueTypes);
+				inPort, false, valueTypes);
 		types.add(type);
 		return types;
 	}

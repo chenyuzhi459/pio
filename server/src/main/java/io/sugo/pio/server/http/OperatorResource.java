@@ -51,7 +51,7 @@ public class OperatorResource {
     public Response operators() {
         try {
             return Response.ok(processManager.getOperatorMetaJson()).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -69,7 +69,7 @@ public class OperatorResource {
             Preconditions.checkNotNull(dto.getOperatorType(), I18N.getMessage("pio.error.operator.type_can_not_null"));
             OperatorProcess process = processManager.addOperator(processId, dto);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -84,7 +84,7 @@ public class OperatorResource {
         try {
             Operator operator = processManager.getOperator(processId, operatorId);
             return Response.ok(operator).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -100,7 +100,7 @@ public class OperatorResource {
         try {
             OperatorProcess process = processManager.deleteOperator(processId, operatorId);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -117,7 +117,7 @@ public class OperatorResource {
             Preconditions.checkNotNull(dto.getToPort(), I18N.getMessage("pio.error.operator.to_port_can_not_null"));
             OperatorProcess process = processManager.connect(processId, dto);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -134,7 +134,7 @@ public class OperatorResource {
             Preconditions.checkNotNull(dto.getToPort(), I18N.getMessage("pio.error.operator.to_port_can_not_null"));
             OperatorProcess process = processManager.disconnect(processId, dto);
             return Response.ok(process).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -152,7 +152,7 @@ public class OperatorResource {
 //            List<OperatorParamDto> paramList = jsonMapper.readValue(keyValues, operatorParamType);
             Operator operator = processManager.updateParameter(processId, operatorId, paramList);
             return Response.ok(operator).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -169,7 +169,7 @@ public class OperatorResource {
         try {
             Operator operator = processManager.updateOperator(processId, operatorId, dto);
             return Response.ok(operator).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -184,7 +184,7 @@ public class OperatorResource {
         try {
             Operator operator = processManager.getOperator(processId, operatorId);
             return Response.ok(operator.getResult()).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -201,7 +201,7 @@ public class OperatorResource {
         try {
             Operator operator = processManager.updateExampleData(processId, operatorId, dataList);
             return Response.ok(operator).build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }

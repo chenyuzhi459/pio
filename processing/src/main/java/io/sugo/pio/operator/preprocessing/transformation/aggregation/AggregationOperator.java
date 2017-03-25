@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.preprocessing.transformation.aggregation;
 
+import com.google.common.base.Strings;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
@@ -50,6 +51,8 @@ import java.util.regex.PatternSyntaxException;
  * </p>
  */
 public class AggregationOperator extends AbstractDataProcessing {
+
+    private static final String PARAMETER_ATTRIBUTES = "attributes";
 
     public static class AggregationTreeNode {
 
@@ -287,15 +290,18 @@ public class AggregationOperator extends AbstractDataProcessing {
         }
 
 //		if (getCompatibilityLevel().isAbove(VERSION_6_0_6)) {
-        String[] groupByAttributes = getParameterAsString(PARAMETER_GROUP_BY_ATTRIBUTES)
-                .split(ParameterTypeAttributes.ATTRIBUTE_SEPARATOR_REGEX);
-        for (String attribute : groupByAttributes) {
-            // if the list is empty, there is already a warning:
-            if (!attribute.isEmpty() && metaData.getAttributeByName(attribute) == null) {
-                getExampleSetInputPort().addError(new SimpleMetaDataError(Severity.WARNING, getExampleSetInputPort(),
-                        "aggregation.group_by_attribute_unknown", attribute));
+        String groupByAttributesStr = getParameterAsString(PARAMETER_GROUP_BY_ATTRIBUTES);
+        if (!Strings.isNullOrEmpty(groupByAttributesStr)) {
+            String[] groupByAttributes = groupByAttributesStr.split(ParameterTypeAttributes.ATTRIBUTE_SEPARATOR_REGEX);
+            for (String attribute : groupByAttributes) {
+                // if the list is empty, there is already a warning:
+                if (!attribute.isEmpty() && metaData.getAttributeByName(attribute) == null) {
+                    getExampleSetInputPort().addError(new SimpleMetaDataError(Severity.WARNING, getExampleSetInputPort(),
+                            "aggregation.group_by_attribute_unknown", attribute));
+                }
             }
         }
+
 //		}
 
         return resultMD;
@@ -694,25 +700,32 @@ public class AggregationOperator extends AbstractDataProcessing {
         type.setExpert(false);
         types.add(type);
 
-        types.add(new ParameterTypeList(PARAMETER_AGGREGATION_ATTRIBUTES, I18N.getMessage("pio.AggregationOperator.aggregation_attributes"),
+        /*types.add(new ParameterTypeList(PARAMETER_AGGREGATION_ATTRIBUTES, I18N.getMessage("pio.AggregationOperator.aggregation_attributes"),
                 new ParameterTypeAttribute("aggregation_attribute", I18N.getMessage("pio.AggregationOperator.aggregation_attributes"),
                         getExampleSetInputPort()),
                 new ParameterTypeStringCategory(PARAMETER_AGGREGATION_FUNCTIONS,
-                        I18N.getMessage("pio.AggregationOperator.aggregation_functions"), functions, functions[0])));
+                        I18N.getMessage("pio.AggregationOperator.aggregation_functions"), functions, functions[0])));*/
         types.add(new ParameterTypeAttributes(PARAMETER_GROUP_BY_ATTRIBUTES,
                 I18N.getMessage("pio.AggregationOperator.group_by_attributes"), getExampleSetInputPort(),
                 true));
-        types.add(new ParameterTypeBoolean(PARAMETER_ALL_COMBINATIONS,
+        /*types.add(new ParameterTypeBoolean(PARAMETER_ALL_COMBINATIONS,
                 I18N.getMessage("pio.AggregationOperator.count_all_combinations"),
                 false));
         type = new ParameterTypeBoolean(PARAMETER_ONLY_DISTINCT,
                 I18N.getMessage("pio.AggregationOperator.only_distinct"),
                 false);
         type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_ALL_COMBINATIONS, false, false));
-        types.add(type);
+        types.add(type);*/
         types.add(new ParameterTypeBoolean(PARAMETER_IGNORE_MISSINGS,
                 I18N.getMessage("pio.AggregationOperator.ignore_missings"),
-                true));
+                true, false, true));
+
+        types.forEach(parameterType -> {
+            if (PARAMETER_ATTRIBUTES.equals(parameterType.getKey())) {
+                parameterType.setDescription(I18N.getMessage("pio.AggregationOperator.attributes_desc"));
+                parameterType.setFullName(I18N.getMessage("pio.AggregationOperator.attributes_desc"));
+            }
+        });
         return types;
     }
 

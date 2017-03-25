@@ -161,7 +161,7 @@ public class ProcessResource {
     }
 
     @GET
-    @Path("/runAsyn/{id}")
+    @Path("/run/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response run(@PathParam("id") final String id) {
         try {

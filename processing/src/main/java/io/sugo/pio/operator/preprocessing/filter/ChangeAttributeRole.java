@@ -210,7 +210,7 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
                 getExampleSetInputPort(), false, false));
         ParameterType type = new ParameterTypeStringCategory(PARAMETER_TARGET_ROLE,
                 I18N.getMessage("pio.ChangeAttributeRole.target_role"), TARGET_ROLES, TARGET_ROLES_DESC,
-                TARGET_ROLES[0], true);
+                TARGET_ROLES[2], true);
 //		type.setExpert(false);
         types.add(type);
 

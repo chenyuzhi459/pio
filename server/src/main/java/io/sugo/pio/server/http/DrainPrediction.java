@@ -7,11 +7,16 @@ import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.constant.ProcessConstant;
+import io.sugo.pio.example.Attributes;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.nio.model.AbstractDataResultSetReader;
+import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter;
+import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
+import io.sugo.pio.parameter.ParameterTypeList;
 import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.server.http.dto.OperatorParamDto;
@@ -20,6 +25,8 @@ import io.sugo.pio.server.process.ProcessManager;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Path("/pio/process/drain/")
@@ -46,6 +53,9 @@ public class DrainPrediction {
         try {
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"), tenantId);
 
+            List<OperatorParamDto> attributeFilterParam = buildAttributeFilterParam(paramList);
+            List<OperatorParamDto> samplingParam = buildSamplingParam();
+
             OperatorProcess trainProcess = getBuiltInProcess(tenantId, ProcessConstant.Type.DRAIN_TRAINING);
 
             // 1.Not found built-in process, then create one.
@@ -53,18 +63,32 @@ public class DrainPrediction {
                 log.info("Not found drain training built-in process by tenantId:%s, and prepare to new process using the template.", tenantId);
                 trainProcess = processManager.createByTemplate(tenantId, ProcessConstant.Type.DRAIN_TRAINING);
             }
+            // Refresh cache to ensure that is the same object when process running
+            processManager.add2cache(trainProcess);
 
             // 2.Update operator parameters
             Operator csvOperator = getOperator(trainProcess, ProcessConstant.OperatorType.CSVExampleSource);
             processManager.updateParameter(trainProcess.getId(), csvOperator.getName(), paramList);
-            log.info("Update csv operator parameters of 'drain_training' process successfully. tenantId:%s", tenantId);
+
+            Operator attributeFilterOperator = getOperator(trainProcess, ProcessConstant.OperatorType.AttributeFilter);
+            processManager.updateParameter(trainProcess.getId(), attributeFilterOperator.getName(), attributeFilterParam);
+
+            Operator samplingOperator = getOperator(trainProcess, ProcessConstant.OperatorType.SamplingOperator);
+            processManager.updateParameter(trainProcess.getId(), samplingOperator.getName(), samplingParam);
+            log.info("Update operator parameters of 'drain_training' process successfully. tenantId:%s", tenantId);
 
             // 3.Run process
             trainProcess = processManager.runSyn(trainProcess.getId());
             log.info("Run 'drain_training' process successfully. tenantId:%s", tenantId);
 
-            return Response.ok(trainProcess).build();
-        } catch (Exception e) {
+            // 4.Return the training results
+            Operator applyModelOperator = getOperator(trainProcess, ProcessConstant.OperatorType.ModelApplier);
+            Operator performanceOperator = getOperator(trainProcess, ProcessConstant.OperatorType.PolynominalClassificationPerformanceEvaluator);
+            IOContainer container = applyModelOperator.getResult();
+            container.getIoObjects().addAll(performanceOperator.getResult().getIoObjects());
+
+            return Response.ok(container).build();
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -77,6 +101,7 @@ public class DrainPrediction {
         try {
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"), tenantId);
 
+            List<OperatorParamDto> attributeFilterParam = buildAttributeFilterParam(paramList);
             OperatorProcess predictionProcess = getBuiltInProcess(tenantId, ProcessConstant.Type.DRAIN_PREDICTION);
 
             // 1.Not found built-in process, then create one.
@@ -90,7 +115,10 @@ public class DrainPrediction {
             // 2.Update operator parameters
             Operator csvOperator = getOperator(predictionProcess, ProcessConstant.OperatorType.CSVExampleSource);
             processManager.updateParameter(predictionProcess.getId(), csvOperator.getName(), paramList);
-            log.info("Update csv operator parameters of 'drain_prediction' process successfully. tenantId:%s", tenantId);
+
+            Operator attributeFilterOperator = getOperator(predictionProcess, ProcessConstant.OperatorType.AttributeFilter);
+            processManager.updateParameter(predictionProcess.getId(), attributeFilterOperator.getName(), attributeFilterParam);
+            log.info("Update operator parameters of 'drain_prediction' process successfully. tenantId:%s", tenantId);
 
             // 3.Get model from decision tree operator of 'drain_training' process
             OperatorProcess trainProcess = processManager.getFromCache(tenantId, ProcessConstant.Type.DRAIN_TRAINING);
@@ -124,37 +152,17 @@ public class DrainPrediction {
 
             // 6.Return the prediction results
             applyModelOperator = getOperator(predictionProcess, ProcessConstant.OperatorType.ModelApplier);
-            Operator performanceOperator = getOperator(predictionProcess, ProcessConstant.OperatorType.PolynominalClassificationPerformanceEvaluator);
             IOContainer container = applyModelOperator.getResult();
-            container.getIoObjects().addAll(performanceOperator.getResult().getIoObjects());
 
             return Response.ok(container).build();
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
     private OperatorProcess getBuiltInProcess(String tenantId, String processType) {
         return processManager.getBuiltIn(tenantId, processType);
-    }
-
-    private Operator getOperator(String tenantId, String processType, String operatorType) {
-        OperatorProcess process = getBuiltInProcess(tenantId, processType);
-        Preconditions.checkNotNull(process, I18N.getMessage("pio.error.process.not_found_by_tenant_id"), tenantId,
-                ProcessConstant.Type.DRAIN_PREDICTION.equals(processType) ? I18N.getMessage("pio.ProcessType.drain_prediction") :
-                        I18N.getMessage("pio.ProcessType.drain_training"));
-
-        List<Operator> operators = process.getRootOperator().getExecutionUnit().getOperators();
-        if (operators != null && !operators.isEmpty()) {
-            for (Operator operator : operators) {
-                if (operatorType.equals(operator.getType())) {
-                    return operator;
-                }
-            }
-        }
-
-        return null;
     }
 
     private Operator getOperator(OperatorProcess process, String operatorType) {
@@ -168,5 +176,75 @@ public class DrainPrediction {
         }
 
         return null;
+    }
+
+    private List<OperatorParamDto> buildAttributeFilterParam(List<OperatorParamDto> paramList) {
+        List<String> selectedColumns = new ArrayList<>();
+        int labelCount = 0;
+        int idCount = 0;
+        if (paramList != null && !paramList.isEmpty()) {
+            for (OperatorParamDto operatorParam : paramList) {
+                if (AbstractDataResultSetReader.PARAMETER_META_DATA.equals(operatorParam.getKey())) {
+                    List<String[]> columnList = ParameterTypeList.transformString2List(operatorParam.getValue());
+                    for (String[] columnArray : columnList) { // [index, attributeName.isSelected.valueType.role]
+                        if (columnArray.length != 2) {
+                            throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.metadata.parameters.number_must_be_two"));
+                        }
+                        String clolumnInfo = columnArray[1]; // attributeName.isSelected.valueType.role
+                        String[] infoArray = clolumnInfo.split("\\.");
+                        String columnName = infoArray[0];
+                        boolean isSelected = Boolean.valueOf(infoArray[1]);
+                        String role = infoArray[3];
+
+                        if (isSelected) {
+                            selectedColumns.add(columnName);
+                            if (Attributes.ID_NAME.equals(role)) {
+                                idCount++;
+                            }
+                            if (Attributes.LABEL_NAME.equals(role)) {
+                                labelCount++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (selectedColumns.isEmpty()) {
+            throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.metadata.parameters.attribute_empty"));
+        }
+        if (idCount > 1) {
+            throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.metadata.parameters.id_attribute_more_than_one"));
+        }
+        if (labelCount == 0) {
+            throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.metadata.parameters.label_attribute_null"));
+        }
+        if (labelCount > 1) {
+            throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.metadata.parameters.label_attribute_more_than_one"));
+        }
+
+        OperatorParamDto param = new OperatorParamDto();
+        String selectedColumn = org.apache.commons.lang.StringUtils.join(selectedColumns.toArray(), ';');
+        param.setKey(SubsetAttributeFilter.PARAMETER_ATTRIBUTES);
+        param.setValue(selectedColumn);
+
+        return Collections.singletonList(param);
+    }
+
+    private List<OperatorParamDto> buildSamplingParam() {
+        List<OperatorParamDto> paramList = new ArrayList<>();
+
+        OperatorParamDto param1 = new OperatorParamDto();
+        param1.setKey(SamplingOperator.PARAMETER_SAMPLE);
+        param1.setValue("2");
+
+        OperatorParamDto param2 = new OperatorParamDto();
+        param2.setKey(SamplingOperator.PARAMETER_SAMPLE_PROBABILITY);
+        param2.setValue("0.6");
+
+        paramList.add(param1);
+        paramList.add(param2);
+
+        return paramList;
     }
 }

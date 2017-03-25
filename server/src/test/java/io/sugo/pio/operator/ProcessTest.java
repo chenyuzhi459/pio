@@ -429,7 +429,7 @@ public class ProcessTest {
 //        sample.setParameter(PARAMETER_SAMPLE, "relative");
 //        sample.setParameter(PARAMETER_SAMPLE_RATIO, "0.1");
 //
-        sample.setParameter(PARAMETER_SAMPLE, "probability");
+        sample.setParameter(PARAMETER_SAMPLE, "2");
         sample.setParameter(PARAMETER_SAMPLE_PROBABILITY, "0.2");
         process.getRootOperator().getExecutionUnit().addOperator(sample);
 

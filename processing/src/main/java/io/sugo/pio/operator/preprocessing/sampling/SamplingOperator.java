@@ -310,6 +310,7 @@ public class SamplingOperator extends AbstractSamplingOperator {
         List<ParameterType> types = super.getParameterTypes();
         ParameterType type = new ParameterTypeCategory(PARAMETER_SAMPLE, I18N.getMessage("pio.SamplingOperator.sample"),
                 SAMPLE_MODES, SAMPLE_ABSOLUTE);
+        type.setOptional(false);
         type.setExpert(false);
         types.add(type);
         type = new ParameterTypeBoolean(PARAMETER_BALANCE_DATA,
@@ -322,18 +323,21 @@ public class SamplingOperator extends AbstractSamplingOperator {
         type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_SAMPLE, SAMPLE_MODES, true, SAMPLE_ABSOLUTE));
 //        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
         type.setExpert(false);
+        type.setOptional(false);
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_SAMPLE_RATIO, I18N.getMessage("pio.SamplingOperator.sample_ratio"), 0.0d,
                 1.0d, 0.1d);
         type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_SAMPLE, SAMPLE_MODES, true, SAMPLE_RELATIVE));
 //        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
         type.setExpert(false);
+        type.setOptional(false);
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_SAMPLE_PROBABILITY, I18N.getMessage("pio.SamplingOperator.sample_probability"), 0.0d, 1.0d,
                 0.1d);
         type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_SAMPLE, SAMPLE_MODES, true,
                 SAMPLE_PROBABILITY));
 //        type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_BALANCE_DATA, true, false));
+        type.setOptional(false);
         type.setExpert(false);
         types.add(type);
 

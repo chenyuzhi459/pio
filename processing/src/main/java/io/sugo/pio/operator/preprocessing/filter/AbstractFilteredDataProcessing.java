@@ -6,6 +6,7 @@ import io.sugo.pio.example.AttributeRole;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.NonSpecialAttributesExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorVersion;
 import io.sugo.pio.operator.UserError;
@@ -32,9 +33,10 @@ public abstract class AbstractFilteredDataProcessing extends AbstractDataProcess
 
     private static final Logger logger = new Logger(AbstractFilteredDataProcessing.class);
 
+    private static final String PARAMETER_ATTRIBUTES = "attributes";
+
     private final AttributeSubsetSelector attributeSelector = new AttributeSubsetSelector(this, getExampleSetInputPort(),
             getFilterValueTypes());
-    ;
 
     public AbstractFilteredDataProcessing() {
         super();
@@ -204,6 +206,13 @@ public abstract class AbstractFilteredDataProcessing extends AbstractDataProcess
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
         types.addAll(attributeSelector.getParameterTypes());
+
+        types.forEach(parameterType -> {
+            if (PARAMETER_ATTRIBUTES.equals(parameterType.getKey())) {
+                parameterType.setDescription(I18N.getMessage("pio.NumericToPolynominal.attributes_desc"));
+                parameterType.setFullName(I18N.getMessage("pio.NumericToPolynominal.attributes_desc"));
+            }
+        });
         return types;
     }
 }

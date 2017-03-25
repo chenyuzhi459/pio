@@ -68,9 +68,9 @@ public class UserError extends OperatorException implements NoBugError {
         this(operator, null, errorId, arguments);
     }
 
-    public UserError(Operator operator, String parameterKey, String errorId) {
+    /*public UserError(Operator operator, String parameterKey, String errorId) {
         this(operator, parameterKey,null, errorId, new Object[0]);
-    }
+    }*/
 
     /**
      * Convenience constructor for messages with no arguments.
