@@ -2,6 +2,7 @@ package io.sugo.pio.operator.performance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.*;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.*;
@@ -10,7 +11,6 @@ import io.sugo.pio.operator.learner.CapabilityProvider;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.Ontology;
 
@@ -74,10 +74,10 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
      */
     private static final String PARAMETER_USE_EXAMPLE_WEIGHTS = "use_example_weights";
 
-    private InputPort exampleSetInput = getInputPorts().createPort(PortType.LABELLED_DATA);
-    private InputPort performanceInput = getInputPorts().createPort(PortType.PERFORMANCE);
-    private OutputPort performanceOutput = getOutputPorts().createPort(PortType.PERFORMANCE);
-    private OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET);
+    private InputPort exampleSetInput = getInputPorts().createPort(PortConstant.LABELLED_DATA, PortConstant.LABELLED_DATA_DESC);
+    private InputPort performanceInput = getInputPorts().createPort(PortConstant.PERFORMANCE, PortConstant.PERFORMANCE_DESC);
+    private OutputPort performanceOutput = getOutputPorts().createPort(PortConstant.PERFORMANCE, PortConstant.PERFORMANCE_DESC);
+    private OutputPort exampleSetOutput = getOutputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
 
     /**
      * The currently used performance vector. This is be used for logging / plotting purposes.

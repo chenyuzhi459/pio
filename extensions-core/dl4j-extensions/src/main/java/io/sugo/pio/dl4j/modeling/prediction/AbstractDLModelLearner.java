@@ -1,5 +1,6 @@
 package io.sugo.pio.dl4j.modeling.prediction;
 
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.dl4j.io.LayerSemaphore;
 import io.sugo.pio.dl4j.layers.AbstractLayer;
 import io.sugo.pio.dl4j.layers.OutputLayer;
@@ -11,7 +12,6 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 
 import java.util.LinkedList;
@@ -21,11 +21,11 @@ import java.util.List;
  */
 public abstract class AbstractDLModelLearner extends OperatorChain {
 
-    protected InputPort trainPort = getInputPorts().createPort(PortType.TRAINING_EXAMPLES, ExampleSet.class);
-    protected OutputPort modelPort = getOutputPorts().createPort(PortType.MODEL);
-    protected OutputPort examplePort = getOutputPorts().createPort(PortType.EXAMPLES);
-    protected final OutputPort start = getExecutionUnit(0).getInnerSources().createPort(PortType.START);
-    protected final InputPort end = getExecutionUnit(0).getInnerSinks().createPort(PortType.END);
+    protected InputPort trainPort = getInputPorts().createPort(PortConstant.TRAINING_EXAMPLES, PortConstant.TRAINING_EXAMPLES_DESC, ExampleSet.class);
+    protected OutputPort modelPort = getOutputPorts().createPort(PortConstant.MODEL, PortConstant.MODEL_DESC);
+    protected OutputPort examplePort = getOutputPorts().createPort(PortConstant.EXAMPLES, PortConstant.EXAMPLES_DESC);
+    protected final OutputPort start = getExecutionUnit(0).getInnerSources().createPort(PortConstant.START, PortConstant.START_DESC);
+    protected final InputPort end = getExecutionUnit(0).getInnerSinks().createPort(PortConstant.END, PortConstant.END_DESC);
 
     protected List<AbstractLayer> structure = new LinkedList<AbstractLayer>();
 

@@ -2,19 +2,18 @@ package io.sugo.pio.operator.nio.model;
 
 import com.google.common.base.Strings;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.Annotations;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.io.AbstractDataReader;
 import io.sugo.pio.operator.io.AbstractExampleSource;
 import io.sugo.pio.operator.nio.file.FileInputPortHandler;
 import io.sugo.pio.operator.nio.file.FileObject;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.SimplePrecondition;
@@ -73,7 +72,7 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
 //        return fileInputPort;
 //    }
 
-    private InputPort fileInputPort = getInputPorts().createPort(PortType.FILE);
+    private InputPort fileInputPort = getInputPorts().createPort(PortConstant.FILE, PortConstant.FILE_DESC);
     private FileInputPortHandler filePortHandler = new FileInputPortHandler(this, fileInputPort, this.getFileParameterName());
 
     public AbstractDataResultSetReader() {

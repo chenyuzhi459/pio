@@ -11,7 +11,7 @@ public interface InputPorts extends Ports<InputPort> {
      */
     public void checkPreconditions();
 
-    public InputPort createPort(PortType type, Class<? extends IOObject> clazz);
+    public InputPort createPort(String name, String description, Class<? extends IOObject> clazz);
 
-    public InputPort createPort(PortType type, MetaData metaData);
+    public InputPort createPort(String name, String description, MetaData metaData);
 }

@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.preprocessing.sampling;
 
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
@@ -16,10 +17,8 @@ import io.sugo.pio.operator.preprocessing.sampling.sequences.ProbabilitySampling
 import io.sugo.pio.operator.preprocessing.sampling.sequences.RelativeSamplingSequenceGenerator;
 import io.sugo.pio.operator.preprocessing.sampling.sequences.SamplingSequenceGenerator;
 import io.sugo.pio.parameter.*;
-import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.parameter.conditions.EqualTypeCondition;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.Ontology;
 import io.sugo.pio.tools.OperatorResourceConsumptionHandler;
@@ -42,9 +41,11 @@ public class SamplingOperator extends AbstractSamplingOperator {
 
     public static final String PARAMETER_SAMPLE = "sample";
 
-    private final OutputPort remainedExampleSetOutput = getOutputPorts().createPort(PortType.REMAINED_EXAMPLE_SET_OUTPUT);
+    private final OutputPort remainedExampleSetOutput =
+            getOutputPorts().createPort(PortConstant.REMAINED_EXAMPLE_SET_OUTPUT,
+                    PortConstant.REMAINED_EXAMPLE_SET_OUTPUT_DESC);
 
-//    public static String[] SAMPLE_MODES = {"absolute", "relative", "probability"};
+    //    public static String[] SAMPLE_MODES = {"absolute", "relative", "probability"};
     public static String[] SAMPLE_MODES = {
             I18N.getMessage("pio.SamplingOperator.sample_modes.absolute"),
             I18N.getMessage("pio.SamplingOperator.sample_modes.relative"),

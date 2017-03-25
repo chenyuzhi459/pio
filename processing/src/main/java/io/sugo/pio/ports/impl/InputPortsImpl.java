@@ -23,13 +23,13 @@ public class InputPortsImpl extends AbstractPorts<InputPort> implements InputPor
     }
 
     @Override
-    public InputPort createPort(PortType type) {
-        return createPort(type,true);
+    public InputPort createPort(String name, String description) {
+        return createPort(name, description,true);
     }
 
     @Override
-    public InputPort createPort(PortType type, boolean add) {
-        InputPort in = new InputPortImpl(this, type.getName(), type.getDescription());
+    public InputPort createPort(String name, String description, boolean add) {
+        InputPort in = new InputPortImpl(this, name, description);
         if (add) {
             addPort(in);
         }
@@ -37,19 +37,19 @@ public class InputPortsImpl extends AbstractPorts<InputPort> implements InputPor
     }
 
     @Override
-    public InputPort createPort(PortType type, Class<? extends IOObject> clazz) {
-        return createPort(type, new MetaData(clazz));
+    public InputPort createPort(String name, String description, Class<? extends IOObject> clazz) {
+        return createPort(name, description, new MetaData(clazz));
     }
 
     @Override
-    public InputPort createPort(PortType type, MetaData metaData) {
-        InputPort in = createPort(type);
+    public InputPort createPort(String name, String description, MetaData metaData) {
+        InputPort in = createPort(name, description);
         return in;
     }
 
     @Override
-    public InputPort createPassThroughPort(PortType type) {
-        InputPort in = new InputPortImpl(this, type.getName(), type.getDescription());
+    public InputPort createPassThroughPort(String name, String description) {
+        InputPort in = new InputPortImpl(this, name, description);
         addPort(in);
         return in;
     }

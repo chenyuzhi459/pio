@@ -1,17 +1,14 @@
 package io.sugo.pio.operator;
 
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.error.UnsupportedApplicationParameterError;
 import io.sugo.pio.operator.preprocessing.PreprocessingOperator;
 import io.sugo.pio.parameter.ParameterType;
-import io.sugo.pio.parameter.ParameterTypeBoolean;
-import io.sugo.pio.parameter.ParameterTypeList;
-import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 
 import java.util.ArrayList;
@@ -47,10 +44,10 @@ public class ModelApplier extends Operator {
      */
     private static final String PARAMETER_CREATE_VIEW = "create_view";
 
-    private final InputPort modelInput = getInputPorts().createPort(PortType.MODEL);
-    private final InputPort exampleSetInput = getInputPorts().createPort(PortType.UNLABELLED_DATA);
-    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.LABELLED_DATA);
-    private final OutputPort modelOutput = getOutputPorts().createPort(PortType.MODEL);
+    private final InputPort modelInput = getInputPorts().createPort(PortConstant.MODEL, PortConstant.MODEL_DESC);
+    private final InputPort exampleSetInput = getInputPorts().createPort(PortConstant.UNLABELLED_DATA, PortConstant.UNLABELLED_DATA_DESC);
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortConstant.LABELLED_DATA, PortConstant.LABELLED_DATA_DESC);
+    private final OutputPort modelOutput = getOutputPorts().createPort(PortConstant.MODEL, PortConstant.MODEL_DESC);
 
     public ModelApplier() {
 //        super("modelApplier");

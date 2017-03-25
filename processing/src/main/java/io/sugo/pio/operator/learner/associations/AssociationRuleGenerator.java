@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.learner.associations;
 
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth;
@@ -10,7 +11,6 @@ import io.sugo.pio.parameter.ParameterTypeDouble;
 import io.sugo.pio.parameter.conditions.EqualTypeCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.GenerateNewMDRule;
 
 import java.util.ArrayList;
@@ -35,9 +35,9 @@ public class AssociationRuleGenerator extends Operator {
 
     private static final Logger logger = new Logger(AssociationRuleGenerator.class);
 
-    private InputPort itemSetsInput = getInputPorts().createPort(PortType.ITEM_SETS, FrequentItemSets.class);
-    private OutputPort rulesOutput = getOutputPorts().createPort(PortType.RULES);
-    private OutputPort itemSetsOutput = getOutputPorts().createPort(PortType.ITEM_SETS);
+    private InputPort itemSetsInput = getInputPorts().createPort(PortConstant.ITEM_SETS, PortConstant.ITEM_SETS_DESC,FrequentItemSets.class);
+    private OutputPort rulesOutput = getOutputPorts().createPort(PortConstant.RULES, PortConstant.RULES_DESC);
+    private OutputPort itemSetsOutput = getOutputPorts().createPort(PortConstant.ITEM_SETS, PortConstant.ITEM_SETS_DESC);
 
     public static final String PARAMETER_CRITERION = "criterion";
 

@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.features.weighting;
 
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.AttributeWeights;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
@@ -16,7 +17,6 @@ import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.ParameterService;
 import io.sugo.pio.tools.Tools;
@@ -27,13 +27,12 @@ import java.util.List;
  * This is an abstract superclass for RapidMiner weighting operators. New weighting schemes should
  * extend this class to support the same normalization parameter as other weighting operators.
  *
- * @author Helge Homburg
  */
 public abstract class AbstractWeighting extends Operator implements CapabilityProvider {
 
-	private InputPort exampleSetInput = getInputPorts().createPort(PortType.EXAMPLE_SET);
-	private OutputPort weightsOutput = getOutputPorts().createPort(PortType.WEIGHTS);
-	private OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET);
+	private InputPort exampleSetInput = getInputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
+	private OutputPort weightsOutput = getOutputPorts().createPort(PortConstant.WEIGHTS, PortConstant.WEIGHTS_DESC);
+	private OutputPort exampleSetOutput = getOutputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
 	private boolean checkForLabel;
 
 	private static final String[] SORT_DIRECTIONS = new String[] { "ascending", "descending" };

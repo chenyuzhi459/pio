@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.constant.ProcessConstant;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.guice.annotations.Json;
@@ -17,7 +18,6 @@ import io.sugo.pio.operator.nio.model.AbstractDataResultSetReader;
 import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter;
 import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
 import io.sugo.pio.parameter.ParameterTypeList;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.server.http.dto.OperatorParamDto;
 import io.sugo.pio.server.process.ProcessManager;
@@ -128,22 +128,22 @@ public class DrainPrediction {
             }
 
             Operator decisionTreeOperator = getOperator(trainProcess, ProcessConstant.OperatorType.ParallelDecisionTreeLearner);
-            IOObject treeModel = decisionTreeOperator.getOutputPorts().getPort(PortType.MODEL).getAnyDataOrNull();
-            MetaData metaData = decisionTreeOperator.getOutputPorts().getPort(PortType.MODEL).getMetaData();
+            IOObject treeModel = decisionTreeOperator.getOutputPorts().getPort(PortConstant.MODEL).getAnyDataOrNull();
+            MetaData metaData = decisionTreeOperator.getOutputPorts().getPort(PortConstant.MODEL).getMetaData();
             if (treeModel == null) {
                 log.info("Get decision tree model from 'drain_training' process, but the result obtained is null, " +
                         "then run the 'drain_training' process again. tenantId:%s", tenantId);
                 OperatorProcess newRunProcess = processManager.runSyn(trainProcess.getId());
                 decisionTreeOperator = getOperator(newRunProcess, ProcessConstant.OperatorType.ParallelDecisionTreeLearner);
-                treeModel = decisionTreeOperator.getOutputPorts().getPort(PortType.MODEL).getAnyDataOrNull();
-                metaData = decisionTreeOperator.getOutputPorts().getPort(PortType.MODEL).getMetaData();
+                treeModel = decisionTreeOperator.getOutputPorts().getPort(PortConstant.MODEL).getAnyDataOrNull();
+                metaData = decisionTreeOperator.getOutputPorts().getPort(PortConstant.MODEL).getMetaData();
             }
             log.info("Get decision tree model from 'drain_training' process successfully. tenantId:%s", tenantId);
 
             // 4.Set decision tree model to 'drain_prediction' process
             Operator applyModelOperator = getOperator(predictionProcess, ProcessConstant.OperatorType.ModelApplier);
-            applyModelOperator.getInputPorts().getPort(PortType.MODEL).receive(treeModel);
-            applyModelOperator.getInputPorts().getPort(PortType.MODEL).receiveMD(metaData);
+            applyModelOperator.getInputPorts().getPort(PortConstant.MODEL).receive(treeModel);
+            applyModelOperator.getInputPorts().getPort(PortConstant.MODEL).receiveMD(metaData);
             log.info("Set decision tree model to 'drain_prediction' process successfully. tenantId:%s", tenantId);
 
             // 5.Run 'drain_prediction' process

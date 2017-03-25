@@ -13,13 +13,13 @@ public class OutputPortsImpl extends AbstractPorts<OutputPort> implements Output
     }
 
     @Override
-    public OutputPort createPort(PortType type) {
-        return createPort(type, true);
+    public OutputPort createPort(String name, String description) {
+        return createPort(name, description, true);
     }
 
     @Override
-    public OutputPort createPort(PortType type, boolean add) {
-        OutputPort out = new OutputPortImpl(this, type.getName(), type.getDescription());
+    public OutputPort createPort(String name, String description, boolean add) {
+        OutputPort out = new OutputPortImpl(this, name, description);
         if (add) {
             addPort(out);
         }
@@ -27,8 +27,8 @@ public class OutputPortsImpl extends AbstractPorts<OutputPort> implements Output
     }
 
     @Override
-    public OutputPort createPassThroughPort(PortType type) {
-        OutputPort in = new OutputPortImpl(this, type.getName(), type.getDescription());
+    public OutputPort createPassThroughPort(String name, String description) {
+        OutputPort in = new OutputPortImpl(this, name, description);
         addPort(in);
         return in;
     }

@@ -23,9 +23,9 @@ public abstract class AbstractPorts<T extends Port> implements Ports<T> {
     }
 
     @Override
-    public T getPort(PortType portType) {
+    public T getPort(String name) {
         for (T port : portList) {
-            if (portType.getName().equals(port.getName())) {
+            if (name.equals(port.getName())) {
                 return port;
             }
         }

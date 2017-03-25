@@ -11,13 +11,13 @@ import java.util.Observer;
  */
 public interface Ports<T> extends Serializable {
     /** Creates a new port and adds it to these Ports. */
-    public T createPort(PortType type);
+    public T createPort(String name, String description);
 
     /** Creates a new port and adds it to these Ports if add is true.. */
-    public T createPort(PortType type, boolean add);
+    public T createPort(String name, String description, boolean add);
 
     /** Creates (and adds) a new port whose {@link Port#simulatesStack()} returns false. */
-    public T createPassThroughPort(PortType type);
+    public T createPassThroughPort(String name, String description);
 
     public T createPassThroughPort(String name);
 
@@ -38,7 +38,7 @@ public interface Ports<T> extends Serializable {
     /** Returns an immutable view of the ports. */
     public List<T> getAllPorts();
 
-    public T getPort(PortType portType);
+    public T getPort(String name);
 
     /**
      * Add a port and notify the {@link Observer}s.

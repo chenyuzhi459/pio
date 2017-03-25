@@ -2,6 +2,7 @@ package io.sugo.pio.operator.learner;
 
 
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.AttributeWeights;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.*;
@@ -9,7 +10,6 @@ import io.sugo.pio.operator.error.ProcessSetupError;
 import io.sugo.pio.operator.performance.PerformanceVector;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.*;
 import io.sugo.pio.tools.ParameterService;
 import io.sugo.pio.tools.Tools;
@@ -27,12 +27,12 @@ public abstract class AbstractLearner extends Operator implements Learner {
 
     private static final Logger logger = new Logger(AbstractLearner.class);
 
-    private final InputPort exampleSetInput = getInputPorts().createPort(PortType.TRAINING_SET);
-    private final OutputPort modelOutput = getOutputPorts().createPort(PortType.MODEL);
-    private final OutputPort performanceOutput = getOutputPorts().createPort(PortType.ESTIMATED_PERFORMANCE,
-            canEstimatePerformance());
-    private final OutputPort weightsOutput = getOutputPorts().createPort(PortType.WEIGHTS, canCalculateWeights());
-    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET);
+    private final InputPort exampleSetInput = getInputPorts().createPort(PortConstant.TRAINING_SET, PortConstant.TRAINING_SET_DESC);
+    private final OutputPort modelOutput = getOutputPorts().createPort(PortConstant.MODEL, PortConstant.MODEL_DESC);
+    private final OutputPort performanceOutput = getOutputPorts().createPort(PortConstant.ESTIMATED_PERFORMANCE,
+            PortConstant.ESTIMATED_PERFORMANCE_DESC, canEstimatePerformance());
+    private final OutputPort weightsOutput = getOutputPorts().createPort(PortConstant.WEIGHTS, PortConstant.WEIGHTS_DESC, canCalculateWeights());
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
 
     @Override
     public IOContainer getResult() {

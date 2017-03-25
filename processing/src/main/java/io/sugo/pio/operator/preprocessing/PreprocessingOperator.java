@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.preprocessing;
 
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.set.NonSpecialAttributesExampleSet;
 import io.sugo.pio.i18n.I18N;
@@ -9,14 +10,12 @@ import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;
 import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.GenerateModelTransformationRule;
 import io.sugo.pio.tools.AttributeSubsetSelector;
 import io.sugo.pio.tools.Pair;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public abstract class PreprocessingOperator extends AbstractDataProcessing {
 
     private static final Logger logger = new Logger(PreprocessingOperator.class);
 
-    private final OutputPort modelOutput = getOutputPorts().createPort(PortType.PREPROCESSING_MODEL);
+    private final OutputPort modelOutput = getOutputPorts().createPort(PortConstant.PREPROCESSING_MODEL, PortConstant.PREPROCESSING_MODEL_DESC);
 
     protected final AttributeSubsetSelector attributeSelector = new AttributeSubsetSelector(this, getExampleSetInputPort(),
             getFilterValueTypes());

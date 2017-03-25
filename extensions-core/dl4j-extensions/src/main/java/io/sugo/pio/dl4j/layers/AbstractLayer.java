@@ -1,5 +1,6 @@
 package io.sugo.pio.dl4j.layers;
 
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.dl4j.io.LayerSemaphore;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
@@ -8,7 +9,6 @@ import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.PassThroughRule;
 import org.deeplearning4j.nn.conf.layers.Layer;
 
@@ -16,8 +16,8 @@ import org.deeplearning4j.nn.conf.layers.Layer;
  */
 public abstract class AbstractLayer extends Operator {
 
-    private final InputPort inPort = getInputPorts().createPort(PortType.THROUGH);
-    private final OutputPort outPort = getOutputPorts().createPort(PortType.THROUGH);
+    private final InputPort inPort = getInputPorts().createPort(PortConstant.THROUGH, PortConstant.THROUGH_DESC);
+    private final OutputPort outPort = getOutputPorts().createPort(PortConstant.THROUGH, PortConstant.THROUGH_DESC);
 
     public AbstractLayer() {
         getTransformer().addRule(new PassThroughRule(inPort, outPort, false));
@@ -31,7 +31,7 @@ public abstract class AbstractLayer extends Operator {
     public boolean isLinked() throws UserError {
 
         LayerSemaphore semaphore = inPort.getDataOrNull(LayerSemaphore.class);
-        if (semaphore != null && semaphore.getClass() == LayerSemaphore.class){
+        if (semaphore != null && semaphore.getClass() == LayerSemaphore.class) {
             return true;
         } else {
             return false;

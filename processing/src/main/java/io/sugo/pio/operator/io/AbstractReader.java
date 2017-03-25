@@ -2,12 +2,12 @@ package io.sugo.pio.operator.io;
 
 
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.MetaDataError;
@@ -25,7 +25,7 @@ import java.util.List;
  */
 public abstract class AbstractReader<T extends IOObject> extends Operator {
 
-    private final OutputPort outputPort = getOutputPorts().createPort(PortType.OUTPUT);
+    private final OutputPort outputPort = getOutputPorts().createPort(PortConstant.OUTPUT, PortConstant.OUTPUT_DESC);
     private final Class<? extends IOObject> generatedClass;
 
     private boolean cacheDirty = true;

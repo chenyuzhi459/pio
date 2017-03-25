@@ -1,6 +1,7 @@
 package io.sugo.pio.operator;
 
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.DataRowFactory;
 import io.sugo.pio.example.table.DataRowReader;
@@ -10,13 +11,11 @@ import io.sugo.pio.operator.preprocessing.MaterializeDataInMemory;
 import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.PassThroughRule;
 import io.sugo.pio.ports.metadata.SimplePrecondition;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,9 +28,9 @@ public abstract class AbstractExampleSetProcessing extends Operator {
 
     private static final Logger logger = new Logger(AbstractExampleSetProcessing.class);
 
-    private final InputPort exampleSetInput = getInputPorts().createPort(PortType.EXAMPLE_SET_INPUT);
-    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET_OUTPUT);
-    private final OutputPort originalOutput = getOutputPorts().createPort(PortType.ORIGINAL);
+    private final InputPort exampleSetInput = getInputPorts().createPort(PortConstant.EXAMPLE_SET_INPUT, PortConstant.EXAMPLE_SET_INPUT_DESC);
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortConstant.EXAMPLE_SET_OUTPUT, PortConstant.EXAMPLE_SET_OUTPUT_DESC);
+    private final OutputPort originalOutput = getOutputPorts().createPort(PortConstant.ORIGINAL, PortConstant.ORIGINAL_DESC);
 
     public AbstractExampleSetProcessing() {
         exampleSetInput.addPrecondition(new SimplePrecondition(exampleSetInput, getRequiredMetaData()));

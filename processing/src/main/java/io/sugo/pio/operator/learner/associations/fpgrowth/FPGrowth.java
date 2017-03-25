@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.learner.associations.fpgrowth;
 
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
@@ -16,7 +17,6 @@ import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 import io.sugo.pio.ports.metadata.ExampleSetPrecondition;
 import io.sugo.pio.tools.Ontology;
 
@@ -94,10 +94,10 @@ public class FPGrowth extends Operator {
 
     private static final String PARAMETER_KEEP_EXAMPLE_SET = "keep_example_set";
 
-    private final InputPort exampleSetInput = getInputPorts().createPort(PortType.EXAMPLE_SET);
+    private final InputPort exampleSetInput = getInputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
 
-    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortType.EXAMPLE_SET);
-    private final OutputPort frequentSetsOutput = getOutputPorts().createPort(PortType.FREQUENT_SETS);
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
+    private final OutputPort frequentSetsOutput = getOutputPorts().createPort(PortConstant.FREQUENT_SETS, PortConstant.FREQUENT_SETS_DESC);
 
     public FPGrowth() {
         super();
