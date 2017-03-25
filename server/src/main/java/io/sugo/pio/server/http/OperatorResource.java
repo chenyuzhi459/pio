@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.annotations.Json;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
@@ -64,8 +65,8 @@ public class OperatorResource {
             OperatorDto dto
     ) {
         try {
-            Preconditions.checkNotNull(processId, "processId cannot be null");
-            Preconditions.checkNotNull(dto.getOperatorType(), "operatorType cannot be null");
+            Preconditions.checkNotNull(processId, I18N.getMessage("pio.error.operator.process_id_can_not_null"));
+            Preconditions.checkNotNull(dto.getOperatorType(), I18N.getMessage("pio.error.operator.type_can_not_null"));
             OperatorProcess process = processManager.addOperator(processId, dto);
             return Response.ok(process).build();
         } catch (Exception e) {
@@ -110,10 +111,10 @@ public class OperatorResource {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response connect(@PathParam("processId") final String processId, Connection dto) {
         try {
-            Preconditions.checkNotNull(dto.getFromOperator(), "fromOperator cannot be null");
-            Preconditions.checkNotNull(dto.getFromPort(), "fromPort cannot be null");
-            Preconditions.checkNotNull(dto.getToOperator(), "toOperator cannot be null");
-            Preconditions.checkNotNull(dto.getToPort(), "toPort cannot be null");
+            Preconditions.checkNotNull(dto.getFromOperator(), I18N.getMessage("pio.error.operator.from_can_not_null"));
+            Preconditions.checkNotNull(dto.getFromPort(), I18N.getMessage("pio.error.operator.from_port_can_not_null"));
+            Preconditions.checkNotNull(dto.getToOperator(), I18N.getMessage("pio.error.operator.to_can_not_null"));
+            Preconditions.checkNotNull(dto.getToPort(), I18N.getMessage("pio.error.operator.to_port_can_not_null"));
             OperatorProcess process = processManager.connect(processId, dto);
             return Response.ok(process).build();
         } catch (Exception e) {
@@ -127,10 +128,10 @@ public class OperatorResource {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response disconnect(@PathParam("processId") final String processId, Connection dto) {
         try {
-            Preconditions.checkNotNull(dto.getFromOperator(), "fromOperator cannot be null");
-            Preconditions.checkNotNull(dto.getFromPort(), "fromPort cannot be null");
-            Preconditions.checkNotNull(dto.getToOperator(), "toOperator cannot be null");
-            Preconditions.checkNotNull(dto.getToPort(), "toPort cannot be null");
+            Preconditions.checkNotNull(dto.getFromOperator(), I18N.getMessage("pio.error.operator.from_can_not_null"));
+            Preconditions.checkNotNull(dto.getFromPort(), I18N.getMessage("pio.error.operator.from_port_can_not_null"));
+            Preconditions.checkNotNull(dto.getToOperator(), I18N.getMessage("pio.error.operator.to_can_not_null"));
+            Preconditions.checkNotNull(dto.getToPort(), I18N.getMessage("pio.error.operator.to_port_can_not_null"));
             OperatorProcess process = processManager.disconnect(processId, dto);
             return Response.ok(process).build();
         } catch (Exception e) {

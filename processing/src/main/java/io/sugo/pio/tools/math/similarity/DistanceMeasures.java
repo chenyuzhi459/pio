@@ -33,21 +33,37 @@ public class DistanceMeasures {
     public static final String PARAMETER_MIXED_MEASURE = "mixed_measure";
     public static final String PARAMETER_DIVERGENCE = "divergence";
 
-    public static final String[] MEASURE_TYPES = new String[]{"MixedMeasures", "NominalMeasures", "NumericalMeasures",
-            "BregmanDivergences"};
+    /*public static final String[] MEASURE_TYPES = new String[]{"MixedMeasures", "NominalMeasures", "NumericalMeasures",
+            "BregmanDivergences"};*/
+    public static final String[] MEASURE_TYPES = new String[]{
+            I18N.getMessage("pio.DistanceMeasures.mixed_measure"),
+            I18N.getMessage("pio.DistanceMeasures.nominal_measure"),
+            I18N.getMessage("pio.DistanceMeasures.numerical_measure"),
+            I18N.getMessage("pio.DistanceMeasures.divergence")
+    };
 
     public static final int MIXED_MEASURES_TYPE = 0;
     public static final int NOMINAL_MEASURES_TYPE = 1;
     public static final int NUMERICAL_MEASURES_TYPE = 2;
     public static final int DIVERGENCES_TYPE = 3;
 
-    private static String[] NOMINAL_MEASURES = new String[]{"NominalDistance", "DiceSimilarity", "JaccardSimilarity",
-            "KulczynskiSimilarity", "RogersTanimotoSimilarity", "RussellRaoSimilarity", "SimpleMatchingSimilarity"};
+    /*private static String[] NOMINAL_MEASURES = new String[]{"NominalDistance", "DiceSimilarity", "JaccardSimilarity",
+            "KulczynskiSimilarity", "RogersTanimotoSimilarity", "RussellRaoSimilarity", "SimpleMatchingSimilarity"};*/
+    private static String[] NOMINAL_MEASURES = new String[]{
+            "NominalDistance",
+            "DiceSimilarity",
+            "JaccardSimilarity",
+            "KulczynskiSimilarity",
+            "RogersTanimotoSimilarity",
+            "RussellRaoSimilarity",
+            "SimpleMatchingSimilarity"
+    };
     private static Class[] NOMINAL_MEASURE_CLASSES = new Class[]{NominalDistance.class, DiceNominalSimilarity.class,
             JaccardNominalSimilarity.class, KulczynskiNominalSimilarity.class, RogersTanimotoNominalSimilarity.class,
             RussellRaoNominalSimilarity.class, SimpleMatchingNominalSimilarity.class};
 
-    private static String[] MIXED_MEASURES = new String[]{"MixedEuclideanDistance"};
+    /*private static String[] MIXED_MEASURES = new String[]{"MixedEuclideanDistance"};*/
+    private static String[] MIXED_MEASURES = new String[]{I18N.getMessage("pio.DistanceMeasures.MixedEuclideanDistance")};
     private static Class[] MIXED_MEASURE_CLASSES = new Class[]{MixedEuclideanDistance.class};
 
     /* If this changes, the parameter dependencies might need to be updated */

@@ -38,6 +38,8 @@ public interface Ports<T> extends Serializable {
     /** Returns an immutable view of the ports. */
     public List<T> getAllPorts();
 
+    public T getPort(PortType portType);
+
     /**
      * Add a port and notify the {@link Observer}s.
      */

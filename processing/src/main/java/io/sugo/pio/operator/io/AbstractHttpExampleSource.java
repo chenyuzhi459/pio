@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.io;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.google.common.base.Strings;
@@ -19,6 +20,8 @@ import org.jboss.netty.handler.codec.http.HttpMethod;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -28,7 +31,7 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
 
     private static final Logger logger = new Logger(AbstractHttpExampleSource.class);
 
-    public final ObjectMapper jsonMapper = new ObjectMapper();
+    public static final ObjectMapper jsonMapper = new ObjectMapper();
 
     protected String httpGet(String url) {
         if (!isValidUrl(url)) {
@@ -79,6 +82,22 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
             } catch (IOException e) {
                 logger.warn("Deserialize '" + json + "' to type [" + clazz.getName() +
                         "] failed, details:" + e.getMessage());
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    protected <T> List<T> deserialize2list(String json, Class<T> clazz) {
+        if (Objects.nonNull(json)) {
+            JavaType javaType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, clazz);
+            try {
+                List<T> instance = jsonMapper.readValue(json, javaType);
+                return instance;
+            } catch (IOException e) {
+                logger.warn("Deserialize '" + json + "' to type [" + clazz.getName() +
+                        "] list failed, details:" + e.getMessage());
                 return null;
             }
         }

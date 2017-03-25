@@ -15,26 +15,26 @@ public class ParameterTypeDynamicCategory extends ParameterTypeSingle {
     private String defaultValue = null;
 
     @JsonProperty
-    private DynamicCategoryCombo[] categories;
+    private String[] categories;
 
     private boolean editable = true;
 
     public ParameterTypeDynamicCategory(String key, String observeKey, String description) {
-        this(key, observeKey, description, new DynamicCategoryCombo[0]);
+        this(key, observeKey, description, new String[0]);
     }
 
     public ParameterTypeDynamicCategory(String key, String observeKey, String description,
-                                        DynamicCategoryCombo[] categories) {
+                                        String[] categories) {
         this(key, observeKey, description, categories, null);
     }
 
     public ParameterTypeDynamicCategory(String key, String observeKey, String description,
-                                        DynamicCategoryCombo[] categories, String defaultValue) {
+                                        String[] categories, String defaultValue) {
         this(key, observeKey, description, categories, defaultValue, true);
     }
 
     public ParameterTypeDynamicCategory(String key, String observeKey, String description,
-                                        DynamicCategoryCombo[] categories, String defaultValue, boolean editable) {
+                                        String[] categories, String defaultValue, boolean editable) {
         super(key, description);
         this.categories = categories;
         this.defaultValue = defaultValue;
@@ -42,16 +42,6 @@ public class ParameterTypeDynamicCategory extends ParameterTypeSingle {
         this.observeKey = observeKey;
         this.categories = categories;
         setOptional(defaultValue != null);
-    }
-
-    public String getCategoryName(String categoryId) {
-        for (int i = 0; i < categories.length; i++) {
-            if (categories[i].getId().equals(categoryId)) {
-                return categories[i].getName();
-            }
-        }
-
-        return null;
     }
 
     @Override
@@ -74,36 +64,4 @@ public class ParameterTypeDynamicCategory extends ParameterTypeSingle {
         return null;
     }
 
-    public static final class DynamicCategoryCombo {
-        @JsonProperty
-        String id;
-        @JsonProperty
-        String name;
-        @JsonProperty
-        String desc;
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getDesc() {
-            return desc;
-        }
-
-        public void setDesc(String desc) {
-            this.desc = desc;
-        }
-    }
 }

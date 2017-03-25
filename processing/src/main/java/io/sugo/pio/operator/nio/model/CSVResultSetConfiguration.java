@@ -118,10 +118,11 @@ public class CSVResultSetConfiguration implements DataResultSetFactory {
         }
 
         if (Strings.isNullOrEmpty(csvFile)) {
-            throw new OperatorException("pio.error.file_not_specfied");
+            throw new OperatorException("pio.error.file_not_specfied", "");
         }
 
-        logger.info("CSVResultSetConfiguration found csv file[%s], and initiate the mode that read csv from file.", csvFile);
+        logger.info("CSVResultSetConfiguration found csv file[%s], and initiate the mode that read csv from " +
+                "file.", csvFile);
         return new CSVResultSet(this, operator);
     }
 

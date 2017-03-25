@@ -184,10 +184,10 @@ public abstract class PreprocessingOperator extends AbstractDataProcessing {
         type.setHidden(true);
         types.add(type);
 
-        type = new ParameterTypeBoolean(PARAMETER_CREATE_VIEW,
+        /*type = new ParameterTypeBoolean(PARAMETER_CREATE_VIEW,
                 I18N.getMessage("pio.PreprocessingOperator.create_view"), false);
         type.setHidden(!isSupportingView());
-        types.add(type);
+        types.add(type);*/
 
         types.addAll(attributeSelector.getParameterTypes());
         return types;

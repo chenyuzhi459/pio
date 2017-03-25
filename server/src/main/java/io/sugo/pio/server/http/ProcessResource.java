@@ -6,7 +6,10 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.constant.ProcessConstant;
 import io.sugo.pio.guice.annotations.Json;
+import io.sugo.pio.i18n.I18N;
+import io.sugo.pio.operator.UserError;
 import io.sugo.pio.server.process.ProcessManager;
 import io.sugo.pio.server.utils.JsonUtil;
 import org.codehaus.jettison.json.JSONObject;
@@ -14,7 +17,9 @@ import org.codehaus.jettison.json.JSONObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("/pio/process/")
 public class ProcessResource {
@@ -39,11 +44,12 @@ public class ProcessResource {
     }
 
     @GET
-    @Path("/")
+    @Path("/list/{tenantId}")
     @Produces({MediaType.APPLICATION_JSON})
-    public Response getAll(@QueryParam("all") boolean all) {
+    public Response getAll(@PathParam("tenantId") final String tenantId, @QueryParam("all") boolean all) {
         try {
-            List<OperatorProcess> processes = processManager.getAll(all);
+            Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
+            List<OperatorProcess> processes = processManager.getAll(tenantId, all);
             return Response.ok(processes).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
@@ -51,19 +57,61 @@ public class ProcessResource {
     }
 
     @POST
-    @Path("/")
+    @Path("/{tenantId}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response create(String query) {
+    public Response create(@PathParam("tenantId") final String tenantId, String query) {
         try {
             JSONObject jsonObject = new JSONObject(query);
 
             String name = JsonUtil.getString(jsonObject, "name");
             String description = JsonUtil.getString(jsonObject, "description");
-            Preconditions.checkNotNull(name, "process name cannot be null");
+            Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.name_can_not_null"));
+            Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
 
-            OperatorProcess process = processManager.create(name, description);
+            OperatorProcess process = processManager.create(tenantId, name, description);
             return Response.ok(process).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/template/{tenantId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response createTemplate(@PathParam("tenantId") final String tenantId, String query) {
+        try {
+            JSONObject jsonObject = new JSONObject(query);
+
+            String name = JsonUtil.getString(jsonObject, "name");
+            String description = JsonUtil.getString(jsonObject, "description");
+            String type = JsonUtil.getString(jsonObject, "type");
+            Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.name_can_not_null"));
+            Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
+            Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.template_type_can_not_null"));
+
+            OperatorProcess template = processManager.getTemplate(type);
+            if (template != null) {
+                throw new RuntimeException(I18N.getMessage("pio.error.process.template_already_exist"));
+            }
+
+            OperatorProcess process = processManager.create(tenantId, name, description, type);
+            return Response.ok(process).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/template/spec")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getTemplateSpec() {
+        try {
+            Map<String, String> templateSpec = new HashMap<>();
+            templateSpec.put(ProcessConstant.Type.DRAIN_TRAINING, I18N.getMessage("pio.ProcessType.drain_training"));
+            templateSpec.put(ProcessConstant.Type.DRAIN_PREDICTION, I18N.getMessage("pio.ProcessType.drain_prediction"));
+            return Response.ok(templateSpec).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
@@ -105,7 +153,7 @@ public class ProcessResource {
     @Produces({MediaType.APPLICATION_JSON})
     public Response get(@PathParam("id") final String id, @QueryParam("all") boolean all) {
         try {
-            OperatorProcess process = processManager.get(id, all);
+            OperatorProcess process = processManager.getFromCache(id, all);
             return Response.ok(process).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
@@ -113,11 +161,11 @@ public class ProcessResource {
     }
 
     @GET
-    @Path("/run/{id}")
+    @Path("/runAsyn/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response run(@PathParam("id") final String id) {
         try {
-            OperatorProcess process = processManager.run(id);
+            OperatorProcess process = processManager.runAsyn(id);
             return Response.ok(process).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();

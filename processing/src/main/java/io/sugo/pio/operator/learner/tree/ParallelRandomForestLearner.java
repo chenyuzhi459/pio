@@ -66,8 +66,12 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
      */
     public static final String PARAMETER_VOTING_STRATEGY = "voting_strategy";
 
-    public static final String[] VOTING_STRATEGIES = {VotingStrategy.CONFIDENCE_VOTE.toString(),
-            VotingStrategy.MAJORITY_VOTE.toString()};
+    /*public static final String[] VOTING_STRATEGIES = {VotingStrategy.CONFIDENCE_VOTE.toString(),
+            VotingStrategy.MAJORITY_VOTE.toString()};*/
+    public static final String[] VOTING_STRATEGIES = {
+            I18N.getMessage("pio.ParallelRandomForestLearner.voting_strategy.confidence_vote"),
+            I18N.getMessage("pio.ParallelRandomForestLearner.voting_strategy.majority_vote")
+    };
 
     /**
      * The last version which did not allow to specify the voting strategy.
@@ -354,7 +358,7 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
         type.setExpert(false);
         types.add(type);
 
-        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));
+//        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));
 
         return types;
     }

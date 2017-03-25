@@ -106,7 +106,6 @@ public class ParallelDecisionTreeLearner extends AbstractParallelTreeLearner {
 		List<ParameterType> types = super.getParameterTypes();
 
 		return types;
-
 	}
 
 }

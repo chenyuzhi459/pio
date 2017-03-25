@@ -22,6 +22,7 @@ import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.ports.InputPort;
@@ -37,8 +38,6 @@ import java.util.HashMap;
 
 /**
  * A normalization method for bringing the sum of all attribute values to 1.
- * 
- * @author Sebastian Land
  * 
  */
 public class ProportionNormalizationMethod extends AbstractNormalizationMethod {
@@ -94,6 +93,11 @@ public class ProportionNormalizationMethod extends AbstractNormalizationMethod {
 	@Override
 	public String getName() {
 		return "proportion transformation";
+	}
+
+	@Override
+	public String getDisplayName() {
+		return I18N.getMessage("pio.ProportionNormalizationMethod.display_name");
 	}
 
 }

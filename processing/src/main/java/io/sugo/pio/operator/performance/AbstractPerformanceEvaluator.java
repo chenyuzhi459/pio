@@ -496,14 +496,14 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
                 types.add(type);
             }
 
-            List<PerformanceCriterion> criteria = getCriteria();
+            /*List<PerformanceCriterion> criteria = getCriteria();
             boolean isDefault = true;
             for (PerformanceCriterion criterion : criteria) {
                 ParameterType type = new ParameterTypeBoolean(criterion.getName(), criterion.getDescription(), isDefault,
                         false);
                 types.add(type);
                 isDefault = false;
-            }
+            }*/
         }
 
         if (showSkipNaNLabelsParameter()) {
@@ -511,11 +511,11 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
                     I18N.getMessage("pio.AbstractPerformanceEvaluator.skip_undefined_labels"),
                     true));
         }
-        if (showComparatorParameter()) {
+        /*if (showComparatorParameter()) {
             types.add(new ParameterTypeString(PARAMETER_COMPARATOR_CLASS,
                     I18N.getMessage("pio.AbstractPerformanceEvaluator.comparator_class"),
                     true));
-        }
+        }*/
 
         types.add(new ParameterTypeBoolean(PARAMETER_USE_EXAMPLE_WEIGHTS,
                 I18N.getMessage("pio.AbstractPerformanceEvaluator.use_example_weights"),

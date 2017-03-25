@@ -58,7 +58,7 @@ public class DiscoveryModule implements Module
    * Requests that the un-annotated PioNode instance be injected and published as part of the lifecycle.
    * 
    * That is, this module will announce the PioNode instance returned by
-   * injector.getInstance(Key.get(PioNode.class)) automatically.
+   * injector.getInstance(Key.getFromCache(PioNode.class)) automatically.
    * Announcement will happen in the LAST stage of the Lifecycle
    *
    * @param binder the Binder to register with
@@ -72,7 +72,7 @@ public class DiscoveryModule implements Module
    * Requests that the annotated PioNode instance be injected and published as part of the lifecycle.
    * 
    * That is, this module will announce the PioNode instance returned by
-   * injector.getInstance(Key.get(PioNode.class, annotation)) automatically.
+   * injector.getInstance(Key.getFromCache(PioNode.class, annotation)) automatically.
    * Announcement will happen in the LAST stage of the Lifecycle
    *
    * @param annotation The annotation instance to use in finding the PioNode instance, usually a Named annotation
@@ -86,7 +86,7 @@ public class DiscoveryModule implements Module
    * Requests that the annotated PioNode instance be injected and published as part of the lifecycle.
    * 
    * That is, this module will announce the PioNode instance returned by
-   * injector.getInstance(Key.get(PioNode.class, annotation)) automatically.
+   * injector.getInstance(Key.getFromCache(PioNode.class, annotation)) automatically.
    * Announcement will happen in the LAST stage of the Lifecycle
    *
    * @param binder the Binder to register with
@@ -101,7 +101,7 @@ public class DiscoveryModule implements Module
    * Requests that the keyed PioNode instance be injected and published as part of the lifecycle.
    * 
    * That is, this module will announce the PioNode instance returned by
-   * injector.getInstance(Key.get(PioNode.class, annotation)) automatically.
+   * injector.getInstance(Key.getFromCache(PioNode.class, annotation)) automatically.
    * Announcement will happen in the LAST stage of the Lifecycle
    *
    * @param binder the Binder to register with

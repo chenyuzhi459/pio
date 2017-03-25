@@ -56,8 +56,8 @@ public class Normalization extends PreprocessingOperator {
     static {
         registerNormalizationMethod(new ZTransformationNormalizationMethod());
         registerNormalizationMethod(new RangeNormalizationMethod());
-        registerNormalizationMethod(new ProportionNormalizationMethod());
-        registerNormalizationMethod(new IQRNormalizationMethod());
+//        registerNormalizationMethod(new ProportionNormalizationMethod());
+//        registerNormalizationMethod(new IQRNormalizationMethod());
     }
 
     /**
@@ -183,7 +183,8 @@ public class Normalization extends PreprocessingOperator {
         NORMALIZATION_METHODS = new String[METHODS.size()];
         int i = 0;
         for (NormalizationMethod method : METHODS) {
-            NORMALIZATION_METHODS[i] = method.getName();
+//            NORMALIZATION_METHODS[i] = method.getName();
+            NORMALIZATION_METHODS[i] = method.getDisplayName();
             i++;
         }
     }

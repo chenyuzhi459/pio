@@ -21,6 +21,7 @@ package io.sugo.pio.operator.preprocessing.normalization;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.Statistics;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.ports.InputPort;
@@ -41,7 +42,6 @@ import java.util.HashMap;
 /**
  * The normalization method for the Z-Transformation
  * 
- * @author Sebastian Land
  */
 public class ZTransformationNormalizationMethod extends AbstractNormalizationMethod {
 
@@ -73,6 +73,11 @@ public class ZTransformationNormalizationMethod extends AbstractNormalizationMet
 	@Override
 	public String getName() {
 		return "Z-transformation";
+	}
+
+	@Override
+	public String getDisplayName() {
+		return I18N.getMessage("pio.ZTransformationNormalizationMethod.display_name");
 	}
 
 }

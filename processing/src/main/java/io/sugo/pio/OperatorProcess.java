@@ -3,6 +3,7 @@ package io.sugo.pio;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.metamx.common.IAE;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.constant.ProcessConstant;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.ProcessRootOperator;
@@ -21,8 +22,24 @@ import java.util.*;
 public class OperatorProcess {
 
     private String id;
+    /**
+     * The tenant ID of this process
+     */
+    private String tenantId;
     private String name;
     private String description;
+    /**
+     * Indicates is it a built-in process
+     */
+    private int builtIn = ProcessConstant.BuiltIn.NO;
+    /**
+     * Indicates is it a template process
+     */
+    private int isTemplate = ProcessConstant.IsTemplate.NO;
+    /**
+     * The type of this process
+     */
+    private String type;
     private Status status = Status.INIT;
     private DateTime createTime;
     private DateTime updateTime;
@@ -65,6 +82,11 @@ public class OperatorProcess {
     }
 
     @JsonProperty
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    @JsonProperty
     public String getName() {
         return name;
     }
@@ -93,12 +115,41 @@ public class OperatorProcess {
         this.id = id;
     }
 
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getBuiltIn() {
+        return builtIn;
+    }
+
+    public void setBuiltIn(int builtIn) {
+        this.builtIn = builtIn;
+    }
+
+    public int getIsTemplate() {
+        return isTemplate;
+    }
+
+    public void setIsTemplate(int isTemplate) {
+        this.isTemplate = isTemplate;
+    }
+
+    @JsonProperty
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public void setStatus(Status status) {
@@ -226,17 +277,20 @@ public class OperatorProcess {
     public String registerName(final String name, final Operator operator) {
         if (operatorNameMap.get(name) != null) {
             String baseName = name;
-            int index = baseName.indexOf(" (");
-            if (index >= 0) {
-                baseName = baseName.substring(0, index);
+            if (baseName != null) {
+                int index = baseName.indexOf(" (");
+                if (index >= 0) {
+                    baseName = baseName.substring(0, index);
+                }
+                int i = 2;
+                while (operatorNameMap.get(baseName + " (" + i + ")") != null) {
+                    i++;
+                }
+                String newName = baseName + " (" + i + ")";
+                operatorNameMap.put(newName, operator);
+                return newName;
             }
-            int i = 2;
-            while (operatorNameMap.get(baseName + " (" + i + ")") != null) {
-                i++;
-            }
-            String newName = baseName + " (" + i + ")";
-            operatorNameMap.put(newName, operator);
-            return newName;
+            return name;
         } else {
             operatorNameMap.put(name, operator);
             return name;
@@ -256,6 +310,10 @@ public class OperatorProcess {
 
     public void failed() {
         setStatus(Status.FAILED);
+    }
+
+    public boolean runFinished() {
+        return status.equals(Status.FAILED) || status.equals(Status.SUCCESS);
     }
 
     public Operator getOperator(String operatorId) {
@@ -371,5 +429,4 @@ public class OperatorProcess {
     private List<InputPort> getEndPorts(Operator operator) {
         return operator.getExecutionUnit().getInnerSinks().getAllPorts();
     }
-
 }

@@ -45,11 +45,9 @@ public class Initialization {
      *
      * @param config Extensions configuration
      * @param clazz  The class of extension module (e.g., DruidModule)
-     *
      * @return A collection that contains distinct extension modules
      */
-    public synchronized static <T> Collection<T> getFromExtensions(ExtensionsConfig config, Class<T> clazz)
-    {
+    public synchronized static <T> Collection<T> getFromExtensions(ExtensionsConfig config, Class<T> clazz) {
         final Set<T> retVal = Sets.newHashSet();
         final Set<String> loadedExtensionNames = Sets.newHashSet();
 
@@ -86,8 +84,7 @@ public class Initialization {
                         retVal.add(module);
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw Throwables.propagate(e);
             }
         }
@@ -102,11 +99,9 @@ public class Initialization {
      *
      * @param config Engines configuration
      * @param clazz  The class of extension module (e.g., DruidModule)
-     *
      * @return A collection that contains distinct extension modules
      */
-    private synchronized static <T> Collection<T> getFromEngines(EnginesConfig config, Class<T> clazz)
-    {
+    private synchronized static <T> Collection<T> getFromEngines(EnginesConfig config, Class<T> clazz) {
         final Set<T> retVal = Sets.newHashSet();
         final Set<String> loadedExtensionNames = Sets.newHashSet();
 
@@ -143,8 +138,7 @@ public class Initialization {
                         retVal.add(module);
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw Throwables.propagate(e);
             }
         }
@@ -159,11 +153,9 @@ public class Initialization {
      *
      * @param config Engines configuration
      * @param clazz  The class of extension module (e.g., DruidModule)
-     *
      * @return A collection that contains distinct extension modules
      */
-    private synchronized static <T> Collection<T> getFromEngineExtensions(EnginesConfig config, Class<T> clazz)
-    {
+    private synchronized static <T> Collection<T> getFromEngineExtensions(EnginesConfig config, Class<T> clazz) {
         final Set<T> retVal = Sets.newHashSet();
         final Set<String> loadedExtensionNames = Sets.newHashSet();
 
@@ -200,8 +192,7 @@ public class Initialization {
                         retVal.add(module);
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw Throwables.propagate(e);
             }
         }
@@ -219,11 +210,9 @@ public class Initialization {
      * under the root extensions directory.
      *
      * @param config ExtensionsConfig configured by druid.extensions.xxx
-     *
      * @return an array of druid extension files that will be loaded by druid process
      */
-    public static File[] getExtensionFilesToLoad(ExtensionsConfig config)
-    {
+    public static File[] getExtensionFilesToLoad(ExtensionsConfig config) {
         final File rootExtensionsDir = new File(config.getDirectory());
         if (!rootExtensionsDir.exists() || !rootExtensionsDir.isDirectory()) {
             log.warn("Root extensions directory [%s] is not a directory!?", rootExtensionsDir);
@@ -262,11 +251,9 @@ public class Initialization {
      * under the root extensions directory.
      *
      * @param config ExtensionsConfig configured by druid.extensions.xxx
-     *
      * @return an array of druid extension files that will be loaded by druid process
      */
-    public static File[] getEngineFilesToLoad(EnginesConfig config)
-    {
+    public static File[] getEngineFilesToLoad(EnginesConfig config) {
         final File rootExtensionsDir = new File(config.getEnginesDirectory());
         if (!rootExtensionsDir.exists() || !rootExtensionsDir.isDirectory()) {
             log.warn("Root extensions directory [%s] is not a directory!?", rootExtensionsDir);
@@ -305,11 +292,9 @@ public class Initialization {
      * under the root extensions directory.
      *
      * @param config ExtensionsConfig configured by druid.extensions.xxx
-     *
      * @return an array of druid extension files that will be loaded by druid process
      */
-    public static File[] getEngineExtensionFilesToLoad(EnginesConfig config)
-    {
+    public static File[] getEngineExtensionFilesToLoad(EnginesConfig config) {
         final File rootExtensionsDir = new File(config.getExtensionsDirectory());
         if (!rootExtensionsDir.exists() || !rootExtensionsDir.isDirectory()) {
             log.warn("Root extensions directory [%s] is not a directory!?", rootExtensionsDir);
@@ -323,15 +308,13 @@ public class Initialization {
      * Find all the hadoop dependencies that should be loaded by druid
      *
      * @param sparkDependencyCoordinates e.g.["org.apache.hadoop:hadoop-client:2.3.0"]
-     * @param extensionsConfig            ExtensionsConfig configured by druid.extensions.xxx
-     *
+     * @param extensionsConfig           ExtensionsConfig configured by druid.extensions.xxx
      * @return an array of hadoop dependency files that will be loaded by druid process
      */
     public static File[] getSparkFilesToLoad(
             List<String> sparkDependencyCoordinates,
             ExtensionsConfig extensionsConfig
-    )
-    {
+    ) {
         final File rootSparkDependenciesDir = new File(extensionsConfig.getSparkDependenciesDir());
         if (rootSparkDependenciesDir.exists() && !rootSparkDependenciesDir.isDirectory()) {
             throw new ISE("Root Spark dependencies directory [%s] is not a directory!?", rootSparkDependenciesDir);
@@ -356,13 +339,10 @@ public class Initialization {
 
     /**
      * @param extension The File instance of the extension we want to load
-     *
      * @return a URLClassLoader that loads all the jars on which the extension is dependent
-     *
      * @throws MalformedURLException
      */
-    public static URLClassLoader getClassLoaderForExtension(File extension) throws MalformedURLException
-    {
+    public static URLClassLoader getClassLoaderForExtension(File extension) throws MalformedURLException {
         URLClassLoader loader = loadersMap.get(extension);
         if (loader == null) {
             final Collection<File> jars = FileUtils.listFiles(extension, new String[]{"jar"}, false);
@@ -395,6 +375,7 @@ public class Initialization {
                 new MetadataConfigModule(),
                 new DerbyMetadataStoragePioModule(),
                 new ProcessPioModule(),
+//                new DL4JModule(),
                 new JacksonConfigManagerModule(),
                 new TaskServiceDiscoveryModule(),
                 new BrokerServiceDiscoveryModule()
@@ -426,26 +407,22 @@ public class Initialization {
         return Guice.createInjector(Modules.override(intermediateModules).with(extensionModules.getModules()));
     }
 
-    private static class ModuleList
-    {
+    private static class ModuleList {
         private final Injector baseInjector;
         private final ObjectMapper jsonMapper;
         private final List<Module> modules;
 
-        public ModuleList(Injector baseInjector)
-        {
+        public ModuleList(Injector baseInjector) {
             this.baseInjector = baseInjector;
             this.jsonMapper = baseInjector.getInstance(Key.get(ObjectMapper.class, Json.class));
             this.modules = Lists.newArrayList();
         }
 
-        private List<Module> getModules()
-        {
+        private List<Module> getModules() {
             return Collections.unmodifiableList(modules);
         }
 
-        public void addModule(Object input)
-        {
+        public void addModule(Object input) {
             if (input instanceof PioModule) {
                 baseInjector.injectMembers(input);
                 modules.add(registerJacksonModules(((PioModule) input)));
@@ -472,31 +449,27 @@ public class Initialization {
             }
         }
 
-        public void addModules(Object... object)
-        {
+        public void addModules(Object... object) {
             for (Object o : object) {
                 addModule(o);
             }
         }
 
-        private PioModule registerJacksonModules(PioModule module)
-        {
+        private PioModule registerJacksonModules(PioModule module) {
             for (com.fasterxml.jackson.databind.Module jacksonModule : module.getJacksonModules()) {
                 jsonMapper.registerModule(jacksonModule);
             }
             return module;
         }
 
-        private EngineModule registerJacksonModules(EngineModule module)
-        {
+        private EngineModule registerJacksonModules(EngineModule module) {
             for (com.fasterxml.jackson.databind.Module jacksonModule : module.getJacksonModules()) {
                 jsonMapper.registerModule(jacksonModule);
             }
             return module;
         }
 
-        private EngineExtensionModule registerJacksonModules(EngineExtensionModule module)
-        {
+        private EngineExtensionModule registerJacksonModules(EngineExtensionModule module) {
             for (com.fasterxml.jackson.databind.Module jacksonModule : module.getJacksonModules()) {
                 jsonMapper.registerModule(jacksonModule);
             }

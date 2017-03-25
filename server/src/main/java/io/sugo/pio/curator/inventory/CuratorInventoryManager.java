@@ -64,7 +64,7 @@ public class CuratorInventoryManager<ContainerClass>
     this.containers = new MapMaker().makeMap();
     this.uninitializedInventory = Sets.newConcurrentHashSet();
 
-    //NOTE: cacheData is temporarily set to false and we get data directly from ZK on each event.
+    //NOTE: cacheData is temporarily set to false and we getFromCache data directly from ZK on each event.
     //this is a workaround to solve curator's out-of-order events problem
     //https://issues.apache.org/jira/browse/CURATOR-191
     this.cacheFactory = new SimplePathChildrenCacheFactory(false, true, new ShutdownNowIgnoringExecutorService(exec));
@@ -205,7 +205,7 @@ public class CuratorInventoryManager<ContainerClass>
             final ContainerClass container = strategy.deserializeContainer(data);
 
             // This would normally be a race condition, but the only thing that should be mutating the containers
-            // map is this listener, which should never run concurrently.  If the same container is going to disappear
+            // map is this listener, which should never runAsyn concurrently.  If the same container is going to disappear
             // and come back, we expect a removed event in between.
             if (containers.containsKey(containerKey)) {
               log.error("New node[%s] but there was already one.  That's not good, ignoring new one.", child.getPath());
@@ -286,7 +286,7 @@ public class CuratorInventoryManager<ContainerClass>
       }
     }
 
-    // must be run in synchronized(lock) { synchronized(holder) { ... } } block
+    // must be runAsyn in synchronized(lock) { synchronized(holder) { ... } } block
     private void markInventoryInitialized(final ContainerHolder holder)
     {
       holder.initialized = true;

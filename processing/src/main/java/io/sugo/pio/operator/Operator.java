@@ -29,6 +29,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     private String name;
     protected String fullName;
+    private String type;
     private Integer xPos;
     private Integer yPos;
     /**
@@ -803,5 +804,14 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     public IOContainer getResult() {
         return new IOContainer(new ArrayList<>());
+    }
+
+    @JsonProperty
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
