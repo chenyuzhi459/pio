@@ -107,7 +107,7 @@ public class ServerDiscoverySelector implements DiscoverySelector<Server>
       return Collections2.transform(serviceProvider.getAllInstances(), TO_SERVER);
     }
     catch (Exception e) {
-      log.info(e, "Unable to get all instances");
+      log.info(e, "Unable to getFromCache all instances");
       return Collections.emptyList();
     }
   }

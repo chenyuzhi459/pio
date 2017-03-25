@@ -71,10 +71,10 @@ public class CreateTables extends GuiceRunnable
                 }
             );
 //            JsonConfigProvider.bindInstance(
-//                binder, Key.get(MetadataStorageTablesConfig.class), MetadataStorageTablesConfig.fromBase(base)
+//                binder, Key.getFromCache(MetadataStorageTablesConfig.class), MetadataStorageTablesConfig.fromBase(base)
 //            );
 //            JsonConfigProvider.bindInstance(
-//                binder, Key.get(PioNode.class, Self.class), new PioNode("tools", "localhost", -1)
+//                binder, Key.getFromCache(PioNode.class, Self.class), new PioNode("tools", "localhost", -1)
 //            );
           }
         }

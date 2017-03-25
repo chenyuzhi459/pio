@@ -18,5 +18,5 @@ public interface MetadataProcessManager
   void insert(OperatorProcess spec);
   boolean update(OperatorProcess pi);
 
-  List<OperatorProcess> getAll(String tenantId, boolean includeDelete);
+  public List<OperatorProcess> getAll(String tenantId, boolean includeDelete, int builtIn, Integer isTemplate, String type);
 }

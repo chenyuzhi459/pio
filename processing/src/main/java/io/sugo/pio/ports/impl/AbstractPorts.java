@@ -22,6 +22,17 @@ public abstract class AbstractPorts<T extends Port> implements Ports<T> {
         return portList;
     }
 
+    @Override
+    public T getPort(PortType portType) {
+        for (T port : portList) {
+            if (portType.getName().equals(port.getName())) {
+                return port;
+            }
+        }
+
+        return null;
+    }
+
     public AbstractPorts(PortOwner owner) {
         this.owner = owner;
     }

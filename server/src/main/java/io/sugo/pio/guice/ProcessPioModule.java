@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
+import io.sugo.pio.constant.ProcessConstant;
 import io.sugo.pio.initialization.PioModule;
 import io.sugo.pio.operator.ModelApplier;
 import io.sugo.pio.operator.clustering.clusterer.KMeans;
@@ -43,36 +44,36 @@ public class ProcessPioModule implements PioModule {
         return ImmutableList.of(
                 new SimpleModule(ProcessPioModule.class.getSimpleName())
                         .registerSubtypes(
-                                new NamedType(DatabaseDataReader.class, "db_data_reader"),
-                                new NamedType(AttributeFilter.class, "select_attributes"),
-                                new NamedType(ExampleFilter.class, "filter_examples"),
-                                new NamedType(ChangeAttributeRole.class, "set_role"),
-                                new NamedType(Normalization.class, "normalization"),
-                                new NamedType(AggregationOperator.class, "aggregate"),
+                                new NamedType(DatabaseDataReader.class, ProcessConstant.OperatorType.DatabaseDataReader),
+                                new NamedType(AttributeFilter.class, ProcessConstant.OperatorType.AttributeFilter),
+                                new NamedType(ExampleFilter.class, ProcessConstant.OperatorType.ExampleFilter),
+                                new NamedType(ChangeAttributeRole.class, ProcessConstant.OperatorType.ChangeAttributeRole),
+                                new NamedType(Normalization.class, ProcessConstant.OperatorType.Normalization),
+                                new NamedType(AggregationOperator.class, ProcessConstant.OperatorType.AggregationOperator),
 
-                                new NamedType(NumericToBinominal.class, "numeric2binominal"),
-                                new NamedType(NumericToPolynominal.class, "numeric2polynominal"),
+                                new NamedType(NumericToBinominal.class, ProcessConstant.OperatorType.NumericToBinominal),
+                                new NamedType(NumericToPolynominal.class, ProcessConstant.OperatorType.NumericToPolynominal),
 
-                                new NamedType(ParallelDecisionTreeLearner.class, "parallel_decision_tree"),
-                                new NamedType(ParallelRandomForestLearner.class, "random_forest"),
+                                new NamedType(ParallelDecisionTreeLearner.class, ProcessConstant.OperatorType.ParallelDecisionTreeLearner),
+                                new NamedType(ParallelRandomForestLearner.class, ProcessConstant.OperatorType.ParallelRandomForestLearner),
 //                                new NamedType(LogisticRegression.class, "logistic_regression"),
-                                new NamedType(MyKLRLearner.class, "logistic_regression"),
-                                new NamedType(LinearRegression.class, "linear_regression"),
-                                new NamedType(KMeans.class, "k_means"),
-                                new NamedType(JMySVMLearner.class, "support_vector_machine"),
-                                new NamedType(FPGrowth.class, "fp_growth"),
-                                new NamedType(AssociationRuleGenerator.class, "create_association_rules"),
+                                new NamedType(MyKLRLearner.class, ProcessConstant.OperatorType.MyKLRLearner),
+                                new NamedType(LinearRegression.class, ProcessConstant.OperatorType.LinearRegression),
+                                new NamedType(KMeans.class, ProcessConstant.OperatorType.KMeans),
+                                new NamedType(JMySVMLearner.class, ProcessConstant.OperatorType.JMySVMLearner),
+                                new NamedType(FPGrowth.class, ProcessConstant.OperatorType.FPGrowth),
+                                new NamedType(AssociationRuleGenerator.class, ProcessConstant.OperatorType.AssociationRuleGenerator),
 
-                                new NamedType(PolynominalClassificationPerformanceEvaluator.class, "performance_classification"),
-                                new NamedType(BinominalClassificationPerformanceEvaluator.class, "performance_binominal_classification"),
-                                new NamedType(RegressionPerformanceEvaluator.class, "performance_regression"),
+                                new NamedType(PolynominalClassificationPerformanceEvaluator.class, ProcessConstant.OperatorType.PolynominalClassificationPerformanceEvaluator),
+                                new NamedType(BinominalClassificationPerformanceEvaluator.class, ProcessConstant.OperatorType.BinominalClassificationPerformanceEvaluator),
+                                new NamedType(RegressionPerformanceEvaluator.class, ProcessConstant.OperatorType.RegressionPerformanceEvaluator),
 
-                                new NamedType(SamplingOperator.class, "sample"),
-                                new NamedType(ModelApplier.class, "apply_model"),
+                                new NamedType(SamplingOperator.class, ProcessConstant.OperatorType.SamplingOperator),
+                                new NamedType(ModelApplier.class, ProcessConstant.OperatorType.ModelApplier),
 
-                                new NamedType(CSVExampleSource.class, "read_csv"),
-                                new NamedType(HttpSqlExampleSource.class, "http_sql_source"),
-                                new NamedType(SingleViewExampleSource.class, "single_view_source")
+                                new NamedType(CSVExampleSource.class, ProcessConstant.OperatorType.CSVExampleSource),
+                                new NamedType(HttpSqlExampleSource.class, ProcessConstant.OperatorType.HttpSqlExampleSource),
+                                new NamedType(SingleViewExampleSource.class, ProcessConstant.OperatorType.SingleViewExampleSource)
                         )
         );
     }

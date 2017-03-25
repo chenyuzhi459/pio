@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.io;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Strings;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
@@ -27,11 +28,15 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private static final Logger logger = new Logger(SingleViewExampleSource.class);
 
-    public static final String PARAMETER_URL = "url";
+//    public static final String PARAMETER_URL = "url";
 
     public static final String PARAMETER_DATA_SOURCE = "data_source";
 
     public static final String PARAMETER_SINGLE_VIEW_DATA_SOURCE = "single_view_data_source";
+
+    public static final String PARAMETER_PARAM = "param";
+
+    private static final String SINGLE_VIEW_URL_PREFIX = "http://192.168.0.212:8000/api";
 
     private static final String URI_LIST_DATA_SOURCE = "/datasources/list";
 
@@ -41,68 +46,66 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private static final String URI_QUERY_DRUID = "/slices/query-druid";
 
+    private static final String URI_QUERY_DIMENSION = "/dimension";
+
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
-        if (isParameterExist(PARAMETER_URL) && isParameterExist(PARAMETER_DATA_SOURCE) &&
-                isParameterExist(PARAMETER_SINGLE_VIEW_DATA_SOURCE)) {
-            String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-            String druidUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_QUERY_DRUID);
+        String druidUrl = SINGLE_VIEW_URL_PREFIX + URI_QUERY_DRUID;
 
-            String singleViewValue = buildQueryDruidParam();
-            String result = httpPost(druidUrl, singleViewValue);
+        String singleViewValue = buildQueryDruidParam();
+        String result = httpPost(druidUrl, singleViewValue);
 
-            if (result != null) {
-                List<Object> resultList;
-                try {
-                    resultList = parseResult(result);
-                } catch (IOException e) {
-                    throw new OperatorException("pio.error.parsing.unresolvable_druid_result", result, e);
-                }
+        if (result != null) {
+            List<Object> resultList;
+            try {
+                resultList = parseResult(result);
+            } catch (IOException e) {
+                throw new OperatorException("pio.error.parsing.unresolvable_druid_result", result, e);
+            }
 
-                logger.info("Get druid data from url '" + druidUrl + "' successfully.");
+            logger.info("Get druid data from url '" + druidUrl + "' successfully.");
 
-                DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
-                List<Attribute> attributes = getAttributes(resultList);
-                ExampleSetBuilder builder = ExampleSets.from(attributes);
+            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
+            List<Attribute> attributes = getAttributes();
+            ExampleSetBuilder builder = ExampleSets.from(attributes);
 
-                if (resultList != null && !resultList.isEmpty()) {
-                    logger.info("Begin to traverse druid data to example set data. Data size:" + resultList.size());
+            if (resultList != null && !resultList.isEmpty()) {
+                logger.info("Begin to traverse druid data to example set data. Data size:" + resultList.size());
 
-                    int attrSize = attributes.size();
+                int attrSize = attributes.size();
 
-                    // traverse all rows to store data
-                    for (Object resultObj : resultList) {
-                        String resultStr = null;
-                        Map resultMap = null;
-                        try {
-                            resultStr = jsonMapper.writeValueAsString(resultObj);
-                            if (Objects.nonNull(resultStr)) {
-                                resultMap = jsonMapper.readValue(resultStr, Map.class);
-                            }
-                        } catch (IOException e) {
-                            throw new OperatorException("pio.error.parsing.unresolvable_druid_row", resultStr, e);
+                // traverse all rows to store data
+                for (Object resultObj : resultList) {
+                    String resultStr = null;
+                    Map resultMap = null;
+                    try {
+                        resultStr = jsonMapper.writeValueAsString(resultObj);
+                        if (Objects.nonNull(resultStr)) {
+                            resultMap = jsonMapper.readValue(resultStr, Map.class);
                         }
-
-                        // one result corresponds to one data row
-                        DataRow dataRow = factory.create(attrSize);
-                        for (int i = 0; i < attrSize; i++) {
-                            Attribute attr = attributes.get(i);
-                            String attrName = attr.getName();
-                            Object attrValue = resultMap.get(attrName);
-                            String attrValueStr = attrValue == null ? null : attrValue.toString();
-
-                            double value = attr.getMapping().mapString(attrValueStr);
-                            dataRow.set(attr, value);
-                        }
-
-                        builder.addDataRow(dataRow);
+                    } catch (IOException e) {
+                        throw new OperatorException("pio.error.parsing.unresolvable_druid_row", resultStr, e);
                     }
 
-                    logger.info("Traverse druid data to example set data successfully.");
+                    // one result corresponds to one data row
+                    DataRow dataRow = factory.create(attrSize);
+                    for (int i = 0; i < attrSize; i++) {
+                        Attribute attr = attributes.get(i);
+                        String attrName = attr.getName();
+                        Object attrValue = resultMap.get(attrName);
+                        String attrValueStr = attrValue == null ? null : attrValue.toString();
+
+                        double value = attr.getMapping().mapString(attrValueStr);
+                        dataRow.set(attr, value);
+                    }
+
+                    builder.addDataRow(dataRow);
                 }
 
-                return builder.build();
+                logger.info("Traverse druid data to example set data successfully.");
             }
+
+            return builder.build();
         }
 
         return null;
@@ -126,15 +129,23 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
     @Override
     public List<ParameterType> getParameterTypes() {
         List types = super.getParameterTypes();
-        ParameterTypeString urlType = new ParameterTypeString(PARAMETER_URL,
+        /*ParameterTypeString urlType = new ParameterTypeString(PARAMETER_URL,
                 I18N.getMessage("pio.SingleViewExampleSource.url"), false);
-        types.add(urlType);
+        types.add(urlType);*/
 
-        ParameterTypeDynamicCategory dataSourceType = getDataSourceParamType();
+        ParameterTypeDynamicCategory dataSourceType = new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, null,
+                I18N.getMessage("pio.SingleViewExampleSource.data_source"),
+                new String[0], null);
         types.add(dataSourceType);
 
-        ParameterTypeDynamicCategory singleViewDataSourceType = getSingleViewParamType();
+        ParameterTypeDynamicCategory singleViewDataSourceType = new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE, null,
+                I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"),
+                new String[0], null);
         types.add(singleViewDataSourceType);
+
+        ParameterTypeString param = new ParameterTypeString(PARAMETER_PARAM, "param", false);
+        param.setHidden(true);
+        types.add(param);
 
         return types;
     }
@@ -142,156 +153,35 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
     @Override
     public MetaData getGeneratedMetaData() throws OperatorException {
         ExampleSetMetaData metaData = new ExampleSetMetaData();
-        if (isParameterExist(PARAMETER_URL) && isParameterExist(PARAMETER_DATA_SOURCE) &&
-                isParameterExist(PARAMETER_SINGLE_VIEW_DATA_SOURCE)) {
-            String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-            String druidUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_QUERY_DRUID);
-            String singleViewValue = buildQueryDruidParam();
-
-            String result = httpPost(druidUrl, singleViewValue);
-
-            if (result != null) {
-                List<Object> resultList;
-                try {
-                    resultList = parseResult(result);
-                } catch (IOException e) {
-                    throw new OperatorException("pio.error.parsing.unresolvable_druid_result", result, e);
-                }
-
-                List<Attribute> attributes = getAttributes(resultList);
-                if (attributes != null && !attributes.isEmpty()) {
-                    attributes.forEach(attribute -> {
-                        metaData.addAttribute(new AttributeMetaData(attribute));
-                    });
-                }
-
-                logger.info("Dynamic generate single view metadata successfully.");
-            }
+        List<Attribute> attributes = getAttributes();
+        if (attributes != null && !attributes.isEmpty()) {
+            attributes.forEach(attribute -> {
+                metaData.addAttribute(new AttributeMetaData(attribute));
+            });
         }
+
+        logger.info("Dynamic generate single view metadata successfully.");
 
         return metaData;
     }
 
-    /**
-     * 动态获取单图下拉列表的值
-     *
-     * @return
-     */
-    private ParameterTypeDynamicCategory getSingleViewParamType() {
-        if (isParameterExist(PARAMETER_DATA_SOURCE)) { // parameters不为空，且包含有值，再去取参数值，否则会死循环
-            String dataSourceName = getParameterAsString(PARAMETER_DATA_SOURCE);
-            if (!Strings.isNullOrEmpty(dataSourceName)) {
-                List<SingleMapVo> singleMapList = listSingleView();
-                if (singleMapList != null && !singleMapList.isEmpty()) {
-                    ParameterTypeDynamicCategory.DynamicCategoryCombo[] categories =
-                            new ParameterTypeDynamicCategory.DynamicCategoryCombo[singleMapList.size()];
-
-                    for (int i = 0; i < singleMapList.size(); i++) {
-                        SingleMapVo singleMap = singleMapList.get(i);
-
-                        ParameterTypeDynamicCategory.DynamicCategoryCombo category =
-                                new ParameterTypeDynamicCategory.DynamicCategoryCombo();
-
-                        category.setId(singleMap.getId());
-                        category.setName(singleMap.getSlice_name());
-//                        category.setDesc(singleMap.getDatasource_name());
-                        categories[i] = category;
-                    }
-
-                    logger.info("Dynamic generate single view parameter type successfully.");
-
-                    return new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE, PARAMETER_DATA_SOURCE,
-                            I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"),
-                            categories, categories.length > 0 ? categories[0].getId() : null);
-                }
-            }
-        }
-
-        return new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE,
-                PARAMETER_DATA_SOURCE,
-                I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"));
-    }
-
-    /**
-     * 动态获取数据源下拉列表的值
-     *
-     * @return
-     */
-    private ParameterTypeDynamicCategory getDataSourceParamType() {
-        if (isParameterExist(PARAMETER_URL)) { // parameters不为空，且包含有值，再去取参数值，否则会死循环
-            String url = getParameterAsString(PARAMETER_URL);
-            if (isValidUrl(url)) {
-                List<DataSourceVo> dataSourceList = listDataSource();
-                if (dataSourceList != null && !dataSourceList.isEmpty()) {
-                    ParameterTypeDynamicCategory.DynamicCategoryCombo[] categories =
-                            new ParameterTypeDynamicCategory.DynamicCategoryCombo[dataSourceList.size()];
-
-                    for (int i = 0; i < dataSourceList.size(); i++) {
-                        DataSourceVo dataSource = dataSourceList.get(i);
-
-                        ParameterTypeDynamicCategory.DynamicCategoryCombo category =
-                                new ParameterTypeDynamicCategory.DynamicCategoryCombo();
-                        category.setId(dataSource.getId());
-                        category.setName(dataSource.getName());
-                        category.setDesc(dataSource.getTitle());
-                        categories[i] = category;
-                    }
-
-                    logger.info("Dynamic generate data source parameter type successfully.");
-
-                    return new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, PARAMETER_URL,
-                            I18N.getMessage("pio.SingleViewExampleSource.data_source"),
-                            categories, categories.length > 0 ? categories[0].getId() : null);
-
-                }
-            }
-        }
-
-        return new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, PARAMETER_URL,
-                I18N.getMessage("pio.SingleViewExampleSource.data_source"));
-    }
-
     private String buildQueryDruidParam() {
-        if (isParameterExist(PARAMETER_SINGLE_VIEW_DATA_SOURCE)) {
-            String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-            String selectedSingleViewId = getParameterAsString(PARAMETER_SINGLE_VIEW_DATA_SOURCE);
+        String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
+        String param = getParameterAsString(PARAMETER_PARAM);
 
-            String singleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_DETAIL_SINGLE_MAP) + selectedSingleViewId;
-            SingleMapDetailWrapperVo singleMapDetailWrapper = httpGet(singleMapUrl, SingleMapDetailWrapperVo.class);
+//        Preconditions.checkNotNull(dataSource, I18N.getMessage("pio.error.operator.data_source_can_not_null"));
+//        Preconditions.checkNotNull(param, I18N.getMessage("pio.error.operator.param_can_not_null"));
 
-            if (singleMapDetailWrapper != null) {
-                try {
-                    SingleMapVo singleMapVo = singleMapDetailWrapper.getResult();
-                    SingleMapRequestVo requestVo = new SingleMapRequestVo();
-                    requestVo.setDruid_datasource_id(singleMapVo.getDruid_datasource_id());
-                    requestVo.setParams(singleMapVo.getParams());
-                    String requestStr = jsonMapper.writeValueAsString(requestVo);
-                    return requestStr;
-                } catch (IOException e) {
-                    logger.error("Build druid query parameter failed, details:" + e.getMessage());
-                    return null;
-                }
-            }
+        try {
+            SingleMapRequestVo requestVo = new SingleMapRequestVo();
+            requestVo.setDruid_datasource_id(dataSource);
+            requestVo.setParams(param);
+            String requestStr = jsonMapper.writeValueAsString(requestVo);
+            return requestStr;
+        } catch (IOException e) {
+            logger.error("Build druid query parameter failed, details:" + e.getMessage());
+            return null;
         }
-
-        return null;
-    }
-
-    private List<DataSourceVo> listDataSource() {
-        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-        DataSourceWrapperVo wrapperVo = httpGet(listDataSourceUrl, DataSourceWrapperVo.class);
-
-        return wrapperVo == null ? null : wrapperVo.getResult();
-    }
-
-    private List<SingleMapVo> listSingleView() {
-        String listDataSourceUrl = getParameterAsString(PARAMETER_URL);
-        String dataSourceValue = getParameterAsString(PARAMETER_DATA_SOURCE);
-
-        String listSingleMapUrl = listDataSourceUrl.replaceAll(URI_LIST_DATA_SOURCE, URI_LIST_SINGLE_MAP) + dataSourceValue;
-        SingleMapWrapperVo wrapperVo = httpGet(listSingleMapUrl, SingleMapWrapperVo.class);
-
-        return wrapperVo == null ? null : wrapperVo.getResult();
     }
 
     /**
@@ -359,7 +249,54 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         return attributes;
     }
 
-    private static class DataSourceWrapperVo {
+    private List<Attribute> getAttributes() {
+        List<Attribute> attributes = new ArrayList<>();
+//        String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
+//        String param = getParameterAsString(PARAMETER_PARAM);
+        String dataSource = "SJ9o92XGl";
+        String param = "{\"filters\":[{\"eq\":\"-7 days\",\"op\":\"in\",\"col\":\"__time\"}],\"metrics\":[\"wuxianjiRT_total\"],\"vizType\":\"multi_dim_line\",\"dimensions\":[\"Province\",\"__time\"],\"dimensionExtraSettingDict\":{\"__time\":{\"sortCol\":\"wuxianjiRT_total\",\"sortDirect\":\"desc\",\"granularity\":\"P1D\"},\"Province\":{\"sortCol\":\"wuxianjiRT_total\",\"sortDirect\":\"desc\"}}}";
+
+        if (!Strings.isNullOrEmpty(dataSource) && !Strings.isNullOrEmpty(param)) {
+            ParamVo paramVo = deserialize(param, ParamVo.class);
+            if (paramVo != null) {
+                Object dimensions = paramVo.getDimensions();
+
+                DimensionQueryVo dimensionQueryVo = new DimensionQueryVo();
+                dimensionQueryVo.setParentId(dataSource);
+                dimensionQueryVo.setName(dimensions.toString());
+
+                String dimensionQueryStr = null;
+                try {
+                    dimensionQueryStr = jsonMapper.writeValueAsString(dimensionQueryVo);
+                } catch (JsonProcessingException ignore) {
+                }
+
+                String dimensionUrl = SINGLE_VIEW_URL_PREFIX + URI_QUERY_DIMENSION;
+                String result = httpPost(dimensionUrl, dimensionQueryStr);
+                List<DimensionVo> dimensionList = deserialize2list(result, DimensionVo.class);
+                if (dimensionList != null) {
+                    dimensionList.forEach(dimensionVo -> {
+                        String name = dimensionVo.getName();
+                        String type = dimensionVo.getType();
+                        attributes.add(AttributeFactory.createAttribute(name, convertType(type)));
+                    });
+                }
+            }
+        }
+
+        return attributes;
+    }
+
+    private int convertType(String dimensionType) {
+        switch (dimensionType) {
+            case "String":
+                return Ontology.STRING;
+            default:
+                return Ontology.STRING;
+        }
+    }
+
+    /*private static class DataSourceWrapperVo {
         List<DataSourceVo> result;
         Integer code;
 
@@ -378,9 +315,47 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         public void setCode(Integer code) {
             this.code = code;
         }
+    }*/
+
+    private static class DimensionQueryVo {
+        String parentId;
+        String name;
+
+        public String getParentId() {
+            return parentId;
+        }
+
+        public void setParentId(String parentId) {
+            this.parentId = parentId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            DimensionQueryNameVo dimensionName = new DimensionQueryNameVo();
+            dimensionName.set$in(name);
+            try {
+                this.name = jsonMapper.writeValueAsString(dimensionName);
+            } catch (JsonProcessingException ignore) {
+            }
+        }
     }
 
-    private static class DataSourceVo {
+    private static class DimensionQueryNameVo {
+        String $in;
+
+        public String get$in() {
+            return $in;
+        }
+
+        public void set$in(String $in) {
+            this.$in = $in;
+        }
+    }
+
+    private static class DimensionVo {
         String id;
         String name;
         String title;
@@ -419,7 +394,64 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         }
     }
 
-    private static class SingleMapWrapperVo {
+    private static class ParamVo {
+        Object filters;
+        Object metrics;
+        Object vizType;
+        Object timezone;
+        Object dimensions;
+        Object dimensionExtraSettingDict;
+
+        public Object getFilters() {
+            return filters;
+        }
+
+        public void setFilters(Object filters) {
+            this.filters = filters;
+        }
+
+        public Object getMetrics() {
+            return metrics;
+        }
+
+        public void setMetrics(Object metrics) {
+            this.metrics = metrics;
+        }
+
+        public Object getVizType() {
+            return vizType;
+        }
+
+        public void setVizType(Object vizType) {
+            this.vizType = vizType;
+        }
+
+        public Object getTimezone() {
+            return timezone;
+        }
+
+        public void setTimezone(Object timezone) {
+            this.timezone = timezone;
+        }
+
+        public Object getDimensions() {
+            return dimensions;
+        }
+
+        public void setDimensions(Object dimensions) {
+            this.dimensions = dimensions;
+        }
+
+        public Object getDimensionExtraSettingDict() {
+            return dimensionExtraSettingDict;
+        }
+
+        public void setDimensionExtraSettingDict(Object dimensionExtraSettingDict) {
+            this.dimensionExtraSettingDict = dimensionExtraSettingDict;
+        }
+    }
+
+    /*private static class SingleMapWrapperVo {
         List<SingleMapVo> result;
         Integer code;
 
@@ -508,7 +540,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             this.params = params;
         }
 
-    }
+    }*/
 
     private static class DruidResultVo {
         List<HashMap<String, Object>> result;
@@ -552,5 +584,11 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         }
 
     }
+
+    public static void main(String[] args) {
+        SingleViewExampleSource instance = new SingleViewExampleSource();
+        instance.getAttributes();
+    }
+
 
 }

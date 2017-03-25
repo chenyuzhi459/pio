@@ -44,7 +44,7 @@ public class JobHelper {
      *
      * @param distributedClassPath  classpath shared across multiple jobs
      * @param intermediateClassPath classpath exclusive for this job. used to upload SNAPSHOT jar files.
-     * @param conf                   job to run
+     * @param conf                   job to runAsyn
      *
      * @throws IOException
      */

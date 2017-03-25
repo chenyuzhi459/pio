@@ -111,6 +111,10 @@ public final class ProcessRootOperator extends OperatorChain {
         registerOperator(this.operatorProcess);
     }
 
+    public void setProcessOnly(OperatorProcess operatorProcess) {
+        this.operatorProcess = operatorProcess;
+    }
+
     @Override
     public OperatorProcess getProcess() {
         return operatorProcess;

@@ -181,13 +181,13 @@ public class PolynominalClassificationPerformanceEvaluator extends AbstractPerfo
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
-        types.add(new ParameterTypeList(
+        /*types.add(new ParameterTypeList(
                 PARAMETER_CLASS_WEIGHTS,
                 I18N.getMessage("pio.PolynominalClassificationPerformanceEvaluator.class_weights"),
                 new ParameterTypeString("class_name", I18N.getMessage("pio.PolynominalClassificationPerformanceEvaluator.class_name")),
                 new ParameterTypeDouble("weight",
                         I18N.getMessage("pio.PolynominalClassificationPerformanceEvaluator.weight"),
-                        0.0d, Double.POSITIVE_INFINITY, 1.0d)));
+                        0.0d, Double.POSITIVE_INFINITY, 1.0d)));*/
         return types;
     }
 

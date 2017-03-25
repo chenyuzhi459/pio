@@ -154,7 +154,7 @@ public class ModelApplier extends Operator {
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
-        types.add(new ParameterTypeList(PARAMETER_APPLICATION_PARAMETERS,
+        /*types.add(new ParameterTypeList(PARAMETER_APPLICATION_PARAMETERS,
                 I18N.getMessage("pio.ModelApplier.application_parameters"),
 //                "Model parameters for application (usually not needed).",
                 new ParameterTypeString(PARAMETER_KEY,
@@ -169,7 +169,7 @@ public class ModelApplier extends Operator {
         types.add(new ParameterTypeBoolean(PARAMETER_CREATE_VIEW,
                 I18N.getMessage("pio.ModelApplier.create_view"),
 //                "Indicates that models should create a new view on the data where possible. Then, instead of changing the data itself, the results are calculated on the fly if needed.",
-                false));
+                false));*/
         return types;
     }
 }

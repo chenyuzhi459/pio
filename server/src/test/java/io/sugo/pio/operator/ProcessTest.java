@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.guice.ProcessPioModule;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.clustering.clusterer.KMeans;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
@@ -385,8 +386,8 @@ public class ProcessTest {
         kMeans.setParameter(PARAMETER_ADD_CLUSTER_ATTRIBUTE, "true");
         kMeans.setParameter(PARAMETER_REMOVE_UNLABELED, "false");
         kMeans.setParameter(PARAMETER_ADD_AS_LABEL, "false");
-        kMeans.setParameter(PARAMETER_MEASURE_TYPES, "MixedMeasures");
-        kMeans.setParameter(PARAMETER_MIXED_MEASURE, "MixedEuclideanDistance");
+        kMeans.setParameter(PARAMETER_MEASURE_TYPES, I18N.getMessage("pio.DistanceMeasures.mixed_measure"));
+        kMeans.setParameter(PARAMETER_MIXED_MEASURE, I18N.getMessage("pio.DistanceMeasures.MixedEuclideanDistance"));
         process.getRootOperator().getExecutionUnit().addOperator(kMeans);
 
         process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);

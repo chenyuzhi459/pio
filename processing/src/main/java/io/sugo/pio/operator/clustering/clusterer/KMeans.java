@@ -281,7 +281,7 @@ public class KMeans extends RMAbstractClusterer implements CapabilityProvider {
 
         types.add(new ParameterTypeInt(PARAMETER_MAX_OPTIMIZATION_STEPS,
                 I18N.getMessage("pio.KMeans.max_optimization_steps"), 1, Integer.MAX_VALUE, 100, false));
-        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));
+//        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));
         return types;
     }
 }

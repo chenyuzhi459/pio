@@ -1,7 +1,9 @@
 package io.sugo.pio.server.process;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -11,28 +13,32 @@ import com.metamx.common.lifecycle.LifecycleStart;
 import com.metamx.common.lifecycle.LifecycleStop;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.constant.ProcessConstant;
 import io.sugo.pio.guice.ManageLifecycle;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.metadata.MetadataProcessManager;
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
+import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.operator.Status;
 import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
 import io.sugo.pio.server.http.dto.OperatorParamDto;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.*;
+
+import static java.lang.Thread.sleep;
 
 @ManageLifecycle
 public class ProcessManager {
 
     private static final Logger log = new Logger(ProcessManager.class);
+
+    private static final int WAITING_PROCESS_RUN = 100; //million seconds
 
     private final BlockingQueue<OperatorProcess> queue;
     private final ProcessRunner[] runners;
@@ -129,10 +135,19 @@ public class ProcessManager {
         }
     }
 
+    public void add2cache(OperatorProcess operatorProcess) {
+        processCache.put(operatorProcess.getId(), operatorProcess);
+    }
+
     public OperatorProcess create(String tenantId, String name, String description) {
+        return create(tenantId, name, description, null);
+    }
+
+    public OperatorProcess create(String tenantId, String name, String description, String type) {
         OperatorProcess process = new OperatorProcess(name);
         process.setTenantId(tenantId);
         process.setDescription(description);
+        process.setType(type);
         processCache.put(process.getId(), process);
         metadataProcessManager.insert(process);
 
@@ -141,8 +156,66 @@ public class ProcessManager {
         return process;
     }
 
+    /**
+     * Create process by given type template
+     *
+     * @param tenantId tenant id of the company
+     * @param type     process type
+     * @return new process
+     */
+    public OperatorProcess createByTemplate(String tenantId, String type) {
+        OperatorProcess template = getTemplate(type);
+        Preconditions.checkNotNull(template, I18N.getMessage("pio.error.process.not_found_template"), type);
+
+        OperatorProcess newProcess = new OperatorProcess(template.getName());
+        newProcess.setTenantId(tenantId);
+        newProcess.setType(type);
+        newProcess.setDescription("Created by template " + type);
+        newProcess.setBuiltIn(ProcessConstant.BuiltIn.YES);
+        newProcess.setIsTemplate(ProcessConstant.IsTemplate.NO);
+
+        try {
+            // Deep clone root operator
+            ProcessRootOperator root = jsonMapper.readValue(
+                    jsonMapper.writeValueAsBytes(template.getRootOperator()),
+                    new TypeReference<ProcessRootOperator>() {
+                    }
+            );
+
+            /*root.getExecutionUnit().getOperators().forEach(operator -> {
+                newProcess.registerName(operator.getName(), operator);
+            });*/
+//            root.setProcess(newProcess);
+            newProcess.setRootOperator(root);
+            /*newProcess.getRootOperator().setExecUnits(root.getExecUnits());
+            newProcess.getRootOperator().setStatus(root.getStatus());
+            root.getExecutionUnit().getOperators().forEach(operator -> {
+                newProcess.registerName(operator.getName(), operator);
+            });*/
+
+            // Deep clone connections
+            byte[] cBytes = jsonMapper.writeValueAsBytes(template.getConnections());
+            if (cBytes != null & cBytes.length > 0) {
+                Set<Connection> connections = jsonMapper.readValue(cBytes,
+                        new TypeReference<Set<Connection>>() {
+                        }
+                );
+                newProcess.setConnections(connections);
+            }
+        } catch (IOException e) {
+            log.error("Deep clone operators or connections failed.", e);
+        }
+
+        processCache.put(newProcess.getId(), newProcess);
+        metadataProcessManager.insert(newProcess);
+
+        log.info("Create process of tenantId[%s] with template of type[%s] successfully.", tenantId, type);
+
+        return newProcess;
+    }
+
     public OperatorProcess update(String id, String name, String description, String status) {
-        OperatorProcess process = get(id, true);
+        OperatorProcess process = getFromCache(id, true);
         if (name != null && name != "") {
             process.setName(name);
         }
@@ -161,7 +234,7 @@ public class ProcessManager {
     }
 
     public OperatorProcess delete(String id) {
-        OperatorProcess process = get(id);
+        OperatorProcess process = getFromCache(id);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             process.setStatus(Status.DELETED);
             process.setUpdateTime(new DateTime());
@@ -176,9 +249,9 @@ public class ProcessManager {
         }
     }
 
-    public OperatorProcess run(String id) {
+    public OperatorProcess runAsyn(String id) {
         try {
-            OperatorProcess process = get(id);
+            OperatorProcess process = getFromCache(id);
             process.clearStatus();
 
             log.info("Put the will be running process[id:%s] to the queue.", id);
@@ -195,8 +268,33 @@ public class ProcessManager {
         }
     }
 
+    public OperatorProcess runSyn(String id) {
+        OperatorProcess process = runAsyn(id);
+        while (!process.runFinished()) {
+            try {
+                sleep(WAITING_PROCESS_RUN);
+            } catch (InterruptedException ignore) {
+            }
+
+            process = getResult(id);
+        }
+
+        return process;
+    }
+
+    /**
+     * Get all processes include template, and exclude built-in processes from database.
+     *
+     * @param tenantId tenant id of the company
+     * @param all      indicates is include 'DELETED' status processes
+     * @return process list
+     */
     public List<OperatorProcess> getAll(String tenantId, boolean all) {
-        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, all);
+        return getAll(tenantId, all, ProcessConstant.BuiltIn.NO, null);
+    }
+
+    public List<OperatorProcess> getAll(String tenantId, boolean all, int builtIn, String type) {
+        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, all, builtIn, null, type);
         if (processes == null || processes.isEmpty()) {
             return new ArrayList<>();
         }
@@ -205,11 +303,24 @@ public class ProcessManager {
         return processes;
     }
 
-    public OperatorProcess get(String id) {
-        return get(id, false);
+    /**
+     * Get process by id exclude 'DELETED' from cache
+     *
+     * @param id process id
+     * @return specified process
+     */
+    public OperatorProcess getFromCache(String id) {
+        return getFromCache(id, false);
     }
 
-    public OperatorProcess get(String id, boolean all) {
+    /**
+     * Get process by id and status 'DELETED' from cache
+     *
+     * @param id  process id
+     * @param all true:include 'DELETED' process
+     * @return specified process
+     */
+    public OperatorProcess getFromCache(String id, boolean all) {
         loader.setProcessId(id);
         try {
             OperatorProcess process = processCache.get(id, loader);
@@ -217,7 +328,6 @@ public class ProcessManager {
                 processCache.invalidate(id);
                 return null;
             }
-
             log.info("Get process named %s[id:%s] from cache successfully.", process.getName(), id);
 
             return process;
@@ -225,6 +335,63 @@ public class ProcessManager {
             log.error(e, "Get process %s error", id);
             throw new RuntimeException(e);
         }
+    }
+
+    public OperatorProcess getFromCache(String tenantId, String type) {
+        ConcurrentMap<String, OperatorProcess> map = processCache.asMap();
+        if (map != null) {
+            Collection<OperatorProcess> collection = map.values();
+            if (!collection.isEmpty()) {
+                Iterator<OperatorProcess> it = collection.iterator();
+                while (it.hasNext()) {
+                    OperatorProcess operatorProcess = it.next();
+                    if (tenantId.equals(operatorProcess.getTenantId()) && type.equals(operatorProcess.getType())) {
+                        return operatorProcess;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public OperatorProcess get(String tenantId, int builtIn, String type) {
+        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, false,
+                builtIn, ProcessConstant.IsTemplate.NO, type);
+        if (processes == null || processes.isEmpty()) {
+            return null;
+        }
+        log.info("Get process named[%s] from database successfully.", processes.get(0).getName());
+
+        return processes.get(0);
+    }
+
+    /**
+     * Get built-in process from database
+     *
+     * @param tenantId tenant id of the company
+     * @param type     process type @see ProcessConstant.Type
+     * @return built-in process
+     */
+    public OperatorProcess getBuiltIn(String tenantId, String type) {
+        return get(tenantId, ProcessConstant.BuiltIn.YES, type);
+    }
+
+    /**
+     * Get process which is template from database
+     *
+     * @param type process type @see ProcessConstant.Type
+     * @return template process
+     */
+    public OperatorProcess getTemplate(String type) {
+        List<OperatorProcess> processes = metadataProcessManager.getAll(null, false,
+                ProcessConstant.BuiltIn.NO, ProcessConstant.IsTemplate.YES, type);
+        if (processes == null || processes.isEmpty()) {
+            return null;
+        }
+        log.info("Get process template named[%s] from database successfully.", processes.get(0).getName());
+
+        return processes.get(0);
     }
 
     class OperatorProcessLoader implements Callable<OperatorProcess> {
@@ -249,11 +416,12 @@ public class ProcessManager {
     }
 
     public OperatorProcess addOperator(String processId, OperatorDto dto) {
-        OperatorProcess process = get(processId, false);
+        OperatorProcess process = getFromCache(processId, false);
         OperatorMeta meta = operatorMetaMap.get(dto.getOperatorType());
         try {
             Operator operator = (Operator) meta.getType().getType().newInstance();
             operator.setName(meta.getName() + "-" + UUID.randomUUID().toString());
+            operator.setType(dto.getOperatorType());
             operator.setxPos(dto.getxPos());
             operator.setyPos(dto.getyPos());
             operator.setFullName(dto.getFullName());
@@ -272,7 +440,7 @@ public class ProcessManager {
     }
 
     public Operator getOperator(String processId, String operatorId) {
-        OperatorProcess process = get(processId);
+        OperatorProcess process = getFromCache(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             Operator operator = process.getOperator(operatorId);
             return operator;
@@ -282,7 +450,7 @@ public class ProcessManager {
     }
 
     public OperatorProcess deleteOperator(String processId, String operatorId) {
-        OperatorProcess process = get(processId);
+        OperatorProcess process = getFromCache(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             process.setUpdateTime(new DateTime());
             process.removeOperator(operatorId);
@@ -298,7 +466,7 @@ public class ProcessManager {
     }
 
     public OperatorProcess connect(String processId, Connection dto) {
-        OperatorProcess process = get(processId);
+        OperatorProcess process = getFromCache(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             process.setUpdateTime(new DateTime());
             process.connect(dto, true);
@@ -315,7 +483,7 @@ public class ProcessManager {
     }
 
     public OperatorProcess disconnect(String processId, Connection dto) {
-        OperatorProcess process = get(processId);
+        OperatorProcess process = getFromCache(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             process.setUpdateTime(new DateTime());
             process.disconnect(dto);
@@ -332,7 +500,7 @@ public class ProcessManager {
     }
 
     public Operator updateParameter(String processId, String operatorId, List<OperatorParamDto> paramList) {
-        OperatorProcess process = get(processId);
+        OperatorProcess process = getFromCache(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             Operator operator = process.getOperator(operatorId);
             if (!paramList.isEmpty()) {
@@ -355,7 +523,7 @@ public class ProcessManager {
     }
 
     public Operator updateOperator(String processId, String operatorId, OperatorDto dto) {
-        OperatorProcess process = get(processId);
+        OperatorProcess process = getFromCache(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             Operator operator = process.getOperator(operatorId);
             if (dto.getFullName() != null) {
@@ -366,6 +534,9 @@ public class ProcessManager {
             }
             if (dto.getyPos() != null) {
                 operator.setyPos(dto.getyPos());
+            }
+            if (dto.getOperatorType() != null) {
+                operator.setType(dto.getOperatorType());
             }
 
             metadataProcessManager.update(process);
@@ -380,7 +551,7 @@ public class ProcessManager {
     }
 
     public Operator updateExampleData(String processId, String operatorId, List<String> dataList) {
-        OperatorProcess process = get(processId);
+        OperatorProcess process = getFromCache(processId);
         if (process != null && !Status.DELETED.equals(process.getStatus())) {
             Operator operator = process.getOperator(operatorId);
             if (!dataList.isEmpty()) {
@@ -397,7 +568,7 @@ public class ProcessManager {
     }
 
     public OperatorProcess getResult(String id) {
-        OperatorProcess process = get(id);
+        OperatorProcess process = getFromCache(id);
         IOContainer result = process.getRootOperator().getResults(true);
 
         log.info("Get result of process named %s[id:%s] successfully.",
