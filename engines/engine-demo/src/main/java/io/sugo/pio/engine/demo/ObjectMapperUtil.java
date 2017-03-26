@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.EngineModule;
 import io.sugo.pio.engine.als.ALSEngineModule;
 import io.sugo.pio.engine.articleClu.ArtiClusterEngineModule;
+import io.sugo.pio.engine.bbs.BbsEngineModule;
 import io.sugo.pio.engine.detail.DetailEngineModule;
+import io.sugo.pio.engine.flow.FlowEngineModule;
 import io.sugo.pio.engine.fp.FpEngineModule;
 import io.sugo.pio.engine.popular.PopEngineModule;
 import io.sugo.pio.engine.search.SearchEngineModule;
@@ -55,6 +57,16 @@ public class ObjectMapperUtil {
         }
 
         engineModule = new ArtiClusterEngineModule();
+        for(Module module: engineModule.getJacksonModules()) {
+            jsonMapper.registerModule(module);
+        }
+
+        engineModule = new BbsEngineModule();
+        for(Module module: engineModule.getJacksonModules()) {
+            jsonMapper.registerModule(module);
+        }
+
+        engineModule = new FlowEngineModule();
         for(Module module: engineModule.getJacksonModules()) {
             jsonMapper.registerModule(module);
         }
