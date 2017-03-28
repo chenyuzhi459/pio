@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
-import io.sugo.pio.engine.popular.PopResult;
-import io.sugo.pio.engine.popular.PopularModelFactory;
 import io.sugo.pio.engine.prediction.PredictionModel;
 import io.sugo.pio.engine.search.Constants;
 import io.sugo.pio.engine.search.SearchModelFactory;

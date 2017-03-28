@@ -38,6 +38,7 @@ public class DemoTrainer implements Runnable {
         textSimilarTraining.train();
         ArtiClusterTraining artiClusterTraining = new ArtiClusterTraining();
         artiClusterTraining.train();
-
+        BbsTraining bbsTraining = new BbsTraining();
+        bbsTraining.train();
     }
 }

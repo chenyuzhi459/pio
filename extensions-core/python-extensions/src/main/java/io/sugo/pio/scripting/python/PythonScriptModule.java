@@ -1,6 +1,7 @@
 package io.sugo.pio.scripting.python;
 
 import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
@@ -14,6 +15,7 @@ public class PythonScriptModule implements PioModule {
     @Override
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(new SimpleModule(PythonScriptModule.class.getSimpleName())
+                .registerSubtypes(new NamedType(PythonScriptingOperator.class, "python_script"))
                );
     }
 

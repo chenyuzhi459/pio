@@ -45,6 +45,8 @@
         <module>engines/userHistory-engine</module>
         <module>engines/textSimilar-engine</module>
         <module>engines/articleCluster-engine</module>
+        <module>engines/bbs-recommend-engine</module>
+        <module>engines/flow-engine</module>
         <!-- distribution packaging -->
         <module>distribution</module>
     </modules>

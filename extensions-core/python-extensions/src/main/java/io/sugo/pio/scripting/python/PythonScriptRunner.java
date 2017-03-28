@@ -42,7 +42,6 @@ public class PythonScriptRunner extends AbstractScriptRunner {
 
     @Override
     public void cancel() {
-
     }
 
     @Override

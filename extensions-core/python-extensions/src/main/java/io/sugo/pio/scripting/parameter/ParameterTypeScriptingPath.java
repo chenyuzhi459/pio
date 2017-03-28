@@ -1,5 +1,6 @@
-package io.sugo.pio.parameter;
+package io.sugo.pio.scripting.parameter;
 
+import io.sugo.pio.parameter.ParameterTypeFile;
 import io.sugo.pio.scripting.SetupTester;
 
 /**

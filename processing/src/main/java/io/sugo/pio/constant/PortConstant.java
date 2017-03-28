@@ -34,6 +34,7 @@ public class PortConstant {
     public static final String START = "start";
     public static final String END = "end";
     public static final String WEIGHTS = "weights";
+    public static final String INPUT = "input";
     public static final String OUTPUT = "output";
     public static final String FILE = "file";
     public static final String VECTOR = "vector";
@@ -66,6 +67,7 @@ public class PortConstant {
     public static final String START_DESC = I18N.getMessage("pio.PortName.start");
     public static final String END_DESC = I18N.getMessage("pio.PortName.end");
     public static final String WEIGHTS_DESC = I18N.getMessage("pio.PortName.weights");
+    public static final String INPUT_DESC = I18N.getMessage("pio.PortName.input");
     public static final String OUTPUT_DESC = I18N.getMessage("pio.PortName.output");
     public static final String FILE_DESC = I18N.getMessage("pio.PortName.file");
     public static final String VECTOR_DESC = I18N.getMessage("pio.PortName.vector");

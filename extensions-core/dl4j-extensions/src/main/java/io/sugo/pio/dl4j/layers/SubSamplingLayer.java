@@ -44,12 +44,12 @@ public class SubSamplingLayer extends AbstractLayer {
 
     @Override
     public String getDefaultFullName() {
-        return SubSamplingLayer.class.getName();
+        return SubSamplingLayer.class.getSimpleName();
     }
 
     @Override
     public String getDescription() {
-        return SubSamplingLayer.class.getName();
+        return SubSamplingLayer.class.getSimpleName();
     }
 
     public List<ParameterType> getParameterTypes(){
