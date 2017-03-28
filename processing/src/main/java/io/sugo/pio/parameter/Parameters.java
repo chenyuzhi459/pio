@@ -1,6 +1,7 @@
 package io.sugo.pio.parameter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Strings;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.tools.AbstractObservable;
@@ -58,11 +59,13 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
     }
 
     public void addParameterType(ParameterType type) {
-        keyToTypeMap.put(type.getKey(), type);
+        if (!Strings.isNullOrEmpty(type.getKey())) {
+            keyToTypeMap.put(type.getKey(), type);
+        }
     }
 
     public void udpateParameterType(ParameterType type) {
-        if (keyToTypeMap.get(type.getKey()) != null) {
+        if (!Strings.isNullOrEmpty(type.getKey())) {
             keyToTypeMap.put(type.getKey(), type);
         }
     }
@@ -121,7 +124,7 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
             }
             Object defaultValue = type.getDefaultValue();
             if ((defaultValue == null) && !type.isOptional()) {
-                throw new UndefinedParameterError(null,"pio.error.parameter_not_set_no_default_value", key, "");
+                throw new UndefinedParameterError(key,null, "pio.error.parameter_not_set_no_default_value", "");
             }
             if (defaultValue == null) {
                 return null;
@@ -148,7 +151,9 @@ public class Parameters extends AbstractObservable<String> implements Cloneable,
         if (value == null) {
             keyToValueMap.remove(key);
         } else {
-            keyToValueMap.put(key, value);
+            if (!Strings.isNullOrEmpty(key)) {
+                keyToValueMap.put(key, value);
+            }
         }
         return parameterType != null;
     }

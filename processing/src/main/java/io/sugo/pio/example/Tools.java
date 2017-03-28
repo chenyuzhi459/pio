@@ -400,7 +400,7 @@ public class Tools {
 			if (att != null) {
 				specialToCheck.add(att);
 			} else {
-				throw new UserError(operator, "113", specialAttributes[i]);
+				throw new UserError(operator, "pio.error.operator.attribute_not_exist", specialAttributes[i]);
 			}
 		}
 
@@ -413,7 +413,7 @@ public class Tools {
 				AttributeRole att = allAttributes.next();
 				if (!att.isSpecial() || specialToCheck.contains(att.getAttribute())) {
 					if (Double.isNaN(example.getValue(att.getAttribute()))) {
-						throw new UserError(operator, "pio.error.operator.data_contains_miss_value", task);
+						throw new UserError(operator, "pio.error.operator.data_contains_miss_value", att.getAttribute().getName());
 					}
 				}
 			}

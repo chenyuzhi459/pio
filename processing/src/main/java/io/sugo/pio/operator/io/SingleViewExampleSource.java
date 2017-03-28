@@ -1,6 +1,7 @@
 package io.sugo.pio.operator.io;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
@@ -28,29 +29,23 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private static final Logger logger = new Logger(SingleViewExampleSource.class);
 
-//    public static final String PARAMETER_URL = "url";
+    public static final String PARAMETER_URL = "url";
 
     public static final String PARAMETER_DATA_SOURCE = "data_source";
 
-    public static final String PARAMETER_SINGLE_VIEW_DATA_SOURCE = "single_view_data_source";
+    public static final String PARAMETER_SINGLE_VIEW = "single_view";
 
     public static final String PARAMETER_PARAM = "param";
 
-    private static final String SINGLE_VIEW_URL_PREFIX = "http://192.168.0.212:8000/api";
+//    private static final String SINGLE_VIEW_URL_PREFIX = "http://192.168.0.101:8080/api";
 
-    private static final String URI_LIST_DATA_SOURCE = "/datasources/list";
+    private static final String URI_QUERY_DRUID = "/api/slices/query-druid";
 
-    private static final String URI_LIST_SINGLE_MAP = "/slices/list/";
-
-    private static final String URI_DETAIL_SINGLE_MAP = "/slices/";
-
-    private static final String URI_QUERY_DRUID = "/slices/query-druid";
-
-    private static final String URI_QUERY_DIMENSION = "/dimension";
+    private static final String URI_QUERY_DIMENSION = "/api/dimension";
 
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
-        String druidUrl = SINGLE_VIEW_URL_PREFIX + URI_QUERY_DRUID;
+        String druidUrl = getParameterAsString(PARAMETER_URL) + URI_QUERY_DRUID;
 
         String singleViewValue = buildQueryDruidParam();
         String result = httpPost(druidUrl, singleViewValue);
@@ -91,12 +86,29 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                     DataRow dataRow = factory.create(attrSize);
                     for (int i = 0; i < attrSize; i++) {
                         Attribute attr = attributes.get(i);
+                        int valueType = attr.getValueType();
                         String attrName = attr.getName();
                         Object attrValue = resultMap.get(attrName);
-                        String attrValueStr = attrValue == null ? null : attrValue.toString();
 
-                        double value = attr.getMapping().mapString(attrValueStr);
-                        dataRow.set(attr, value);
+                        if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NOMINAL)) {
+                            String attrValueStr = attrValue == null ? null : attrValue.toString();
+                            double value = attr.getMapping().mapString(attrValueStr);
+                            dataRow.set(attr, value);
+                        } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NUMERICAL)) {
+                            double value;
+                            if (attrValue == null || Strings.isNullOrEmpty(attrValue.toString()))  {
+                                value = 0.0D / 0.0;
+                            } else {
+                                value = Double.valueOf(attrValue.toString());
+                            }
+                            dataRow.set(attr, value);
+                        } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.DATE_TIME)) {
+                            // TODO: parse datetime value
+                            double value = 0.0D / 0.0;
+                            dataRow.set(attr, value);
+                        } else {
+
+                        }
                     }
 
                     builder.addDataRow(dataRow);
@@ -129,16 +141,17 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
     @Override
     public List<ParameterType> getParameterTypes() {
         List types = super.getParameterTypes();
-        /*ParameterTypeString urlType = new ParameterTypeString(PARAMETER_URL,
+        ParameterTypeString urlType = new ParameterTypeString(PARAMETER_URL,
                 I18N.getMessage("pio.SingleViewExampleSource.url"), false);
-        types.add(urlType);*/
+        urlType.setHidden(true);
+        types.add(urlType);
 
         ParameterTypeDynamicCategory dataSourceType = new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, null,
                 I18N.getMessage("pio.SingleViewExampleSource.data_source"),
                 new String[0], null);
         types.add(dataSourceType);
 
-        ParameterTypeDynamicCategory singleViewDataSourceType = new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW_DATA_SOURCE, null,
+        ParameterTypeDynamicCategory singleViewDataSourceType = new ParameterTypeDynamicCategory(PARAMETER_SINGLE_VIEW, null,
                 I18N.getMessage("pio.SingleViewExampleSource.single_view_data_source"),
                 new String[0], null);
         types.add(singleViewDataSourceType);
@@ -169,14 +182,18 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
         String param = getParameterAsString(PARAMETER_PARAM);
 
-//        Preconditions.checkNotNull(dataSource, I18N.getMessage("pio.error.operator.data_source_can_not_null"));
-//        Preconditions.checkNotNull(param, I18N.getMessage("pio.error.operator.param_can_not_null"));
+        Preconditions.checkNotNull(dataSource, I18N.getMessage("pio.error.operator.data_source_can_not_null"));
+        Preconditions.checkNotNull(param, I18N.getMessage("pio.error.operator.param_can_not_null"));
 
         try {
+
+            ParamVo paramVo = deserialize(param, ParamVo.class);
+
             SingleMapRequestVo requestVo = new SingleMapRequestVo();
             requestVo.setDruid_datasource_id(dataSource);
-            requestVo.setParams(param);
+            requestVo.setParams(paramVo);
             String requestStr = jsonMapper.writeValueAsString(requestVo);
+
             return requestStr;
         } catch (IOException e) {
             logger.error("Build druid query parameter failed, details:" + e.getMessage());
@@ -251,34 +268,44 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private List<Attribute> getAttributes() {
         List<Attribute> attributes = new ArrayList<>();
-//        String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
-//        String param = getParameterAsString(PARAMETER_PARAM);
-        String dataSource = "SJ9o92XGl";
-        String param = "{\"filters\":[{\"eq\":\"-7 days\",\"op\":\"in\",\"col\":\"__time\"}],\"metrics\":[\"wuxianjiRT_total\"],\"vizType\":\"multi_dim_line\",\"dimensions\":[\"Province\",\"__time\"],\"dimensionExtraSettingDict\":{\"__time\":{\"sortCol\":\"wuxianjiRT_total\",\"sortDirect\":\"desc\",\"granularity\":\"P1D\"},\"Province\":{\"sortCol\":\"wuxianjiRT_total\",\"sortDirect\":\"desc\"}}}";
+        String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
+        String param = getParameterAsString(PARAMETER_PARAM);
+        String url = getParameterAsString(PARAMETER_URL);
 
         if (!Strings.isNullOrEmpty(dataSource) && !Strings.isNullOrEmpty(param)) {
             ParamVo paramVo = deserialize(param, ParamVo.class);
             if (paramVo != null) {
-                Object dimensions = paramVo.getDimensions();
-
-                DimensionQueryVo dimensionQueryVo = new DimensionQueryVo();
-                dimensionQueryVo.setParentId(dataSource);
-                dimensionQueryVo.setName(dimensions.toString());
-
                 String dimensionQueryStr = null;
                 try {
+                    DimensionQueryVo dimensionQueryVo = new DimensionQueryVo();
+                    dimensionQueryVo.setParentId(dataSource);
+
+                    DimensionQueryNameVo queryNameVo = new DimensionQueryNameVo();
+                    queryNameVo.set$in(paramVo.getDimensions());
+                    dimensionQueryVo.setName(queryNameVo);
+
                     dimensionQueryStr = jsonMapper.writeValueAsString(dimensionQueryVo);
                 } catch (JsonProcessingException ignore) {
                 }
 
-                String dimensionUrl = SINGLE_VIEW_URL_PREFIX + URI_QUERY_DIMENSION;
+                String dimensionUrl = url + URI_QUERY_DIMENSION;
                 String result = httpPost(dimensionUrl, dimensionQueryStr);
                 List<DimensionVo> dimensionList = deserialize2list(result, DimensionVo.class);
+
+                // 1.dimensions
                 if (dimensionList != null) {
                     dimensionList.forEach(dimensionVo -> {
                         String name = dimensionVo.getName();
                         String type = dimensionVo.getType();
                         attributes.add(AttributeFactory.createAttribute(name, convertType(type)));
+                    });
+                }
+
+                // 2.metrics
+                List<String> metrics = paramVo.getMetrics();
+                if (metrics != null) {
+                    metrics.forEach(metric -> {
+                        attributes.add(AttributeFactory.createAttribute(metric, Ontology.NUMERICAL));
                     });
                 }
             }
@@ -291,6 +318,12 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         switch (dimensionType) {
             case "String":
                 return Ontology.STRING;
+            case "Int":
+            case "Long":
+            case "Float":
+                return Ontology.NUMERICAL;
+            case "Date":
+                return Ontology.DATE_TIME;
             default:
                 return Ontology.STRING;
         }
@@ -319,7 +352,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private static class DimensionQueryVo {
         String parentId;
-        String name;
+        DimensionQueryNameVo name;
 
         public String getParentId() {
             return parentId;
@@ -329,28 +362,23 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             this.parentId = parentId;
         }
 
-        public String getName() {
+        public DimensionQueryNameVo getName() {
             return name;
         }
 
-        public void setName(String name) {
-            DimensionQueryNameVo dimensionName = new DimensionQueryNameVo();
-            dimensionName.set$in(name);
-            try {
-                this.name = jsonMapper.writeValueAsString(dimensionName);
-            } catch (JsonProcessingException ignore) {
-            }
+        public void setName(DimensionQueryNameVo name) {
+            this.name = name;
         }
     }
 
     private static class DimensionQueryNameVo {
-        String $in;
+        List<String> $in;
 
-        public String get$in() {
+        public List<String> get$in() {
             return $in;
         }
 
-        public void set$in(String $in) {
+        public void set$in(List<String> $in) {
             this.$in = $in;
         }
     }
@@ -395,34 +423,34 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
     }
 
     private static class ParamVo {
-        Object filters;
-        Object metrics;
-        Object vizType;
+        List<Object> filters;
+        List<String> metrics;
+        String vizType;
         Object timezone;
-        Object dimensions;
+        List<String> dimensions;
         Object dimensionExtraSettingDict;
 
-        public Object getFilters() {
+        public List<Object> getFilters() {
             return filters;
         }
 
-        public void setFilters(Object filters) {
+        public void setFilters(List<Object> filters) {
             this.filters = filters;
         }
 
-        public Object getMetrics() {
+        public List<String> getMetrics() {
             return metrics;
         }
 
-        public void setMetrics(Object metrics) {
+        public void setMetrics(List<String> metrics) {
             this.metrics = metrics;
         }
 
-        public Object getVizType() {
+        public String getVizType() {
             return vizType;
         }
 
-        public void setVizType(Object vizType) {
+        public void setVizType(String vizType) {
             this.vizType = vizType;
         }
 
@@ -434,11 +462,11 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             this.timezone = timezone;
         }
 
-        public Object getDimensions() {
+        public List<String> getDimensions() {
             return dimensions;
         }
 
-        public void setDimensions(Object dimensions) {
+        public void setDimensions(List<String> dimensions) {
             this.dimensions = dimensions;
         }
 
@@ -565,7 +593,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private static class SingleMapRequestVo {
         String druid_datasource_id;
-        Object params;
+        ParamVo params;
 
         public String getDruid_datasource_id() {
             return druid_datasource_id;
@@ -575,11 +603,11 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             this.druid_datasource_id = druid_datasource_id;
         }
 
-        public Object getParams() {
+        public ParamVo getParams() {
             return params;
         }
 
-        public void setParams(Object params) {
+        public void setParams(ParamVo params) {
             this.params = params;
         }
 

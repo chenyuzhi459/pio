@@ -39,6 +39,8 @@ public class Ontology {
     /** Human readable string representations. */
     private final String names[];
 
+    private final String[] displayNames;
+
     public static final int NO_PARENT = -1;
 
     // -------------------- VALUE TYPE --------------------
@@ -99,7 +101,7 @@ public class Ontology {
             ATTRIBUTE_VALUE, // date_time
             DATE_TIME,       // date
             DATE_TIME        // time
-    }, VALUE_TYPE_NAMES);
+    }, VALUE_TYPE_NAMES, VALUE_TYPE_NAMES_VALUE);
 
     // -------------------- BLOCK TYPE --------------------
 
@@ -121,9 +123,9 @@ public class Ontology {
 
     public static final int VALUE_MATRIX_ROW_START = 8;
 
-    /*public static final String[] BLOCK_TYPE_NAMES = { "attribute_block", "single_value", "value_series",
+    public static final String[] BLOCK_TYPE_NAMES_VALUE = { "attribute_block", "single_value", "value_series",
         "value_series_start", "value_series_end", "value_matrix", "value_matrix_start", "value_matrix_end",
-    "value_matrix_row_start" };*/
+    "value_matrix_row_start" };
     public static final String[] BLOCK_TYPE_NAMES = {
             io.sugo.pio.i18n.I18N.getMessage("pio.Ontology.block_type_names.attribute_block"),
             io.sugo.pio.i18n.I18N.getMessage("pio.Ontology.block_type_names.single_value"),
@@ -147,12 +149,13 @@ public class Ontology {
             VALUE_MATRIX,     // value matrix start
             VALUE_MATRIX,     // value matrix end
             VALUE_MATRIX      // value matrix row start
-    }, BLOCK_TYPE_NAMES);
+    }, BLOCK_TYPE_NAMES, BLOCK_TYPE_NAMES_VALUE);
 
     /** Constructs a new ontology where each of the entries points to its parent. */
-    private Ontology(int[] parents, String[] names) {
+    private Ontology(int[] parents, String[] names, String[] displayNames) {
         this.parentId = parents;
         this.names = names;
+        this.displayNames = displayNames;
     }
 
     /** Returns true if child is a parent. */
@@ -168,8 +171,15 @@ public class Ontology {
 
     /** Maps the name of a class to its index or -1 if unknown. */
     public int mapName(String name) {
+        // First, search names array
         for (int i = 0; i < names.length; i++) {
             if (names[i].equals(name)) {
+                return i;
+            }
+        }
+        // If not found, then search display names array
+        for (int i = 0; i < displayNames.length; i++) {
+            if (displayNames[i].equals(name)) {
                 return i;
             }
         }
@@ -180,6 +190,8 @@ public class Ontology {
     public String mapIndex(int index) {
         if (index >= 0 && index < names.length) {
             return names[index];
+        } if (index >= 0 && index < displayNames.length) {
+            return displayNames[index];
         } else {
             return null;
         }

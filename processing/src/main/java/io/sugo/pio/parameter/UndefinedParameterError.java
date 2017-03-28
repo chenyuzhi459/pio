@@ -35,8 +35,8 @@ public class UndefinedParameterError extends ParameterError {
         super(operator, code, additionalText);
     }
 
-    public UndefinedParameterError(Operator operator, String errorId, String parameterkey, String additionalText) {
-        super(operator, errorId, parameterkey, new Object[]{parameterkey, additionalText});
+    public UndefinedParameterError(String key, Operator operator, String errorId, String additionalText) {
+        super(operator, errorId, key, new Object[]{key, additionalText});
     }
 
 }

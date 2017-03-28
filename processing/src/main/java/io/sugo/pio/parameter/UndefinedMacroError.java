@@ -16,7 +16,7 @@ public class UndefinedMacroError extends UndefinedParameterError {
      * @param macroKey the key of the missing macro
      */
     public UndefinedMacroError(String parameterKey, String macroKey) {
-        super(null, "pio.error.macro_undefined", parameterKey, macroKey);
+        super(parameterKey, null, "pio.error.macro_undefined", macroKey);
     }
 
     /**
