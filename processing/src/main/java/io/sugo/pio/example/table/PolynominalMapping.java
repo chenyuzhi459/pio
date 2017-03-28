@@ -1,11 +1,12 @@
 package io.sugo.pio.example.table;
 
+import io.sugo.pio.tools.Tools;
+
 import java.util.*;
 
 /**
  */
 public class PolynominalMapping implements NominalMapping {
-
 
     /** The map between symbolic values and their indices. */
     private final Map<String, Integer> symbolToIndexMap = new LinkedHashMap<>();
@@ -44,6 +45,19 @@ public class PolynominalMapping implements NominalMapping {
     @Override
     public Object clone() {
         return new PolynominalMapping(this);
+    }
+
+    @Override
+    public boolean equals(NominalMapping mapping) {
+        if (mapping.size() != size()) {
+            return false;
+        }
+        for (String value : mapping.getValues()) {
+            if (!symbolToIndexMap.containsKey(value)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -96,7 +110,10 @@ public class PolynominalMapping implements NominalMapping {
 
     @Override
     public void setMapping(String nominalValue, int index) {
-
+        String oldValue = indexToSymbolMap.get(index);
+        indexToSymbolMap.set(index, nominalValue);
+        symbolToIndexMap.remove(oldValue);
+        symbolToIndexMap.put(nominalValue, index);
     }
 
     /**
@@ -153,6 +170,31 @@ public class PolynominalMapping implements NominalMapping {
         return indexToSymbolMap.size();
     }
 
+    /**
+     * This method rearranges the string to number mappings such that they are in alphabetical
+     * order. <br>
+     * <b>VERY IMPORTANT NOTE:</b> Do not call this method when this attribute is already associated
+     * with an {@link ExampleTable} and it already contains {@link Example}s. All examples will be
+     * messed up since the indices will not be replaced in the data table.
+     */
+    @Override
+    public void sortMappings() {
+        List<String> allStrings = new LinkedList<>(symbolToIndexMap.keySet());
+        Collections.sort(allStrings);
+        symbolToIndexMap.clear();
+        indexToSymbolMap.clear();
+        Iterator<String> i = allStrings.iterator();
+        while (i.hasNext()) {
+            mapString(i.next());
+        }
+    }
+
+    /** Clears all mappings for nominal values. */
+    @Override
+    public void clear() {
+        symbolToIndexMap.clear();
+        indexToSymbolMap.clear();
+    }
 
     /**
      * Throws a runtime exception if this attribute is not a classification attribute.
@@ -161,6 +203,11 @@ public class PolynominalMapping implements NominalMapping {
         if (size() != 2) {
             throw new AttributeTypeException("Attribute " + this.toString() + " is not a classification attribute!");
         }
+    }
+
+    @Override
+    public String toString() {
+        return indexToSymbolMap.toString() + Tools.getLineSeparator() + symbolToIndexMap.toString();
     }
 
 }

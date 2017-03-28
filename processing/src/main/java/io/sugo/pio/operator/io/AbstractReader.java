@@ -38,7 +38,7 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
 
             @Override
             public void transformMD() {
-                if (cacheDirty || !isMetaDataCacheable()) {
+//                if (cacheDirty || !isMetaDataCacheable()) {
                     try {
                         // TODO add extra thread for meta data generation?
                         cachedMetaData = AbstractReader.this.getGeneratedMetaData();
@@ -57,7 +57,7 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
                         cachedMetaData.addToHistory(outputPort);
                     }
                     cacheDirty = false;
-                }
+//                }
                 outputPort.deliverMD(cachedMetaData);
                 if (cachedError != null) {
                     outputPort.addError(cachedError);

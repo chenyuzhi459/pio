@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.extension.jdbc.io;
 
+import com.google.common.base.Strings;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
@@ -107,37 +108,42 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 
     public MetaData getGeneratedMetaData() throws OperatorException {
         ExampleSetMetaData metaData = new ExampleSetMetaData();
-        try {
-            this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
-            if (this.databaseHandler != null) {
-                String query1 = this.getQuery(this.databaseHandler.getStatementCreator());
-                PreparedStatement prepared1 = this.databaseHandler.getConnection().prepareStatement(query1);
-                List attributes = getAttributes(prepared1.getMetaData());
-                Iterator var6 = attributes.iterator();
-
-                while (var6.hasNext()) {
-                    Attribute att = (Attribute) var6.next();
-                    metaData.addAttribute(new AttributeMetaData(att));
-                }
-
-                prepared1.close();
-            } else {
-                logger.warn("DatabaseDataReader cannot get database connection and cannot generate metadata, " +
-                        "the reason maybe parameter 'database_url' or 'username' or 'password' is empty.");
-            }
-
-        } catch (SQLException sqlEx) {
-            throw new OperatorException(DatabaseDataReader.class.getSimpleName(), sqlEx);
-//                LogService.getRoot().log(Level.WARNING, I18N.getMessage(LogService.getRoot().getResourceBundle(), "io.sugo.pio.operator.io.DatabaseDataReader.fetching_meta_data_error", new Object[]{var16}), var16);
-        } finally {
+        if (!Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_DATABASE_URL)) &&
+                !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_USERNAME)) &&
+                !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_PASSWORD))&&
+                !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_QUERY))) {
             try {
-                if (this.databaseHandler != null && this.databaseHandler.getConnection() != null) {
-                    this.databaseHandler.disconnect();
-                }
-            } catch (SQLException var15) {
-                this.getLogger().warn("DB error closing connection: " + var15, var15);
-            }
+                this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
+                if (this.databaseHandler != null) {
+                    String query1 = this.getQuery(this.databaseHandler.getStatementCreator());
+                    PreparedStatement prepared1 = this.databaseHandler.getConnection().prepareStatement(query1);
+                    List attributes = getAttributes(prepared1.getMetaData());
+                    Iterator var6 = attributes.iterator();
 
+                    while (var6.hasNext()) {
+                        Attribute att = (Attribute) var6.next();
+                        metaData.addAttribute(new AttributeMetaData(att));
+                    }
+
+                    prepared1.close();
+                } else {
+                    logger.warn("DatabaseDataReader cannot get database connection and cannot generate metadata, " +
+                            "the reason maybe parameter 'database_url' or 'username' or 'password' is empty.");
+                }
+
+            } catch (SQLException sqlEx) {
+                throw new OperatorException(DatabaseDataReader.class.getSimpleName(), sqlEx);
+//                LogService.getRoot().log(Level.WARNING, I18N.getMessage(LogService.getRoot().getResourceBundle(), "io.sugo.pio.operator.io.DatabaseDataReader.fetching_meta_data_error", new Object[]{var16}), var16);
+            } finally {
+                try {
+                    if (this.databaseHandler != null && this.databaseHandler.getConnection() != null) {
+                        this.databaseHandler.disconnect();
+                    }
+                } catch (SQLException var15) {
+                    this.getLogger().warn("DB error closing connection: " + var15, var15);
+                }
+
+            }
         }
 
         return metaData;

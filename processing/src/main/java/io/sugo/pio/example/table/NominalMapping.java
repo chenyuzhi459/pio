@@ -6,6 +6,13 @@ import java.util.List;
 /**
  */
 public interface NominalMapping extends Cloneable, Serializable {
+
+    /**
+     * This should return true if all the mappings contain the same values regardless of their
+     * internal order.
+     */
+    public boolean equals(NominalMapping mapping);
+
     /** Should return a deep clone of this nominal mapping. */
     public Object clone();
 
@@ -68,4 +75,16 @@ public interface NominalMapping extends Cloneable, Serializable {
      * {@link #mapString(String)} until now.
      */
     public int size();
+
+    /**
+     * This method rearranges the string to number mappings such that they are in alphabetical
+     * order. <br>
+     * <b>VERY IMPORTANT NOTE:</b> Do not call this method when this attribute is already associated
+     * with an {@link AbstractExampleTable} and it already contains {@link Example}s. All examples
+     * will be messed up otherwise!
+     */
+    public void sortMappings();
+
+    /** Clears the mapping. */
+    public void clear();
 }

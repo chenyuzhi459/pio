@@ -568,7 +568,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
         try {
             return Integer.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Expected integer but found '" + value + "'.");
+            throw new UndefinedParameterError(key, this, "pio.error.parameter_expect_int", value);
         }
     }
 
@@ -593,7 +593,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
         try {
             return Long.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Expected long but found '" + value + "'.");
+            throw new UndefinedParameterError(key, this, "pio.error.parameter_expect_long", value);
         }
     }
 
@@ -609,7 +609,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
         try {
             return Double.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new UndefinedParameterError(key, this, "Expected real number but found '" + value + "'.");
+            throw new UndefinedParameterError(key, this, "pio.error.parameter_expect_double", value);
         }
     }
 
@@ -632,7 +632,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * name defines a non-optional parameter which is not set and has no default value, a
      * UndefinedParameterError will be thrown. If the parameter is optional and was not set this
      * method returns null. Operators should always use this method instead of directly using the
-     * method {@link Process#resolveFileName(String)}.
+     * method { Process#resolveFileName(String)}.
      */
     @Override
     public java.io.File getParameterAsFile(String key) throws UserError {
@@ -645,9 +645,9 @@ public abstract class Operator implements ParameterHandler, Serializable {
      * defines a non-optional parameter which is not set and has no default value, a
      * UndefinedParameterError will be thrown. If the parameter is optional and was not set this
      * method returns null. Operators should always use this method instead of directly using the
-     * method {@link Process#resolveFileName(String)}.
+     * method { Process#resolveFileName(String)}.
      *
-     * @throws DirectoryCreationError
+     * @throws 'DirectoryCreationError'
      */
 //    @Override
     public java.io.File getParameterAsFile(String key, boolean createMissingDirectories) throws UserError {

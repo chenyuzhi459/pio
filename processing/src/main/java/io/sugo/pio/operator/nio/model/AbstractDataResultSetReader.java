@@ -153,7 +153,9 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         ColumnMetaData[] columnMetaDatas = DataResultSetTranslationConfiguration.readColumnMetaData(this);
         if (columnMetaDatas.length > 0) {
             for (ColumnMetaData columnMetaData : columnMetaDatas) {
-                result.addAttribute(columnMetaData.getAttributeMetaData());
+                if (columnMetaData.isSelected()) {
+                    result.addAttribute(columnMetaData.getAttributeMetaData());
+                }
             }
         }
 

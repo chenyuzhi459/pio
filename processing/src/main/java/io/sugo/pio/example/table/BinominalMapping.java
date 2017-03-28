@@ -1,5 +1,7 @@
 package io.sugo.pio.example.table;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,6 +40,19 @@ public class BinominalMapping implements NominalMapping {
     @Override
     public Object clone() {
         return new BinominalMapping(this);
+    }
+
+    @Override
+    public boolean equals(NominalMapping mapping) {
+        if (mapping.size() != size()) {
+            return false;
+        }
+        for (String value : mapping.getValues()) {
+            if (!value.equals(firstValue) && !value.equals(secondValue)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -82,12 +97,26 @@ public class BinominalMapping implements NominalMapping {
 
     @Override
     public String mapIndex(int index) {
-        return null;
+        switch (index) {
+            case FIRST_VALUE_INDEX:
+                return firstValue;
+            case SECOND_VALUE_INDEX:
+                return secondValue;
+            default:
+                throw new AttributeTypeException(
+                        "Cannot map index of binary attribute to nominal value: index " + index + " is out of bounds!");
+        }
     }
 
     @Override
     public void setMapping(String nominalValue, int index) {
-
+        if (index == FIRST_VALUE_INDEX) {
+            firstValue = nominalValue;
+        } else if (index == SECOND_VALUE_INDEX) {
+            secondValue = nominalValue;
+        } else {
+            throw new AttributeTypeException("Cannot set mapping of binary attribute to index '" + index + "'.");
+        }
     }
 
     /**
@@ -121,7 +150,13 @@ public class BinominalMapping implements NominalMapping {
 
     @Override
     public List<String> getValues() {
-        return null;
+        if (firstValue == null) {
+            return Collections.emptyList();
+        } else if (secondValue == null) {
+            return Arrays.asList(firstValue);
+        } else {
+            return Arrays.asList(firstValue, secondValue);
+        }
     }
 
     /** Returns the number of different nominal values. */
@@ -134,5 +169,30 @@ public class BinominalMapping implements NominalMapping {
         } else {
             return 2;
         }
+    }
+
+    /**
+     * This method rearranges the string to number mappings such that they are in alphabetical
+     * order. <br>
+     * <b>VERY IMPORTANT NOTE:</b> Do not call this method when this attribute is already associated
+     * with an {@link AbstractExampleTable} and it already contains {@link Example}s. All examples
+     * will be messed up!
+     */
+    @Override
+    public void sortMappings() {
+        if (size() == 2) {
+            if (firstValue.compareTo(secondValue) > 0) {
+                String dummy = secondValue;
+                secondValue = firstValue;
+                firstValue = dummy;
+            }
+        }
+    }
+
+    /** Clears all mappings for nominal values. */
+    @Override
+    public void clear() {
+        firstValue = null;
+        secondValue = null;
     }
 }
