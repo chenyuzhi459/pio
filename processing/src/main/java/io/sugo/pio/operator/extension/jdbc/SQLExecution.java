@@ -31,7 +31,7 @@ public class SQLExecution extends Operator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.source;
+        return OperatorGroup.dataSource;
     }
 
     @Override

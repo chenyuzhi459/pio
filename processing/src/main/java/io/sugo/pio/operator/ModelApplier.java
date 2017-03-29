@@ -78,7 +78,12 @@ public class ModelApplier extends Operator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.modelApply;
+    }
+
+    @Override
+    public int getSequence() {
+        return 1;
     }
 
     /**

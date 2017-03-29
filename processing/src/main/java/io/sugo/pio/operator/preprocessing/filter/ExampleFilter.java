@@ -188,12 +188,17 @@ public class ExampleFilter extends AbstractDataProcessing {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.filtering;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.ExampleFilter.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     @Override

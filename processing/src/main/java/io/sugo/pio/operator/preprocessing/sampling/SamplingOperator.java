@@ -97,12 +97,17 @@ public class SamplingOperator extends AbstractSamplingOperator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.sampling;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.SamplingOperator.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     @Override

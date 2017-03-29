@@ -89,12 +89,17 @@ public class PolynominalClassificationPerformanceEvaluator extends AbstractPerfo
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.modelPerformance;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.PolynominalClassificationPerformanceEvaluator.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 1;
     }
 
     @Override

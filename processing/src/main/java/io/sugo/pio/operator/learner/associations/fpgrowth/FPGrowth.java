@@ -114,12 +114,17 @@ public class FPGrowth extends Operator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.association;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.FPGrowth.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     @Override

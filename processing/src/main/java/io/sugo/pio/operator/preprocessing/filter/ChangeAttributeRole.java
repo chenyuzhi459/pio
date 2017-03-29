@@ -98,12 +98,17 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.fieldSetting;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.ChangeAttributeRole.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 1;
     }
 
     @Override

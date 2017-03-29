@@ -13,7 +13,6 @@ import java.util.List;
  * are powerful classification methods which often can also easily be understood. This decision tree
  * learner works similar to Quinlan's ID3.
  *
- * @author Ingo Mierswa
  */
 public class ID3Learner extends AbstractTreeLearner {
 
@@ -34,7 +33,7 @@ public class ID3Learner extends AbstractTreeLearner {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.classification;
     }
 
     @Override

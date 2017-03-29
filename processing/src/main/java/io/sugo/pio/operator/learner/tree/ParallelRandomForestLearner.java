@@ -322,7 +322,12 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.classification;
+    }
+
+    @Override
+    public int getSequence() {
+        return 3;
     }
 
     @Override

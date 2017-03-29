@@ -52,6 +52,11 @@ public class SubSamplingLayer extends AbstractLayer {
         return SubSamplingLayer.class.getSimpleName();
     }
 
+    @Override
+    public int getSequence() {
+        return 4;
+    }
+
     public List<ParameterType> getParameterTypes(){
 
         List<ParameterType> types = super.getParameterTypes();

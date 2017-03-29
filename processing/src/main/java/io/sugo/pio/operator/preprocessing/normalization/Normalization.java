@@ -122,12 +122,17 @@ public class Normalization extends PreprocessingOperator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.normalization;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.Normalization.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     /**

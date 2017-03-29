@@ -106,7 +106,8 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
     }
 
     protected boolean isValidUrl(String url) {
-        return !Strings.isNullOrEmpty(url) && urlPattern.matcher(url).matches();
+//        return !Strings.isNullOrEmpty(url) && urlPattern.matcher(url).matches();
+        return !Strings.isNullOrEmpty(url);
     }
 
     public static void main(String[] args) {

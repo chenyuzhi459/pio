@@ -98,7 +98,12 @@ public class ParallelDecisionTreeLearner extends AbstractParallelTreeLearner {
 
 	@Override
 	public OperatorGroup getGroup() {
-		return OperatorGroup.algorithmModel;
+		return OperatorGroup.classification;
+	}
+
+	@Override
+	public int getSequence() {
+		return 0;
 	}
 
 	@Override

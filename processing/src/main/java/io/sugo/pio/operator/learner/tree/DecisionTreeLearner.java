@@ -55,7 +55,7 @@ public class DecisionTreeLearner extends AbstractTreeLearner {
 
 	@Override
 	public OperatorGroup getGroup() {
-		return OperatorGroup.algorithmModel;
+		return OperatorGroup.classification;
 	}
 
 	@Override

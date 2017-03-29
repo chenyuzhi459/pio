@@ -44,36 +44,44 @@ public class ProcessPioModule implements PioModule {
         return ImmutableList.of(
                 new SimpleModule(ProcessPioModule.class.getSimpleName())
                         .registerSubtypes(
+                                // dataSource
                                 new NamedType(DatabaseDataReader.class, ProcessConstant.OperatorType.DatabaseDataReader),
-                                new NamedType(AttributeFilter.class, ProcessConstant.OperatorType.AttributeFilter),
-                                new NamedType(ExampleFilter.class, ProcessConstant.OperatorType.ExampleFilter),
-                                new NamedType(ChangeAttributeRole.class, ProcessConstant.OperatorType.ChangeAttributeRole),
-                                new NamedType(Normalization.class, ProcessConstant.OperatorType.Normalization),
-                                new NamedType(AggregationOperator.class, ProcessConstant.OperatorType.AggregationOperator),
-
-                                new NamedType(NumericToBinominal.class, ProcessConstant.OperatorType.NumericToBinominal),
-                                new NamedType(NumericToPolynominal.class, ProcessConstant.OperatorType.NumericToPolynominal),
-
-                                new NamedType(ParallelDecisionTreeLearner.class, ProcessConstant.OperatorType.ParallelDecisionTreeLearner),
-                                new NamedType(ParallelRandomForestLearner.class, ProcessConstant.OperatorType.ParallelRandomForestLearner),
-//                                new NamedType(LogisticRegression.class, "logistic_regression"),
-                                new NamedType(MyKLRLearner.class, ProcessConstant.OperatorType.MyKLRLearner),
-                                new NamedType(LinearRegression.class, ProcessConstant.OperatorType.LinearRegression),
-                                new NamedType(KMeans.class, ProcessConstant.OperatorType.KMeans),
-                                new NamedType(JMySVMLearner.class, ProcessConstant.OperatorType.JMySVMLearner),
-                                new NamedType(FPGrowth.class, ProcessConstant.OperatorType.FPGrowth),
-                                new NamedType(AssociationRuleGenerator.class, ProcessConstant.OperatorType.AssociationRuleGenerator),
-
-                                new NamedType(PolynominalClassificationPerformanceEvaluator.class, ProcessConstant.OperatorType.PolynominalClassificationPerformanceEvaluator),
-                                new NamedType(BinominalClassificationPerformanceEvaluator.class, ProcessConstant.OperatorType.BinominalClassificationPerformanceEvaluator),
-                                new NamedType(RegressionPerformanceEvaluator.class, ProcessConstant.OperatorType.RegressionPerformanceEvaluator),
-
-                                new NamedType(SamplingOperator.class, ProcessConstant.OperatorType.SamplingOperator),
-                                new NamedType(ModelApplier.class, ProcessConstant.OperatorType.ModelApplier),
-
                                 new NamedType(CSVExampleSource.class, ProcessConstant.OperatorType.CSVExampleSource),
                                 new NamedType(HttpSqlExampleSource.class, ProcessConstant.OperatorType.HttpSqlExampleSource),
-                                new NamedType(SingleViewExampleSource.class, ProcessConstant.OperatorType.SingleViewExampleSource)
+                                new NamedType(SingleViewExampleSource.class, ProcessConstant.OperatorType.SingleViewExampleSource),
+
+                                // fieldSetting
+                                new NamedType(AttributeFilter.class, ProcessConstant.OperatorType.AttributeFilter),
+                                new NamedType(ChangeAttributeRole.class, ProcessConstant.OperatorType.ChangeAttributeRole),
+                                new NamedType(NumericToBinominal.class, ProcessConstant.OperatorType.NumericToBinominal),
+                                new NamedType(NumericToPolynominal.class, ProcessConstant.OperatorType.NumericToPolynominal),
+                                // filtering
+                                new NamedType(ExampleFilter.class, ProcessConstant.OperatorType.ExampleFilter),
+                                // sampling
+                                new NamedType(SamplingOperator.class, ProcessConstant.OperatorType.SamplingOperator),
+                                // normalization
+                                new NamedType(Normalization.class, ProcessConstant.OperatorType.Normalization),
+                                // aggregation
+                                new NamedType(AggregationOperator.class, ProcessConstant.OperatorType.AggregationOperator),
+
+                                // classification
+                                new NamedType(ParallelDecisionTreeLearner.class, ProcessConstant.OperatorType.ParallelDecisionTreeLearner),
+                                new NamedType(MyKLRLearner.class, ProcessConstant.OperatorType.MyKLRLearner),
+                                new NamedType(JMySVMLearner.class, ProcessConstant.OperatorType.JMySVMLearner),
+                                new NamedType(ParallelRandomForestLearner.class, ProcessConstant.OperatorType.ParallelRandomForestLearner),
+                                // regression
+                                new NamedType(LinearRegression.class, ProcessConstant.OperatorType.LinearRegression),
+                                // clustering
+                                new NamedType(KMeans.class, ProcessConstant.OperatorType.KMeans),
+                                // association
+                                new NamedType(FPGrowth.class, ProcessConstant.OperatorType.FPGrowth),
+                                // modelApply
+                                new NamedType(AssociationRuleGenerator.class, ProcessConstant.OperatorType.AssociationRuleGenerator),
+                                new NamedType(ModelApplier.class, ProcessConstant.OperatorType.ModelApplier),
+                                // modelPerformance
+                                new NamedType(BinominalClassificationPerformanceEvaluator.class, ProcessConstant.OperatorType.BinominalClassificationPerformanceEvaluator),
+                                new NamedType(PolynominalClassificationPerformanceEvaluator.class, ProcessConstant.OperatorType.PolynominalClassificationPerformanceEvaluator),
+                                new NamedType(RegressionPerformanceEvaluator.class, ProcessConstant.OperatorType.RegressionPerformanceEvaluator)
                         )
         );
     }

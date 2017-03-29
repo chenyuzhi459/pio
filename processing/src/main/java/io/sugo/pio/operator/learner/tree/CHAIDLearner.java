@@ -39,7 +39,6 @@ import java.util.List;
  * {@link io.sugo.pio.operator.learner.tree.DecisionTreeLearner} with one exception: it used a
  * chi squared based criterion instead of the information gain or gain ratio criteria.
  * 
- * @author Ingo Mierswa
  */
 public class CHAIDLearner extends DecisionTreeLearner {
 
@@ -60,7 +59,7 @@ public class CHAIDLearner extends DecisionTreeLearner {
 
 	@Override
 	public OperatorGroup getGroup() {
-		return OperatorGroup.algorithmModel;
+		return OperatorGroup.classification;
 	}
 
 	@Override

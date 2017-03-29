@@ -54,12 +54,17 @@ public class NumericToBinominal extends NumericToNominal {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.fieldSetting;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.NumericToBinominal.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 2;
     }
 
     @Override

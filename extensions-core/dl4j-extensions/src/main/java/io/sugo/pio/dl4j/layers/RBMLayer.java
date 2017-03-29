@@ -154,6 +154,11 @@ public class RBMLayer extends AbstractLayer{
     }
 
     @Override
+    public int getSequence() {
+        return 5;
+    }
+
+    @Override
     public List<ParameterType> getParameterTypes() {
 
         List<ParameterType> types = super.getParameterTypes();

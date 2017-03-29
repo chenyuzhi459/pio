@@ -93,6 +93,11 @@ public class DenseLayer extends AbstractLayer {
         return DenseLayer.class.getSimpleName();
     }
 
+    @Override
+    public int getSequence() {
+        return 2;
+    }
+
     public List<ParameterType> getParameterTypes() {
 
         List<ParameterType> types = super.getParameterTypes();

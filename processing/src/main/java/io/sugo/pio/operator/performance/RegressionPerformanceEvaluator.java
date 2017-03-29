@@ -73,12 +73,17 @@ public class RegressionPerformanceEvaluator extends AbstractPerformanceEvaluator
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.modelPerformance;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.RegressionPerformanceEvaluator.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 2;
     }
 
     @Override
