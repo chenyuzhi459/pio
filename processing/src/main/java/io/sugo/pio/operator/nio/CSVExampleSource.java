@@ -94,12 +94,17 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.source;
+        return OperatorGroup.dataSource;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.CSVExampleSource.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 1;
     }
 
     @Override

@@ -17,7 +17,6 @@ import java.util.List;
  * This operator calculates the relevance of a feature by computing for each attribute of the input
  * example set the value of the chi-squared statistic with respect to the class attribute.
  *
- * @author Ingo Mierswa
  */
 public class ChiSquaredWeighting extends AbstractWeighting {
 
@@ -44,7 +43,7 @@ public class ChiSquaredWeighting extends AbstractWeighting {
 
 	@Override
 	public OperatorGroup getGroup() {
-		return OperatorGroup.algorithmModel;
+		return OperatorGroup.classification;
 	}
 
 	@Override

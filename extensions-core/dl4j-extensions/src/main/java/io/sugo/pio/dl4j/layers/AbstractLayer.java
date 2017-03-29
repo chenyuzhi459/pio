@@ -51,7 +51,7 @@ public abstract class AbstractLayer extends Operator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.deepLearning;
     }
 
 }

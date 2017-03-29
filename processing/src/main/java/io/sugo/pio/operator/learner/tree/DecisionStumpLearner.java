@@ -13,7 +13,6 @@ import java.util.List;
  * This operator learns decision stumps, i.e. a small decision tree with only one single split. This
  * decision stump works on both numerical and nominal attributes.
  * 
- * @author Ingo Mierswa
  */
 public class DecisionStumpLearner extends AbstractTreeLearner {
 
@@ -34,7 +33,7 @@ public class DecisionStumpLearner extends AbstractTreeLearner {
 
 	@Override
 	public OperatorGroup getGroup() {
-		return OperatorGroup.algorithmModel;
+		return OperatorGroup.classification;
 	}
 
 	@Override

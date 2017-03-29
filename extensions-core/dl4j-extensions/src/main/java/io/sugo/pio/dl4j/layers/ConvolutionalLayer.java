@@ -144,6 +144,11 @@ public class ConvolutionalLayer extends AbstractLayer {
     }
 
     @Override
+    public int getSequence() {
+        return 3;
+    }
+
+    @Override
     public List<ParameterType> getParameterTypes() {
 
         List<ParameterType> types = super.getParameterTypes();

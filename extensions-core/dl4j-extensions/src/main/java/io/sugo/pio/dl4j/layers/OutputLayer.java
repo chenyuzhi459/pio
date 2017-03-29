@@ -89,6 +89,11 @@ public class OutputLayer extends AbstractLayer {
     }
 
     @Override
+    public int getSequence() {
+        return 6;
+    }
+
+    @Override
     public List<ParameterType> getParameterTypes() {
 
         List<ParameterType> types = super.getParameterTypes();

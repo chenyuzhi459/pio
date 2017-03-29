@@ -119,12 +119,17 @@ public class Word2VecLearner extends Operator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.deepLearning;
     }
 
     @Override
     public String getDescription() {
         return Word2VecLearner.class.getSimpleName();
+    }
+
+    @Override
+    public int getSequence() {
+        return 1;
     }
 
     @Override

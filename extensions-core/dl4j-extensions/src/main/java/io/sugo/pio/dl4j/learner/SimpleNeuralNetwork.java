@@ -26,12 +26,17 @@ public class SimpleNeuralNetwork extends AbstractDLModelLearner {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.deepLearning;
     }
 
     @Override
     public String getDescription() {
         return SimpleNeuralNetwork.class.getSimpleName();
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     @Override

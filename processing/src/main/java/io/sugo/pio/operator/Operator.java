@@ -33,6 +33,10 @@ public abstract class Operator implements ParameterHandler, Serializable {
     private Integer xPos;
     private Integer yPos;
     /**
+     * Indicates the sequence of the operator in it's group
+     */
+    private int sequence = 0;
+    /**
      * Parameters for this Operator.
      */
     private Parameters parameters = null;
@@ -813,5 +817,13 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

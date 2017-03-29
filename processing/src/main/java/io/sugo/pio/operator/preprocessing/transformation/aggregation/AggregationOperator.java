@@ -206,12 +206,17 @@ public class AggregationOperator extends AbstractDataProcessing {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.aggregation;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.AggregationOperator.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     @Override

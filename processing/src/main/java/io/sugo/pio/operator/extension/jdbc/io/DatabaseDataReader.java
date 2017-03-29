@@ -322,12 +322,17 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.source;
+        return OperatorGroup.dataSource;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.DatabaseDataReader.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     public List<ParameterType> getParameterTypes() {

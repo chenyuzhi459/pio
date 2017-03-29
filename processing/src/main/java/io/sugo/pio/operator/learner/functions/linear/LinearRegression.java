@@ -754,12 +754,17 @@ public class LinearRegression extends AbstractLearner {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.regression;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.LinearRegression.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     @Override

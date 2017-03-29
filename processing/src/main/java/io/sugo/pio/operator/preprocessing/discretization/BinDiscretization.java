@@ -23,7 +23,6 @@ import java.util.*;
  * created and the numerical values are simply sorted into those bins. Skips all special attributes
  * including the label.
  *
- * @author Sebastian Land, Ingo Mierswa
  */
 public class BinDiscretization extends AbstractDiscretizationOperator {
 
@@ -71,7 +70,7 @@ public class BinDiscretization extends AbstractDiscretizationOperator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.classification;
     }
 
     @Override

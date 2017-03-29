@@ -10,6 +10,7 @@ public class OperatorMeta {
     private String description;
     private NamedType type;
     private OperatorGroup group;
+    private int sequence;
     private int xPos;
     private int yPos;
 
@@ -34,6 +35,16 @@ public class OperatorMeta {
     @JsonProperty
     public String getDescription() {
         return description;
+    }
+
+    @JsonProperty
+    public int getSequence() {
+        return sequence;
+    }
+
+    public OperatorMeta setSequence(int sequence) {
+        this.sequence = sequence;
+        return this;
     }
 
     public NamedType getType() {
@@ -77,8 +88,18 @@ public class OperatorMeta {
     }
 
     @JsonProperty
+    public String getCategory() {
+        return group.getCategory().getDescription();
+    }
+
+    @JsonProperty
     public String getGroup() {
         return group.getDescription();
+    }
+
+    @JsonProperty
+    public int getGroupSequence() {
+        return group.getSequence();
     }
 
     public OperatorMeta setGroup(OperatorGroup group) {

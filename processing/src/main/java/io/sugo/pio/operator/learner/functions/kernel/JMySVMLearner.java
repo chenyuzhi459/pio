@@ -97,12 +97,17 @@ public class JMySVMLearner extends AbstractMySVMLearner {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.classification;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.JMySVMLearner.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 2;
     }
 
     /**

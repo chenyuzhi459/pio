@@ -46,6 +46,9 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
         String druidUrl = getParameterAsString(PARAMETER_URL) + URI_QUERY_DRUID;
+        if (!druidUrl.startsWith("http")) {
+            druidUrl = "http://" + druidUrl;
+        }
 
         String singleViewValue = buildQueryDruidParam();
         String result = httpPost(druidUrl, singleViewValue);
@@ -130,12 +133,17 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.source;
+        return OperatorGroup.dataSource;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.SingleViewExampleSource.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 3;
     }
 
     @Override
@@ -271,6 +279,9 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
         String param = getParameterAsString(PARAMETER_PARAM);
         String url = getParameterAsString(PARAMETER_URL);
+        if (!url.startsWith("http")) {
+            url = "http://" + url;
+        }
 
         if (!Strings.isNullOrEmpty(dataSource) && !Strings.isNullOrEmpty(param)) {
             ParamVo paramVo = deserialize(param, ParamVo.class);

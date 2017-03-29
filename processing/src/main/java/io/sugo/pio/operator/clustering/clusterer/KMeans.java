@@ -63,12 +63,17 @@ public class KMeans extends RMAbstractClusterer implements CapabilityProvider {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.clustering;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.KMeans.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     /**

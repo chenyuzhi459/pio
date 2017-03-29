@@ -100,7 +100,7 @@ public class LogisticRegression extends AbstractLearner {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.classification;
     }
 
     @Override

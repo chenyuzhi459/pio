@@ -87,12 +87,17 @@ public class AttributeFilter extends AbstractFeatureSelection {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.fieldSetting;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.AttributeFilter.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     @Override

@@ -100,12 +100,17 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.source;
+        return OperatorGroup.dataSource;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.HttpSqlExampleSource.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 2;
     }
 
     @Override

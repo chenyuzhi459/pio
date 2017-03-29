@@ -14,8 +14,6 @@ import java.util.List;
  * Decision trees are powerful classification methods which often can also easily be understood.
  * This decision tree learner works similar to Quinlan's ID3.
  *
- * @author Ingo Mierswa
- *
  * @deprecated This learner is not used anymore.
  */
 @Deprecated
@@ -38,7 +36,7 @@ public class ID3NumericalLearner extends AbstractTreeLearner {
 
 	@Override
 	public OperatorGroup getGroup() {
-		return OperatorGroup.algorithmModel;
+		return OperatorGroup.classification;
 	}
 
 	@Override

@@ -29,12 +29,17 @@ public class NumericToPolynominal extends NumericToNominal {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.fieldSetting;
     }
 
     @Override
     public String getDescription() {
         return I18N.getMessage("pio.NumericToPolynominal.description");
+    }
+
+    @Override
+    public int getSequence() {
+        return 3;
     }
 
     @Override
