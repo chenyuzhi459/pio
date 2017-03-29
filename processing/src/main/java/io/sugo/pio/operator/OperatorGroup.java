@@ -17,7 +17,8 @@ public enum OperatorGroup {
     association(OperatorCategory.algorithmModel, "association", I18N.getMessage("pio.OperatorGroup.association"), 3),
     deepLearning(OperatorCategory.algorithmModel, "deepLearning", I18N.getMessage("pio.OperatorGroup.deepLearning"), 4),
     modelApply(OperatorCategory.algorithmModel, "modelApply", I18N.getMessage("pio.OperatorGroup.modelApply"), 5),
-    modelPerformance(OperatorCategory.algorithmModel, "modelPerformance", I18N.getMessage("pio.OperatorGroup.modelPerformance"), 6);
+    modelPerformance(OperatorCategory.algorithmModel, "modelPerformance", I18N.getMessage("pio.OperatorGroup.modelPerformance"), 6),
+    fm(OperatorCategory.algorithmModel, "fm", I18N.getMessage("pio.OperatorGroup.fm"), 7);
 
     private final OperatorCategory category;
     private final String group;

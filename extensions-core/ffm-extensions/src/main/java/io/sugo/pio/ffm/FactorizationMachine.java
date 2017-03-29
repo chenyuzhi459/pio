@@ -25,12 +25,17 @@ public class FactorizationMachine extends Operator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.fm;
     }
 
     @Override
     public String getDescription() {
         return FactorizationMachine.class.getSimpleName();
+    }
+
+    @Override
+    public int getSequence() {
+        return 0;
     }
 
     @Override

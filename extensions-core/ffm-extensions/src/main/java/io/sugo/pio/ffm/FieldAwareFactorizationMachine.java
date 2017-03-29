@@ -43,12 +43,17 @@ public class FieldAwareFactorizationMachine extends Operator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.fm;
     }
 
     @Override
     public String getDescription() {
         return FieldAwareFactorizationMachine.class.getSimpleName();
+    }
+
+    @Override
+    public int getSequence() {
+        return 1;
     }
 
     @Override
