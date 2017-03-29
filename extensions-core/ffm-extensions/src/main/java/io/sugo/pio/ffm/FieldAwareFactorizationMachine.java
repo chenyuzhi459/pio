@@ -33,7 +33,7 @@ public class FieldAwareFactorizationMachine extends Operator {
 
     public static final String PARAMETER_LATENT_FACTOR_DIM = "latent_factor_dim";
 
-    private final InputPort input = getInputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
+    private final InputPort input = getInputPorts().createPort(PortConstant.TRAINING_EXAMPLES, PortConstant.TRAINING_EXAMPLES_DESC);
     private final OutputPort model = getOutputPorts().createPort(PortConstant.MODEL, PortConstant.MODEL_DESC);
 
     @Override

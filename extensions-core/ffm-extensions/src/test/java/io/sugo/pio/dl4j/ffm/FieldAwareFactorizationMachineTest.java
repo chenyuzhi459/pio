@@ -38,7 +38,7 @@ public class FieldAwareFactorizationMachineTest {
         process.getRootOperator().getExecutionUnit().addOperator(ffm);
 
         process.connect(new Connection("operator_db_reader", "output", "change_role", "example set input"), true);
-        process.connect(new Connection("change_role", "example set output", "ffm", "training set"), true);
+        process.connect(new Connection("change_role", "example set output", "ffm", "training examples"), true);
 
         process.run();
     }
