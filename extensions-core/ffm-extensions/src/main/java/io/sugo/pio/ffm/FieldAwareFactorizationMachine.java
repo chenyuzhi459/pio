@@ -1,5 +1,6 @@
 package io.sugo.pio.ffm;
 
+import io.sugo.pio.constant.PortConstant;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
@@ -10,7 +11,6 @@ import io.sugo.pio.parameter.ParameterTypeDouble;
 import io.sugo.pio.parameter.ParameterTypeInt;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
-import io.sugo.pio.ports.PortType;
 
 import java.util.List;
 
@@ -33,8 +33,8 @@ public class FieldAwareFactorizationMachine extends Operator {
 
     public static final String PARAMETER_LATENT_FACTOR_DIM = "latent_factor_dim";
 
-    private final InputPort input = getInputPorts().createPort(PortType.TRAINING_SET);
-    private final OutputPort model = getOutputPorts().createPort(PortType.MODEL);
+    private final InputPort input = getInputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
+    private final OutputPort model = getOutputPorts().createPort(PortConstant.MODEL, PortConstant.MODEL_DESC);
 
     @Override
     public String getDefaultFullName() {
