@@ -5,8 +5,6 @@ import io.sugo.pio.engine.als.*;
 import io.sugo.pio.engine.demo.ObjectMapperUtil;
 import io.sugo.pio.engine.data.output.LocalFileRepository;
 import io.sugo.pio.engine.data.output.Repository;
-import io.sugo.pio.engine.detail.DetailModelFactory;
-import io.sugo.pio.engine.detail.DetailResult;
 import io.sugo.pio.engine.prediction.PredictionModel;
 
 import javax.servlet.http.HttpServletRequest;

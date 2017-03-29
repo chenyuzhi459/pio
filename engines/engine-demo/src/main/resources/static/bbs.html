@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<head>
+    <title>内容推荐</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"/>
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+    <link href="css/common.css" rel="stylesheet" type="text/css" media="all"/>
+
+    <script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="js/move-top.js"></script>
+    <script type="text/javascript" src="js/easing.js"></script>
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/bbs.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <div class="header">
+        <div class="wrap">
+            <div class="header_top">
+                <div class="logo">
+                    <a href="bbs.html"><img src="images/sugologo.png" alt="" /></a>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <div class="container mg2t">
+        <div class="col-md-20">
+            <form class="form-horizontal"  method="post" >
+                <div class="form-group">
+                    <label for="title" class="col-sm-15 control-label">帖子标题</label>
+                    <div class="col-sm-45">
+                        <input type="text"
+                               class="form-control"
+                               id="title"
+                               v-model="title"
+                               name="title"
+                               placeholder="请输入帖子标贴">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="content" class="col-sm-15 control-label">帖子内容</label>
+                    <div class="col-sm-45">
+                        <textarea class="form-control" rows="15" v-model="content" placeholder="请输入帖子内容"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-15 col-sm-45">
+                        <button type="button" class="btn btn-default" @click="getitems">提交</button>
+                    </div>
+                </div>
+                <div class="alert alert-warning mg1t" role="alert"> 建议使用帖子样本：
+                    <a href="http://q.mama.cn/group/30/">"母婴用品使用讨论圈"</a>,
+                </div>
+            </form>
+        </div>
+        <div class="col-md-10 aligncenter" :style="{fontSize: '5em'}">
+            <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+        </div>
+        <div class="col-md-30">
+            <h3>{{hint}}</h3>
+            <div class="alert alert-warning mg1t" role="alert"> 商品推荐（小树熊商品）</div>
+            <textarea class="form-control" style="" rows="20" v-model="result" placeholder="物品推荐结果"></textarea>
+            <div> </div>
+            <div class="alert alert-warning mg1t" role="alert"> 文章推荐（部分圈子）</div>
+            <textarea class="form-control" style="" rows="20" v-model="artres" placeholder="文本推荐结果"></textarea>
+        </div>
+    </div>
+
+    <div class="bottom">
+        <div class="wrap">
+            <div class="copy_right">
+                <p>Copyright &copy; 2017.sugo All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+    <a href="javascript:" id="toTop"><span id="toTopHover"> </span></a>
+</div>
+<div class="hidden">
+    <script src='http://v7.cnzz.com/stat.php?id=155540&web_id=155540' language='JavaScript' charset='gb2312'></script>
+</div>
+</body>
+</html>
+
