@@ -1,5 +1,7 @@
 package io.sugo.pio.example.table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -149,6 +151,7 @@ public class BinominalMapping implements NominalMapping {
 
 
     @Override
+    @JsonProperty
     public List<String> getValues() {
         if (firstValue == null) {
             return Collections.emptyList();

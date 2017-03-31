@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  */
@@ -56,26 +55,13 @@ public class RFMManager {
         QuantileCalculator calculator = new QuantileCalculator(rfmModelList, r, f, m);
         QuantileModel quantileModel = calculator.calculate();
 
-        Map<String, Integer> groupMap = quantileModel.getGroupMap();
-        rfmModelList.forEach(rfmModel -> {
-            // Label each of the rfm model
-            rfmModel.setrLabel(quantileModel.getRLabel(rfmModel.getRecency()));
-            rfmModel.setfLabel(quantileModel.getFLabel(rfmModel.getFrequency()));
-            rfmModel.setmLabel(quantileModel.getMLabel(rfmModel.getMonetary()));
-
-            // Statistic members of each group
-            String group = rfmModel.getGroup();
-            Integer count = groupMap.get(group);
-            groupMap.put(group, ++count);
-        });
-
         return quantileModel;
     }
 
     public static void main(String[] args) {
         RFMManager rfmManager = new RFMManager();
         List<RFMModel> rfmModelList = rfmManager.getRFMModelList();
-        QuantileModel quantileModel = rfmManager.generateQuantileModel(rfmModelList, 2, 3, 4);
+        QuantileModel quantileModel = rfmManager.generateQuantileModel(rfmModelList, 2, 3, 2);
 
         try {
             System.out.println(

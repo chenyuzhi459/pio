@@ -9,7 +9,6 @@ import io.sugo.pio.tools.Tools;
 /**
  * A split condition for numerical values (less equals).
  *
- * @author Ingo Mierswa
  */
 public class LessEqualsSplitCondition extends AbstractSplitCondition {
 

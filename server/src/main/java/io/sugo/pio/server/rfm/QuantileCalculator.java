@@ -1,6 +1,7 @@
 package io.sugo.pio.server.rfm;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  */
@@ -38,6 +39,19 @@ public class QuantileCalculator {
         quantileModel.setRq(calculateR());
         quantileModel.setFq(calculateF());
         quantileModel.setMq(calculateM());
+
+        Map<String, Integer> groupMap = quantileModel.getGroupMap();
+        rfmModelList.forEach(rfmModel -> {
+            // Label each of the rfm model
+            rfmModel.setrLabel(quantileModel.getRLabel(rfmModel.getRecency()));
+            rfmModel.setfLabel(quantileModel.getFLabel(rfmModel.getFrequency()));
+            rfmModel.setmLabel(quantileModel.getMLabel(rfmModel.getMonetary()));
+
+            // Statistic members of each group
+            String group = rfmModel.getGroup();
+            Integer count = groupMap.get(group);
+            groupMap.put(group, ++count);
+        });
 
         return quantileModel;
     }

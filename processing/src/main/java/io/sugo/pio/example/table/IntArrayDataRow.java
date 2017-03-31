@@ -1,6 +1,5 @@
 package io.sugo.pio.example.table;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**

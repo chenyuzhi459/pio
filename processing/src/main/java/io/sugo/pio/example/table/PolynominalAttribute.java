@@ -1,5 +1,6 @@
 package io.sugo.pio.example.table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.AttributeTransformation;
 import io.sugo.pio.tools.Ontology;
 
@@ -11,108 +12,112 @@ import java.util.Iterator;
  * attribute fields this class keeps information about the nominal values and the value to index
  * mappings. If one of the methods designed for numerical attributes was invoked a RuntimeException
  * will be thrown.
- * 
+ * <p>
  * It will be guaranteed that all values are mapped to indices without any missing values. This
  * could, however, be changed in future versions thus operators should not rely on this fact.
- * 
+ * <p>
  * This class is one of the two available implementations of {@link NominalAttribute} available in
  * RapidMiner. In contrast to the {@link BinominalAttribute}, which stores the possible values
  * internally very efficient, this class allows an arbitrary number of nominal values and uses a
  * {@link PolynominalMapping} for the internal representation mapping.
- * 
  */
 public class PolynominalAttribute extends NominalAttribute {
 
-	private static final long serialVersionUID = 3713022530244256813L;
+    private static final long serialVersionUID = 3713022530244256813L;
 
-	/** The maximum number of nominal values displayed in result strings. */
-	private static final int MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES = 100;
+    /**
+     * The maximum number of nominal values displayed in result strings.
+     */
+    private static final int MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES = 100;
 
-	private NominalMapping nominalMapping = new PolynominalMapping();
+    private NominalMapping nominalMapping = new PolynominalMapping();
 
-	/**
-	 * Creates a simple attribute which is not part of a series and does not provide a unit string.
-	 */
-	/* pp */PolynominalAttribute(String name) {
-		this(name, Ontology.NOMINAL);
-	}
+    /**
+     * Creates a simple attribute which is not part of a series and does not provide a unit string.
+     */
+    /* pp */PolynominalAttribute(String name) {
+        this(name, Ontology.NOMINAL);
+    }
 
-	/**
-	 * Creates a simple attribute which is not part of a series and does not provide a unit string.
-	 */
+    /**
+     * Creates a simple attribute which is not part of a series and does not provide a unit string.
+     */
 	/* pp */PolynominalAttribute(String name, int valueType) {
-		super(name, valueType);
-	}
+        super(name, valueType);
+    }
 
-	/**
-	 * Clone constructor.
-	 */
-	private PolynominalAttribute(PolynominalAttribute a) {
-		super(a);
-		// this.nominalMapping = (NominalMapping)a.nominalMapping.clone();
-		this.nominalMapping = a.nominalMapping;
-	}
+    /**
+     * Clone constructor.
+     */
+    private PolynominalAttribute(PolynominalAttribute a) {
+        super(a);
+        // this.nominalMapping = (NominalMapping)a.nominalMapping.clone();
+        this.nominalMapping = a.nominalMapping;
+    }
 
-	/** Clones this attribute. */
-	@Override
-	public Object clone() {
-		return new PolynominalAttribute(this);
-	}
+    /**
+     * Clones this attribute.
+     */
+    @Override
+    public Object clone() {
+        return new PolynominalAttribute(this);
+    }
 
-	@Override
-	public AttributeTransformation getLastTransformation() {
-		return null;
-	}
+    @Override
+    public AttributeTransformation getLastTransformation() {
+        return null;
+    }
 
-	@Override
-	public NominalMapping getMapping() {
-		return this.nominalMapping;
-	}
+    @Override
+    @JsonProperty
+    public NominalMapping getMapping() {
+        return this.nominalMapping;
+    }
 
-	@Override
-	public void setMapping(NominalMapping newMapping) {
-		this.nominalMapping = new PolynominalMapping();
-	}
+    @Override
+    public void setMapping(NominalMapping newMapping) {
+        this.nominalMapping = new PolynominalMapping();
+    }
 
-	@Override
-	public void setBlockType(int b) {
+    @Override
+    public void setBlockType(int b) {
 
-	}
+    }
 
-	@Override
-	public boolean isNumerical() {
-		return false;
-	}
+    @Override
+    public boolean isNumerical() {
+        return false;
+    }
 
-	// ================================================================================
-	// string and result methods
-	// ================================================================================
+    // ================================================================================
+    // string and result methods
+    // ================================================================================
 
-	@Override
-	public String toString() {
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append("/values=[");
-		Iterator<String> i = this.nominalMapping.getValues().iterator();
-		int index = 0;
-		while (i.hasNext()) {
-			if (index >= MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES) {
-				result.append(", ... (" + (this.nominalMapping.getValues().size() - MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES)
-						+ " values) ...");
-				break;
-			}
-			if (index != 0) {
-				result.append(", ");
-			}
-			result.append(i.next());
-			index++;
-		}
-		result.append("]");
-		return result.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuffer result = new StringBuffer(super.toString());
+        result.append("/values=[");
+        Iterator<String> i = this.nominalMapping.getValues().iterator();
+        int index = 0;
+        while (i.hasNext()) {
+            if (index >= MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES) {
+                result.append(", ... (" + (this.nominalMapping.getValues().size() - MAX_NUMBER_OF_SHOWN_NOMINAL_VALUES)
+                        + " values) ...");
+                break;
+            }
+            if (index != 0) {
+                result.append(", ");
+            }
+            result.append(i.next());
+            index++;
+        }
+        result.append("]");
+        return result.toString();
+    }
 
-	@Override
-	public boolean isDateTime() {
-		return false;
-	}
+    @Override
+    public boolean isDateTime() {
+        return false;
+    }
 
 }

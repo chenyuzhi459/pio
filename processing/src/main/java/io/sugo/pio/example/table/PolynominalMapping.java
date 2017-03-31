@@ -1,5 +1,6 @@
 package io.sugo.pio.example.table;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.tools.Tools;
 
 import java.util.*;
@@ -160,6 +161,7 @@ public class PolynominalMapping implements NominalMapping {
     }
 
     @Override
+    @JsonProperty
     public List<String> getValues() {
         return indexToSymbolMap;
     }

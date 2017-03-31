@@ -65,6 +65,7 @@ public abstract class AbstractExampleTable implements ExampleTable {
      * Returns a new array containing all {@link Attribute}s.
      */
 	@Override
+    @JsonProperty
     public Attribute[] getAttributes() {
         Attribute[] attribute = new Attribute[attributes.size()];
         attributes.toArray(attribute);
