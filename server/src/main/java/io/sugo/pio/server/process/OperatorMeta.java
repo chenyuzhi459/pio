@@ -93,8 +93,18 @@ public class OperatorMeta {
     }
 
     @JsonProperty
+    public String getCategoryCode() {
+        return group.getCategory().name();
+    }
+
+    @JsonProperty
     public String getGroup() {
         return group.getDescription();
+    }
+
+    @JsonProperty
+    public String getGroupCode() {
+        return group.name();
     }
 
     @JsonProperty

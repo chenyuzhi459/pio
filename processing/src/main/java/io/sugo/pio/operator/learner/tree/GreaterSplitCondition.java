@@ -9,7 +9,6 @@ import io.sugo.pio.tools.Tools;
 /**
  * Returns true if the value of the desired attribute is greater then a given threshold.
  *
- * @author Ingo Mierswa
  */
 public class GreaterSplitCondition extends AbstractSplitCondition {
 

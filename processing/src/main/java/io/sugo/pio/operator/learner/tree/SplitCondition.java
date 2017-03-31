@@ -18,6 +18,8 @@ import java.io.Serializable;
         @JsonSubTypes.Type(name = "less_equals", value = LessEqualsSplitCondition.class),
         @JsonSubTypes.Type(name = "contain", value = ContainsSplitCondition.class),
         @JsonSubTypes.Type(name = "not_contain", value = NotContainsSplitCondition.class),
+        @JsonSubTypes.Type(name = "nominal", value = NominalSplitCondition.class),
+        @JsonSubTypes.Type(name = "numerical_missing", value = NumericalMissingSplitCondition.class),
 })
 public interface SplitCondition extends Serializable {
 

@@ -26,7 +26,6 @@ import java.util.List;
 /**
  * This class encapsulates the translation step from a {@link DataResultSetTranslator} to an
  * {@link ExampleSet} which is controlled by the {@link DataResultSetTranslationConfiguration}.
- *
  */
 public class DataResultSetTranslator {
 
@@ -80,7 +79,8 @@ public class DataResultSetTranslator {
      */
     public ExampleSet read(DataResultSet dataResultSet, DataResultSetTranslationConfiguration configuration,
                            boolean previewOnly) throws OperatorException {
-        int maxRows = 1000;
+//        int maxRows = previewOnly ? ImportWizardUtils.getPreviewLength() : -1;
+        int maxRows = -1;
 
         cancelLoadingRequested = false;
         boolean isFaultTolerant = configuration.isFaultTolerant();
@@ -120,7 +120,7 @@ public class DataResultSetTranslator {
         // detect if this is executed in a process
         boolean isRunningInProcess = false;
         /*if (operator != null) {
-			Process process = operator.getProcess();
+            Process process = operator.getProcess();
 			if (process != null && process.getProcessState() == Process.PROCESS_STATE_RUNNING) {
 				isRunningInProcess = true;
 			}
@@ -128,7 +128,7 @@ public class DataResultSetTranslator {
 
         while (dataResultSet.hasNext() && !shouldStop && (currentRow < maxRows || maxRows < 0)) {
             if (isRunningInProcess) {
-				operator.checkForStop();
+                operator.checkForStop();
             }
             if (cancelLoadingRequested) {
                 break;
@@ -180,7 +180,7 @@ public class DataResultSetTranslator {
                         String annotationValue = getString(dataResultSet, exampleIndex, attributeColumns[attributeIndex],
                                 isFaultTolerant);
                         if (annotationValue != null && !annotationValue.isEmpty()) {
-							attribute.getAnnotations().put(currentAnnotation, annotationValue);
+                            attribute.getAnnotations().put(currentAnnotation, annotationValue);
                         }
                     }
                     attributeNames.add(attribute.getName());
@@ -257,7 +257,7 @@ public class DataResultSetTranslator {
 
             String roleId = cmd.getRole();
             if (!Attributes.ATTRIBUTE_NAME.equals(roleId)) {
-				exampleSet.getAttributes().setSpecialAttribute(attribute, roleId);
+                exampleSet.getAttributes().setSpecialAttribute(attribute, roleId);
             }
             attributeIndex++;
             attributeNames.add(attribute.getName());
@@ -274,7 +274,7 @@ public class DataResultSetTranslator {
                                   int column, boolean isFaultTolerant) throws OperatorException {
         DataResultSet.ValueType nativeValueType;
         try {
-        nativeValueType = dataResultSet.getNativeValueType(column);
+            nativeValueType = dataResultSet.getNativeValueType(column);
         } catch (io.sugo.pio.operator.nio.model.ParseException e1) {
 //            addOrThrow(isFaultTolerant, e1.getError(), row);
             return Double.NaN;
@@ -297,7 +297,7 @@ public class DataResultSetTranslator {
     private double getDate(DataResultSet dataResultSet, int row, int column, boolean isFaultTolerant)
             throws OperatorException {
         try {
-        return dataResultSet.getDate(column).getTime();
+            return dataResultSet.getDate(column).getTime();
         } catch (io.sugo.pio.operator.nio.model.ParseException e) {
 //            addOrThrow(isFaultTolerant, e.getError(), row);
             return Double.NaN;
@@ -601,7 +601,7 @@ public class DataResultSetTranslator {
 
     /**
      * Cancels
-     * {@link #guessValueTypes(int[], DataResultSetTranslationConfiguration, DataResultSet, int, ProgressListener)}
+     * { #guessValueTypes(int[], DataResultSetTranslationConfiguration, DataResultSet, int, ProgressListener)}
      * after the next row.
      */
     public void cancelGuessing() {
@@ -610,7 +610,7 @@ public class DataResultSetTranslator {
 
     /**
      * Cancels
-     * {@link #read(DataResultSet, DataResultSetTranslationConfiguration, int, ProgressListener)}
+     * { #read(DataResultSet, DataResultSetTranslationConfiguration, int, ProgressListener)}
      * after the next row.
      */
     public void cancelLoading() {

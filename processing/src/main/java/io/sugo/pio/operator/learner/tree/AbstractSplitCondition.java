@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * The abstract super class for all split conditions.
  * 
- * @author Ingo Mierswa
  */
 public abstract class AbstractSplitCondition implements SplitCondition {
 

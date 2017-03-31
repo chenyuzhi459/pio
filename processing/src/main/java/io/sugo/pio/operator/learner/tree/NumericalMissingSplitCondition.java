@@ -7,7 +7,6 @@ import io.sugo.pio.example.Example;
 /**
  * A split condition for numerical missing values (equals).
  *
- * @author Gisa Schaefer
  */
 public class NumericalMissingSplitCondition extends AbstractSplitCondition {
 

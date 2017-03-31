@@ -11,8 +11,6 @@ import java.util.Set;
  * SplitCondition for Radoop's Decision Tree. Returns true if the value of the desired attribute is
  * not in the given set.
  * 
- * @author Zsolt Toth
- * 
  */
 public class NotContainsSplitCondition extends AbstractSplitCondition {
 
