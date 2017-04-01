@@ -1,5 +1,6 @@
 package io.sugo.pio.example.set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
@@ -13,7 +14,6 @@ import java.util.Iterator;
  * used as a data header description. Since no data reference exist, all example based methods will
  * throw an {@link UnsupportedOperationException}.
  * 
- * @author Ingo Mierswa
  */
 public class HeaderExampleSet extends AbstractExampleSet {
 
@@ -49,6 +49,7 @@ public class HeaderExampleSet extends AbstractExampleSet {
 	}
 
 	@Override
+	@JsonProperty
 	public int size() {
 		return 0;
 	}

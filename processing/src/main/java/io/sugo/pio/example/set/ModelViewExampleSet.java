@@ -1,5 +1,6 @@
 package io.sugo.pio.example.set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
@@ -15,7 +16,6 @@ import java.util.Iterator;
  * This is a generic example set (view on the view stack of the data) which can be used to apply any
  * preprocessing model and create a view from it.
  * 
- * @author Sebastian Land, Ingo Mierswa
  */
 public class ModelViewExampleSet extends AbstractExampleSet {
 
@@ -69,6 +69,7 @@ public class ModelViewExampleSet extends AbstractExampleSet {
 	}
 
 	@Override
+	@JsonProperty
 	public int size() {
 		return this.parent.size();
 	}

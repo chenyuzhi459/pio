@@ -97,6 +97,7 @@ public class RemappedExampleSet extends AbstractExampleSet {
     }
 
     @Override
+    @JsonProperty
     public int size() {
         return parent.size();
     }

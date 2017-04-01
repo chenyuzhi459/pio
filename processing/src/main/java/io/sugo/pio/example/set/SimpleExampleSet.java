@@ -125,6 +125,7 @@ public class SimpleExampleSet extends AbstractExampleSet {
     }
 
     @Override
+    @JsonProperty
     public int size() {
         return exampleTable.size();
     }

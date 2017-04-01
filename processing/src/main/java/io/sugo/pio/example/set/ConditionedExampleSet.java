@@ -1,5 +1,6 @@
 package io.sugo.pio.example.set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
@@ -185,6 +186,7 @@ public class ConditionedExampleSet extends AbstractExampleSet {
      * Counts the number of examples which fulfills the condition.
      */
     @Override
+    @JsonProperty
     public int size() {
         return mapping.length;
     }

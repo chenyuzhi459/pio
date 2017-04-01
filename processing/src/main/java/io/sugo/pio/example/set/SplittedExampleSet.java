@@ -1,5 +1,6 @@
 package io.sugo.pio.example.set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
@@ -33,6 +34,7 @@ public class SplittedExampleSet extends AbstractExampleSet {
     }
 
     @Override
+    @JsonProperty
     public int size() {
         return partition.getSelectionSize();
     }

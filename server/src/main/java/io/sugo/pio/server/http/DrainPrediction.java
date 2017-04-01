@@ -15,6 +15,7 @@ import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.nio.model.AbstractDataResultSetReader;
+import io.sugo.pio.operator.preprocessing.filter.ExampleFilter;
 import io.sugo.pio.operator.preprocessing.filter.attributes.SubsetAttributeFilter;
 import io.sugo.pio.operator.preprocessing.sampling.SamplingOperator;
 import io.sugo.pio.parameter.ParameterTypeList;
@@ -54,6 +55,7 @@ public class DrainPrediction {
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"), tenantId);
 
             List<OperatorParamDto> attributeFilterParam = buildAttributeFilterParam(paramList);
+            List<OperatorParamDto> exampleFilterParam = buildExampleFilterParam(paramList, false);
             List<OperatorParamDto> samplingParam = buildSamplingParam();
 
             OperatorProcess trainProcess = getBuiltInProcess(tenantId, ProcessConstant.Type.DRAIN_TRAINING);
@@ -72,6 +74,9 @@ public class DrainPrediction {
 
             Operator attributeFilterOperator = getOperator(trainProcess, ProcessConstant.OperatorType.AttributeFilter);
             processManager.updateParameter(trainProcess.getId(), attributeFilterOperator.getName(), attributeFilterParam);
+
+            Operator exampleFilterOperator = getOperator(trainProcess, ProcessConstant.OperatorType.ExampleFilter);
+            processManager.updateParameter(trainProcess.getId(), exampleFilterOperator.getName(), exampleFilterParam);
 
             Operator samplingOperator = getOperator(trainProcess, ProcessConstant.OperatorType.SamplingOperator);
             processManager.updateParameter(trainProcess.getId(), samplingOperator.getName(), samplingParam);
@@ -104,6 +109,7 @@ public class DrainPrediction {
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"), tenantId);
 
             List<OperatorParamDto> attributeFilterParam = buildAttributeFilterParam(paramList);
+            List<OperatorParamDto> exampleFilterParam = buildExampleFilterParam(paramList, true);
             OperatorProcess predictionProcess = getBuiltInProcess(tenantId, ProcessConstant.Type.DRAIN_PREDICTION);
 
             // 1.Not found built-in process, then create one.
@@ -120,6 +126,9 @@ public class DrainPrediction {
 
             Operator attributeFilterOperator = getOperator(predictionProcess, ProcessConstant.OperatorType.AttributeFilter);
             processManager.updateParameter(predictionProcess.getId(), attributeFilterOperator.getName(), attributeFilterParam);
+
+            Operator exampleFilterOperator = getOperator(predictionProcess, ProcessConstant.OperatorType.ExampleFilter);
+            processManager.updateParameter(predictionProcess.getId(), exampleFilterOperator.getName(), exampleFilterParam);
             log.info("Update operator parameters of 'drain_prediction' process successfully. tenantId:%s", tenantId);
 
             // 3.Get model from decision tree operator of 'drain_training' process
@@ -229,6 +238,45 @@ public class DrainPrediction {
         String selectedColumn = org.apache.commons.lang.StringUtils.join(selectedColumns.toArray(), ';');
         param.setKey(SubsetAttributeFilter.PARAMETER_ATTRIBUTES);
         param.setValue(selectedColumn);
+
+        return Collections.singletonList(param);
+    }
+
+    private List<OperatorParamDto> buildExampleFilterParam(List<OperatorParamDto> paramList, boolean excludeLabelColumn) {
+        List<String> filterColumns = new ArrayList<>();
+        if (paramList != null && !paramList.isEmpty()) {
+            for (OperatorParamDto operatorParam : paramList) {
+                if (AbstractDataResultSetReader.PARAMETER_META_DATA.equals(operatorParam.getKey())) {
+                    List<String[]> columnList = ParameterTypeList.transformString2List(operatorParam.getValue());
+                    for (String[] columnArray : columnList) { // [index, attributeName.isSelected.valueType.role]
+                        if (columnArray.length != 2) {
+                            throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.metadata.parameters.number_must_be_two"));
+                        }
+                        String clolumnInfo = columnArray[1]; // attributeName.isSelected.valueType.role
+                        String[] infoArray = clolumnInfo.split("\\.");
+                        String columnName = infoArray[0];
+                        boolean isSelected = Boolean.valueOf(infoArray[1]);
+                        String role = infoArray[3];
+
+                        if (isSelected) {
+                            if (excludeLabelColumn && Attributes.LABEL_NAME.equals(role)) {
+                                continue;
+                            }
+                            filterColumns.add(ExampleFilter.PARAMETER_FILTERS_LIST + ":" + columnName + ".is_not_missing.");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (filterColumns.isEmpty()) {
+            throw new IllegalArgumentException(I18N.getErrorMessage("pio.error.metadata.parameters.attribute_empty"));
+        }
+
+        OperatorParamDto param = new OperatorParamDto();
+        String filterColumn = org.apache.commons.lang.StringUtils.join(filterColumns.toArray(), ';');
+        param.setKey(ExampleFilter.PARAMETER_FILTERS_LIST);
+        param.setValue(filterColumn);
 
         return Collections.singletonList(param);
     }

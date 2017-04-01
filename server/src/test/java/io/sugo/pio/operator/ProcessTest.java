@@ -102,7 +102,7 @@ public class ProcessTest {
 
         ExampleFilter ef = new ExampleFilter();
         ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         ChangeAttributeRole role = new ChangeAttributeRole();
@@ -149,7 +149,7 @@ public class ProcessTest {
 //        );
         System.out.println(
                 jsonMapper.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(dt.getResult())
+                        .writeValueAsString(dt.getResult().addIoObjects(ef.getResult().getIoObjects()))
         );
         System.out.println();
 //        System.out.println();
@@ -169,7 +169,7 @@ public class ProcessTest {
 
         ExampleFilter ef = new ExampleFilter();
         ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         ChangeAttributeRole role = new ChangeAttributeRole();
@@ -179,7 +179,7 @@ public class ProcessTest {
         process.getRootOperator().getExecutionUnit().addOperator(role);
 
         LinearRegression linearRegression = new LinearRegression();
-        linearRegression.setParameter("feature_selection", "M5 prime");
+        linearRegression.setParameter("feature_selection", "0");
         linearRegression.setParameter("eliminate_colinear_features", "true");
         linearRegression.setParameter("min_tolerance", "0.05");
         linearRegression.setParameter("use_bias", "true");
@@ -260,7 +260,7 @@ public class ProcessTest {
 
         ExampleFilter ef = new ExampleFilter();
         ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         ChangeAttributeRole role = new ChangeAttributeRole();
@@ -316,7 +316,7 @@ public class ProcessTest {
 
         ExampleFilter ef = new ExampleFilter();
         ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         ChangeAttributeRole role = new ChangeAttributeRole();
@@ -369,7 +369,7 @@ public class ProcessTest {
 
         ExampleFilter ef = new ExampleFilter();
         ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         ChangeAttributeRole role = new ChangeAttributeRole();
@@ -418,7 +418,7 @@ public class ProcessTest {
 
         ExampleFilter ef = new ExampleFilter();
         ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         SamplingOperator sample = new SamplingOperator();
@@ -461,7 +461,7 @@ public class ProcessTest {
 
         ExampleFilter ef = new ExampleFilter();
         ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_entry_key:is_default.is_not_missing.");
+        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
         process.getRootOperator().getExecutionUnit().addOperator(ef);
 
         ChangeAttributeRole role = new ChangeAttributeRole();

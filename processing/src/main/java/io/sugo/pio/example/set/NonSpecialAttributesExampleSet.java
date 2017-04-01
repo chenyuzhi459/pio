@@ -13,7 +13,6 @@ import java.util.Iterator;
 /**
  * This example set treats all special attributes as regular attributes.
  *
- * @author Ingo Mierswa
  */
 public class NonSpecialAttributesExampleSet extends AbstractExampleSet {
 
@@ -67,6 +66,7 @@ public class NonSpecialAttributesExampleSet extends AbstractExampleSet {
     }
 
     @Override
+    @JsonProperty
     public int size() {
         return parent.size();
     }

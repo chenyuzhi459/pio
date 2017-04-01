@@ -1,5 +1,6 @@
 package io.sugo.pio.spark.datahandler;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.SimpleAttributes;
@@ -31,6 +32,7 @@ public class HadoopExampleSet extends AbstractExampleSet {
     }
 
     @Override
+    @JsonProperty
     public int size() {
         return exampleTable.size();
     }

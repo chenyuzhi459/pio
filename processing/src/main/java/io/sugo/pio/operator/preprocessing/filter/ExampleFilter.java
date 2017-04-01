@@ -8,9 +8,7 @@ import io.sugo.pio.example.set.ConditionedExampleSet;
 import io.sugo.pio.example.set.CustomFilter;
 import io.sugo.pio.example.table.AttributeTypeException;
 import io.sugo.pio.i18n.I18N;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.operator.UserError;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.preprocessing.AbstractDataProcessing;
 import io.sugo.pio.operator.tools.ExpressionEvaluationException;
 import io.sugo.pio.parameter.*;
@@ -179,6 +177,16 @@ public class ExampleFilter extends AbstractDataProcessing {
         } catch (ExpressionEvaluationException e) {
             throw new UserError(this, e, "pio.error.cannot_instantiate", className, e.getMessage());
         }
+    }
+
+    @Override
+    public IOContainer getResult() {
+        IOContainer container = super.getResult();
+
+        List<IOObject> ioObjects = container.getIoObjects();
+        ioObjects.add(unmatchedOutput.getAnyDataOrNull());
+
+        return container;
     }
 
     @Override
