@@ -51,16 +51,17 @@ public class RegressionPerformanceEvaluator extends AbstractPerformanceEvaluator
      */
     private static final Class<?>[] SIMPLE_CRITERIA_CLASSES = {
             io.sugo.pio.operator.performance.RootMeanSquaredError.class,
-            io.sugo.pio.operator.performance.AbsoluteError.class,
-            io.sugo.pio.operator.performance.RelativeError.class,
-            io.sugo.pio.operator.performance.LenientRelativeError.class,
-            io.sugo.pio.operator.performance.StrictRelativeError.class,
-            io.sugo.pio.operator.performance.NormalizedAbsoluteError.class,
-            io.sugo.pio.operator.performance.RootRelativeSquaredError.class,
-            io.sugo.pio.operator.performance.SquaredError.class,
-            io.sugo.pio.operator.performance.CorrelationCriterion.class,
-            io.sugo.pio.operator.performance.SquaredCorrelationCriterion.class,
-            io.sugo.pio.operator.performance.PredictionAverage.class};
+            io.sugo.pio.operator.performance.AbsoluteError.class
+//            io.sugo.pio.operator.performance.RelativeError.class,
+//            io.sugo.pio.operator.performance.LenientRelativeError.class,
+//            io.sugo.pio.operator.performance.StrictRelativeError.class,
+//            io.sugo.pio.operator.performance.NormalizedAbsoluteError.class,
+//            io.sugo.pio.operator.performance.RootRelativeSquaredError.class,
+//            io.sugo.pio.operator.performance.SquaredError.class,
+//            io.sugo.pio.operator.performance.CorrelationCriterion.class,
+//            io.sugo.pio.operator.performance.SquaredCorrelationCriterion.class,
+//            io.sugo.pio.operator.performance.PredictionAverage.class
+    };
 
     public RegressionPerformanceEvaluator() {
         super();
@@ -123,9 +124,9 @@ public class RegressionPerformanceEvaluator extends AbstractPerformanceEvaluator
         }
 
         // rank correlation criteria
-        for (int i = 0; i < RankCorrelation.NAMES.length; i++) {
+        /*for (int i = 0; i < RankCorrelation.NAMES.length; i++) {
             allCriteria.add(new RankCorrelation(i));
-        }
+        }*/
 
 //        logger.info("RegressionPerformanceEvaluator get criteria successfully, size[%d].", allCriteria.size());
 

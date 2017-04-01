@@ -85,7 +85,9 @@ public class DrainPrediction {
             Operator applyModelOperator = getOperator(trainProcess, ProcessConstant.OperatorType.ModelApplier);
             Operator performanceOperator = getOperator(trainProcess, ProcessConstant.OperatorType.PolynominalClassificationPerformanceEvaluator);
             IOContainer container = applyModelOperator.getResult();
-            container.getIoObjects().addAll(performanceOperator.getResult().getIoObjects());
+
+            List<IOObject> performanceIOObjects = performanceOperator.getResult().getIoObjects();
+            container.addIoObjects(performanceIOObjects);
 
             return Response.ok(container).build();
         } catch (Throwable e) {

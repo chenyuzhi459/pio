@@ -486,12 +486,16 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
         if (showCriteriaParameter()) {
             String[] criteriaNames = getAllCriteriaNames();
             if (criteriaNames.length > 0) {
-                String[] allCriteriaNames = new String[criteriaNames.length + 1];
+                /*String[] allCriteriaNames = new String[criteriaNames.length + 1];
                 allCriteriaNames[0] = PerformanceVector.MAIN_CRITERION_FIRST;
                 System.arraycopy(criteriaNames, 0, allCriteriaNames, 1, criteriaNames.length);
                 ParameterType type = new ParameterTypeStringCategory(PARAMETER_MAIN_CRITERION,
                         I18N.getMessage("pio.AbstractPerformanceEvaluator.main_criterion"),
-                        allCriteriaNames, allCriteriaNames[0]);
+                        allCriteriaNames, allCriteriaNames[0]);*/
+
+                ParameterType type = new ParameterTypeStringCategory(PARAMETER_MAIN_CRITERION,
+                        I18N.getMessage("pio.AbstractPerformanceEvaluator.main_criterion"),
+                        criteriaNames, criteriaNames[0]);
                 type.setExpert(false);
                 types.add(type);
             }

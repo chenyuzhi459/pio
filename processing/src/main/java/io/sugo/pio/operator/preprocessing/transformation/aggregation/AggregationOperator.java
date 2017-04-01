@@ -690,7 +690,7 @@ public class AggregationOperator extends AbstractDataProcessing {
         List<ParameterType> types = super.getParameterTypes();
 
         types.add(new ParameterTypeBoolean(PARAMETER_USE_DEFAULT_AGGREGATION,
-                I18N.getMessage("pio.AggregationOperator.use_default_aggregation"), false, false));
+                I18N.getMessage("pio.AggregationOperator.use_default_aggregation"), true, false, true));
         List<ParameterType> parameterTypes = attributeSelector.getParameterTypes();
         for (ParameterType type : parameterTypes) {
             type.registerDependencyCondition(

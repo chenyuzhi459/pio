@@ -24,6 +24,22 @@ public class IOContainer implements Serializable {
         return ioObjects;
     }
 
+    public IOContainer addIoObject(IOObject ioObject) {
+        if (!ioObjects.contains(ioObject)) {
+            ioObjects.add(ioObject);
+        }
+
+        return this;
+    }
+
+    public IOContainer addIoObjects(List<IOObject> ioObjects) {
+        ioObjects.forEach(ioObject -> {
+            addIoObject(ioObject);
+        });
+
+        return this;
+    }
+
     /** Gets the first IOObject which is of class cls. */
     public <T extends IOObject> T get(Class<T> cls) throws MissingIOObjectException {
         return getInput(cls, 0, false);

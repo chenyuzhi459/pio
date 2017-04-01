@@ -1,21 +1,3 @@
-/**
- * Copyright (C) 2001-2016 by RapidMiner and the contributors
- * <p>
- * Complete list of developers available at our web site:
- * <p>
- * http://rapidminer.com
- * <p>
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Affero General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- * <p>
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Affero General Public License for more details.
- * <p>
- * You should have received a copy of the GNU Affero General Public License along with this program.
- * If not, see http://www.gnu.org/licenses/.
- */
 package io.sugo.pio.operator.learner.functions.linear;
 
 import Jama.Matrix;
@@ -88,27 +70,29 @@ public class LinearRegression extends AbstractLearner {
     public static final Map<String, Class<? extends LinearRegressionMethod>> SELECTION_METHODS = new LinkedHashMap<>();
 
     static {
-        SELECTION_METHODS.put("none", PlainLinearRegressionMethod.class);
+        /*SELECTION_METHODS.put("none", PlainLinearRegressionMethod.class);
         SELECTION_METHODS.put("M5 prime", M5PLinearRegressionMethod.class);
         SELECTION_METHODS.put("greedy", GreedyLinearRegressionMethod.class);
         SELECTION_METHODS.put("T-Test", TTestLinearRegressionMethod.class);
-        SELECTION_METHODS.put("Iterative T-Test", IterativeTTestLinearRegressionMethod.class);
+        SELECTION_METHODS.put("Iterative T-Test", IterativeTTestLinearRegressionMethod.class);*/
+        SELECTION_METHODS.put(I18N.getMessage("pio.LinearRegression.greedy"), GreedyLinearRegressionMethod.class);
+        SELECTION_METHODS.put(I18N.getMessage("pio.LinearRegression.T-Test"), TTestLinearRegressionMethod.class);
     }
 
     /** Attribute selection method: No attribute selection */
-    public static final int NO_SELECTION = 0;
+//    public static final int NO_SELECTION = 0;
 
     /** Attribute selection method: M5 method */
-    public static final int M5_PRIME = 1;
+//    public static final int M5_PRIME = 1;
 
     /** Attribute selection method: Greedy method */
-    public static final int GREEDY = 2;
+    public static final int GREEDY = 0;
 
     /** Attribute selection method: T-Test method */
-    public static final int T_TEST = 3;
+    public static final int T_TEST = 1;
 
     /** Attribute selection method: Iterative T-Test method */
-    public static final int ITERATIVE_T_TEST = 4;
+//    public static final int ITERATIVE_T_TEST = 4;
 
     private OutputPort weightOutput = getOutputPorts().createPort(PortConstant.WEIGHTS, PortConstant.WEIGHTS_DESC);
 
@@ -774,7 +758,7 @@ public class LinearRegression extends AbstractLearner {
         types.add(new ParameterTypeCategory(PARAMETER_FEATURE_SELECTION,
                 I18N.getMessage("pio.LinearRegression.feature_selection"),
 //				"The feature selection method used during regression.",
-                availableSelectionMethods, M5_PRIME));
+                availableSelectionMethods, GREEDY));
 
         // adding parameter of methods
         int i = 0;
@@ -795,7 +779,7 @@ public class LinearRegression extends AbstractLearner {
         types.add(new ParameterTypeBoolean(PARAMETER_ELIMINATE_COLINEAR_FEATURES,
                 I18N.getMessage("pio.LinearRegression.eliminate_colinear_features"),
 //				"Indicates if the algorithm should try to delete colinear features during the regression.",
-                true));
+                true, false, true));
         ParameterType type = new ParameterTypeDouble(PARAMETER_MIN_TOLERANCE,
                 I18N.getMessage("pio.LinearRegression.min_tolerance"),
 //				"The minimum tolerance for the removal of colinear features.",
