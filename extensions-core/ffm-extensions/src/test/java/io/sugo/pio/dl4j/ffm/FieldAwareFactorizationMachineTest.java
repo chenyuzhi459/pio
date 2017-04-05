@@ -79,10 +79,8 @@ public class FieldAwareFactorizationMachineTest {
 
         process.run();
 
-        System.out.println(
-                jsonMapper.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString((ffm.getResult().getIoObjects()))
-        );
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString((ffm.getResult().getIoObjects())));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(modelApplier.getResult()));
     }
 
     private DatabaseDataReader getDbReader() {
