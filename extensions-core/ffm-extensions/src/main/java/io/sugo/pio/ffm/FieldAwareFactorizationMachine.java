@@ -6,10 +6,7 @@ import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
-import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.operator.UserError;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.learner.AbstractLearner;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;
@@ -19,6 +16,7 @@ import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.tools.Ontology;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -126,6 +124,13 @@ public class FieldAwareFactorizationMachine extends Operator {
                         ffmModel.k, ffmModel.W, ffmModel.normalization, firstClassName, secondClassName);
 
         modelOutput.deliver(model);
+    }
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(modelOutput.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
     }
 
     @Override
