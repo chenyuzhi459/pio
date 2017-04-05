@@ -1,22 +1,31 @@
 package io.sugo.pio.ffm;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.constant.PortConstant;
+import io.sugo.pio.example.Attribute;
+import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.example.table.AttributeFactory;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
+import io.sugo.pio.operator.UserError;
+import io.sugo.pio.operator.learner.AbstractLearner;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeBoolean;
 import io.sugo.pio.parameter.ParameterTypeDouble;
 import io.sugo.pio.parameter.ParameterTypeInt;
 import io.sugo.pio.ports.InputPort;
 import io.sugo.pio.ports.OutputPort;
+import io.sugo.pio.tools.Ontology;
 
 import java.util.List;
 
 /**
  */
 public class FieldAwareFactorizationMachine extends Operator {
+
+    private static final Logger logger = new Logger(FieldAwareFactorizationMachine.class);
 
     /**
      * The parameter name for &quot;The number of training iterations used for the training.&quot;
@@ -34,7 +43,7 @@ public class FieldAwareFactorizationMachine extends Operator {
     public static final String PARAMETER_LATENT_FACTOR_DIM = "latent_factor_dim";
 
     private final InputPort input = getInputPorts().createPort(PortConstant.TRAINING_EXAMPLES, PortConstant.TRAINING_EXAMPLES_DESC);
-    private final OutputPort model = getOutputPorts().createPort(PortConstant.MODEL, PortConstant.MODEL_DESC);
+    private final OutputPort modelOutput = getOutputPorts().createPort(PortConstant.MODEL, PortConstant.MODEL_DESC);
 
     @Override
     public String getDefaultFullName() {
@@ -66,9 +75,57 @@ public class FieldAwareFactorizationMachine extends Operator {
         double l2 = getParameterAsDouble(PARAMETER_L2);
         int latentFactorDim = getParameterAsInt(PARAMETER_LATENT_FACTOR_DIM);
 
-        ExampleSet exampleSet = input.getData(ExampleSet.class);
+        String firstClassName = null;
+        String secondClassName = null;
+        ExampleSet trainExampleSet = input.getData(ExampleSet.class);
+        Attribute label = trainExampleSet.getAttributes().getLabel();
+        Attribute workingLabel = label;
+        if (label == null) {
+            throw new UserError(this, "pio.error.operator.exampleset_miss_label");
+        }
 
-        new FieldAwareFactorizationMachineModel(exampleSet, 0, 0, latentFactorDim,null);
+        if (label.isNominal()) {
+            logger.info("FFM of nominal label.");
+
+            if (label.getMapping().size() == 2) {
+                firstClassName = label.getMapping().getNegativeString();
+                secondClassName = label.getMapping().getPositiveString();
+
+                int firstIndex = label.getMapping().getNegativeIndex();
+
+                workingLabel = AttributeFactory.createAttribute("ffm_label", Ontology.REAL);
+                trainExampleSet.getExampleTable().addAttribute(workingLabel);
+
+                for (Example example : trainExampleSet) {
+                    double index = example.getValue(label);
+                    if (index == firstIndex) {
+                        example.setValue(workingLabel, 0.0d);
+                    } else {
+                        example.setValue(workingLabel, 1.0d);
+                    }
+                }
+
+                trainExampleSet.getAttributes().setLabel(workingLabel);
+            }
+        }
+
+        FFMProblem trainProblem = FFMProblem.convertExampleSet(trainExampleSet);
+
+        FFMParameter param = FFMParameter.defaultParameter();
+        param.eta = (float) lr;
+        param.lambda = (float) l2;
+        param.n_iters = iteration;
+        param.k = latentFactorDim;
+        param.normalization = normalization;
+        param.random = random;
+
+        FFMModel ffmModel = new FFMModel().train(trainProblem, null, param);
+
+        FieldAwareFactorizationMachineModel model =
+                new FieldAwareFactorizationMachineModel(trainExampleSet, ffmModel.n, ffmModel.m,
+                        ffmModel.k, ffmModel.W, ffmModel.normalization, firstClassName, secondClassName);
+
+        modelOutput.deliver(model);
     }
 
     @Override

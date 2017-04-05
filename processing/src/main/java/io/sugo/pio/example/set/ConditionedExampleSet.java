@@ -55,6 +55,7 @@ public class ConditionedExampleSet extends AbstractExampleSet {
 
     private ExampleSet parent;
 
+    @JsonProperty
     private int[] mapping;
 
     /**

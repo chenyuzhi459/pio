@@ -71,6 +71,7 @@ public class SortedExampleSet extends AbstractExampleSet {
     /**
      * The used mapping.
      */
+    @JsonProperty
     private int[] mapping;
 
     public SortedExampleSet(ExampleSet parent, Attribute sortingAttribute, int sortingDirection) {

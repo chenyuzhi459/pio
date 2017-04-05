@@ -49,6 +49,7 @@ public class MappedExampleSet extends AbstractExampleSet {
     private ExampleSet parent;
 
     /** The used mapping. */
+    @JsonProperty
     private int[] mapping;
 
     /** Constructs an example set based on the given mapping. */

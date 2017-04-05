@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * <p>
  * This operator takes an {@link ExampleSet} as input and returns a new {@link ExampleSet} including
- * only the {@link Example}s that fulfill a condition.
+ * only the {@ Example}s that fulfill a condition.
  * </p>
  * <p>
  * <p>
@@ -143,7 +143,6 @@ public class ExampleFilter extends AbstractDataProcessing {
     @Override
     public ExampleSet apply(final ExampleSet inputSet) throws OperatorException {
         logger.info(getName() + ": input set has " + inputSet.size() + " examples.");
-
 //		String className = getParameterAsString(PARAMETER_CONDITION_CLASS);
 //		String parameter = getParameterAsString(PARAMETER_PARAMETER_STRING);
 //		getLogger().fine("Creating condition '" + className + "' with parameter '" + parameter + "'");
