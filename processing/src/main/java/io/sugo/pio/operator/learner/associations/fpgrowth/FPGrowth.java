@@ -546,22 +546,22 @@ public class FPGrowth extends Operator {
         List<ParameterType> types = super.getParameterTypes();
         ParameterType type = new ParameterTypeBoolean(PARAMETER_FIND_MIN_NUMBER_OF_ITEMSETS,
                 I18N.getMessage("pio.FPGrowth.find_min_number_of_itemsets"),
-                true);
-        type.setExpert(false);
+                false);
+        type.setExpert(false).setHidden(true);
         types.add(type);
         type = new ParameterTypeInt(PARAMETER_MIN_NUMBER_OF_ITEMSETS,
                 I18N.getMessage("pio.FPGrowth.min_number_of_itemsets"),
                 0, Integer.MAX_VALUE, 100);
         type.registerDependencyCondition(
                 new BooleanParameterCondition(this, PARAMETER_FIND_MIN_NUMBER_OF_ITEMSETS, true, true));
-        type.setExpert(false);
+        type.setExpert(false).setHidden(true);
         types.add(type);
         type = new ParameterTypeInt(PARAMETER_MAX_REDUCTION_STEPS,
                 I18N.getMessage("pio.FPGrowth.max_number_of_retries"),
                 2, Integer.MAX_VALUE, 15);
         type.registerDependencyCondition(
                 new BooleanParameterCondition(this, PARAMETER_FIND_MIN_NUMBER_OF_ITEMSETS, false, true));
-        type.setExpert(true);
+        type.setExpert(true).setHidden(true);
         types.add(type);
 
         type = new ParameterTypeString(PARAMETER_POSITIVE_VALUE,
@@ -572,9 +572,9 @@ public class FPGrowth extends Operator {
         types.add(new ParameterTypeDouble(PARAMETER_MIN_SUPPORT,
                 I18N.getMessage("pio.FPGrowth.min_support"), 0.0d, 1.0d, 0.95d));
         types.add(new ParameterTypeInt(PARAMETER_MAX_ITEMS,
-                I18N.getMessage("pio.FPGrowth.max_items"), -1, Integer.MAX_VALUE, -1));
-        types.add(new ParameterTypeString(PARAMETER_MUST_CONTAIN,
-                I18N.getMessage("pio.FPGrowth.must_contain")));
+                I18N.getMessage("pio.FPGrowth.max_items"), 1, Integer.MAX_VALUE, 2));
+        /*types.add(new ParameterTypeString(PARAMETER_MUST_CONTAIN,
+                I18N.getMessage("pio.FPGrowth.must_contain")));*/
 
         /*type = new ParameterTypeBoolean(PARAMETER_KEEP_EXAMPLE_SET, "indicates if example set is kept", false);
         type.setDeprecated();

@@ -345,7 +345,7 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
 
         type = new ParameterTypeBoolean(PARAMETER_USE_HEURISTIC_SUBSET_RATION,
                 I18N.getMessage("pio.ParallelRandomForestLearner.guess_subset_ratio"), true);
-        type.setExpert(false);
+        type.setExpert(false).setHidden(true);
         types.add(type);
 
         type = new ParameterTypeDouble(PARAMETER_SUBSET_RATIO,
@@ -360,7 +360,7 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
                 I18N.getMessage("pio.ParallelRandomForestLearner.voting_strategy"),
                 VOTING_STRATEGIES, 0);
 //		type.registerDependencyCondition(new AboveOperatorVersionCondition(this, ONLY_MAJORITY_VOTING));
-        type.setExpert(false);
+        type.setExpert(false).setHidden(true);
         types.add(type);
 
 //        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));

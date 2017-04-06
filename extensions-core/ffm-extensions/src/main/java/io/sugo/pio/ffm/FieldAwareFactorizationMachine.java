@@ -82,7 +82,7 @@ public class FieldAwareFactorizationMachine extends Operator {
             throw new UserError(this, "pio.error.operator.exampleset_miss_label");
         }
 
-        if (label.isNominal()) {
+        /*if (label.isNominal()) {
             logger.info("FFM of nominal label.");
 
             if (label.getMapping().size() == 2) {
@@ -105,7 +105,7 @@ public class FieldAwareFactorizationMachine extends Operator {
 
                 trainExampleSet.getAttributes().setLabel(workingLabel);
             }
-        }
+        }*/
 
         FFMProblem trainProblem = FFMProblem.convertExampleSet(trainExampleSet);
 

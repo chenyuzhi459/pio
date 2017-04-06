@@ -14,7 +14,10 @@ import io.sugo.pio.tools.math.kernels.Kernel;
 import io.sugo.pio.tools.math.similarity.divergences.*;
 import io.sugo.pio.tools.math.similarity.mixed.MixedEuclideanDistance;
 import io.sugo.pio.tools.math.similarity.nominal.*;
-import io.sugo.pio.tools.math.similarity.numerical.*;
+import io.sugo.pio.tools.math.similarity.numerical.CamberraNumericalDistance;
+import io.sugo.pio.tools.math.similarity.numerical.ChebychevNumericalDistance;
+import io.sugo.pio.tools.math.similarity.numerical.CorrelationSimilarity;
+import io.sugo.pio.tools.math.similarity.numerical.EuclideanDistance;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -36,16 +39,17 @@ public class DistanceMeasures {
     /*public static final String[] MEASURE_TYPES = new String[]{"MixedMeasures", "NominalMeasures", "NumericalMeasures",
             "BregmanDivergences"};*/
     public static final String[] MEASURE_TYPES = new String[]{
-            I18N.getMessage("pio.DistanceMeasures.mixed_measure"),
-            I18N.getMessage("pio.DistanceMeasures.nominal_measure"),
-            I18N.getMessage("pio.DistanceMeasures.numerical_measure"),
-            I18N.getMessage("pio.DistanceMeasures.divergence")
+//            I18N.getMessage("pio.DistanceMeasures.mixed_measure"),
+//            I18N.getMessage("pio.DistanceMeasures.nominal_measure"),
+            I18N.getMessage("pio.DistanceMeasures.numerical_measure")
+//            I18N.getMessage("pio.DistanceMeasures.divergence")
     };
 
-    public static final int MIXED_MEASURES_TYPE = 0;
-    public static final int NOMINAL_MEASURES_TYPE = 1;
-    public static final int NUMERICAL_MEASURES_TYPE = 2;
-    public static final int DIVERGENCES_TYPE = 3;
+    //    public static final int MIXED_MEASURES_TYPE = 0;
+//    public static final int NOMINAL_MEASURES_TYPE = 1;
+//    public static final int NUMERICAL_MEASURES_TYPE = 2;
+//    public static final int DIVERGENCES_TYPE = 3;
+    public static final int NUMERICAL_MEASURES_TYPE = 0;
 
     /*private static String[] NOMINAL_MEASURES = new String[]{"NominalDistance", "DiceSimilarity", "JaccardSimilarity",
             "KulczynskiSimilarity", "RogersTanimotoSimilarity", "RussellRaoSimilarity", "SimpleMatchingSimilarity"};*/
@@ -67,7 +71,7 @@ public class DistanceMeasures {
     private static Class[] MIXED_MEASURE_CLASSES = new Class[]{MixedEuclideanDistance.class};
 
     /* If this changes, the parameter dependencies might need to be updated */
-    private static String[] NUMERICAL_MEASURES = new String[]{"EuclideanDistance", "CamberraDistance",
+    /*private static String[] NUMERICAL_MEASURES = new String[]{"EuclideanDistance", "CamberraDistance",
             "ChebychevDistance", "CorrelationSimilarity", "CosineSimilarity", "DiceSimilarity",
             "DynamicTimeWarpingDistance", "InnerProductSimilarity", "JaccardSimilarity", "KernelEuclideanDistance",
             "ManhattanDistance", "MaxProductSimilarity", "OverlapSimilarity"};
@@ -75,7 +79,15 @@ public class DistanceMeasures {
             CamberraNumericalDistance.class, ChebychevNumericalDistance.class, CorrelationSimilarity.class,
             CosineSimilarity.class, DiceNumericalSimilarity.class, DTWDistance.class, InnerProductSimilarity.class,
             JaccardNumericalSimilarity.class, KernelEuclideanDistance.class, ManhattanDistance.class,
-            MaxProductSimilarity.class, OverlapNumericalSimilarity.class};
+            MaxProductSimilarity.class, OverlapNumericalSimilarity.class};*/
+    private static String[] NUMERICAL_MEASURES = new String[]{
+            I18N.getMessage("pio.DistanceMeasures.EuclideanDistance"),
+            I18N.getMessage("pio.DistanceMeasures.CamberraDistance"),
+            I18N.getMessage("pio.DistanceMeasures.ChebychevDistance"),
+            I18N.getMessage("pio.DistanceMeasures.CorrelationSimilarity")
+    };
+    private static Class[] NUMERICAL_MEASURE_CLASSES = new Class[]{EuclideanDistance.class,
+            CamberraNumericalDistance.class, ChebychevNumericalDistance.class, CorrelationSimilarity.class};
 
     private static String[] DIVERGENCES = new String[]{"GeneralizedIDivergence", "ItakuraSaitoDistance", "KLDivergence",
             "LogarithmicLoss", "LogisticLoss", "MahalanobisDistance", "SquaredEuclideanDistance", "SquaredLoss",};
@@ -83,11 +95,13 @@ public class DistanceMeasures {
             KLDivergence.class, LogarithmicLoss.class, LogisticLoss.class, MahalanobisDistance.class,
             SquaredEuclideanDistance.class, SquaredLoss.class,};
 
-    private static String[][] MEASURE_ARRAYS = new String[][]{MIXED_MEASURES, NOMINAL_MEASURES, NUMERICAL_MEASURES,
-            DIVERGENCES};
+    /*private static String[][] MEASURE_ARRAYS = new String[][]{MIXED_MEASURES, NOMINAL_MEASURES, NUMERICAL_MEASURES,
+            DIVERGENCES};*/
+    private static String[][] MEASURE_ARRAYS = new String[][]{NUMERICAL_MEASURES};
 
-    private static Class[][] MEASURE_CLASS_ARRAYS = new Class[][]{MIXED_MEASURE_CLASSES, NOMINAL_MEASURE_CLASSES,
-            NUMERICAL_MEASURE_CLASSES, DIVERGENCE_CLASSES};
+    /*private static Class[][] MEASURE_CLASS_ARRAYS = new Class[][]{MIXED_MEASURE_CLASSES, NOMINAL_MEASURE_CLASSES,
+            NUMERICAL_MEASURE_CLASSES, DIVERGENCE_CLASSES};*/
+    private static Class[][] MEASURE_CLASS_ARRAYS = new Class[][]{NUMERICAL_MEASURE_CLASSES,};
 
     /**
      * This method allows registering distance or similarity measures defined in plugins. There are
@@ -135,15 +149,16 @@ public class DistanceMeasures {
         } else {
             // if type is not set, then might be there is no type selection: Test if one definition
             // is present
-            if (parameterHandler.isParameterSet(PARAMETER_MIXED_MEASURE)) {
+            /*if (parameterHandler.isParameterSet(PARAMETER_MIXED_MEASURE)) {
                 measureType = MIXED_MEASURES_TYPE;
             } else if (parameterHandler.isParameterSet(PARAMETER_NOMINAL_MEASURE)) {
                 measureType = NOMINAL_MEASURES_TYPE;
-            } else if (parameterHandler.isParameterSet(PARAMETER_NUMERICAL_MEASURE)) {
+            } else*/
+            if (parameterHandler.isParameterSet(PARAMETER_NUMERICAL_MEASURE)) {
                 measureType = NUMERICAL_MEASURES_TYPE;
-            } else if (parameterHandler.isParameterSet(PARAMETER_DIVERGENCE)) {
+            } /*else if (parameterHandler.isParameterSet(PARAMETER_DIVERGENCE)) {
                 measureType = DIVERGENCES_TYPE;
-            } else {
+            } */ else {
                 // if nothing fits: Try to access to get a proper exception
                 measureType = parameterHandler.getParameterAsInt(PARAMETER_MEASURE_TYPES);
             }
@@ -151,18 +166,18 @@ public class DistanceMeasures {
         Class[] classes = MEASURE_CLASS_ARRAYS[measureType];
         Class measureClass = null;
         switch (measureType) {
-            case MIXED_MEASURES_TYPE:
+            /*case MIXED_MEASURES_TYPE:
                 measureClass = classes[parameterHandler.getParameterAsInt(PARAMETER_MIXED_MEASURE)];
                 break;
             case NOMINAL_MEASURES_TYPE:
                 measureClass = classes[parameterHandler.getParameterAsInt(PARAMETER_NOMINAL_MEASURE)];
-                break;
+                break;*/
             case NUMERICAL_MEASURES_TYPE:
                 measureClass = classes[parameterHandler.getParameterAsInt(PARAMETER_NUMERICAL_MEASURE)];
                 break;
-            case DIVERGENCES_TYPE:
+            /*case DIVERGENCES_TYPE:
                 measureClass = classes[parameterHandler.getParameterAsInt(PARAMETER_DIVERGENCE)];
-                break;
+                break;*/
         }
         if (measureClass != null) {
             DistanceMeasure measure;
@@ -190,10 +205,12 @@ public class DistanceMeasures {
      */
     public static List<ParameterType> getParameterTypes(Operator parameterHandler) {
         List<ParameterType> list = new LinkedList<ParameterType>();
-        list.add(new ParameterTypeCategory(PARAMETER_MEASURE_TYPES,
+        ParameterType type = new ParameterTypeCategory(PARAMETER_MEASURE_TYPES,
                 I18N.getMessage("pio.DistanceMeasures.measure_types"),
-                MEASURE_TYPES, 0));
-        ParameterType type = new ParameterTypeCategory(PARAMETER_MIXED_MEASURE,
+                MEASURE_TYPES, 0);
+        type.setHidden(true);
+        list.add(type);
+        /*ParameterType type = new ParameterTypeCategory(PARAMETER_MIXED_MEASURE,
                 I18N.getMessage("pio.DistanceMeasures.mixed_measure"),
                 MEASURE_ARRAYS[MIXED_MEASURES_TYPE], 0);
         type.registerDependencyCondition(new EqualTypeCondition(parameterHandler, PARAMETER_MEASURE_TYPES, MEASURE_TYPES,
@@ -205,19 +222,19 @@ public class DistanceMeasures {
                 0);
         type.registerDependencyCondition(new EqualTypeCondition(parameterHandler, PARAMETER_MEASURE_TYPES, MEASURE_TYPES,
                 false, 1));
-        list.add(type);
+        list.add(type);*/
         type = new ParameterTypeCategory(PARAMETER_NUMERICAL_MEASURE,
                 I18N.getMessage("pio.DistanceMeasures.numerical_measure"),
                 MEASURE_ARRAYS[NUMERICAL_MEASURES_TYPE], 0);
         type.registerDependencyCondition(new EqualTypeCondition(parameterHandler, PARAMETER_MEASURE_TYPES, MEASURE_TYPES,
-                false, 2));
+                false, 0));
         list.add(type);
-        type = new ParameterTypeCategory(PARAMETER_DIVERGENCE,
+        /*type = new ParameterTypeCategory(PARAMETER_DIVERGENCE,
                 I18N.getMessage("pio.DistanceMeasures.divergence"),
                 MEASURE_ARRAYS[DIVERGENCES_TYPE], 0);
         type.registerDependencyCondition(new EqualTypeCondition(parameterHandler, PARAMETER_MEASURE_TYPES, MEASURE_TYPES,
                 false, 3));
-        list.add(type);
+        list.add(type);*/
         list.addAll(registerDependency(Kernel.getParameters(parameterHandler), 9, parameterHandler));
 
         return list;

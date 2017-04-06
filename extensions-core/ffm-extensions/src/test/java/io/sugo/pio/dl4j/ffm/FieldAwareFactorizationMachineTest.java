@@ -53,8 +53,8 @@ public class FieldAwareFactorizationMachineTest {
         FieldAwareFactorizationMachine ffm = new FieldAwareFactorizationMachine();
         ffm.setName("ffm");
         ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_ITERATION, "15");
-        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_LEARNING_RATE, "0.1f");
-        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_L2, "0");
+        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_LEARNING_RATE, "0.2f");
+        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_L2, "0.00002f");
         ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_NORMALIZATION, "true");
         ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_RANDOM, "true");
         ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_LATENT_FACTOR_DIM, "4");
@@ -68,7 +68,58 @@ public class FieldAwareFactorizationMachineTest {
         csvExampleSource4test.setName("operator_csv_test");
         csvExampleSource4test.setParameter(CSVExampleSource.PARAMETER_CSV_FILE, csvFilePath);
         csvExampleSource4test.setParameter(CSVExampleSource.PARAMETER_META_DATA,
-                "0:ID.true.attribute_value.id;1:age.true.integer.attribute;2:education.true.integer.attribute;3:seniority.true.integer.attribute;4:address_year.true.integer.attribute;5:income.true.integer.attribute;6:debt_ratio.true.real.attribute;7:Credit_card_debt.true.real.attribute;8:other_debt.true.real.attribute;9:is_default.true.binominal.label");
+                "0:ID.true.attribute_value.id;1:age.true.integer.attribute;2:education.true.integer.attribute;3:seniority.true.integer.attribute;4:address_year.true.integer.attribute;5:income.true.integer.attribute;6:debt_ratio.true.real.attribute;7:Credit_card_debt.true.real.attribute;8:other_debt.true.real.attribute;9:is_default.true.nominal.label");
+        process.getRootOperator().getExecutionUnit().addOperator(csvExampleSource4test);
+
+        process.connect(new Connection("operator_csv", "output", "ffm", "training examples"), true);
+        process.connect(new Connection("ffm", "model", "apply_model", "model"), true);
+//        process.connect(new Connection("apply_model", "labelled data", "performance_classification", "labelled data"), true);
+
+        process.connect(new Connection("operator_csv_test", "output", "apply_model", "unlabelled data"), true);
+
+        process.run();
+
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString((ffm.getResult().getIoObjects())));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(modelApplier.getResult()));
+    }
+
+    @Test
+    public void test2() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("testProcess");
+        process.setDescription("testProcess desc");
+
+        /*DatabaseDataReader dbReader = getDbReader();
+        process.getRootOperator().getExecutionUnit().addOperator(dbReader);*/
+        String csvFilePath = getFullPath("ffm.train.csv");
+
+        CSVExampleSource csvExampleSource = new CSVExampleSource();
+        csvExampleSource.setName("operator_csv");
+        csvExampleSource.setParameter(CSVExampleSource.PARAMETER_CSV_FILE, csvFilePath);
+        csvExampleSource.setParameter(CSVExampleSource.PARAMETER_META_DATA,
+                "0:label.true.binominal.label;1:node1.true.real.attribute;2:node2.true.real.attribute;3:node3.true.real.attribute;4:node4.true.real.attribute;5:node5.true.real.attribute;6:node6.true.real.attribute;7:node7.true.real.attribute;8:node8.true.real.attribute;9:node9.true.real.attribute;10:node10.true.real.attribute;11:node11.true.real.attribute;12:node12.true.real.attribute;");
+        csvExampleSource.setParameter(CSVExampleSource.PARAMETER_COLUMN_SEPARATORS, "\\s");
+        process.getRootOperator().getExecutionUnit().addOperator(csvExampleSource);
+
+        FieldAwareFactorizationMachine ffm = new FieldAwareFactorizationMachine();
+        ffm.setName("ffm");
+        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_ITERATION, "15");
+        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_LEARNING_RATE, "0.2f");
+        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_L2, "0.00002f");
+        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_NORMALIZATION, "true");
+        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_RANDOM, "true");
+        ffm.setParameter(FieldAwareFactorizationMachine.PARAMETER_LATENT_FACTOR_DIM, "4");
+        process.getRootOperator().getExecutionUnit().addOperator(ffm);
+
+        ModelApplier modelApplier = new ModelApplier();
+        modelApplier.setName("apply_model");
+        process.getRootOperator().getExecutionUnit().addOperator(modelApplier);
+
+        CSVExampleSource csvExampleSource4test = new CSVExampleSource();
+        csvExampleSource4test.setName("operator_csv_test");
+        csvExampleSource4test.setParameter(CSVExampleSource.PARAMETER_CSV_FILE, csvFilePath);
+        csvExampleSource4test.setParameter(CSVExampleSource.PARAMETER_META_DATA,
+                "0:label.true.binominal.label;1:node1.true.real.attribute;2:node2.true.real.attribute;3:node3.true.real.attribute;4:node4.true.real.attribute;5:node5.true.real.attribute;6:node6.true.real.attribute;7:node7.true.real.attribute;8:node8.true.real.attribute;9:node9.true.real.attribute;10:node10.true.real.attribute;11:node11.true.real.attribute;12:node12.true.real.attribute;");
+        csvExampleSource.setParameter(CSVExampleSource.PARAMETER_COLUMN_SEPARATORS, "\\s");
         process.getRootOperator().getExecutionUnit().addOperator(csvExampleSource4test);
 
         process.connect(new Connection("operator_csv", "output", "ffm", "training examples"), true);

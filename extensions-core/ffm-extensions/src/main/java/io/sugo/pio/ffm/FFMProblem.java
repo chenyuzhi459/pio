@@ -1,13 +1,11 @@
 package io.sugo.pio.ffm;
 
-import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.DataRow;
 import io.sugo.pio.example.table.DataRowReader;
 import io.sugo.pio.example.table.ExampleTable;
 import io.sugo.pio.example.table.NominalMapping;
-import io.sugo.pio.operator.UserError;
 import io.sugo.pio.tools.Ontology;
 
 import java.io.*;
@@ -18,7 +16,7 @@ import java.util.*;
  */
 public class FFMProblem {
 
-    private static final Logger logger = new Logger(FFMProblem.class);
+//    private static final Logger logger = new Logger(FFMProblem.class);
 
     //data : field_num:feature_num:value
     // max(feature_num) + 1
@@ -169,13 +167,13 @@ public class FFMProblem {
             ffmList.add(ffmStr);
         }
 
-        if (logger.isDebugEnabled()) {
+        /*if (logger.isDebugEnabled()) {
             ffmList.forEach(ffmStr -> {
                 logger.debug(ffmStr);
             });
-        }
+        }*/
 
-        logger.info("Converted result of FFMProblem: " + problem);
+        System.out.printf("Converted result of FFMProblem: " + problem);
 
         return problem;
     }

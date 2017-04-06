@@ -75,6 +75,8 @@ public class FieldAwareFactorizationMachineModel extends PredictionModel {
             } else {
                 example.setValue(predictedLabel, y);
             }
+
+            index++;
         }
 
         return exampleSet;

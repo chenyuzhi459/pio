@@ -20,8 +20,8 @@ public class FFMParameter {
 	
 	public static FFMParameter defaultParameter() {
 		FFMParameter parameter = new FFMParameter();
-		parameter.eta = 0.1f;
-		parameter.lambda = 0;
+		parameter.eta = 0.2f;
+		parameter.lambda = 0.00002f;
 		parameter.n_iters = 15;
 		parameter.k = 4;
 		parameter.normalization = true;

@@ -186,7 +186,7 @@ public class JMySVMLearner extends AbstractMySVMLearner {
                 I18N.getMessage("pio.JMySVMLearner.epsilon_minus"),
                 0.0d,
                 Double.POSITIVE_INFINITY, 0.0d));
-        types.add(new ParameterTypeBoolean(PARAMETER_BALANCE_COST,
+        /*types.add(new ParameterTypeBoolean(PARAMETER_BALANCE_COST,
                 I18N.getMessage("pio.JMySVMLearner.balance_cost"),
                 false));
         types.add(new ParameterTypeBoolean(PARAMETER_QUADRATIC_LOSS_POS,
@@ -194,7 +194,7 @@ public class JMySVMLearner extends AbstractMySVMLearner {
                 false));
         types.add(new ParameterTypeBoolean(PARAMETER_QUADRATIC_LOSS_NEG,
                 I18N.getMessage("pio.JMySVMLearner.quadratic_loss_neg"),
-                false));
+                false));*/
 
         // deprecated parameters
        /* ParameterType type = new ParameterTypeBoolean(PARAMETER_ESTIMATE_PERFORMANCE,

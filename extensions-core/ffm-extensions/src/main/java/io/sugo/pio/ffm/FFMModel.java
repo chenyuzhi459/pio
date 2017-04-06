@@ -1,13 +1,11 @@
 package io.sugo.pio.ffm;
 
-import com.metamx.common.logger.Logger;
-
 import java.io.*;
 import java.util.Random;
 
 public class FFMModel {
 
-    private static final Logger logger = new Logger(FFMModel.class);
+//    private static final Logger logger = new Logger(FFMModel.class);
 
     // max(feature_num) + 1
     public int n;
@@ -19,7 +17,8 @@ public class FFMModel {
     public float[] W;
     public boolean normalization;
 
-    public FFMModel() {}
+    public FFMModel() {
+    }
 
     public FFMModel(int n, int m, int k, float[] W, boolean normalization) {
         this.n = n;
@@ -215,7 +214,7 @@ public class FFMModel {
                 wTx(tr, i, r, model, kappa, param.eta, param.lambda, true);
             }
             tr_loss /= tr.l;
-            logger.info("iter: %2d, tr_loss: %.5f", iter + 1, tr_loss);
+            System.out.printf("iter: %2d, tr_loss: %.5f", iter + 1, tr_loss);
 
             if (va != null && va.l != 0) {
                 double va_loss = 0.;
@@ -227,10 +226,8 @@ public class FFMModel {
                     va_loss += Math.log(1 + expnyt);
                 }
                 va_loss /= va.l;
-                logger.info(", va_loss: %.5f", va_loss);
+                System.out.printf(", va_loss: %.5f", va_loss);
             }
-
-            System.out.println();
         }
 
         return model;
@@ -291,6 +288,7 @@ public class FFMModel {
             float y = (float) (1 / (1 + Math.exp(-t)));
             yLables[lIndex] = y;
             va.Y[lIndex] = y;
+            System.out.println("y:" + y);
         }
 
         return yLables;
@@ -311,14 +309,15 @@ public class FFMModel {
             total_loss += loss;
             evalutor.addLogLoss(loss);
             if ((i + 1) % printInterval == 0) {
-                logger.info("%d, %f\n", (i + 1) / printInterval, evalutor.getAverageLogLoss());
+                System.out.printf("%d, %f\n", (i + 1) / printInterval, evalutor.getAverageLogLoss());
             }
         }
-        logger.info("%f\n", total_loss / va.l);
+        System.out.printf("%f\n", total_loss / va.l);
     }
 
     public static void main(String[] args) throws IOException {
         args = new String[]{"0.1", "0.01", "15", "4", "true", "false", "F:/bigdata.tr.modify.txt", "F:/bigdata.te.modify.txt"};
+//        args = new String[]{"0.1", "0.01", "15", "4", "true", "false", "F:/ffm.train.no_head.csv", "F:/ffm.train.no_head.csv"};
         if (args.length != 8) {
             System.out.println("java -jar ffm.jar <eta> <lambda> <n_iters> "
                     + "<k> <normal> <random> <train_file> <va_file>");
@@ -338,7 +337,7 @@ public class FFMModel {
         param.random = Boolean.parseBoolean(args[5]);
 
         FFMModel model = new FFMModel().train(tr, va, param);
-//        FFMModel.test(model, va, param, 10, 20);
+//        new FFMModel().test(model, va, param, 10, 20);
         model.predict(model, va);
 
     }

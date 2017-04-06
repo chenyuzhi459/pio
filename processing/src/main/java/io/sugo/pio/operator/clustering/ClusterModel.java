@@ -116,6 +116,7 @@ public class ClusterModel extends AbstractModel implements ClusterModelInterface
 
     }
 
+    @JsonProperty
     public int getNumberOfClusters() {
         return clusters.size();
     }

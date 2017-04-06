@@ -20,6 +20,7 @@ import io.sugo.pio.tools.math.similarity.DistanceMeasureHelper;
 import io.sugo.pio.tools.math.similarity.DistanceMeasures;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -244,8 +245,8 @@ public class KMeans extends RMAbstractClusterer implements CapabilityProvider {
         try {
             // Check if a measure type is selected that supports nominal attributes
             int selectedMeasureType = measureHelper.getSelectedMeasureType();
-            pureNominal = selectedMeasureType == DistanceMeasures.NOMINAL_MEASURES_TYPE;
-            supportsNominal = selectedMeasureType == DistanceMeasures.MIXED_MEASURES_TYPE || pureNominal;
+            /*pureNominal = selectedMeasureType == DistanceMeasures.NOMINAL_MEASURES_TYPE;
+            supportsNominal = selectedMeasureType == DistanceMeasures.MIXED_MEASURES_TYPE || pureNominal;*/
         } catch (UndefinedParameterError e) {
             // parameter is undefined we will stick tell that we do not support nominal attributes
         }
@@ -262,31 +263,35 @@ public class KMeans extends RMAbstractClusterer implements CapabilityProvider {
 
     @Override
     public List<ParameterType> getParameterTypes() {
-        List<ParameterType> types = super.getParameterTypes();
+        List<ParameterType> types = new LinkedList<>();
         types.add(new ParameterTypeInt(PARAMETER_K, I18N.getMessage("pio.KMeans.k"), 2,
                 Integer.MAX_VALUE, 2, false));
-        types.add(new ParameterTypeInt(PARAMETER_MAX_RUNS,
-                I18N.getMessage("pio.KMeans.max_runs"), 1,
-                Integer.MAX_VALUE, 10, false));
 
-        ParameterType type = new ParameterTypeBoolean(KMeanspp.PARAMETER_USE_KPP,
+        /*ParameterType type = new ParameterTypeBoolean(KMeanspp.PARAMETER_USE_KPP,
                 I18N.getMessage("pio.KMeanspp.determine_good_start_values"), false);
         type.setExpert(false);
-        types.add(type);
+        types.add(type);*/
 
         for (ParameterType a : DistanceMeasures.getParameterTypes(this)) {
-            if (a.getKey() == DistanceMeasures.PARAMETER_MEASURE_TYPES) {
+            /*if (a.getKey() == DistanceMeasures.PARAMETER_MEASURE_TYPES) {
                 a.setDefaultValue(DistanceMeasures.DIVERGENCES_TYPE);
             }
             if (a.getKey() == DistanceMeasures.PARAMETER_DIVERGENCE) {
                 a.setDefaultValue(6);
-            }
+            }*/
             types.add(a);
         }
 
+        types.add(new ParameterTypeInt(PARAMETER_MAX_RUNS,
+                I18N.getMessage("pio.KMeans.max_runs"), 1,
+                Integer.MAX_VALUE, 10, false));
+
         types.add(new ParameterTypeInt(PARAMETER_MAX_OPTIMIZATION_STEPS,
-                I18N.getMessage("pio.KMeans.max_optimization_steps"), 1, Integer.MAX_VALUE, 100, false));
-//        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));
+                I18N.getMessage("pio.KMeans.max_optimization_steps"), 1, Integer.MAX_VALUE, 100, false, true));
+        types.addAll(RandomGenerator.getRandomGeneratorParameters(this));
+
+        types.addAll(super.getParameterTypes());
+
         return types;
     }
 }

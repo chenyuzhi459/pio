@@ -120,8 +120,8 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
             I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.neural"),
             I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.anova"),
 //            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.epachnenikov"),
-            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.gaussian_combination"),
-            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.multiquadric")
+            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.gaussian_combination")
+//            I18N.getMessage("pio.AbstractMySVMLearner.kernel_type.multiquadric")
     };
 
     /**
@@ -152,17 +152,18 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
     /**
      * Indicates a epanechnikov kernel.
      */
-    public static final int KERNEL_EPANECHNIKOV = 5;
+//    public static final int KERNEL_EPANECHNIKOV = 5;
 
     /**
      * Indicates a gaussian combination kernel.
      */
-    public static final int KERNEL_GAUSSIAN_COMBINATION = 6;
+//    public static final int KERNEL_GAUSSIAN_COMBINATION = 6;
+    public static final int KERNEL_GAUSSIAN_COMBINATION = 5;
 
     /**
      * Indicates a multiquadric kernel.
      */
-    public static final int KERNEL_MULTIQUADRIC = 7;
+//    public static final int KERNEL_MULTIQUADRIC = 7;
 
     /**
      * The SVM which is used for learning.
@@ -316,16 +317,16 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
         } else if (kernelType == KERNEL_ANOVA) {
             ((KernelAnova) kernel).setParameters(getParameterAsDouble(PARAMETER_KERNEL_GAMMA),
                     getParameterAsDouble(PARAMETER_KERNEL_DEGREE));
-        } else if (kernelType == KERNEL_EPANECHNIKOV) {
+        } /*else if (kernelType == KERNEL_EPANECHNIKOV) {
             ((KernelEpanechnikov) kernel).setParameters(getParameterAsDouble(PARAMETER_KERNEL_SIGMA1),
                     getParameterAsDouble(PARAMETER_KERNEL_DEGREE));
-        } else if (kernelType == KERNEL_GAUSSIAN_COMBINATION) {
+        }*/ else if (kernelType == KERNEL_GAUSSIAN_COMBINATION) {
             ((KernelGaussianCombination) kernel).setParameters(getParameterAsDouble(PARAMETER_KERNEL_SIGMA1),
                     getParameterAsDouble(PARAMETER_KERNEL_SIGMA2), getParameterAsDouble(PARAMETER_KERNEL_SIGMA3));
-        } else if (kernelType == KERNEL_MULTIQUADRIC) {
+        } /*else if (kernelType == KERNEL_MULTIQUADRIC) {
             ((KernelMultiquadric) kernel).setParameters(getParameterAsDouble(PARAMETER_KERNEL_SIGMA1),
                     getParameterAsDouble(PARAMETER_KERNEL_SHIFT));
-        }
+        }*/
         kernel.init(svmExamples, cacheSize);
 
         // SVM
@@ -378,12 +379,12 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
                 return new KernelNeural();
             case KERNEL_ANOVA:
                 return new KernelAnova();
-            case KERNEL_EPANECHNIKOV:
-                return new KernelEpanechnikov();
+            /*case KERNEL_EPANECHNIKOV:
+                return new KernelEpanechnikov();*/
             case KERNEL_GAUSSIAN_COMBINATION:
                 return new KernelGaussianCombination();
-            case KERNEL_MULTIQUADRIC:
-                return new KernelMultiquadric();
+            /*case KERNEL_MULTIQUADRIC:
+                return new KernelMultiquadric();*/
             default:
                 return new KernelDot();
         }
@@ -428,12 +429,12 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_KERNEL_SIGMA2, I18N.getMessage("pio.AbstractMySVMLearner.kernel_sigma2"), 0.0d,
                 Double.POSITIVE_INFINITY, 0.0d);
-        type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_KERNEL_TYPE, KERNEL_TYPES, false, 6));
+        type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_KERNEL_TYPE, KERNEL_TYPES, false, 5));
         type.setExpert(false);
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_KERNEL_SIGMA3, I18N.getMessage("pio.AbstractMySVMLearner.kernel_sigma3"), 0.0d,
                 Double.POSITIVE_INFINITY, 2.0d);
-        type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_KERNEL_TYPE, KERNEL_TYPES, false, 6));
+        type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_KERNEL_TYPE, KERNEL_TYPES, false, 5));
         type.setExpert(false);
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_KERNEL_SHIFT, I18N.getMessage("pio.AbstractMySVMLearner.kernel_shift"), 0.0d,
@@ -443,7 +444,7 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_KERNEL_DEGREE, I18N.getMessage("pio.AbstractMySVMLearner.kernel_degree"), 0.0d,
                 Double.POSITIVE_INFINITY, 2);
-        type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_KERNEL_TYPE, KERNEL_TYPES, false, 2, 4, 5));
+        type.registerDependencyCondition(new EqualTypeCondition(this, PARAMETER_KERNEL_TYPE, KERNEL_TYPES, false, 2, 4));
         type.setExpert(false);
         types.add(type);
         type = new ParameterTypeDouble(PARAMETER_KERNEL_A, I18N.getMessage("pio.AbstractMySVMLearner.kernel_a"), Double.NEGATIVE_INFINITY,
@@ -468,8 +469,8 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
         types.add(type);
         types.add(new ParameterTypeInt(PARAMETER_MAX_ITERATIONS, I18N.getMessage("pio.AbstractMySVMLearner.max_iterations"), 1, Integer.MAX_VALUE,
                 100000));
-        types.add(new ParameterTypeBoolean(PARAMETER_SCALE,
-                I18N.getMessage("pio.AbstractMySVMLearner.scale"), true));
+        /*types.add(new ParameterTypeBoolean(PARAMETER_SCALE,
+                I18N.getMessage("pio.AbstractMySVMLearner.scale"), true));*/
 
         // the following parameters are deprecated and switched to on in order to provide always
         // results on the outports and for loading old processes

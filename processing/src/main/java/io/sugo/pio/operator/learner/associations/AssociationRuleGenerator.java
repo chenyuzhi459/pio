@@ -51,12 +51,12 @@ public class AssociationRuleGenerator extends Operator {
 
     /*public static final String[] CRITERIA = {"confidence", "lift", "conviction", "ps", "gain", "laplace"};*/
     public static final String[] CRITERIA = {
-            I18N.getMessage("pio.AssociationRuleGenerator.criteria.confidence"),
-            I18N.getMessage("pio.AssociationRuleGenerator.criteria.lift"),
-            I18N.getMessage("pio.AssociationRuleGenerator.criteria.conviction"),
-            I18N.getMessage("pio.AssociationRuleGenerator.criteria.ps"),
-            I18N.getMessage("pio.AssociationRuleGenerator.criteria.gain"),
-            I18N.getMessage("pio.AssociationRuleGenerator.criteria.laplace")
+            I18N.getMessage("pio.AssociationRuleGenerator.criteria.confidence")
+//            I18N.getMessage("pio.AssociationRuleGenerator.criteria.lift"),
+//            I18N.getMessage("pio.AssociationRuleGenerator.criteria.conviction"),
+//            I18N.getMessage("pio.AssociationRuleGenerator.criteria.ps"),
+//            I18N.getMessage("pio.AssociationRuleGenerator.criteria.gain"),
+//            I18N.getMessage("pio.AssociationRuleGenerator.criteria.laplace")
     };
 
     public static final int CONFIDENCE = 0;
@@ -258,7 +258,7 @@ public class AssociationRuleGenerator extends Operator {
         types.add(type);
 
         type = new ParameterTypeDouble(PARAMETER_GAIN_THETA, I18N.getMessage("pio.AssociationRuleGenerator.gain_theta"),
-                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 2d);
+                Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.1d);
         type.setExpert(true);
         types.add(type);
 

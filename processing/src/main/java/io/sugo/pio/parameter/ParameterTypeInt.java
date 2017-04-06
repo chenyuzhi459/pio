@@ -39,6 +39,12 @@ public class ParameterTypeInt extends ParameterTypeNumber {
         setExpert(expert);
     }
 
+    public ParameterTypeInt(String key, String description, int min, int max, int defaultValue, boolean expert, boolean hidden) {
+        this(key, description, min, max, defaultValue);
+        setExpert(expert);
+        setHidden(hidden);
+    }
+
     @Override
     public Object getDefaultValue() {
         if (noDefault) {

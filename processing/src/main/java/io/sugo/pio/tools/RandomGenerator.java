@@ -1,6 +1,7 @@
 package io.sugo.pio.tools;
 
 import io.sugo.pio.OperatorProcess;
+import io.sugo.pio.i18n.*;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.ProcessRootOperator;
 import io.sugo.pio.parameter.ParameterType;
@@ -123,9 +124,9 @@ public class RandomGenerator extends Random {
 		List<ParameterType> types = new LinkedList<>();
 
 		types.add(new ParameterTypeBoolean(PARAMETER_USE_LOCAL_RANDOM_SEED,
-				"Indicates if a local random seed should be used.", false));
+				io.sugo.pio.i18n.I18N.getMessage("pio.RandomGenerator.use_local_random_seed"), true, false, true));
 
-		ParameterType type = new ParameterTypeInt(PARAMETER_LOCAL_RANDOM_SEED, "Specifies the local random seed", 1,
+		ParameterType type = new ParameterTypeInt(PARAMETER_LOCAL_RANDOM_SEED, io.sugo.pio.i18n.I18N.getMessage("pio.RandomGenerator.local_random_seed"), 1,
 				Integer.MAX_VALUE, 1992);
 		type.registerDependencyCondition(new BooleanParameterCondition(operator, PARAMETER_USE_LOCAL_RANDOM_SEED, false,
 				true));

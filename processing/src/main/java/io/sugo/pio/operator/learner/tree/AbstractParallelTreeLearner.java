@@ -212,7 +212,7 @@ public abstract class AbstractParallelTreeLearner extends AbstractLearner {
         type = new ParameterTypeInt(PARAMETER_NUMBER_OF_PREPRUNING_ALTERNATIVES,
                 I18N.getMessage("pio.ParallelDecisionTreeLearner.number_of_prepruning_alternatives"),
 //				"The number of alternative nodes tried when prepruning would prevent a split.",
-                0, Integer.MAX_VALUE, 3);
+                0, Integer.MAX_VALUE, 3).setHidden(true);
         type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_PRE_PRUNING, false, true));
         types.add(type);
 

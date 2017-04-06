@@ -148,24 +148,14 @@ public class ProcessTest {
 
         /*DatabaseDataReader dbReader = getDbReader();
         process.getRootOperator().getExecutionUnit().addOperator(dbReader);*/
-        String csvFilePath = getFullPath("bank_sample.csv");
+        String csvFilePath = getFullPath("Ploynominal.csv");
         CSVExampleSource csvExampleSource = new CSVExampleSource();
         csvExampleSource.setName("operator_csv");
         csvExampleSource.setParameter(CSVExampleSource.PARAMETER_CSV_FILE, csvFilePath);
         csvExampleSource.setParameter(CSVExampleSource.PARAMETER_META_DATA,
-                "0:ID.true.attribute_value.id;1:age.true.integer.attribute;2:education.true.integer.attribute;3:seniority.true.integer.attribute;4:address_year.true.integer.attribute;5:income.true.integer.attribute;6:debt_ratio.true.real.attribute;7:Credit_card_debt.true.real.attribute;8:other_debt.true.real.attribute;9:is_default.true.binominal.attribute");
+                "0:label.true.real.label;1:a1.true.real.attribute;2:a2.true.real.attribute;3:a3.true.real.attribute;4:a4.true.real.attribute;5:a5.true.real.attribute;");
+        csvExampleSource.setParameter(CSVExampleSource.PARAMETER_COLUMN_SEPARATORS, "\\s");
         process.getRootOperator().getExecutionUnit().addOperator(csvExampleSource);
-
-        ExampleFilter ef = new ExampleFilter();
-        ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
-        process.getRootOperator().getExecutionUnit().addOperator(ef);
-
-        ChangeAttributeRole role = new ChangeAttributeRole();
-        role.setName("change_role");
-        role.setParameter("attribute_name", "is_default");
-        role.setParameter("target_role", "label");
-        process.getRootOperator().getExecutionUnit().addOperator(role);
 
         LinearRegression linearRegression = new LinearRegression();
         linearRegression.setParameter("feature_selection", "0");
@@ -177,9 +167,7 @@ public class ProcessTest {
         process.getRootOperator().getExecutionUnit().addOperator(linearRegression);
 
 //        process.connect(new Connection("operator_db_reader", "output", "operator_example_filter", "example set input"), true);
-        process.connect(new Connection("operator_csv", "output", "operator_example_filter", "example set input"), true);
-        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
-        process.connect(new Connection("change_role", "example set output", "linear_regression", "training set"), true);
+        process.connect(new Connection("operator_csv", "output", "linear_regression", "training set"), true);
 
         process.getRootOperator().getExecutionUnit().transformMetaData();
 
@@ -377,47 +365,29 @@ public class ProcessTest {
 
         /*DatabaseDataReader dbReader = getDbReader();
         process.getRootOperator().getExecutionUnit().addOperator(dbReader);*/
-        String csvFilePath = getFullPath("bank_sample.csv");
+        String csvFilePath = getFullPath("lris.csv");
         CSVExampleSource csvExampleSource = new CSVExampleSource();
         csvExampleSource.setName("operator_csv");
         csvExampleSource.setParameter(CSVExampleSource.PARAMETER_CSV_FILE, csvFilePath);
         csvExampleSource.setParameter(CSVExampleSource.PARAMETER_META_DATA,
-                "0:ID.true.attribute_value.id;1:age.true.integer.attribute;2:education.true.integer.attribute;3:seniority.true.integer.attribute;4:address_year.true.integer.attribute;5:income.true.integer.attribute;6:debt_ratio.true.real.attribute;7:Credit_card_debt.true.real.attribute;8:other_debt.true.real.attribute;9:is_default.true.binominal.attribute");
+                "0:id.true.attribute_value.id;1:label.false.nominal.label;2:a1.true.real.attribute;3:a2.true.real.attribute;4:a3.true.real.attribute;5:a4.true.real.attribute;");
+        csvExampleSource.setParameter(CSVExampleSource.PARAMETER_COLUMN_SEPARATORS, "\\s");
         process.getRootOperator().getExecutionUnit().addOperator(csvExampleSource);
-
-        AttributeFilter af = new AttributeFilter();
-        af.setName("operator_attribute_filter");
-        af.setParameter(PARAMETER_ATTRIBUTES, "age;seniority;education;address_year;income;debt_ratio;Credit_card_debt;other_debt;is_default");
-        process.getRootOperator().getExecutionUnit().addOperator(af);
-
-        ExampleFilter ef = new ExampleFilter();
-        ef.setName("operator_example_filter");
-        ef.setParameter(PARAMETER_FILTERS_LIST, "filters_list:is_default.is_not_missing.");
-        process.getRootOperator().getExecutionUnit().addOperator(ef);
-
-        ChangeAttributeRole role = new ChangeAttributeRole();
-        role.setName("change_role");
-        role.setParameter(PARAMETER_NAME, "is_default");
-        role.setParameter(PARAMETER_TARGET_ROLE, "label");
-        process.getRootOperator().getExecutionUnit().addOperator(role);
 
         KMeans kMeans = new KMeans();
         kMeans.setName("k_means");
-        kMeans.setParameter(PARAMETER_K, "2");
+        kMeans.setParameter(PARAMETER_K, "3");
         kMeans.setParameter(PARAMETER_MAX_RUNS, "10");
         kMeans.setParameter(PARAMETER_MAX_OPTIMIZATION_STEPS, "100");
         kMeans.setParameter(PARAMETER_ADD_CLUSTER_ATTRIBUTE, "true");
         kMeans.setParameter(PARAMETER_REMOVE_UNLABELED, "false");
         kMeans.setParameter(PARAMETER_ADD_AS_LABEL, "false");
-        kMeans.setParameter(PARAMETER_MEASURE_TYPES, I18N.getMessage("pio.DistanceMeasures.mixed_measure"));
-        kMeans.setParameter(PARAMETER_MIXED_MEASURE, I18N.getMessage("pio.DistanceMeasures.MixedEuclideanDistance"));
+        kMeans.setParameter(PARAMETER_MEASURE_TYPES, I18N.getMessage("pio.DistanceMeasures.numerical_measure"));
+        kMeans.setParameter(PARAMETER_MIXED_MEASURE, I18N.getMessage("pio.DistanceMeasures.EuclideanDistance"));
         process.getRootOperator().getExecutionUnit().addOperator(kMeans);
 
 //        process.connect(new Connection("operator_db_reader", "output", "operator_attribute_filter", "example set input"), true);
-        process.connect(new Connection("operator_csv", "output", "operator_attribute_filter", "example set input"), true);
-        process.connect(new Connection("operator_attribute_filter", "example set output", "operator_example_filter", "example set input"), true);
-        process.connect(new Connection("operator_example_filter", "example set output", "change_role", "example set input"), true);
-        process.connect(new Connection("change_role", "example set output", "k_means", "example set"), true);
+        process.connect(new Connection("operator_csv", "output", "k_means", "example set"), true);
 
         process.getRootOperator().getExecutionUnit().transformMetaData();
 

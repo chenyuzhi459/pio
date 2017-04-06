@@ -129,8 +129,9 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
      * Sets if this parameter can be seen in expert mode (true) or beginner mode (false).
      *
      */
-    public void setExpert(boolean expert) {
+    public ParameterType setExpert(boolean expert) {
         this.expert = expert;
+        return this;
     }
 
     /**
@@ -156,8 +157,9 @@ public abstract class ParameterType implements Comparable<ParameterType>, Serial
     /**
      * Sets if this parameter is hidden (value true) and will not be shown in the GUI.
      */
-    public void setHidden(boolean hidden) {
+    public ParameterType setHidden(boolean hidden) {
         this.isHidden = hidden;
+        return this;
     }
 
     /**
