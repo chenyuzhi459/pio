@@ -90,7 +90,7 @@ public class SparkDecisionTree extends AbstractSparkLearner {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.classification;
     }
 
     @Override

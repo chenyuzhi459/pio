@@ -40,7 +40,7 @@ public class SparkNest extends OperatorChain {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.algorithmModel;
+        return OperatorGroup.deepLearning;
     }
 
     @Override
