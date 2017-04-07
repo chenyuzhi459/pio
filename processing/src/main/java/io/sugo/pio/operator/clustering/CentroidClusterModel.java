@@ -92,6 +92,7 @@ public class CentroidClusterModel extends ClusterModel {
 
     }
 
+    @JsonProperty
     public String[] getAttributeNames() {
         return dimensionNames.toArray(new String[dimensionNames.size()]);
     }

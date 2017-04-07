@@ -1,18 +1,11 @@
 package io.sugo.pio.example;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.sugo.pio.example.set.RemappedExampleSet;
 import io.sugo.pio.example.table.ExampleTable;
 import io.sugo.pio.operator.ResultObject;
 
 /**
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "example_set")
-@JsonSubTypes(value = {
-        @JsonSubTypes.Type(name = "remapped_example_set", value = RemappedExampleSet.class)
-})
 public interface ExampleSet extends ResultObject, Cloneable, Iterable<Example> {
 
     /**
