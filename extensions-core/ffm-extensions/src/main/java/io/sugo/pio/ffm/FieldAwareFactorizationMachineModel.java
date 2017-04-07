@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
+import io.sugo.pio.example.table.BinominalMapping;
+import io.sugo.pio.example.table.NominalMapping;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.learner.PredictionModel;
 
@@ -61,20 +63,30 @@ public class FieldAwareFactorizationMachineModel extends PredictionModel {
         FFMProblem predictProblem = FFMProblem.convertExampleSet(exampleSet);
         float[] yLabels = ffmModel.predict(ffmModel, predictProblem);
 
+        Attribute originLabel = exampleSet.getAttributes().getSpecial("label");
+        if (originLabel.isNominal()) {
+            BinominalMapping mapping = new BinominalMapping();
+            mapping.setMapping(firstClassName, 0);
+            mapping.setMapping(secondClassName, 1);
+            originLabel.setMapping(mapping);
+        }
+
         int index = 0;
         for (Example example : exampleSet) {
             float y = yLabels[index];
-            if (predictedLabel.isNominal()) {
-                int predictionIndex = y> 0.5 ? predictedLabel.getMapping().getIndex(secondClassName)
-                        : predictedLabel.getMapping().getIndex(firstClassName);
-                example.setValue(predictedLabel, predictionIndex);
+            if (originLabel.isNominal()) {
+
+                int predictionIndex = y > 0.5 ? originLabel.getMapping().getIndex(secondClassName)
+                        : originLabel.getMapping().getIndex(firstClassName);
+                example.setValue(originLabel, predictionIndex);
 
 //                double logFunction = 1.0d / (1.0d + Math.exp(-(prediction - 0.5)));
 //                example.setConfidence(secondClassName, logFunction);
 //                example.setConfidence(firstClassName, 1 - logFunction);
             } else {
-                example.setValue(predictedLabel, y);
+                example.setValue(originLabel, y);
             }
+            example.setValue(predictedLabel, y);
 
             index++;
         }

@@ -6,6 +6,7 @@ import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Example;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.*;
 import io.sugo.pio.operator.learner.AbstractLearner;
 import io.sugo.pio.parameter.ParameterType;
@@ -45,7 +46,7 @@ public class FieldAwareFactorizationMachine extends Operator {
 
     @Override
     public String getDefaultFullName() {
-        return FieldAwareFactorizationMachine.class.getSimpleName();
+        return I18N.getMessage("pio.FieldAwareFactorizationMachine.name");
     }
 
     @Override
@@ -55,7 +56,7 @@ public class FieldAwareFactorizationMachine extends Operator {
 
     @Override
     public String getDescription() {
-        return FieldAwareFactorizationMachine.class.getSimpleName();
+        return I18N.getMessage("pio.FieldAwareFactorizationMachine.description");
     }
 
     @Override
@@ -82,7 +83,7 @@ public class FieldAwareFactorizationMachine extends Operator {
             throw new UserError(this, "pio.error.operator.exampleset_miss_label");
         }
 
-        /*if (label.isNominal()) {
+        if (label.isNominal()) {
             logger.info("FFM of nominal label.");
 
             if (label.getMapping().size() == 2) {
@@ -105,7 +106,7 @@ public class FieldAwareFactorizationMachine extends Operator {
 
                 trainExampleSet.getAttributes().setLabel(workingLabel);
             }
-        }*/
+        }
 
         FFMProblem trainProblem = FFMProblem.convertExampleSet(trainExampleSet);
 
@@ -136,26 +137,32 @@ public class FieldAwareFactorizationMachine extends Operator {
     @Override
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
-        types.add(new ParameterTypeInt(PARAMETER_ITERATION, "The number of iterations used for training.",
+        types.add(new ParameterTypeInt(PARAMETER_ITERATION, //"The number of iterations used for training.",
+                I18N.getMessage("pio.FieldAwareFactorizationMachine.iterations"),
                 1, Integer.MAX_VALUE, 15));
         types.add(new ParameterTypeDouble(
                 PARAMETER_LEARNING_RATE,
-                "The learning rate determines by how much we change the weights at each step. May not be 0.",
+                //"The learning rate determines by how much we change the weights at each step. May not be 0.",
+                I18N.getMessage("pio.FieldAwareFactorizationMachine.learning_rate"),
                 Double.MIN_VALUE, 1.0d, 0.1d));
         types.add(new ParameterTypeDouble(
                 PARAMETER_L2,
-                "The weight on l2 regularization.",
+//                "The weight on l2 regularization.",
+                I18N.getMessage("pio.FieldAwareFactorizationMachine.l2_regularization"),
                 0d, 1d, 0d));
         types.add(new ParameterTypeBoolean(PARAMETER_NORMALIZATION,
-                "Whether to do instance-wise normalization",
+//                "Whether to do instance-wise normalization",
+                I18N.getMessage("pio.FieldAwareFactorizationMachine.normalization"),
                 true
         ));
         types.add(new ParameterTypeBoolean(PARAMETER_RANDOM,
-                "Whether to randomization training order of samples",
+//                "Whether to randomization training order of samples",
+                I18N.getMessage("pio.FieldAwareFactorizationMachine.random_samples"),
                 true
         ));
         types.add(new ParameterTypeInt(PARAMETER_LATENT_FACTOR_DIM,
-                "The size of latent factor dim",
+//                "The size of latent factor dim",
+                I18N.getMessage("pio.FieldAwareFactorizationMachine.latent_factor_dim"),
                 1,
                 5,
                 4

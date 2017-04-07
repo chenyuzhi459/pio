@@ -17,7 +17,7 @@ public class PythonScriptingOperator extends AbstractScriptingLanguageOperator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.processing;
+        return OperatorGroup.dataSource;
     }
 
     @Override

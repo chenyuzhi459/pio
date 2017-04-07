@@ -33,7 +33,7 @@ public class FieldAwareFactorizationMachineTest {
         jsonMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
     }
 
-    @Test
+//    @Test
     public void test() throws JsonProcessingException {
         OperatorProcess process = new OperatorProcess("testProcess");
         process.setDescription("testProcess desc");
@@ -83,7 +83,7 @@ public class FieldAwareFactorizationMachineTest {
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(modelApplier.getResult()));
     }
 
-    @Test
+//    @Test
     public void test2() throws JsonProcessingException {
         OperatorProcess process = new OperatorProcess("testProcess");
         process.setDescription("testProcess desc");

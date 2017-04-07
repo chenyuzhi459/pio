@@ -16,7 +16,7 @@ public class FFMModule implements PioModule {
     public List<? extends Module> getJacksonModules() {
         return ImmutableList.of(new SimpleModule(FFMModule.class.getSimpleName())
                 .registerSubtypes(
-                        new NamedType(FactorizationMachine.class, "fm"),
+//                        new NamedType(FactorizationMachine.class, "fm"),
                         new NamedType(FieldAwareFactorizationMachine.class, "ffm")
                 )
         );
