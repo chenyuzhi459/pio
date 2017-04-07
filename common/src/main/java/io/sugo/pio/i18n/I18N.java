@@ -56,6 +56,21 @@ public class I18N {
         return value;
     }
 
+    public static String getMessage(String key, Object... arguments) {
+        String value = resourceProps.getProperty(key);
+        if (value == null || value.trim() == "") {
+            return key;
+        }
+
+        try {
+            formatter.applyPattern(value);
+            String formatted = formatter.format(arguments);
+            return formatted;
+        } catch (Throwable t) {
+            return value;
+        }
+    }
+
     public static String getErrorMessage(String key) {
         String value = errorProps.getProperty(key);
         if (value == null || value.trim() == "") {

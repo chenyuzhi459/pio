@@ -9,6 +9,7 @@ import io.sugo.pio.example.set.ConditionedExampleSet;
 import io.sugo.pio.example.set.NoMissingAttributeValueCondition;
 import io.sugo.pio.example.table.AttributeFactory;
 import io.sugo.pio.example.table.NominalMapping;
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.AbstractModel;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorProgress;
@@ -236,10 +237,12 @@ public class ClusterModel extends AbstractModel implements ClusterModelInterface
         for (int i = 0; i < getNumberOfClusters(); i++) {
             Cluster cl = getCluster(i);
             int numObjects = cl.getNumberOfExamples();
-            result.append("Cluster " + cl.getClusterId() + ": " + numObjects + " items" + Tools.getLineSeparator());
+//            result.append("Cluster " + cl.getClusterId() + ": " + numObjects + " items" + Tools.getLineSeparator());
+            result.append(I18N.getMessage("pio.ClusterModel.items", cl.getClusterId(), numObjects) + Tools.getLineSeparator());
             sum += numObjects;
         }
-        result.append("Total number of items: " + sum + Tools.getLineSeparator());
+//        result.append("Total number of items: " + sum + Tools.getLineSeparator());
+        result.append(I18N.getMessage("pio.ClusterModel.total_items", sum) + Tools.getLineSeparator());
         return result.toString();
     }
 }
