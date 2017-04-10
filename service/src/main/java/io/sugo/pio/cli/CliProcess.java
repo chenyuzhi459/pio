@@ -12,6 +12,7 @@ import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.server.http.DrainPrediction;
 import io.sugo.pio.server.http.OperatorResource;
 import io.sugo.pio.server.http.ProcessResource;
+import io.sugo.pio.server.http.RFMResource;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import org.eclipse.jetty.server.Server;
 
@@ -43,6 +44,7 @@ public class CliProcess extends ServerRunnable {
                         Jerseys.addResource(binder, ProcessResource.class);
                         Jerseys.addResource(binder, OperatorResource.class);
                         Jerseys.addResource(binder, DrainPrediction.class);
+                        Jerseys.addResource(binder, RFMResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
