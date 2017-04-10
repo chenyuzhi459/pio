@@ -2,6 +2,8 @@ package io.sugo.pio.server.rfm;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 /**
  */
 public class RFMGroup {
@@ -23,6 +25,12 @@ public class RFMGroup {
      */
     @JsonProperty
     private String userPercent;
+
+    /**
+     * The user id list that belong to this group
+     */
+    @JsonProperty
+    private List<String> userIdList;
 
     public String getName() {
         return name;
@@ -47,4 +55,23 @@ public class RFMGroup {
     public void setUserPercent(String userPercent) {
         this.userPercent = userPercent;
     }
+
+    public List<String> getUserIdList() {
+        return userIdList;
+    }
+
+    public void setUserIdList(List<String> userIdList) {
+        this.userIdList = userIdList;
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer("[RFMGroup]");
+        sb.append("name:").append(name).append(", ")
+                .append("userCount:").append(userCount).append(", ")
+                .append("userPercent:").append(userPercent);
+
+        return sb.toString();
+    }
+
 }

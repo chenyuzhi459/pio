@@ -65,9 +65,6 @@ public class QuantileModel {
         this.r = r;
         this.f = f;
         this.m = m;
-        rq = new double[r];
-        fq = new double[f];
-        mq = new double[m];
 
         initLabels(r, f, m);
         initGroup();
@@ -127,13 +124,14 @@ public class QuantileModel {
         return mLabels[mLabels.length - 1];
     }
 
-    public void buildGroups(int totalUsers) {
+    public void buildGroups(Map<String, List<String>> groupUserIdsMap, int totalUsers) {
         groups = new ArrayList<>();
         groupMap.entrySet().iterator().forEachRemaining((entry) -> {
             RFMGroup group = new RFMGroup();
             group.setName(entry.getKey());
             group.setUserCount(entry.getValue());
-            group.setUserPercent(Double.valueOf(df.format(entry.getValue()*100.0d / totalUsers)) + "%");
+            group.setUserPercent(Double.valueOf(df.format(entry.getValue() * 100.0d / totalUsers)) + "%");
+            group.setUserIdList(groupUserIdsMap.get(entry.getKey()));
 
             groups.add(group);
         });
@@ -189,5 +187,52 @@ public class QuantileModel {
 
     public Map<String, Integer> getGroupMap() {
         return groupMap;
+    }
+
+    @Override
+    public String toString() {
+        String spliter = "";
+        StringBuffer sb = new StringBuffer("[QuantileModel]");
+        sb.append("r:").append(r).append(", ")
+                .append("f:").append(f).append(", ")
+                .append("m:").append(m).append(", ")
+                .append("rq: {");
+        for (double e : rq) {
+            sb.append(spliter).append(e);
+            spliter = ",";
+        }
+        spliter = "";
+        sb.append("}, fq: {");
+        for (double e : fq) {
+            sb.append(spliter).append(e);
+            spliter = ",";
+        }
+        spliter = "";
+        sb.append("}, mq: {");
+        for (double e : mq) {
+            sb.append(spliter).append(e);
+            spliter = ",";
+        }
+        spliter = "";
+        sb.append("}, rLabels: {");
+        for (String e : rLabels) {
+            sb.append(spliter).append(e);
+            spliter = ",";
+        }
+        spliter = "";
+        sb.append("}, fLabels: {");
+        for (String e : fLabels) {
+            sb.append(spliter).append(e);
+            spliter = ",";
+        }
+        spliter = "";
+        sb.append("}, mLabels: {");
+        for (String e : mLabels) {
+            sb.append(spliter).append(e);
+            spliter = ",";
+        }
+        sb.append("}, groups:").append(groups);
+
+        return sb.toString();
     }
 }

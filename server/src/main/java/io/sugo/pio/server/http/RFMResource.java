@@ -7,7 +7,6 @@ import com.metamx.common.logger.Logger;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.server.http.dto.CustomizedRFMDto;
 import io.sugo.pio.server.http.dto.DefaultRFMDto;
-import io.sugo.pio.server.http.dto.RFMDto;
 import io.sugo.pio.server.rfm.QuantileModel;
 import io.sugo.pio.server.rfm.RFMManager;
 
@@ -24,6 +23,7 @@ public class RFMResource {
     private static final Logger log = new Logger(RFMResource.class);
 
     private final RFMManager rfmManager;
+
     private final ObjectMapper jsonMapper;
 
     @Inject
@@ -40,7 +40,8 @@ public class RFMResource {
         check(rfmDto);
         try {
             String queryStr = rfmDto.getQuery();
-            QuantileModel quantileModel = rfmManager.getDefaultQuantileModel(queryStr, rfmDto.getR(), rfmDto.getF(), rfmDto.getM());
+            QuantileModel quantileModel = rfmManager.getDefaultQuantileModel(rfmDto.getHost(), queryStr,
+                    rfmDto.getR(), rfmDto.getF(), rfmDto.getM());
 
             return Response.ok(quantileModel).build();
         } catch (Throwable e) {
@@ -56,7 +57,8 @@ public class RFMResource {
         check(rfmDto);
         try {
             String queryStr = rfmDto.getQuery();
-            QuantileModel quantileModel = rfmManager.getCustomizedQuantileModel(queryStr, rfmDto.getRq(), rfmDto.getFq(), rfmDto.getMq());
+            QuantileModel quantileModel = rfmManager.getCustomizedQuantileModel(rfmDto.getHost(), queryStr,
+                    rfmDto.getRq(), rfmDto.getFq(), rfmDto.getMq());
 
             return Response.ok(quantileModel).build();
         } catch (Throwable e) {
@@ -65,6 +67,7 @@ public class RFMResource {
     }
 
     private void check(DefaultRFMDto rfmDto) {
+        Preconditions.checkNotNull(rfmDto.getHost(), "Host can not be null.");
         Preconditions.checkNotNull(rfmDto.getDatasource(), "Data source can not be null.");
         if (rfmDto.getR() <= 0) {
             throw new IllegalArgumentException("'R' must be greater than 0.");
@@ -78,6 +81,7 @@ public class RFMResource {
     }
 
     private void check(CustomizedRFMDto rfmDto) {
+        Preconditions.checkNotNull(rfmDto.getHost(), "Host can not be null.");
         Preconditions.checkNotNull(rfmDto.getDatasource(), "Data source can not be null.");
         if (rfmDto.getRq().length <= 0) {
             throw new IllegalArgumentException("'RQ' must be at least contains one element.");

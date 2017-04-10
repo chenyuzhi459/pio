@@ -6,9 +6,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class RFMDto {
 
+    private String host;
+
     private String datasource;
 
     private ColumnName scene;
+
+    /**
+     * yyyy-mm-dd
+     */
+    private String startDate;
+
+    /**
+     * yyyy-mm-dd
+     */
+    private String endDate;
 
     private static class ColumnName {
         @JsonProperty("UserID")
@@ -43,6 +55,13 @@ public class RFMDto {
         }
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
 
     public String getDatasource() {
         return datasource;
@@ -60,13 +79,31 @@ public class RFMDto {
         this.scene = scene;
     }
 
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
     public String getQuery() {
         StringBuffer sb = new StringBuffer("select ")
                 .append(this.getScene().getUserId()).append(" as userId, ")
                 .append("max(").append(this.getScene().getDate()).append(") as lastTime, ")
                 .append("count(1) as frequency, ")
                 .append("sum(").append(this.getScene().getPrice()).append(") as monetary ")
-                .append("from ").append(this.getDatasource())
+                .append(" from ").append(this.getDatasource())
+                .append(" where ").append(this.getScene().getDate()).append(" >= '").append(this.getStartDate()).append("'")
+                .append(" and ").append(this.getScene().getDate()).append(" <= '").append(this.getEndDate()).append("'")
                 .append(" group by ").append(this.getScene().getUserId());
 
         return sb.toString();

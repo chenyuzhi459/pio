@@ -20,8 +20,10 @@ public class RFMManager {
 
     private static final ObjectReader reader = jsonMapper.readerFor(Result.class);
 
-    public QuantileModel getDefaultQuantileModel(String queryStr, int r, int f, int m) {
-        List<RFMModel> rfmModelList = fetchData(queryStr);
+    private static final String QUERY_URI = "/api/plyql/sql";
+
+    public QuantileModel getDefaultQuantileModel(String host, String queryStr, int r, int f, int m) {
+        List<RFMModel> rfmModelList = fetchData(host, queryStr);
         int dataSize = rfmModelList.size();
         if (r > dataSize) {
             throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
@@ -42,8 +44,8 @@ public class RFMManager {
         return quantileModel;
     }
 
-    public QuantileModel getCustomizedQuantileModel(String queryStr, double[] rq, double[] fq, double[] mq) {
-        List<RFMModel> rfmModelList = fetchData(queryStr);
+    public QuantileModel getCustomizedQuantileModel(String host, String queryStr, double[] rq, double[] fq, double[] mq) {
+        List<RFMModel> rfmModelList = fetchData(host, queryStr);
         int dataSize = rfmModelList.size();
         if (rq.length+1 > dataSize) {
             throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
@@ -64,13 +66,14 @@ public class RFMManager {
         return quantileModel;
     }
 
-    private List<RFMModel> fetchData(String queryStr) {
+    private List<RFMModel> fetchData(String host, String queryStr) {
+        String url = buildUrl(host);
         String requestJson = buildQuery(queryStr);
         String resultStr = "";
         try {
-            resultStr = HttpClientUtil.post("http://192.168.0.212:8000/api/plyql/sql", requestJson);
+            resultStr = HttpClientUtil.post(url, requestJson);
         } catch (IOException e) {
-            log.error("Query druid '%s' with parameter '%s' failed: ", "", requestJson);
+            log.error("Query druid '%s' with parameter '%s' failed: ", url, requestJson);
         }
 
         List<RFMModel> rfmModelList = new ArrayList<>();
@@ -82,7 +85,7 @@ public class RFMManager {
                     "] list failed, details:" + e.getMessage());
         }
 
-        log.info("Fetch %d RFM data.", rfmModelList.size());
+        log.info("Fetch %d RFM data from druid.", rfmModelList.size());
 
         return rfmModelList;
     }
@@ -97,6 +100,10 @@ public class RFMManager {
             log.error("Deserialize query failed: ", e);
             return null;
         }
+    }
+
+    private String buildUrl(String host) {
+        return "http://" + host + QUERY_URI;
     }
 
     private static class Query {
