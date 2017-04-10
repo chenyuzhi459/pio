@@ -1,8 +1,13 @@
 package io.sugo.pio.server.rfm;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  */
 public class RFMModel {
+
+    private static final Calendar calendar = Calendar.getInstance();
 
     public static final int R = 0;
     public static final int F = 1;
@@ -13,6 +18,11 @@ public class RFMModel {
     private int recency;
     private int frequency;
     private double monetary;
+
+    /**
+     * Last purchase time
+     */
+    private Date lastTime;
 
     private String rLabel;
     private String fLabel;
@@ -31,6 +41,15 @@ public class RFMModel {
     }
 
     public int getRecency() {
+        if (recency == 0) {
+            calendar.setTime(lastTime);
+            int dayBefore = calendar.get(Calendar.DAY_OF_YEAR);
+
+            calendar.setTime(new Date());
+            int dayNow = calendar.get(Calendar.DAY_OF_YEAR);
+
+            recency = dayNow - dayBefore;
+        }
         return recency;
     }
 
@@ -56,6 +75,14 @@ public class RFMModel {
 
     public String getrLabel() {
         return rLabel;
+    }
+
+    public Date getLastTime() {
+        return lastTime;
+    }
+
+    public void setLastTime(Date lastTime) {
+        this.lastTime = lastTime;
     }
 
     public RFMModel setrLabel(String rLabel) {

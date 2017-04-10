@@ -51,7 +51,7 @@ public class FieldAwareFactorizationMachine extends Operator {
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.fm;
+        return OperatorGroup.classification;
     }
 
     @Override

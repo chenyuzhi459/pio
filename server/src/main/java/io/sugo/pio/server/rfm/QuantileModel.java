@@ -2,12 +2,16 @@ package io.sugo.pio.server.rfm;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 /**
  */
 public class QuantileModel {
+
+    private static final java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
 
     /**
      * The quantile number of recency
@@ -53,6 +57,8 @@ public class QuantileModel {
     private String[] mLabels;
 
     @JsonProperty
+    private List<RFMGroup> groups;
+
     private Map<String, Integer> groupMap;
 
     public QuantileModel(int r, int f, int m) {
@@ -119,6 +125,18 @@ public class QuantileModel {
             }
         }
         return mLabels[mLabels.length - 1];
+    }
+
+    public void buildGroups(int totalUsers) {
+        groups = new ArrayList<>();
+        groupMap.entrySet().iterator().forEachRemaining((entry) -> {
+            RFMGroup group = new RFMGroup();
+            group.setName(entry.getKey());
+            group.setUserCount(entry.getValue());
+            group.setUserPercent(Double.valueOf(df.format(entry.getValue()*100.0d / totalUsers)) + "%");
+
+            groups.add(group);
+        });
     }
 
     public int getR() {

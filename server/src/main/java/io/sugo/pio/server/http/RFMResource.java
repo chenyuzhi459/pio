@@ -1,50 +1,92 @@
 package io.sugo.pio.server.http;
 
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.guice.annotations.Json;
+import io.sugo.pio.server.http.dto.CustomizedRFMDto;
+import io.sugo.pio.server.http.dto.DefaultRFMDto;
+import io.sugo.pio.server.http.dto.RFMDto;
+import io.sugo.pio.server.rfm.QuantileModel;
+import io.sugo.pio.server.rfm.RFMManager;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/pio/process/rfm/")
 public class RFMResource {
+
     private static final Logger log = new Logger(RFMResource.class);
 
-    java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
+    private final RFMManager rfmManager;
+    private final ObjectMapper jsonMapper;
 
-    public static final int[] arr = new int[]{1, 3, 4, 8, 9, 15, 18, 25, 40, 42, 56, 60, 66, 68, 72, 77, 79, 85, 88, 96};
-
-    public double[] calculateQuantile(int quantileNum) {
-        double[] quantiles = new double[quantileNum-1];
-
-        // Calculate the average step
-        double step = (arr.length + 1.0) / quantileNum;
-
-        for (int i = 0; i < quantileNum-1; i++) {
-            quantiles[i] = getQuantilePoint(i+1, step);
-        }
-
-        return quantiles;
+    @Inject
+    public RFMResource(@Json ObjectMapper jsonMapper, RFMManager rfmManager) {
+        this.jsonMapper = jsonMapper;
+        this.rfmManager = rfmManager;
     }
 
-    public double getQuantilePoint(int quantileIndex, double step) {
-        double nStep = quantileIndex * step;
-        int integerPart = (int) nStep;
-        double decimalPart = nStep - integerPart;
+    @POST
+    @Path("/slice/default")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response slice(DefaultRFMDto rfmDto) {
+        check(rfmDto);
+        try {
+            String queryStr = rfmDto.getQuery();
+            QuantileModel quantileModel = rfmManager.getDefaultQuantileModel(queryStr, rfmDto.getR(), rfmDto.getF(), rfmDto.getM());
 
-        double quantilePoint = arr[integerPart-1] + (arr[integerPart] - arr[integerPart-1]) * decimalPart;
-        return Double.valueOf(df.format(quantilePoint));
+            return Response.ok(quantileModel).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
     }
 
-    public static void main(String[] args) {
-        for (int i = 0; i < RFMResource.arr.length; i++) {
-            System.out.print(RFMResource.arr[i] + ",");
-        }
-        System.out.println();
+    @POST
+    @Path("/slice/customized")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response sliceCustomized(CustomizedRFMDto rfmDto) {
+        check(rfmDto);
+        try {
+            String queryStr = rfmDto.getQuery();
+            QuantileModel quantileModel = rfmManager.getCustomizedQuantileModel(queryStr, rfmDto.getRq(), rfmDto.getFq(), rfmDto.getMq());
 
-        RFMResource rfm = new RFMResource();
-        double[] quantiles = rfm.calculateQuantile(4);
-        for (int i = 0; i < quantiles.length; i++) {
-            System.out.println((i+1) + "分位值为：" + quantiles[i]);
+            return Response.ok(quantileModel).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    private void check(DefaultRFMDto rfmDto) {
+        Preconditions.checkNotNull(rfmDto.getDatasource(), "Data source can not be null.");
+        if (rfmDto.getR() <= 0) {
+            throw new IllegalArgumentException("'R' must be greater than 0.");
+        }
+        if (rfmDto.getF() <= 0) {
+            throw new IllegalArgumentException("'F' must be greater than 0.");
+        }
+        if (rfmDto.getM() <= 0) {
+            throw new IllegalArgumentException("'M' must be greater than 0.");
+        }
+    }
+
+    private void check(CustomizedRFMDto rfmDto) {
+        Preconditions.checkNotNull(rfmDto.getDatasource(), "Data source can not be null.");
+        if (rfmDto.getRq().length <= 0) {
+            throw new IllegalArgumentException("'RQ' must be at least contains one element.");
+        }
+        if (rfmDto.getFq().length <= 0) {
+            throw new IllegalArgumentException("'FQ' must be at least contains one element.");
+        }
+        if (rfmDto.getMq().length <= 0) {
+            throw new IllegalArgumentException("'MQ' must be at least contains one element.");
         }
     }
 

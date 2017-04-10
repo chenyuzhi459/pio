@@ -5,11 +5,9 @@ import java.util.Map;
 
 /**
  */
-public class QuantileCalculator {
+public class DefaultQuantileCalculator extends AbstractQuantileCalculator {
 
     private static final java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
-
-    private List<RFMModel> rfmModelList;
 
     /**
      * The quantile number of recency
@@ -26,34 +24,19 @@ public class QuantileCalculator {
      */
     private int m;
 
-    public QuantileCalculator(List<RFMModel> rfmModelList, int r, int f, int m) {
-        this.rfmModelList = rfmModelList;
+    public DefaultQuantileCalculator(List<RFMModel> rfmModelList, int r, int f, int m) {
+        super(rfmModelList);
         this.r = r;
         this.f = f;
         this.m = m;
     }
 
-    public QuantileModel calculate() {
-
-        QuantileModel quantileModel = new QuantileModel(r, f, m);
+    @Override
+    public void initModel() {
+        quantileModel = new QuantileModel(r, f, m);
         quantileModel.setRq(calculateR());
         quantileModel.setFq(calculateF());
         quantileModel.setMq(calculateM());
-
-        Map<String, Integer> groupMap = quantileModel.getGroupMap();
-        rfmModelList.forEach(rfmModel -> {
-            // Label each of the rfm model
-            rfmModel.setrLabel(quantileModel.getRLabel(rfmModel.getRecency()));
-            rfmModel.setfLabel(quantileModel.getFLabel(rfmModel.getFrequency()));
-            rfmModel.setmLabel(quantileModel.getMLabel(rfmModel.getMonetary()));
-
-            // Statistic members of each group
-            String group = rfmModel.getGroup();
-            Integer count = groupMap.get(group);
-            groupMap.put(group, ++count);
-        });
-
-        return quantileModel;
     }
 
     private double[] calculateR() {
