@@ -1,13 +1,16 @@
 package io.sugo.pio.server.rfm;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.common.utils.HttpClientUtil;
+import io.sugo.pio.data.fetcher.DataFetcherConfig;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,9 +21,15 @@ public class RFMManager {
 
     private static final ObjectMapper jsonMapper = new ObjectMapper();
 
-    private static final ObjectReader reader = jsonMapper.readerFor(Result.class);
+    private static final JavaType javaType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, DruidResult.class);
 
-    private static final String QUERY_URI = "/api/plyql/sql";
+    private final String queryUrl = "http://192.168.0.212:8082/druid/v2?pretty";
+
+    /*@Inject
+    public RFMManager(DataFetcherConfig config) {
+        Preconditions.checkNotNull(config.getUrl(), "must specify parameter: pio.broker.data.fetcher.url");
+        queryUrl = config.getUrl();
+    }*/
 
     public QuantileModel getDefaultQuantileModel(String host, String queryStr, int r, int f, int m) {
         List<RFMModel> rfmModelList = fetchData(host, queryStr);
@@ -47,17 +56,17 @@ public class RFMManager {
     public QuantileModel getCustomizedQuantileModel(String host, String queryStr, double[] rq, double[] fq, double[] mq) {
         List<RFMModel> rfmModelList = fetchData(host, queryStr);
         int dataSize = rfmModelList.size();
-        if (rq.length+1 > dataSize) {
+        if (rq.length + 1 > dataSize) {
             throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
-                    rq.length+1 + ". 'R' must be not greater than data size.");
+                    rq.length + 1 + ". 'R' must be not greater than data size.");
         }
-        if (fq.length+1 > dataSize) {
+        if (fq.length + 1 > dataSize) {
             throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'F' parameter is: " +
-                    fq.length+1 + ". 'F' must be not greater than data size.");
+                    fq.length + 1 + ". 'F' must be not greater than data size.");
         }
-        if (mq.length+1 > dataSize) {
+        if (mq.length + 1 > dataSize) {
             throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'M' parameter is: " +
-                    mq.length+1 + ". 'M' must be not greater than data size.");
+                    mq.length + 1 + ". 'M' must be not greater than data size.");
         }
 
         CustomizedQuantileCalculator calculator = new CustomizedQuantileCalculator(rfmModelList, rq, fq, mq);
@@ -67,75 +76,56 @@ public class RFMManager {
     }
 
     private List<RFMModel> fetchData(String host, String queryStr) {
-        String url = buildUrl(host);
-        String requestJson = buildQuery(queryStr);
         String resultStr = "";
         try {
-            resultStr = HttpClientUtil.post(url, requestJson);
+            resultStr = HttpClientUtil.post(queryUrl, queryStr);
         } catch (IOException e) {
-            log.error("Query druid '%s' with parameter '%s' failed: ", url, requestJson);
+            log.error("Query druid '%s' with parameter '%s' failed: ", queryUrl, queryStr);
         }
 
-        List<RFMModel> rfmModelList = new ArrayList<>();
+        final List<RFMModel> rfmModelList = new ArrayList<>();
         try {
-            Result result = reader.readValue(resultStr);
-            rfmModelList = result.getResult();
+            List<DruidResult> druidResults = jsonMapper.readValue(resultStr, javaType);
+            druidResults.forEach(druidResult -> {
+                rfmModelList.add(druidResult.getEvent());
+            });
+
+            log.info("Fetch %d RFM data from druid %s.", druidResults.size(), queryUrl);
         } catch (IOException e) {
-            log.warn("Deserialize '" + resultStr + "' to type [" + RFMModel.class.getName() +
+            log.warn("Deserialize druid result to type [" + DruidResult.class.getName() +
                     "] list failed, details:" + e.getMessage());
         }
-
-        log.info("Fetch %d RFM data from druid.", rfmModelList.size());
 
         return rfmModelList;
     }
 
-    private String buildQuery(String queryStr) {
-        Query query = new Query();
-        query.setQuery(queryStr);
+    private static class DruidResult {
+        String version;
+        Date timestamp;
+        RFMModel event;
 
-        try {
-            return jsonMapper.writeValueAsString(query);
-        } catch (JsonProcessingException e) {
-            log.error("Deserialize query failed: ", e);
-            return null;
-        }
-    }
-
-    private String buildUrl(String host) {
-        return "http://" + host + QUERY_URI;
-    }
-
-    private static class Query {
-        String query;
-
-        public String getQuery() {
-            return query;
+        public String getVersion() {
+            return version;
         }
 
-        public void setQuery(String query) {
-            this.query = query;
-        }
-    }
-
-    private static class Result {
-        List<RFMModel> result;
-        int code;
-
-        public List<RFMModel> getResult() {
-            return result;
+        public void setVersion(String version) {
+            this.version = version;
         }
 
-        public void setResult(List<RFMModel> result) {
-            this.result = result;
+        public Date getTimestamp() {
+            return timestamp;
         }
 
-        public int getCode() {
-            return code;
+        public void setTimestamp(Date timestamp) {
+            this.timestamp = timestamp;
         }
 
-        public void setCode(int code) {
-            this.code = code;
+        public RFMModel getEvent() {
+            return event;
+        }
+
+        public void setEvent(RFMModel event) {
+            this.event = event;
         }
     }
 

@@ -6,7 +6,9 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Command;
+import io.sugo.pio.data.fetcher.DataFetcherConfig;
 import io.sugo.pio.guice.Jerseys;
+import io.sugo.pio.guice.JsonConfigProvider;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
 import io.sugo.pio.server.http.DrainPrediction;
@@ -40,6 +42,8 @@ public class CliProcess extends ServerRunnable {
                     public void configure(Binder binder) {
                         binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_NAME)).to(CliConst.PROCESS_NAME);
                         binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.PROCESS_PORT);
+
+                        JsonConfigProvider.bind(binder, "pio.broker.data.fetcher", DataFetcherConfig.class);
 
                         Jerseys.addResource(binder, ProcessResource.class);
                         Jerseys.addResource(binder, OperatorResource.class);

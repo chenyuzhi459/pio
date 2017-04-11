@@ -34,26 +34,24 @@ public class QuantileModel {
     /**
      * The quantile of recency
      */
-    @JsonProperty
     private double[] rq;
 
     /**
      * The quantile of frequency
      */
-    @JsonProperty
     private double[] fq;
 
     /**
      * The quantile of monetary
      */
-    @JsonProperty
     private double[] mq;
 
-    @JsonProperty
+    private double[][] rRanges;
+    private double[][] fRanges;
+    private double[][] mRanges;
+
     private String[] rLabels;
-    @JsonProperty
     private String[] fLabels;
-    @JsonProperty
     private String[] mLabels;
 
     @JsonProperty
@@ -132,9 +130,76 @@ public class QuantileModel {
             group.setUserCount(entry.getValue());
             group.setUserPercent(Double.valueOf(df.format(entry.getValue() * 100.0d / totalUsers)) + "%");
             group.setUserIdList(groupUserIdsMap.get(entry.getKey()));
+            group.setrRange(getrRanges(group.getRGroupIndex()));
+            group.setfRange(getfRanges(group.getFGroupIndex()));
+            group.setmRange(getmRanges(group.getMGroupIndex()));
 
             groups.add(group);
         });
+    }
+
+    public double[] getrRanges(int groupIndex) {
+        if (rRanges == null) {
+            initRanges(RFMModel.R);
+        }
+
+        return rRanges[groupIndex-1];
+    }
+
+    public double[] getfRanges(int groupIndex) {
+        if (fRanges == null) {
+            initRanges(RFMModel.F);
+        }
+
+        return fRanges[groupIndex-1];
+    }
+
+    public double[] getmRanges(int groupIndex) {
+        if (mRanges == null) {
+            initRanges(RFMModel.M);
+        }
+
+        return mRanges[groupIndex-1];
+    }
+
+    public void initRanges(int dimension) {
+        double[] q = null;
+        double[][] ranges = null;
+        switch (dimension) {
+            case RFMModel.R:
+                q = rq;
+                ranges = new double[rq.length + 1][];
+                rRanges = ranges;
+                break;
+            case RFMModel.F:
+                q = fq;
+                ranges = new double[fq.length + 1][];
+                fRanges = ranges;
+                break;
+            case RFMModel.M:
+                q = mq;
+                ranges = new double[mq.length + 1][];
+                mRanges = ranges;
+                break;
+        }
+
+        for (int i = 0; i <= q.length; i++) {
+            if (i == 0) {
+                double[] range = new double[2];
+                range[0] = 0;
+                range[1] = q[0];
+                ranges[0] = range;
+            } else if (i == q.length) {
+                double[] range = new double[1];
+                range[0] = q[q.length - 1];
+                ranges[q.length] = range;
+            } else {
+                double[] range = new double[2];
+                range[0] = q[i - 1];
+                range[1] = q[i];
+                ranges[i] = range;
+            }
+        }
     }
 
     public int getR() {

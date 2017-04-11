@@ -11,7 +11,6 @@ public class RFMGroup {
     /**
      * The name of this group
      */
-    @JsonProperty
     private String name;
 
     /**
@@ -31,6 +30,13 @@ public class RFMGroup {
      */
     @JsonProperty
     private List<String> userIdList;
+
+    @JsonProperty("R")
+    private double[] rRange;
+    @JsonProperty("F")
+    private double[] fRange;
+    @JsonProperty("M")
+    private double[] mRange;
 
     public String getName() {
         return name;
@@ -62,6 +68,42 @@ public class RFMGroup {
 
     public void setUserIdList(List<String> userIdList) {
         this.userIdList = userIdList;
+    }
+
+    public double[] getrRange() {
+        return rRange;
+    }
+
+    public void setrRange(double[] rRange) {
+        this.rRange = rRange;
+    }
+
+    public double[] getfRange() {
+        return fRange;
+    }
+
+    public void setfRange(double[] fRange) {
+        this.fRange = fRange;
+    }
+
+    public double[] getmRange() {
+        return mRange;
+    }
+
+    public void setmRange(double[] mRange) {
+        this.mRange = mRange;
+    }
+
+    public int getRGroupIndex() {
+        return Integer.valueOf(this.name.split(":")[0].substring(1));
+    }
+
+    public int getFGroupIndex() {
+        return Integer.valueOf(this.name.split(":")[1].substring(1));
+    }
+
+    public int getMGroupIndex() {
+        return Integer.valueOf(this.name.split(":")[2].substring(1));
     }
 
     @Override

@@ -18,6 +18,9 @@ public class DataFetcherConfig {
     @JsonProperty
     private boolean clusterMode;
 
+    @JsonProperty
+    private String url;
+
     public String getHostAndPorts() {
         return hostAndPorts;
     }
@@ -40,6 +43,14 @@ public class DataFetcherConfig {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public Set<HostAndPort> getNodes() {

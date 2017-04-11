@@ -3,7 +3,6 @@ package io.sugo.pio.server.http;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import com.metamx.common.logger.Logger;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.server.http.dto.CustomizedRFMDto;
 import io.sugo.pio.server.http.dto.DefaultRFMDto;
@@ -19,8 +18,6 @@ import javax.ws.rs.core.Response;
 
 @Path("/pio/process/rfm/")
 public class RFMResource {
-
-    private static final Logger log = new Logger(RFMResource.class);
 
     private final RFMManager rfmManager;
 
@@ -39,13 +36,12 @@ public class RFMResource {
     public Response slice(DefaultRFMDto rfmDto) {
         check(rfmDto);
         try {
-            String queryStr = rfmDto.getQuery();
+            String queryStr = rfmDto.buildQuery();
             QuantileModel quantileModel = rfmManager.getDefaultQuantileModel(rfmDto.getHost(), queryStr,
                     rfmDto.getR(), rfmDto.getF(), rfmDto.getM());
-
-            return Response.ok(quantileModel).build();
+            return Response.ok(quantileModel).header("Access-Control-Allow-Origin", "*").build();
         } catch (Throwable e) {
-            return Response.serverError().entity(e.getMessage()).build();
+            return Response.serverError().entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build();
         }
     }
 
@@ -60,9 +56,9 @@ public class RFMResource {
             QuantileModel quantileModel = rfmManager.getCustomizedQuantileModel(rfmDto.getHost(), queryStr,
                     rfmDto.getRq(), rfmDto.getFq(), rfmDto.getMq());
 
-            return Response.ok(quantileModel).build();
+            return Response.ok(quantileModel).header("Access-Control-Allow-Origin", "*").build();
         } catch (Throwable e) {
-            return Response.serverError().entity(e.getMessage()).build();
+            return Response.serverError().entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build();
         }
     }
 
