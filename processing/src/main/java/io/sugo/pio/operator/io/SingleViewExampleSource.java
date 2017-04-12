@@ -279,7 +279,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
         String param = getParameterAsString(PARAMETER_PARAM);
         String url = getParameterAsString(PARAMETER_URL);
-        if (!url.startsWith("http")) {
+        if (!Strings.isNullOrEmpty(url) && !url.startsWith("http")) {
             url = "http://" + url;
         }
 

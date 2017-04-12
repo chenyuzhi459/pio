@@ -9,11 +9,11 @@ public class CustomizedRFMDto extends RFMDto {
     private RFM params;
 
     private static class RFM {
-        @JsonProperty("RQ")
+        @JsonProperty("R")
         double[] rq;
-        @JsonProperty("FQ")
+        @JsonProperty("F")
         double[] fq;
-        @JsonProperty("MQ")
+        @JsonProperty("M")
         double[] mq;
 
         public double[] getRq() {

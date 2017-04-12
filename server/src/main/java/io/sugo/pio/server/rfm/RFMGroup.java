@@ -2,6 +2,7 @@ package io.sugo.pio.server.rfm;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class RFMGroup {
      * The user id list that belong to this group
      */
     @JsonProperty
-    private List<String> userIdList;
+    private List<String> userIdList = Collections.emptyList();
 
     @JsonProperty("R")
     private double[] rRange;

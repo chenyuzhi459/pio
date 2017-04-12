@@ -183,7 +183,7 @@ public class ProcessManager {
     }
 
     public OperatorProcess cloneCase(String tenantId, String caseId) {
-        OperatorProcess originCase = getFromCache(caseId);
+        OperatorProcess originCase = metadataProcessManager.get(caseId, false);
         Preconditions.checkNotNull(originCase, I18N.getMessage("pio.error.process.not_found_case"), caseId);
 
         OperatorProcess newProcess = new OperatorProcess(originCase.getName());
@@ -191,7 +191,8 @@ public class ProcessManager {
         newProcess.setDescription("Created by case " + originCase.getName());
         newProcess.setBuiltIn(ProcessConstant.BuiltIn.NO);
         newProcess.setIsTemplate(ProcessConstant.IsTemplate.NO);
-        newProcess.setIsCase(ProcessConstant.IsCase.YES);
+        newProcess.setIsCase(ProcessConstant.IsCase.NO);
+        newProcess.setType(originCase.getId());
 
         cloneProcess(newProcess, originCase);
         log.info("Create case of tenantId[%s] with origin case[%s] successfully.", tenantId, originCase.getName());

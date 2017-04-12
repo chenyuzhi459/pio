@@ -68,6 +68,19 @@ public class QuantileModel {
         initGroup();
     }
 
+    public static QuantileModel emptyModel(int r, int f, int m) {
+        return new QuantileModel(r, f, m);
+    }
+
+    public static QuantileModel emptyModel(double[] rq, double[] fq, double[] mq) {
+        QuantileModel model = new QuantileModel(0, 0, 0);
+        model.setRq(rq);
+        model.setFq(fq);
+        model.setMq(mq);
+
+        return model;
+    }
+
     private void initLabels(int r, int f, int m) {
         rLabels = new String[r];
         fLabels = new String[f];
@@ -129,7 +142,9 @@ public class QuantileModel {
             group.setName(entry.getKey());
             group.setUserCount(entry.getValue());
             group.setUserPercent(Double.valueOf(df.format(entry.getValue() * 100.0d / totalUsers)) + "%");
-            group.setUserIdList(groupUserIdsMap.get(entry.getKey()));
+            if (groupUserIdsMap.get(entry.getKey()) != null) {
+                group.setUserIdList(groupUserIdsMap.get(entry.getKey()));
+            }
             group.setrRange(getrRanges(group.getRGroupIndex()));
             group.setfRange(getfRanges(group.getFGroupIndex()));
             group.setmRange(getmRanges(group.getMGroupIndex()));

@@ -13,6 +13,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Base64;
 
 @Path("/pio/process/rfm/")
 public class RFMResource {
@@ -32,10 +33,12 @@ public class RFMResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response slice(@PathParam("param") final String param) {
+        String newParam = new String(Base64.getDecoder().decode(param));
         DefaultRFMDto rfmDto = null;
         try {
-            rfmDto = jsonMapper.readValue(param, DefaultRFMDto.class);
-        } catch (IOException ignore) { }
+            rfmDto = jsonMapper.readValue(newParam, DefaultRFMDto.class);
+        } catch (IOException ignore) {
+        }
 
         check(rfmDto);
         try {
@@ -53,10 +56,12 @@ public class RFMResource {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response sliceCustomized(@PathParam("param") final String param) {
+        String newParam = new String(Base64.getDecoder().decode(param));
         CustomizedRFMDto rfmDto = null;
         try {
-            rfmDto = jsonMapper.readValue(param, CustomizedRFMDto.class);
-        } catch (IOException ignore) { }
+            rfmDto = jsonMapper.readValue(newParam, CustomizedRFMDto.class);
+        } catch (IOException ignore) {
+        }
 
         check(rfmDto);
         try {

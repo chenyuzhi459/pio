@@ -35,16 +35,19 @@ public class RFMManager {
         List<RFMModel> rfmModelList = fetchData(queryStr);
         int dataSize = rfmModelList.size();
         if (r > dataSize) {
-            throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
+            log.warn("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
                     r + ". 'R' must be not greater than data size.");
+            return QuantileModel.emptyModel(r, f, m);
         }
         if (f > dataSize) {
-            throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'F' parameter is: " +
+            log.warn("The total data size is: " + dataSize + ", but the 'F' parameter is: " +
                     f + ". 'F' must be not greater than data size.");
+            return QuantileModel.emptyModel(r, f, m);
         }
         if (m > dataSize) {
-            throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'M' parameter is: " +
+            log.warn("The total data size is: " + dataSize + ", but the 'M' parameter is: " +
                     m + ". 'M' must be not greater than data size.");
+            return QuantileModel.emptyModel(r, f, m);
         }
 
         DefaultQuantileCalculator calculator = new DefaultQuantileCalculator(rfmModelList, r, f, m);
@@ -57,16 +60,19 @@ public class RFMManager {
         List<RFMModel> rfmModelList = fetchData(queryStr);
         int dataSize = rfmModelList.size();
         if (rq.length + 1 > dataSize) {
-            throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
+            log.warn("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
                     rq.length + 1 + ". 'R' must be not greater than data size.");
+            return QuantileModel.emptyModel(rq, fq, mq);
         }
         if (fq.length + 1 > dataSize) {
-            throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'F' parameter is: " +
+            log.warn("The total data size is: " + dataSize + ", but the 'F' parameter is: " +
                     fq.length + 1 + ". 'F' must be not greater than data size.");
+            return QuantileModel.emptyModel(rq, fq, mq);
         }
         if (mq.length + 1 > dataSize) {
-            throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'M' parameter is: " +
+            log.warn("The total data size is: " + dataSize + ", but the 'M' parameter is: " +
                     mq.length + 1 + ". 'M' must be not greater than data size.");
+            return QuantileModel.emptyModel(rq, fq, mq);
         }
 
         CustomizedQuantileCalculator calculator = new CustomizedQuantileCalculator(rfmModelList, rq, fq, mq);
@@ -78,7 +84,7 @@ public class RFMManager {
     private List<RFMModel> fetchData(String queryStr) {
         String resultStr = "";
         try {
-            log.info("Begin to fetch RFM data from url: %s", queryUrl);
+            log.info("Begin to fetch RFM data from url: [%s], params: [%s].", queryUrl, queryStr);
             resultStr = HttpClientUtil.post(queryUrl, queryStr);
         } catch (IOException e) {
             log.error("Query druid '%s' with parameter '%s' failed: ", queryUrl, queryStr);
