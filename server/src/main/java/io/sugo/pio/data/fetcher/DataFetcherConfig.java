@@ -68,7 +68,7 @@ public class DataFetcherConfig {
 
     @Override
     public String toString() {
-        return String.format("%s {hostAndPorts=%s, clusterMode=%s}",
-                DataFetcherConfig.class.getSimpleName(), hostAndPorts, clusterMode);
+        return String.format("%s {hostAndPorts=%s, clusterMode=%s, url=%s}",
+                DataFetcherConfig.class.getSimpleName(), hostAndPorts, clusterMode, url);
     }
 }

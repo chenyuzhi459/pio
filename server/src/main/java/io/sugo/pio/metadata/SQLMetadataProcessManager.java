@@ -75,7 +75,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                     public OperatorProcess withHandle(Handle handle) throws Exception {
 
                         StringBuilder builder = new StringBuilder();
-                        builder.append("SELECT id, tenant_id, name, description, status, type, is_template, created_date, update_date, operators, connections ")
+                        builder.append("SELECT id, tenant_id, name, description, status, type, is_template, is_case, created_date, update_date, operators, connections ")
                                 .append(" FROM %1$s ")
                                 .append(" WHERE id = :id ");
                         if (!includeDelete) {
@@ -110,6 +110,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     }
                                     process.setTenantId(r.getString("tenant_id"));
                                     process.setIsTemplate(r.getInt("is_template"));
+                                    process.setIsCase(r.getInt("is_case"));
                                     process.setDescription(r.getString("description"));
                                     process.setStatus(Status.valueOf(r.getString("status")));
                                     process.setType(r.getString("type"));
@@ -132,19 +133,22 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
     }
 
     @Override
-    public List<OperatorProcess> getAll(String tenantId, boolean includeDelete, int builtIn, Integer isTemplate, String type) {
+    public List<OperatorProcess> getAll(String tenantId, boolean includeDelete, int builtIn, Integer isTemplate, Integer isCase, String type) {
         return dbi.withHandle(
                 new HandleCallback<List<OperatorProcess>>() {
                     @Override
                     public List<OperatorProcess> withHandle(Handle handle) throws Exception {
 
                         StringBuilder builder = new StringBuilder();
-                        builder.append("SELECT id, tenant_id, name, description, status, type, is_template, created_date, update_date, operators, connections ")
+                        builder.append("SELECT id, tenant_id, name, description, status, type, is_template, is_case, created_date, update_date, operators, connections ")
                                 .append(" FROM %1$s ")
                                 .append(" WHERE 1 = 1 ");
                         builder.append(" AND built_in = :builtIn");
                         if (isTemplate != null) {
                             builder.append(" AND is_template = :isTemplate");
+                        }
+                        if (isCase != null) {
+                            builder.append(" AND is_case = :isCase");
                         }
                         if (!Strings.isNullOrEmpty(tenantId)) {
                             builder.append(" AND tenant_id = :tenantId");
@@ -162,6 +166,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                         query.bind("builtIn", builtIn);
                         if (isTemplate != null) {
                             query.bind("isTemplate", isTemplate);
+                        }
+                        if (isCase != null) {
+                            query.bind("isCase", isCase);
                         }
                         if (!Strings.isNullOrEmpty(tenantId)) {
                             query.bind("tenantId", tenantId);
@@ -192,6 +199,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     }
                                     process.setTenantId(r.getString("tenant_id"));
                                     process.setIsTemplate(r.getInt("is_template"));
+                                    process.setIsCase(r.getInt("is_case"));
                                     process.setDescription(r.getString("description"));
                                     process.setStatus(Status.valueOf(r.getString("status")));
                                     process.setType(r.getString("type"));
@@ -233,8 +241,8 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                         public Void withHandle(Handle handle) throws Exception {
                             handle.createStatement(
                                     String.format(
-                                            "INSERT INTO %s (id, tenant_id, type, built_in, is_template, name, description, status, created_date, update_date, operators, connections) " +
-                                                    " VALUES (:id, :tenant_id, :type, :built_in, :is_template, :name, :description, :status, :created_date, :update_date, :operators, :connections)",
+                                            "INSERT INTO %s (id, tenant_id, type, built_in, is_template, is_case, name, description, status, created_date, update_date, operators, connections) " +
+                                                    " VALUES (:id, :tenant_id, :type, :built_in, :is_template, :is_case, :name, :description, :status, :created_date, :update_date, :operators, :connections)",
                                             getTableName()
                                     )
                             )
@@ -243,6 +251,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     .bind("type", process.getType())
                                     .bind("built_in", process.getBuiltIn())
                                     .bind("is_template", process.getIsTemplate())
+                                    .bind("is_case", process.getIsCase())
                                     .bind("name", process.getName())
                                     .bind("description", process.getDescription())
                                     .bind("status", process.getStatus().name())

@@ -19,6 +19,11 @@ public class ProcessConstant {
         public static final int YES = 1;
     }
 
+    public interface IsCase {
+        public static final int NO = 0;
+        public static final int YES = 1;
+    }
+
     public interface OperatorType {
         public static final String DatabaseDataReader = "db_data_reader";
         public static final String AttributeFilter = "select_attributes";

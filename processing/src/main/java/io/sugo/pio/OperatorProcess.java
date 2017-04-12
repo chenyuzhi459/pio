@@ -37,6 +37,10 @@ public class OperatorProcess {
      */
     private int isTemplate = ProcessConstant.IsTemplate.NO;
     /**
+     * Indicates is it a case process
+     */
+    private int isCase = ProcessConstant.IsCase.NO;
+    /**
      * The type of this process
      */
     private String type;
@@ -141,6 +145,14 @@ public class OperatorProcess {
 
     public void setIsTemplate(int isTemplate) {
         this.isTemplate = isTemplate;
+    }
+
+    public int getIsCase() {
+        return isCase;
+    }
+
+    public void setIsCase(int isCase) {
+        this.isCase = isCase;
     }
 
     @JsonProperty

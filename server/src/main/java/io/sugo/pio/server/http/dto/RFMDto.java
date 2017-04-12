@@ -13,8 +13,6 @@ public class RFMDto {
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
-    private String host;
-
     private String datasource;
 
     private ColumnName scene;
@@ -60,14 +58,6 @@ public class RFMDto {
         public void setDate(String date) {
             this.date = date;
         }
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
     }
 
     public String getDatasource() {

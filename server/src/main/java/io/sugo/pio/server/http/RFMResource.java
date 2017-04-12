@@ -9,12 +9,10 @@ import io.sugo.pio.server.http.dto.DefaultRFMDto;
 import io.sugo.pio.server.rfm.QuantileModel;
 import io.sugo.pio.server.rfm.RFMManager;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 @Path("/pio/process/rfm/")
 public class RFMResource {
@@ -29,15 +27,20 @@ public class RFMResource {
         this.rfmManager = rfmManager;
     }
 
-    @POST
-    @Path("/slice/default")
+    @GET
+    @Path("/slice/default/{param}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response slice(DefaultRFMDto rfmDto) {
+    public Response slice(@PathParam("param") final String param) {
+        DefaultRFMDto rfmDto = null;
+        try {
+            rfmDto = jsonMapper.readValue(param, DefaultRFMDto.class);
+        } catch (IOException ignore) { }
+
         check(rfmDto);
         try {
             String queryStr = rfmDto.buildQuery();
-            QuantileModel quantileModel = rfmManager.getDefaultQuantileModel(rfmDto.getHost(), queryStr,
+            QuantileModel quantileModel = rfmManager.getDefaultQuantileModel(queryStr,
                     rfmDto.getR(), rfmDto.getF(), rfmDto.getM());
             return Response.ok(quantileModel).header("Access-Control-Allow-Origin", "*").build();
         } catch (Throwable e) {
@@ -45,15 +48,20 @@ public class RFMResource {
         }
     }
 
-    @POST
-    @Path("/slice/customized")
+    @GET
+    @Path("/slice/customized/{param}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response sliceCustomized(CustomizedRFMDto rfmDto) {
+    public Response sliceCustomized(@PathParam("param") final String param) {
+        CustomizedRFMDto rfmDto = null;
+        try {
+            rfmDto = jsonMapper.readValue(param, CustomizedRFMDto.class);
+        } catch (IOException ignore) { }
+
         check(rfmDto);
         try {
             String queryStr = rfmDto.getQuery();
-            QuantileModel quantileModel = rfmManager.getCustomizedQuantileModel(rfmDto.getHost(), queryStr,
+            QuantileModel quantileModel = rfmManager.getCustomizedQuantileModel(queryStr,
                     rfmDto.getRq(), rfmDto.getFq(), rfmDto.getMq());
 
             return Response.ok(quantileModel).header("Access-Control-Allow-Origin", "*").build();
@@ -63,7 +71,6 @@ public class RFMResource {
     }
 
     private void check(DefaultRFMDto rfmDto) {
-        Preconditions.checkNotNull(rfmDto.getHost(), "Host can not be null.");
         Preconditions.checkNotNull(rfmDto.getDatasource(), "Data source can not be null.");
         if (rfmDto.getR() <= 0) {
             throw new IllegalArgumentException("'R' must be greater than 0.");
@@ -77,7 +84,6 @@ public class RFMResource {
     }
 
     private void check(CustomizedRFMDto rfmDto) {
-        Preconditions.checkNotNull(rfmDto.getHost(), "Host can not be null.");
         Preconditions.checkNotNull(rfmDto.getDatasource(), "Data source can not be null.");
         if (rfmDto.getRq().length <= 0) {
             throw new IllegalArgumentException("'RQ' must be at least contains one element.");

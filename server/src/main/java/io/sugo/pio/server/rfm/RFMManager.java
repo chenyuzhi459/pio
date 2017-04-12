@@ -23,16 +23,16 @@ public class RFMManager {
 
     private static final JavaType javaType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, DruidResult.class);
 
-    private final String queryUrl = "http://192.168.0.212:8082/druid/v2?pretty";
+    private final String queryUrl;
 
-    /*@Inject
+    @Inject
     public RFMManager(DataFetcherConfig config) {
         Preconditions.checkNotNull(config.getUrl(), "must specify parameter: pio.broker.data.fetcher.url");
         queryUrl = config.getUrl();
-    }*/
+    }
 
-    public QuantileModel getDefaultQuantileModel(String host, String queryStr, int r, int f, int m) {
-        List<RFMModel> rfmModelList = fetchData(host, queryStr);
+    public QuantileModel getDefaultQuantileModel(String queryStr, int r, int f, int m) {
+        List<RFMModel> rfmModelList = fetchData(queryStr);
         int dataSize = rfmModelList.size();
         if (r > dataSize) {
             throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
@@ -53,8 +53,8 @@ public class RFMManager {
         return quantileModel;
     }
 
-    public QuantileModel getCustomizedQuantileModel(String host, String queryStr, double[] rq, double[] fq, double[] mq) {
-        List<RFMModel> rfmModelList = fetchData(host, queryStr);
+    public QuantileModel getCustomizedQuantileModel(String queryStr, double[] rq, double[] fq, double[] mq) {
+        List<RFMModel> rfmModelList = fetchData(queryStr);
         int dataSize = rfmModelList.size();
         if (rq.length + 1 > dataSize) {
             throw new IllegalArgumentException("The total data size is: " + dataSize + ", but the 'R' parameter is: " +
@@ -75,9 +75,10 @@ public class RFMManager {
         return quantileModel;
     }
 
-    private List<RFMModel> fetchData(String host, String queryStr) {
+    private List<RFMModel> fetchData(String queryStr) {
         String resultStr = "";
         try {
+            log.info("Begin to fetch RFM data from url: %s", queryUrl);
             resultStr = HttpClientUtil.post(queryUrl, queryStr);
         } catch (IOException e) {
             log.error("Query druid '%s' with parameter '%s' failed: ", queryUrl, queryStr);

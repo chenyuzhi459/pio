@@ -140,14 +140,16 @@ public class ProcessManager {
     }
 
     public OperatorProcess create(String tenantId, String name, String description) {
-        return create(tenantId, name, description, null);
+        return create(tenantId, name, description, null, ProcessConstant.IsTemplate.NO, ProcessConstant.IsCase.NO);
     }
 
-    public OperatorProcess create(String tenantId, String name, String description, String type) {
+    public OperatorProcess create(String tenantId, String name, String description, String type, int isTemplate, int isCase) {
         OperatorProcess process = new OperatorProcess(name);
         process.setTenantId(tenantId);
         process.setDescription(description);
         process.setType(type);
+        process.setIsTemplate(isTemplate);
+        process.setIsCase(isCase);
         processCache.put(process.getId(), process);
         metadataProcessManager.insert(process);
 
@@ -174,42 +176,25 @@ public class ProcessManager {
         newProcess.setBuiltIn(ProcessConstant.BuiltIn.YES);
         newProcess.setIsTemplate(ProcessConstant.IsTemplate.NO);
 
-        try {
-            // Deep clone root operator
-            ProcessRootOperator root = jsonMapper.readValue(
-                    jsonMapper.writeValueAsBytes(template.getRootOperator()),
-                    new TypeReference<ProcessRootOperator>() {
-                    }
-            );
-
-            /*root.getExecutionUnit().getOperators().forEach(operator -> {
-                newProcess.registerName(operator.getName(), operator);
-            });*/
-//            root.setProcess(newProcess);
-            newProcess.setRootOperator(root);
-            /*newProcess.getRootOperator().setExecUnits(root.getExecUnits());
-            newProcess.getRootOperator().setStatus(root.getStatus());
-            root.getExecutionUnit().getOperators().forEach(operator -> {
-                newProcess.registerName(operator.getName(), operator);
-            });*/
-
-            // Deep clone connections
-            byte[] cBytes = jsonMapper.writeValueAsBytes(template.getConnections());
-            if (cBytes != null & cBytes.length > 0) {
-                Set<Connection> connections = jsonMapper.readValue(cBytes,
-                        new TypeReference<Set<Connection>>() {
-                        }
-                );
-                newProcess.setConnections(connections);
-            }
-        } catch (IOException e) {
-            log.error("Deep clone operators or connections failed.", e);
-        }
-
-        processCache.put(newProcess.getId(), newProcess);
-        metadataProcessManager.insert(newProcess);
-
+        cloneProcess(newProcess, template);
         log.info("Create process of tenantId[%s] with template of type[%s] successfully.", tenantId, type);
+
+        return newProcess;
+    }
+
+    public OperatorProcess cloneCase(String tenantId, String caseId) {
+        OperatorProcess originCase = getFromCache(caseId);
+        Preconditions.checkNotNull(originCase, I18N.getMessage("pio.error.process.not_found_case"), caseId);
+
+        OperatorProcess newProcess = new OperatorProcess(originCase.getName());
+        newProcess.setTenantId(tenantId);
+        newProcess.setDescription("Created by case " + originCase.getName());
+        newProcess.setBuiltIn(ProcessConstant.BuiltIn.NO);
+        newProcess.setIsTemplate(ProcessConstant.IsTemplate.NO);
+        newProcess.setIsCase(ProcessConstant.IsCase.YES);
+
+        cloneProcess(newProcess, originCase);
+        log.info("Create case of tenantId[%s] with origin case[%s] successfully.", tenantId, originCase.getName());
 
         return newProcess;
     }
@@ -286,19 +271,30 @@ public class ProcessManager {
      * Get all processes include template, and exclude built-in processes from database.
      *
      * @param tenantId tenant id of the company
-     * @param all      indicates is include 'DELETED' status processes
+     * @param includeDelete indicates is include 'DELETED' status processes
      * @return process list
      */
-    public List<OperatorProcess> getAll(String tenantId, boolean all) {
-        return getAll(tenantId, all, ProcessConstant.BuiltIn.NO, null);
+    public List<OperatorProcess> getAll(String tenantId, boolean includeDelete) {
+        return getAll(tenantId, includeDelete, ProcessConstant.BuiltIn.NO, null);
     }
 
-    public List<OperatorProcess> getAll(String tenantId, boolean all, int builtIn, String type) {
-        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, all, builtIn, null, type);
+    public List<OperatorProcess> getAll(String tenantId, boolean includeDelete, int builtIn, String type) {
+        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, includeDelete, builtIn, null, null, type);
         if (processes == null || processes.isEmpty()) {
             return new ArrayList<>();
         }
         log.info("Get all processes[number:%d] from database successfully.", processes.size());
+
+        return processes;
+    }
+
+    public List<OperatorProcess> getAllCases(boolean includeDelete) {
+        List<OperatorProcess> processes = metadataProcessManager.getAll(null, includeDelete, ProcessConstant.BuiltIn.NO,
+                null, ProcessConstant.IsCase.YES, null);
+        if (processes == null || processes.isEmpty()) {
+            return new ArrayList<>();
+        }
+        log.info("Get all cases[number:%d] from database successfully.", processes.size());
 
         return processes;
     }
@@ -317,14 +313,14 @@ public class ProcessManager {
      * Get process by id and status 'DELETED' from cache
      *
      * @param id  process id
-     * @param all true:include 'DELETED' process
+     * @param includeDelete true:include 'DELETED' process
      * @return specified process
      */
-    public OperatorProcess getFromCache(String id, boolean all) {
+    public OperatorProcess getFromCache(String id, boolean includeDelete) {
         loader.setProcessId(id);
         try {
             OperatorProcess process = processCache.get(id, loader);
-            if (process == null || (!all && Status.DELETED.equals(process.getStatus()))) {
+            if (process == null || (!includeDelete && Status.DELETED.equals(process.getStatus()))) {
                 processCache.invalidate(id);
                 return null;
             }
@@ -357,7 +353,7 @@ public class ProcessManager {
 
     public OperatorProcess get(String tenantId, int builtIn, String type) {
         List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, false,
-                builtIn, ProcessConstant.IsTemplate.NO, type);
+                builtIn, ProcessConstant.IsTemplate.NO, null, type);
         if (processes == null || processes.isEmpty()) {
             return null;
         }
@@ -385,7 +381,7 @@ public class ProcessManager {
      */
     public OperatorProcess getTemplate(String type) {
         List<OperatorProcess> processes = metadataProcessManager.getAll(null, false,
-                ProcessConstant.BuiltIn.NO, ProcessConstant.IsTemplate.YES, type);
+                ProcessConstant.BuiltIn.NO, ProcessConstant.IsTemplate.YES, null, type);
         if (processes == null || processes.isEmpty()) {
             return null;
         }
@@ -575,5 +571,46 @@ public class ProcessManager {
                 process.getName(), id);
 
         return process;
+    }
+
+    private OperatorProcess cloneProcess(OperatorProcess newProcess, OperatorProcess originProcess) {
+        try {
+            // Deep clone root operator
+            ProcessRootOperator root = jsonMapper.readValue(
+                    jsonMapper.writeValueAsBytes(originProcess.getRootOperator()),
+                    new TypeReference<ProcessRootOperator>() {
+                    }
+            );
+
+            /*root.getExecutionUnit().getOperators().forEach(operator -> {
+                newProcess.registerName(operator.getName(), operator);
+            });*/
+//            root.setProcess(newProcess);
+            newProcess.setRootOperator(root);
+            /*newProcess.getRootOperator().setExecUnits(root.getExecUnits());
+            newProcess.getRootOperator().setStatus(root.getStatus());
+            root.getExecutionUnit().getOperators().forEach(operator -> {
+                newProcess.registerName(operator.getName(), operator);
+            });*/
+
+            // Deep clone connections
+            byte[] cBytes = jsonMapper.writeValueAsBytes(originProcess.getConnections());
+            if (cBytes != null & cBytes.length > 0) {
+                Set<Connection> connections = jsonMapper.readValue(cBytes,
+                        new TypeReference<Set<Connection>>() {
+                        }
+                );
+                newProcess.setConnections(connections);
+            }
+        } catch (IOException e) {
+            log.error("Deep clone operators or connections failed.", e);
+        }
+
+        processCache.put(newProcess.getId(), newProcess);
+        metadataProcessManager.insert(newProcess);
+
+        log.info("Clone process['%s] from origin process[%s] successfully.", newProcess.getId(), originProcess.getName());
+
+        return newProcess;
     }
 }
