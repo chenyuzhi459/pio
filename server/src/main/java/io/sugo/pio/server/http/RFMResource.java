@@ -65,7 +65,7 @@ public class RFMResource {
 
         check(rfmDto);
         try {
-            String queryStr = rfmDto.getQuery();
+            String queryStr = rfmDto.buildQuery();
             QuantileModel quantileModel = rfmManager.getCustomizedQuantileModel(queryStr,
                     rfmDto.getRq(), rfmDto.getFq(), rfmDto.getMq());
 

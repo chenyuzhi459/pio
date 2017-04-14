@@ -101,6 +101,14 @@ public class RFMManager {
         } catch (IOException e) {
             log.warn("Deserialize druid result to type [" + DruidResult.class.getName() +
                     "] list failed, details:" + e.getMessage());
+
+            try {
+                DruidError errorResult = jsonMapper.readValue(resultStr, DruidError.class);
+                log.error("Fetch RFM data from druid failed: %s", errorResult.getError());
+            } catch (IOException e1) {
+                log.warn("Deserialize druid error result to type [" + DruidError.class.getName() +
+                        "] failed, details:" + e.getMessage());
+            }
         }
 
         return rfmModelList;
@@ -133,6 +141,18 @@ public class RFMManager {
 
         public void setEvent(RFMModel event) {
             this.event = event;
+        }
+    }
+
+    private static class DruidError {
+        String error;
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
         }
     }
 
