@@ -48,7 +48,7 @@ public class ProcessPioModule implements PioModule {
                                 // dataSource
                                 new NamedType(DatabaseDataReader.class, ProcessConstant.OperatorType.DatabaseDataReader),
                                 new NamedType(CSVExampleSource.class, ProcessConstant.OperatorType.CSVExampleSource),
-                                new NamedType(CSVExampleSetWriter.class, ProcessConstant.OperatorType.CSVExampleSetWriter),
+//                                new NamedType(CSVExampleSetWriter.class, ProcessConstant.OperatorType.CSVExampleSetWriter),
                                 new NamedType(HttpSqlExampleSource.class, ProcessConstant.OperatorType.HttpSqlExampleSource),
                                 new NamedType(SingleViewExampleSource.class, ProcessConstant.OperatorType.SingleViewExampleSource),
 
