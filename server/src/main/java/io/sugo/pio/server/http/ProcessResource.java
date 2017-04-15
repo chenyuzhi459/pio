@@ -146,16 +146,19 @@ public class ProcessResource {
         try {
             JSONObject jsonObject = new JSONObject(json);
             String caseId = JsonUtil.getString(jsonObject, "caseId");
+            String name = JsonUtil.getString(jsonObject, "name");
+            String description = JsonUtil.getString(jsonObject, "description");
 
+            Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.name_can_not_null"));
             Preconditions.checkNotNull(caseId, I18N.getMessage("pio.error.process.case_id_can_not_null"));
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
 
-            OperatorProcess existedCase = processManager.get(tenantId, ProcessConstant.BuiltIn.NO, caseId);
+            /*OperatorProcess existedCase = processManager.get(tenantId, ProcessConstant.BuiltIn.NO, caseId);
             if (existedCase != null) {
                 throw new RuntimeException(I18N.getMessage("pio.error.process.case_already_exist"));
-            }
+            }*/
 
-            OperatorProcess process = processManager.cloneCase(tenantId, caseId);
+            OperatorProcess process = processManager.cloneCase(tenantId, caseId, name, description);
 
             return Response.ok(process).build();
         } catch (Throwable e) {

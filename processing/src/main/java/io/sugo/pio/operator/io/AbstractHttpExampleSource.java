@@ -61,7 +61,7 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
         String result;
         try {
             result = HttpClientUtil.post(url, requestJson);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new OperatorException("pio.error.http_request_failed",url , e);
         }
 

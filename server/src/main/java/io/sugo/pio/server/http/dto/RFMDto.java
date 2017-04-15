@@ -109,7 +109,10 @@ public class RFMDto {
     public String buildQuery() {
         Query query = new Query();
         query.setDataSource(this.datasource);
-        query.setIntervals(this.startDate + "/" + this.endDate);
+//        query.setIntervals(this.startDate + "/" + this.endDate);
+        query.getFilter().setDimension(this.scene.getDate());
+        query.getFilter().setLower(this.startDate);
+        query.getFilter().setUpper(this.endDate);
         query.getDimensions().get(0).setDimension(this.scene.getUserId());
         query.getAggregations().get(0).setFieldName(this.scene.getDate());
         query.getAggregations().get(2).setFieldName(this.scene.getPrice());
@@ -125,9 +128,10 @@ public class RFMDto {
     private static class Query {
         String queryType = "lucene_groupBy";
         String dataSource;
-        String intervals;
+        String intervals = "1000/3000";
         String granularity = "all";
         Context context = new Context();
+        Filter filter = new Filter();
         List<Dimension> dimensions = new ArrayList<>();
         List<Aggregation> aggregations = new ArrayList<>();
         LimitSpec limitSpec = new LimitSpec();
@@ -192,6 +196,14 @@ public class RFMDto {
             this.context = context;
         }
 
+        public Filter getFilter() {
+            return filter;
+        }
+
+        public void setFilter(Filter filter) {
+            this.filter = filter;
+        }
+
         public List<Dimension> getDimensions() {
             return dimensions;
         }
@@ -235,6 +247,45 @@ public class RFMDto {
 
         public void setUseOffheap(boolean useOffheap) {
             this.useOffheap = useOffheap;
+        }
+    }
+
+    private static class Filter {
+        String type = "bound";
+        String dimension;
+        String lower;
+        String upper;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getDimension() {
+            return dimension;
+        }
+
+        public void setDimension(String dimension) {
+            this.dimension = dimension;
+        }
+
+        public String getLower() {
+            return lower;
+        }
+
+        public void setLower(String lower) {
+            this.lower = lower;
+        }
+
+        public String getUpper() {
+            return upper;
+        }
+
+        public void setUpper(String upper) {
+            this.upper = upper;
         }
     }
 

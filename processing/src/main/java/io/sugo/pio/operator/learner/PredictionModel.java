@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.learner;
 
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
@@ -17,6 +18,9 @@ import java.util.Iterator;
 /**
  */
 public abstract class PredictionModel extends AbstractModel {
+
+    private static final Logger logger = new Logger(PredictionModel.class);
+
     /**
      *
      */
@@ -39,14 +43,12 @@ public abstract class PredictionModel extends AbstractModel {
      * which means that no reference to the data itself is kept but only to the header, i.e., to the
      * attribute meta descriptions.
      *
-     * @param sizeCompareOperator
-     *            describes the allowed relations between the given ExampleSet and future
-     *            ExampleSets on which this Model will be applied. If this parameter is null no
-     *            error will be thrown.
-     * @param typeCompareOperator
-     *            describes the allowed relations between the types of the attributes of the given
-     *            ExampleSet and the types of future attributes of ExampleSet on which this Model
-     *            will be applied. If this parameter is null no error will be thrown.
+     * @param sizeCompareOperator describes the allowed relations between the given ExampleSet and future
+     *                            ExampleSets on which this Model will be applied. If this parameter is null no
+     *                            error will be thrown.
+     * @param typeCompareOperator describes the allowed relations between the types of the attributes of the given
+     *                            ExampleSet and the types of future attributes of ExampleSet on which this Model
+     *                            will be applied. If this parameter is null no error will be thrown.
      */
     protected PredictionModel(ExampleSet trainingExampleSet, ExampleSetUtilities.SetsCompareOption sizeCompareOperator,
                               ExampleSetUtilities.TypesCompareOption typeCompareOperator) {
@@ -54,6 +56,13 @@ public abstract class PredictionModel extends AbstractModel {
         this.compareDataType = typeCompareOperator;
         this.compareSetSize = sizeCompareOperator;
     }
+
+    /**
+     * Subclasses should iterate through the given example set and set the prediction for each
+     * example. The given predicted label attribute was already be added to the example set and
+     * should be used to set the predicted values.
+     */
+    public abstract ExampleSet performPrediction(ExampleSet exampleSet, Attribute predictedLabel) throws OperatorException;
 
     /**
      * Applies the model by creating a predicted label attribute and setting the predicted label
@@ -68,10 +77,17 @@ public abstract class PredictionModel extends AbstractModel {
 
         // Copy in order to avoid RemappedExampleSets wrapped around each other accumulating over
         // time
-        exampleSet = (ExampleSet) exampleSet.clone();
+        // exampleSet = (ExampleSet) exampleSet.clone();
         copyPredictedLabel(result, exampleSet);
 
         return exampleSet;
+    }
+
+    /**
+     * Returns the label attribute.
+     */
+    public Attribute getLabel() {
+        return getTrainingHeader().getAttributes().getLabel();
     }
 
     /**
@@ -86,12 +102,16 @@ public abstract class PredictionModel extends AbstractModel {
         ExampleSetUtilities.checkAttributesMatching(getOperator(), trainingHeaderSet.getAttributes(),
                 exampleSet.getAttributes(), compareSetSize, compareDataType);
         // check number of attributes
-        if (exampleSet.getAttributes().size() == trainingHeaderSet.getAttributes().size()) {
+        if (exampleSet.getAttributes().size() != trainingHeaderSet.getAttributes().size()) {
+            logger.warn("The number of regular attributes of the given example set does not fit the number of attributes of the training example set, training: "
+                    + trainingHeaderSet.getAttributes().size() + ", application: " + exampleSet.getAttributes().size());
+        } else {
             // check order of attributes
             Iterator<Attribute> trainingIt = trainingHeaderSet.getAttributes().iterator();
             Iterator<Attribute> applyIt = exampleSet.getAttributes().iterator();
             while (trainingIt.hasNext() && applyIt.hasNext()) {
                 if (!trainingIt.next().getName().equals(applyIt.next().getName())) {
+                    logger.warn("The order of attributes is not equal for the training and the application example set. This might lead to problems for some models.");
                     break;
                 }
             }
@@ -102,15 +122,31 @@ public abstract class PredictionModel extends AbstractModel {
         for (Attribute trainingAttribute : trainingHeaderSet.getAttributes()) {
             String name = trainingAttribute.getName();
             Attribute attribute = exampleSet.getAttributes().getRegular(name);
-            if (attribute != null) {
-                if (trainingAttribute.getValueType() == attribute.getValueType()) {
+            if (attribute == null) {
+                logger.warn("The given example set does not contain a regular attribute with name '" + name
+                        + "'. This might cause problems for some models depending on this particular attribute.");
+            } else {
+                if (trainingAttribute.getValueType() != attribute.getValueType()) {
+                    logger.warn("The value types between training and application differ for attribute '" + name
+                            + "', training: " + Ontology.VALUE_TYPE_NAMES[trainingAttribute.getValueType()]
+                            + ", application: " + Ontology.VALUE_TYPE_NAMES[attribute.getValueType()]);
+                } else {
                     // check nominal values
                     if (trainingAttribute.isNominal()) {
-                        if (trainingAttribute.getMapping().size() == attribute.getMapping().size()) {
+                        if (trainingAttribute.getMapping().size() != attribute.getMapping().size()) {
+                            logger.warn("The number of nominal values is not the same for training and application for attribute '"
+                                    + name
+                                    + "', training: "
+                                    + trainingAttribute.getMapping().size()
+                                    + ", application: "
+                                    + attribute.getMapping().size());
+                        } else {
                             for (String v : trainingAttribute.getMapping().getValues()) {
                                 int trainingIndex = trainingAttribute.getMapping().getIndex(v);
                                 int applicationIndex = attribute.getMapping().getIndex(v);
                                 if (trainingIndex != applicationIndex) {
+                                    logger.warn("The internal nominal mappings are not the same between training and application for attribute '"
+                                            + name + "'. This will probably lead to wrong results during model application.");
                                     break;
                                 }
                             }
@@ -153,18 +189,38 @@ public abstract class PredictionModel extends AbstractModel {
         return label != null && label.isNominal();
     }
 
-
-
     /**
-     * Subclasses should iterate through the given example set and set the prediction for each
-     * example. The given predicted label attribute was already be added to the example set and
-     * should be used to set the predicted values.
+     * Creates a predicted label for the given example set based on the label attribute defined for
+     * this prediction model. Subclasses which override this method should first invoke
+     * super.createPredictedLabel(exampleSet) and should then replace the attribute with a new
+     * predicted label attribute via a method call like
+     * <code>exampleSet.replaceAttribute(predictedLabel, AttributeFactory.changeValueType(predictedLabel, Ontology.REAL)); </code>
+     * . This might be useful in cases where a crisp nominal prediction should be replaced by
+     * confidence predictions.
      */
-    public abstract ExampleSet performPrediction(ExampleSet exampleSet, Attribute predictedLabel) throws OperatorException;
+    public static Attribute createPredictedLabel(ExampleSet exampleSet, Attribute label) {
+        // create and add prediction attribute
+        Attribute predictedLabel = AttributeFactory.createAttribute(label, Attributes.PREDICTION_NAME);
+        predictedLabel.clearTransformations();
+        ExampleTable table = exampleSet.getExampleTable();
+        table.addAttribute(predictedLabel);
+        exampleSet.getAttributes().setPredictedLabel(predictedLabel);
 
-    /** Returns the label attribute. */
-    public Attribute getLabel() {
-        return getTrainingHeader().getAttributes().getLabel();
+        // create and add confidence attributes for nominal labels
+        if (label.isNominal()) {
+            for (String value : predictedLabel.getMapping().getValues()) {
+                Attribute confidence = AttributeFactory.createAttribute(Attributes.CONFIDENCE_NAME + "(" + value + ")",
+                        Ontology.REAL);
+                table.addAttribute(confidence);
+                exampleSet.getAttributes().setSpecialAttribute(confidence, Attributes.CONFIDENCE_NAME + "_" + value);
+            }
+        }
+        return predictedLabel;
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (prediction model for label " + getTrainingHeader().getAttributes().getLabel().getName() + ")";
     }
 
     /**

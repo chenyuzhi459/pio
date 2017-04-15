@@ -54,11 +54,29 @@ public interface ExampleSet extends ResultObject, Cloneable, Iterable<Example> {
     ExampleTable getExampleTable();
 
     /**
+     * Returns all examples which have the given id. Should return null in the case that there are
+     * no examples matching that id.
+     */
+    public int[] getExampleIndicesFromId(double value);
+
+    /**
+     * Returns the example with the given id value. If the example set does not contain an id
+     * attribute this method should return null. Call {@link #remapIds()} before using this method.
+     */
+    public Example getExampleFromId(double value);
+
+    /**
      * Returns the i-th example. It is not guaranteed that asking for an example by using the index
      * in the example table is efficiently implemented. Therefore for-loops for iterations are not
      * an option and an {@link ExampleReader} should be used.
      */
     public Example getExample(int index);
+
+    /**
+     * Remaps all ids. This method should be invoked before the method
+     * {@link #getExampleFromId(double)} is used.
+     */
+    public void remapIds();
 
     // ------------------- Statistics ---------------
 
