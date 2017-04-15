@@ -10,6 +10,7 @@ import io.sugo.pio.initialization.PioModule;
 import io.sugo.pio.operator.ModelApplier;
 import io.sugo.pio.operator.clustering.clusterer.KMeans;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import io.sugo.pio.operator.io.CSVExampleSetWriter;
 import io.sugo.pio.operator.io.HttpSqlExampleSource;
 import io.sugo.pio.operator.io.SingleViewExampleSource;
 import io.sugo.pio.operator.learner.associations.AssociationRuleGenerator;
@@ -47,6 +48,7 @@ public class ProcessPioModule implements PioModule {
                                 // dataSource
                                 new NamedType(DatabaseDataReader.class, ProcessConstant.OperatorType.DatabaseDataReader),
                                 new NamedType(CSVExampleSource.class, ProcessConstant.OperatorType.CSVExampleSource),
+                                new NamedType(CSVExampleSetWriter.class, ProcessConstant.OperatorType.CSVExampleSetWriter),
                                 new NamedType(HttpSqlExampleSource.class, ProcessConstant.OperatorType.HttpSqlExampleSource),
                                 new NamedType(SingleViewExampleSource.class, ProcessConstant.OperatorType.SingleViewExampleSource),
 
