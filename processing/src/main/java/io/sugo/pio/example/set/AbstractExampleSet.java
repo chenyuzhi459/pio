@@ -26,6 +26,27 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
      */
     private Map<Double, int[]> idMap = new HashMap<Double, int[]>();
 
+    /** This method overrides the implementation of ResultObjectAdapter and returns "ExampleSet". */
+    @Override
+    public String getName() {
+        return "ExampleSet";
+    }
+
+    @Override
+    public Example getExampleFromId(double id) {
+        int[] indices = idMap.get(id);
+        if (indices != null && indices.length > 0) {
+            return getExample(indices[0]);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public int[] getExampleIndicesFromId(double id) {
+        return idMap.get(id);
+    }
+
     /**
      * Clones the example set by invoking a single argument clone constructor. Please note that a
      * cloned example set has no information about the attribute statistics. That means, that
@@ -76,6 +97,32 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
         return new DataTableExampleSetAdapter(this, weights);
     }
 
+    @Override
+    public void remapIds() {
+        idMap = new HashMap<Double, int[]>(size());
+        Attribute idAttribute = getAttributes().getSpecial(Attributes.ID_NAME);
+        if (idAttribute != null) {
+            int index = 0;
+            for (Example example : this) {
+                double value = example.getValue(idAttribute);
+                if (!Double.isNaN(value)) {
+                    if (idMap.containsKey(value)) {
+                        int[] indices = idMap.get(value);
+                        int[] newIndices = new int[indices.length + 1];
+                        for (int i = 0; i < indices.length; i++) {
+                            newIndices[i] = indices[i];
+                        }
+                        newIndices[newIndices.length - 1] = index;
+                        idMap.put(value, newIndices);
+                    } else {
+                        idMap.put(value, new int[] { index });
+                    }
+                }
+                index++;
+            }
+        }
+    }
+
     /**
      * Recalculates the attribute statistics for all attributes. They are average value, variance,
      * minimum, and maximum. For nominal attributes the occurences for all values are counted. This
@@ -118,8 +165,6 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
             return;
         } else {
             // init statistics
-//            resetAttributeStatistics(attributeList);
-            // init statistics
             for (Attribute attribute : attributeList) {
                 Iterator<Statistics> stats = attribute.getAllStatistics();
                 while (stats.hasNext()) {
@@ -146,11 +191,6 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
                         statistics.count(value, weight);
                     }
                 }
-                /*if (Thread.currentThread().isInterrupted()) {
-                    // statistics is only partly calculated, reset
-                    resetAttributeStatistics(attributeList);
-                    return;
-                }*/
             }
 
             // store cloned statistics
@@ -170,9 +210,6 @@ public abstract class AbstractExampleSet extends ResultObjectAdapter implements 
                     Statistics statistics = (Statistics) stats.next().clone();
                     statisticsList.add(statistics);
                 }
-                /*if (Thread.currentThread().isInterrupted()) {
-                    return;
-                }*/
             }
         }
     }

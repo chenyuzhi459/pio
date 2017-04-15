@@ -11,6 +11,13 @@ import java.util.Date;
 /**
  */
 public class Example {
+
+    /** Separator used in the getAttributesAsString() method (tab). */
+    public static final String SEPARATOR = " ";
+
+    /** Separates indices from values in sparse format (colon). */
+    public static final String SPARSE_SEPARATOR = ":";
+
     /** The data for this example. */
     private DataRow data;
 
@@ -28,12 +35,12 @@ public class Example {
 
     /** Returns the data row which backs up the example in the example table. */
     public DataRow getDataRow() {
-        return data;
+        return this.data;
     }
 
     /** Delivers the attributes. */
     public Attributes getAttributes() {
-        return parentExampleSet.getAttributes();
+        return this.parentExampleSet.getAttributes();
     }
 
 

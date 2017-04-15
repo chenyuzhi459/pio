@@ -26,8 +26,7 @@ public class OperatorMapHelper {
 
             if (subTypes != null) {
                 for (NamedType subType : subTypes) {
-
-                    Class<?> clazz = Class.forName(subType.getType().getName());
+                    Class<?> clazz = subType.getType();
                     boolean isAbstract = Modifier.isAbstract(clazz.getModifiers());
                     if (!isAbstract) {
                         Object o = subType.getType().newInstance();

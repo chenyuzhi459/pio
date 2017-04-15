@@ -133,7 +133,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
     }
 
     @Override
-    public List<OperatorProcess> getAll(String tenantId, boolean includeDelete, int builtIn, Integer isTemplate, Integer isCase, String type) {
+    public List<OperatorProcess> getAll(String tenantId, boolean includeDelete, int builtIn, Integer isTemplate, Integer isCase, String type, String name) {
         return dbi.withHandle(
                 new HandleCallback<List<OperatorProcess>>() {
                     @Override
@@ -144,6 +144,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                 .append(" FROM %1$s ")
                                 .append(" WHERE 1 = 1 ");
                         builder.append(" AND built_in = :builtIn");
+                        if (!Strings.isNullOrEmpty(name)) {
+                            builder.append(" AND name = :name");
+                        }
                         if (isTemplate != null) {
                             builder.append(" AND is_template = :isTemplate");
                         }
@@ -164,6 +167,9 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                 String.format(builder.toString(), getTableName())
                         );
                         query.bind("builtIn", builtIn);
+                        if (!Strings.isNullOrEmpty(name)) {
+                            query.bind("name", name);
+                        }
                         if (isTemplate != null) {
                             query.bind("isTemplate", isTemplate);
                         }
@@ -203,6 +209,7 @@ public class SQLMetadataProcessManager implements MetadataProcessManager {
                                     process.setDescription(r.getString("description"));
                                     process.setStatus(Status.valueOf(r.getString("status")));
                                     process.setType(r.getString("type"));
+                                    process.setName(r.getString("name"));
                                     process.setCreateTime(new DateTime(r.getString("created_date")));
                                     process.setUpdateTime(new DateTime(r.getString("update_date")));
                                     return process;

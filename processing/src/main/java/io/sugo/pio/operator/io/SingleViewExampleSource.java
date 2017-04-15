@@ -1,5 +1,6 @@
 package io.sugo.pio.operator.io;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -433,6 +434,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class ParamVo {
         List<Object> filters;
         List<String> metrics;
@@ -440,6 +442,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         Object timezone;
         List<String> dimensions;
         Object dimensionExtraSettingDict;
+        String selectedDataSourceId;
 
         public List<Object> getFilters() {
             return filters;
@@ -487,6 +490,14 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
         public void setDimensionExtraSettingDict(Object dimensionExtraSettingDict) {
             this.dimensionExtraSettingDict = dimensionExtraSettingDict;
+        }
+
+        public String getSelectedDataSourceId() {
+            return selectedDataSourceId;
+        }
+
+        public void setSelectedDataSourceId(String selectedDataSourceId) {
+            this.selectedDataSourceId = selectedDataSourceId;
         }
     }
 
