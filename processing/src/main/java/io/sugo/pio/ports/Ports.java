@@ -10,6 +10,9 @@ import java.util.Observer;
 /**
  */
 public interface Ports<T> extends Serializable {
+    /** Returns all input port names registered with these ports. */
+    public String[] getPortNames();
+
     /** Creates a new port and adds it to these Ports. */
     public T createPort(String name, String description);
 

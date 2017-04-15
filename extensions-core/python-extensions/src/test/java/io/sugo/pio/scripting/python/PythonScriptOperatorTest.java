@@ -35,10 +35,18 @@ public class PythonScriptOperatorTest {
 
         PythonScriptingOperator pythonScriptingOperator = new PythonScriptingOperator();
         pythonScriptingOperator.setName("python");
+        pythonScriptingOperator.setParameter("script", "# rm_main is a mandatory function, \n" +
+                "# the number of arguments has to be the number of input ports (can be none)\n" +
+                "def rm_main(data):\n" +
+                "    print('Hello, world!')\n" +
+                "    # output can be found in Log View\n" +
+                "    print(type(data))\n" +
+                "\n" +
+                "    return data");
         process.getRootOperator().getExecutionUnit().addOperator(pythonScriptingOperator);
 
         process.connect(new Connection("operator_db_reader", "output", "change_role", "example set input"), true);
-        process.connect(new Connection("change_role", "example set output", "python", "output"), true);
+        process.connect(new Connection("change_role", "example set output", "python", "input 1"), true);
 
         process.run();
     }

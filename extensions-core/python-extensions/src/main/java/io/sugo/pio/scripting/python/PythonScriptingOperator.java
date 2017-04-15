@@ -27,16 +27,16 @@ public class PythonScriptingOperator extends AbstractScriptingLanguageOperator {
 
     @Override
     protected ScriptRunner getScriptRunner() throws UndefinedParameterError {
-        String script = this.getParameter("script");
+        String script = getParameter("script");
         PythonScriptRunner runner = new PythonScriptRunner(script, this);
         return runner;
     }
 
     public void doWork() throws OperatorException {
-        if(PythonSetupTester.INSTANCE.isPythonInstalled()) {
+//        if(PythonSetupTester.INSTANCE.isPythonInstalled()) {
             super.doWork();
-        } else {
-            throw new UserError(this, "python_scripting.setup_test.failure");
-        }
+//        } else {
+//            throw new UserError(this, "python_scripting.setup_test.failure");
+//        }
     }
 }

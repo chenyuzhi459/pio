@@ -12,7 +12,8 @@ import java.util.*;
 public abstract class AbstractPorts<T extends Port> implements Ports<T> {
     private final List<T> portList = Collections.synchronizedList(new ArrayList<>());
     private final Map<String, T> portMap = new HashMap<>();
-
+    private boolean portNamesValid = false;
+    private String[] portNames;
     private final PortOwner owner;
 
     private List<PortExtender> portExtenders;
@@ -35,6 +36,20 @@ public abstract class AbstractPorts<T extends Port> implements Ports<T> {
 
     public AbstractPorts(PortOwner owner) {
         this.owner = owner;
+        portNamesValid = false;
+    }
+
+    private void updatePortNames() {
+        if (!portNamesValid) {
+            portNames = new String[portList.size()];
+            int i = 0;
+            synchronized (portList) {
+                for (Port port : portList) {
+                    portNames[i++] = port.getName();
+                }
+            }
+            portNamesValid = true;
+        }
     }
 
     @Override
@@ -62,6 +77,7 @@ public abstract class AbstractPorts<T extends Port> implements Ports<T> {
         }
         portList.add(port);
         portMap.put(port.getName(), port);
+        portNamesValid = false;
     }
 
     @Override
@@ -94,6 +110,12 @@ public abstract class AbstractPorts<T extends Port> implements Ports<T> {
         portMap.remove(port.getName());
         ((AbstractPort) port).setName(newName);
         portMap.put(newName, port);
+    }
+
+    @Override
+    public String[] getPortNames() {
+        updatePortNames();
+        return portNames;
     }
 
     @Override

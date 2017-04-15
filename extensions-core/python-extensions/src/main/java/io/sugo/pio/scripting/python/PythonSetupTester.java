@@ -20,7 +20,7 @@ public final class PythonSetupTester extends AbstractSetupTester {
 
     public boolean isPythonInstalled() {
         resetCache();
-        pythonFound = this.scriptingPathTest();
+        pythonFound = scriptingPathTest();
         return pythonFound;
     }
 

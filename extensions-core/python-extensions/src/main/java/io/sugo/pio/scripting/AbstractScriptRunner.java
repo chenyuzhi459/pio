@@ -5,10 +5,8 @@ import io.sugo.pio.operator.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.concurrent.CancellationException;
@@ -26,9 +24,15 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
         this.operator = operator;
     }
 
+    protected Operator getOperator() {
+        return operator;
+    }
+
     protected abstract void serialize(IOObject var1, File var2) throws FileNotFoundException, IOException, UserError, ProcessStoppedException;
 
     protected abstract IOObject deserialize(File var1) throws IOException, UserError;
+
+    protected abstract Process start(Path tempFolder, int numberOfOutputPorts) throws IOException;
 
     @Override
     public List<IOObject> run(List<IOObject> inputs, int numberOfOutputPorts) throws IOException, CancellationException, OperatorException {
@@ -38,32 +42,43 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
         try {
             tempFolder = Files.createTempDirectory("scripting", new FileAttribute[0]);
             serializeInputs(inputs, tempFolder);
-//            generateScriptFile(tempFolder);
-//            process = start(tempFolder, numberOfOutputPorts);
+            generateScriptFile(tempFolder);
+            process = start(tempFolder, numberOfOutputPorts);
 //
-//            try {
-//                int e = process.waitFor();
-//                if(e != 0) {
-//                    String errorString = getError(tempFolder);
-//                    handleLanguageSpecificExitCode(e, errorString);
-//                    if(errorString.isEmpty()) {
-//                        throw new OperatorException(OperatorException.getErrorMessage("python_scripting.script_failed", new Object[0]));
-//                    }
-//
-//                    throw new OperatorException(OperatorException.getErrorMessage("python_scripting.script_failed_message", new Object[]{errorString}));
-//                }
-//            } catch (InterruptedException var9) {
-//                this.cancel();
-//                new CancellationException();
-//            }
-//
+            try {
+                int e = process.waitFor();
+                if(e != 0) {
+                    String errorString = getError(tempFolder);
+                    handleLanguageSpecificExitCode(e, errorString);
+                    if(errorString.isEmpty()) {
+                        throw new OperatorException(OperatorException.getErrorMessage("python_scripting.script_failed", new Object[0]));
+                    }
+
+                    throw new OperatorException(OperatorException.getErrorMessage("python_scripting.script_failed_message", new Object[]{errorString}));
+                }
+            } catch (InterruptedException var9) {
+                cancel();
+                new CancellationException();
+            }
+
             result = deserializeResults(tempFolder);
         } finally {
-//            deleteTempFolder(tempFolder);
+            deleteTempFolder(tempFolder);
         }
 //
         return result;
     }
+
+    protected String getError(Path tempFolder) {
+        try {
+            byte[] e = Files.readAllBytes(Paths.get(tempFolder.toString(), new String[]{"rapidminer_error.log"}));
+            return new String(e, StandardCharsets.UTF_8);
+        } catch (IOException var3) {
+            return "";
+        }
+    }
+
+    protected abstract void handleLanguageSpecificExitCode(int errorCode, String errorString) throws UserError;
 
     public void cancel() {
         if(process != null) {
@@ -71,7 +86,7 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
 
             try {
                 process.waitFor();
-            } catch (InterruptedException var2) {
+            } catch (InterruptedException ie) {
             }
         }
     }
@@ -146,5 +161,70 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
 
     protected abstract String getFileExtension(IOObject input);
 
+    private void deleteTempFolder(Path tempFolder) {
+        if(tempFolder != null) {
+            try {
+                DirectoryStream directoryStream = Files.newDirectoryStream(tempFolder);
+                Throwable outputs = null;
 
+                try {
+                    Iterator iterator = directoryStream.iterator();
+                    label132:
+                    while(true) {
+                        while(true) {
+                            if(!iterator.hasNext()) {
+                                break label132;
+                            }
+
+                            Path entry = (Path)iterator.next();
+                            if(Files.isDirectory(entry, new LinkOption[0])) {
+                                deleteTempFolder(entry);
+                            } else {
+                                try {
+                                    Files.delete(entry);
+                                } catch (IOException | SecurityException e) {
+                                }
+                            }
+                        }
+                    }
+                } catch (Throwable t) {
+                    outputs = t;
+                    throw t;
+                } finally {
+                    if(directoryStream != null) {
+                        if(outputs != null) {
+                            try {
+                                directoryStream.close();
+                            } catch (Throwable t) {
+                                outputs.addSuppressed(t);
+                            }
+                        } else {
+                            directoryStream.close();
+                        }
+                    }
+                }
+            } catch (IOException ioe) {
+            }
+
+            try {
+                Files.delete(tempFolder);
+            } catch (IOException | SecurityException e) {
+            }
+        }
+    }
+
+    private File generateScriptFile(Path tempFolder) throws IOException {
+        Path tempPath = Paths.get(tempFolder.toString(), new String[]{getUserscriptFilename()});
+        Files.write(tempPath, script.getBytes(StandardCharsets.UTF_8), new OpenOption[0]);
+        return tempPath.toFile();
+    }
+
+    protected Process getProcessWithLogging(ProcessBuilder processBuilder) throws IOException {
+        processBuilder.redirectErrorStream(true);
+        processBuilder.redirectError(ProcessBuilder.Redirect.PIPE);
+        Process process = processBuilder.start();
+        return process;
+    }
+
+    protected abstract String getUserscriptFilename();
 }
