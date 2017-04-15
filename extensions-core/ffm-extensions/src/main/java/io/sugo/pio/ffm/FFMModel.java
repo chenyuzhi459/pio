@@ -316,7 +316,7 @@ public class FFMModel {
     }
 
     public static void main(String[] args) throws IOException {
-        args = new String[]{"0.1", "0.01", "15", "4", "true", "false", "F:/bigdata.tr.modify.txt", "F:/bigdata.te.modify.txt"};
+        args = new String[]{"0.1", "0.01", "15", "4", "true", "false", "F:/click_log.csv", "F:/click_log.csv"};
 //        args = new String[]{"0.1", "0.01", "15", "4", "true", "false", "F:/ffm.train.no_head.csv", "F:/ffm.train.no_head.csv"};
         if (args.length != 8) {
             System.out.println("java -jar ffm.jar <eta> <lambda> <n_iters> "
@@ -338,7 +338,7 @@ public class FFMModel {
 
         FFMModel model = new FFMModel().train(tr, va, param);
 //        new FFMModel().test(model, va, param, 10, 20);
-        model.predict(model, va);
+//        model.predict(model, va);
 
     }
 }

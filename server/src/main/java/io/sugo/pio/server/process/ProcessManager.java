@@ -281,7 +281,7 @@ public class ProcessManager {
     }
 
     public List<OperatorProcess> getAll(String tenantId, boolean includeDelete, int builtIn, String type) {
-        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, includeDelete, builtIn, null, null, type);
+        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, includeDelete, builtIn, null, null, type, null);
         if (processes == null || processes.isEmpty()) {
             return new ArrayList<>();
         }
@@ -292,7 +292,7 @@ public class ProcessManager {
 
     public List<OperatorProcess> getAllCases(boolean includeDelete) {
         List<OperatorProcess> processes = metadataProcessManager.getAll(null, includeDelete, ProcessConstant.BuiltIn.NO,
-                null, ProcessConstant.IsCase.YES, null);
+                null, ProcessConstant.IsCase.YES, null, null);
         if (processes == null || processes.isEmpty()) {
             return new ArrayList<>();
         }
@@ -355,7 +355,7 @@ public class ProcessManager {
 
     public OperatorProcess get(String tenantId, int builtIn, String type) {
         List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, false,
-                builtIn, ProcessConstant.IsTemplate.NO, null, type);
+                builtIn, ProcessConstant.IsTemplate.NO, null, type, null);
         if (processes == null || processes.isEmpty()) {
             return null;
         }
@@ -383,7 +383,7 @@ public class ProcessManager {
      */
     public OperatorProcess getTemplate(String type) {
         List<OperatorProcess> processes = metadataProcessManager.getAll(null, false,
-                ProcessConstant.BuiltIn.NO, ProcessConstant.IsTemplate.YES, null, type);
+                ProcessConstant.BuiltIn.NO, ProcessConstant.IsTemplate.YES, null, type, null);
         if (processes == null || processes.isEmpty()) {
             return null;
         }

@@ -96,8 +96,8 @@ public class FPGrowth extends Operator {
 
     private final InputPort exampleSetInput = getInputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
 
-    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
     private final OutputPort frequentSetsOutput = getOutputPorts().createPort(PortConstant.FREQUENT_SETS, PortConstant.FREQUENT_SETS_DESC);
+    private final OutputPort exampleSetOutput = getOutputPorts().createPort(PortConstant.EXAMPLE_SET, PortConstant.EXAMPLE_SET_DESC);
 
     public FPGrowth() {
         super();

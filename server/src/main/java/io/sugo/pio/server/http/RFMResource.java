@@ -77,27 +77,27 @@ public class RFMResource {
 
     private void check(DefaultRFMDto rfmDto) {
         Preconditions.checkNotNull(rfmDto.getDatasource(), "Data source can not be null.");
-        if (rfmDto.getR() <= 0) {
-            throw new IllegalArgumentException("'R' must be greater than 0.");
+        if (rfmDto.getR() <= 0 || rfmDto.getR() > 4) {
+            throw new IllegalArgumentException("'R' must be greater than 0 and less than 5.");
         }
-        if (rfmDto.getF() <= 0) {
-            throw new IllegalArgumentException("'F' must be greater than 0.");
+        if (rfmDto.getF() <= 0 || rfmDto.getF() > 4) {
+            throw new IllegalArgumentException("'F' must be greater than 0 and less than 5.");
         }
-        if (rfmDto.getM() <= 0) {
-            throw new IllegalArgumentException("'M' must be greater than 0.");
+        if (rfmDto.getM() <= 0 || rfmDto.getM() > 4) {
+            throw new IllegalArgumentException("'M' must be greater than 0 and less than 5.");
         }
     }
 
     private void check(CustomizedRFMDto rfmDto) {
         Preconditions.checkNotNull(rfmDto.getDatasource(), "Data source can not be null.");
-        if (rfmDto.getRq().length <= 0) {
-            throw new IllegalArgumentException("'RQ' must be at least contains one element.");
+        if (rfmDto.getRq().length <= 0 || rfmDto.getRq().length > 3) {
+            throw new IllegalArgumentException("'RQ' must be at least contains one element and at most 3 elements.");
         }
-        if (rfmDto.getFq().length <= 0) {
-            throw new IllegalArgumentException("'FQ' must be at least contains one element.");
+        if (rfmDto.getFq().length <= 0 || rfmDto.getFq().length > 3) {
+            throw new IllegalArgumentException("'FQ' must be at least contains one element and at most 3 elements.");
         }
-        if (rfmDto.getMq().length <= 0) {
-            throw new IllegalArgumentException("'MQ' must be at least contains one element.");
+        if (rfmDto.getMq().length <= 0 || rfmDto.getMq().length > 3) {
+            throw new IllegalArgumentException("'MQ' must be at least contains one element and at most 3 elements.");
         }
     }
 
