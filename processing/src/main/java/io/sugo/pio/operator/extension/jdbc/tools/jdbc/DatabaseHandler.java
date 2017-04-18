@@ -41,6 +41,7 @@ public class DatabaseHandler implements AutoCloseable {
     public static final String PARAMETER_DATABASE_URL = "database_url";
     public static final String PARAMETER_USERNAME = "username";
     public static final String PARAMETER_PASSWORD = "password";
+    public static final String PARAMETER_TABLES = "tables";
     public static final String PARAMETER_DEFINE_QUERY = "define_query";
     public static final String PARAMETER_JNDI_NAME = "jndi_name";
     public static final String[] QUERY_MODES = new String[]{"query", "query file", "table name"};
@@ -65,6 +66,21 @@ public class DatabaseHandler implements AutoCloseable {
     public static final String PARAMETER_PARAMETERS = "parameters";
     public static final String PARAMETER_PREPARE_STATEMENT = "prepare_statement";
     private static final String[] SQL_TYPES = new String[]{"VARCHAR", "INTEGER", "REAL", "LONG"};
+
+    public static final String SHOW_TABLE_POSTGRESQL = "select tablename from pg_tables where tablename not like 'pg%' and tablename not like 'sql_%' order by tablename";
+    public static final String SHOW_TABLE_MYSQL = "show tables";
+    public static final String SHOW_TABLE_ORACLE = "select table_name from user_tables";
+    public static final String SHOW_TABLE_SYBASE = "select name from sysobjects where type='U' order by name";
+    public static final String SHOW_TABLE_DB2 = "select tabname from syscat.tables";
+    public static final String SHOW_TABLE_SQLSERVER = "SELECT Name FROM SysObjects Where XType='U' ORDER BY Name";
+
+    public static final String JDBC_PREFIX_POSTGRESQL = "jdbc:postgresql";
+    public static final String JDBC_PREFIX_MYSQL = "jdbc:mysql";
+    public static final String JDBC_PREFIX_ORACLE = "jdbc:oracle:thin";
+    public static final String JDBC_PREFIX_SYBASE = "jdbc:sybase";
+    public static final String JDBC_PREFIX_DB2 = "jdbc:db2";
+    public static final String JDBC_PREFIX_SQLSERVER2000 = "jdbc:microsoft:sqlserver";
+    public static final String JDBC_PREFIX_SQLSERVER2005 = "jdbc:sqlserver";
 
     private DatabaseHandler(String databaseURL, String user) {
         this.databaseURL = databaseURL;

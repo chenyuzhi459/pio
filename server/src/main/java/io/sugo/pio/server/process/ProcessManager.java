@@ -272,7 +272,7 @@ public class ProcessManager {
     /**
      * Get all processes include template, and exclude built-in processes from database.
      *
-     * @param tenantId tenant id of the company
+     * @param tenantId      tenant id of the company
      * @param includeDelete indicates is include 'DELETED' status processes
      * @return process list
      */
@@ -314,7 +314,7 @@ public class ProcessManager {
     /**
      * Get process by id and status 'DELETED' from cache
      *
-     * @param id  process id
+     * @param id            process id
      * @param includeDelete true:include 'DELETED' process
      * @return specified process
      */
@@ -364,6 +364,13 @@ public class ProcessManager {
         return processes.get(0);
     }
 
+    public boolean isProcessExist(String tenantId, String processName) {
+        List<OperatorProcess> processes = metadataProcessManager.getAll(tenantId, false,
+                ProcessConstant.BuiltIn.NO, null, null, null, processName);
+
+        return !processes.isEmpty();
+    }
+
     /**
      * Get built-in process from database
      *
@@ -410,7 +417,6 @@ public class ProcessManager {
         public void setProcessId(String processId) {
             this.processId = processId;
         }
-
     }
 
     public OperatorProcess addOperator(String processId, OperatorDto dto) {
@@ -513,7 +519,6 @@ public class ProcessManager {
             log.info("The process named %s[id:%s] update operator[%s] parameter[%s] successfully.",
                     process.getName(), processId, operator.getName(), paramList);
 
-
             return operator;
         } else {
             return null;
@@ -546,6 +551,45 @@ public class ProcessManager {
         } else {
             return null;
         }
+    }
+
+    public Operator cloneOperator(String processId, String operatorId, OperatorDto dto) {
+        OperatorProcess process = getFromCache(processId);
+        if (process != null && !Status.DELETED.equals(process.getStatus())) {
+            Operator newOperator = null;
+            Operator operator = process.getOperator(operatorId);
+            OperatorMeta meta = operatorMetaMap.get(operator.getType());
+
+            // Deep clone operator
+            try {
+                newOperator = jsonMapper.readValue(
+                        jsonMapper.writeValueAsBytes(operator),
+                        new TypeReference<Operator>() {
+                        }
+                );
+            } catch (IOException e) {
+                log.error("Deep clone operator failed.", e);
+            }
+
+            if (newOperator != null) {
+                newOperator.setName(meta.getName() + "-" + UUID.randomUUID().toString());
+                newOperator.setxPos(dto.getxPos());
+                newOperator.setyPos(dto.getyPos());
+                newOperator.setFullName(operator.getFullName() + "_副本");
+                newOperator.setStatus(Status.INIT);
+                process.getRootOperator().getExecutionUnit().addOperator(newOperator);
+                process.setUpdateTime(new DateTime());
+
+                metadataProcessManager.update(process);
+
+                log.info("The process named %s[id:%s] clone operator[id:%s] successfully.",
+                        process.getName(), processId, newOperator.getName());
+
+                return newOperator;
+            }
+        }
+
+        return null;
     }
 
     public Operator updateExampleData(String processId, String operatorId, List<String> dataList) {

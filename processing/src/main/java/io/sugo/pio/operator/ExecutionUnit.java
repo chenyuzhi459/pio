@@ -96,7 +96,6 @@ public class ExecutionUnit implements Serializable {
         operators.remove(operator);
     }
 
-
     private void registerOperator(Operator operator, boolean registerWithProcess) {
         operator.setEnclosingExecutionUnit(this);
         OperatorProcess process = getEnclosingOperator().getProcess();

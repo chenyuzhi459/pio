@@ -80,6 +80,11 @@ public class ProcessResource {
             Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.name_can_not_null"));
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
 
+            boolean processExist = processManager.isProcessExist(tenantId, name);
+            if (processExist) {
+                throw new RuntimeException(I18N.getMessage("pio.error.process.process_already_exist"));
+            }
+
             OperatorProcess process = processManager.create(tenantId, name, description);
             return Response.ok(process).build();
         } catch (Throwable e) {
@@ -128,6 +133,11 @@ public class ProcessResource {
             String description = JsonUtil.getString(jsonObject, "description");
             Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.name_can_not_null"));
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
+
+            boolean processExist = processManager.isProcessExist(tenantId, name);
+            if (processExist) {
+                throw new RuntimeException(I18N.getMessage("pio.error.process.case_already_exist"));
+            }
 
             OperatorProcess process = processManager.create(tenantId, name, description, null,
                     ProcessConstant.IsTemplate.NO, ProcessConstant.IsCase.YES);

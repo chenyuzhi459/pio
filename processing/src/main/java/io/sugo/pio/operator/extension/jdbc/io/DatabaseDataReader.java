@@ -17,6 +17,7 @@ import io.sugo.pio.operator.extension.jdbc.tools.jdbc.connection.ConnectionEntry
 import io.sugo.pio.operator.extension.jdbc.tools.jdbc.connection.ConnectionProvider;
 import io.sugo.pio.operator.io.AbstractExampleSource;
 import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeStringCategory;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
@@ -25,10 +26,10 @@ import io.sugo.pio.tools.Ontology;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
+import static io.sugo.pio.operator.extension.jdbc.tools.jdbc.DatabaseHandler.PARAMETER_DATABASE_URL;
+import static io.sugo.pio.operator.extension.jdbc.tools.jdbc.DatabaseHandler.PARAMETER_TABLES;
 
 public class DatabaseDataReader extends AbstractExampleSource implements ConnectionProvider {
 
@@ -106,11 +107,12 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         return builder.build();
     }
 
+    @Override
     public MetaData getGeneratedMetaData() throws OperatorException {
         ExampleSetMetaData metaData = new ExampleSetMetaData();
-        if (!Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_DATABASE_URL)) &&
+        if (!Strings.isNullOrEmpty(getParameterAsString(PARAMETER_DATABASE_URL)) &&
                 !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_USERNAME)) &&
-                !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_PASSWORD))&&
+                !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_PASSWORD)) &&
                 !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_QUERY))) {
             try {
                 this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
@@ -132,6 +134,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                 }
 
             } catch (SQLException sqlEx) {
+                logger.error("Get database connection through %s error: %s", getParameterAsString(PARAMETER_DATABASE_URL), sqlEx.getMessage());
                 throw new OperatorException(DatabaseDataReader.class.getSimpleName(), sqlEx);
 //                LogService.getRoot().log(Level.WARNING, I18N.getMessage(LogService.getRoot().getResourceBundle(), "io.sugo.pio.operator.io.DatabaseDataReader.fetching_meta_data_error", new Object[]{var16}), var16);
             } finally {
@@ -147,6 +150,55 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         }
 
         return metaData;
+    }
+
+    private String[] getTables() {
+        String[] tableNamesArr = new String[0];
+        if (isParameterExist(DatabaseHandler.PARAMETER_DATABASE_URL) &&
+                isParameterExist(DatabaseHandler.PARAMETER_USERNAME) &&
+                isParameterExist(DatabaseHandler.PARAMETER_PASSWORD) &&
+                !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_DATABASE_URL)) &&
+                !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_USERNAME)) &&
+                !Strings.isNullOrEmpty(getParameterAsString(DatabaseHandler.PARAMETER_PASSWORD))) {
+            try {
+                this.databaseHandler = DatabaseHandler.getConnectedDatabaseHandler(this);
+                if (this.databaseHandler != null) {
+                    String showTableQuery = this.getShowTableQuery();
+                    PreparedStatement ps = this.databaseHandler.getConnection().prepareStatement(showTableQuery);
+                    ResultSet resultSet = ps.executeQuery();
+                    ArrayList<String> tableNames = new ArrayList<>();
+
+                    while (resultSet.next()) {
+                        String tableName = resultSet.getString(1);
+                        tableNames.add(tableName);
+                    }
+
+                    if (!tableNames.isEmpty()) {
+                        tableNamesArr = new String[tableNames.size()];
+                        tableNames.toArray(tableNamesArr);
+                    }
+
+                    ps.close();
+                    resultSet.close();
+                    logger.info("Query %d tables from database url:%s", tableNames.size(), getParameterAsString(PARAMETER_DATABASE_URL));
+
+                    return tableNamesArr;
+                }
+            } catch (SQLException sqlEx) {
+                logger.error("Get database connection through %s error: %s", getParameterAsString(PARAMETER_DATABASE_URL), sqlEx.getMessage());
+            } finally {
+                try {
+                    if (this.databaseHandler != null && this.databaseHandler.getConnection() != null) {
+                        this.databaseHandler.disconnect();
+                    }
+                } catch (SQLException var15) {
+                    this.getLogger().warn("DB error closing connection: " + var15, var15);
+                }
+
+            }
+        }
+
+        return tableNamesArr;
     }
 
     public static ExampleSetBuilder createExampleTable(ResultSet resultSet, List<Attribute> attributes, int dataManagementType, Operator op) throws SQLException, OperatorException {
@@ -297,6 +349,29 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         }
     }
 
+    private String getShowTableQuery() {
+        String showTableQuery = null;
+        String databaseUrl = this.getParameterAsString(PARAMETER_DATABASE_URL);
+
+        if (databaseUrl.startsWith(DatabaseHandler.JDBC_PREFIX_POSTGRESQL)) {
+            showTableQuery = DatabaseHandler.SHOW_TABLE_POSTGRESQL;
+        } else if (databaseUrl.startsWith(DatabaseHandler.JDBC_PREFIX_MYSQL)) {
+            showTableQuery = DatabaseHandler.SHOW_TABLE_MYSQL;
+        } else if (databaseUrl.startsWith(DatabaseHandler.JDBC_PREFIX_ORACLE)) {
+            showTableQuery = DatabaseHandler.SHOW_TABLE_ORACLE;
+        } else if (databaseUrl.startsWith(DatabaseHandler.JDBC_PREFIX_SYBASE)) {
+            showTableQuery = DatabaseHandler.SHOW_TABLE_SYBASE;
+        } else if (databaseUrl.startsWith(DatabaseHandler.JDBC_PREFIX_DB2)) {
+            showTableQuery = DatabaseHandler.SHOW_TABLE_DB2;
+        } else if (databaseUrl.startsWith(DatabaseHandler.JDBC_PREFIX_SQLSERVER2000)) {
+            showTableQuery = DatabaseHandler.SHOW_TABLE_SQLSERVER;
+        } else if (databaseUrl.startsWith(DatabaseHandler.JDBC_PREFIX_SQLSERVER2005)) {
+            showTableQuery = DatabaseHandler.SHOW_TABLE_SQLSERVER;
+        }
+
+        return showTableQuery;
+    }
+
     public ConnectionEntry getConnectionEntry() {
         return DatabaseHandler.getConnectionEntry(this);
     }
@@ -338,6 +413,14 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     public List<ParameterType> getParameterTypes() {
         List list = super.getParameterTypes();
         list.addAll(DatabaseHandler.getConnectionParameterTypes(this));
+
+        String[] tableNames = getTables();
+        ParameterTypeStringCategory tablesType = new ParameterTypeStringCategory(PARAMETER_TABLES,
+                I18N.getMessage("pio.DatabaseDataReader.tables"),
+                tableNames);
+        tablesType.setOptional(true);
+        list.add(tablesType);
+
         list.addAll(DatabaseHandler.getQueryParameterTypes(this, false));
 //        list.addAll(DatabaseHandler.getStatementPreparationParamterTypes(this));
 //        list.add(new ParameterTypeCategory("datamanagement", "Determines, how the data is represented internally.", DataRowFactory.TYPE_NAMES, 0));

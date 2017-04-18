@@ -174,6 +174,25 @@ public class OperatorResource {
         }
     }
 
+    @POST
+    @Path("/clone/{processId}/{operatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response cloneOperator(
+            @PathParam("processId") final String processId,
+            @PathParam("operatorId") final String operatorId,
+            OperatorDto dto
+    ) {
+        try {
+            Preconditions.checkNotNull(dto.getxPos(), I18N.getMessage("pio.error.operator.x_can_not_null"));
+            Preconditions.checkNotNull(dto.getyPos(), I18N.getMessage("pio.error.operator.y_can_not_null"));
+            Operator operator = processManager.cloneOperator(processId, operatorId, dto);
+            return Response.ok(operator).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
     @GET
     @Path("/result/{processId}/{operatorId}")
     @Produces({MediaType.APPLICATION_JSON})
