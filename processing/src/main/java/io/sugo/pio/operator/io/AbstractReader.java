@@ -3,9 +3,11 @@ package io.sugo.pio.operator.io;
 
 import io.sugo.pio.OperatorProcess;
 import io.sugo.pio.constant.PortConstant;
+import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.Operator;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.metadata.MDTransformationRule;
@@ -13,15 +15,14 @@ import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.MetaDataError;
 import io.sugo.pio.ports.metadata.SimpleMetaDataError;
 import io.sugo.pio.tools.io.Encoding;
-import io.sugo.pio.operator.error.ProcessSetupError.Severity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * Superclass of all operators that have no input and generate a single output. This class is mainly
  * a tribute to the e-LICO DMO.
- *
  */
 public abstract class AbstractReader<T extends IOObject> extends Operator {
 
@@ -39,24 +40,24 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
             @Override
             public void transformMD() {
 //                if (cacheDirty || !isMetaDataCacheable()) {
-                    try {
-                        // TODO add extra thread for meta data generation?
-                        cachedMetaData = AbstractReader.this.getGeneratedMetaData();
-                        cachedError = null;
-                    } catch (OperatorException e) {
-                        cachedMetaData = new MetaData(AbstractReader.this.generatedClass);
-                        String msg = e.getMessage();
-                        if ((msg == null) || (msg.length() == 0)) {
-                            msg = e.toString();
-                        }
-                        // will be added below
-                        cachedError = new SimpleMetaDataError(Severity.WARNING, outputPort,
-                                "pio.error.metadata.cannot_create_exampleset_metadata", new Object[] { msg });
+                try {
+                    // TODO add extra thread for meta data generation?
+                    cachedMetaData = AbstractReader.this.getGeneratedMetaData();
+                    cachedError = null;
+                } catch (OperatorException e) {
+                    cachedMetaData = new MetaData(AbstractReader.this.generatedClass);
+                    String msg = e.getMessage();
+                    if ((msg == null) || (msg.length() == 0)) {
+                        msg = e.toString();
                     }
-                    if (cachedMetaData != null) {
-                        cachedMetaData.addToHistory(outputPort);
-                    }
-                    cacheDirty = false;
+                    // will be added below
+                    cachedError = new SimpleMetaDataError(Severity.WARNING, outputPort,
+                            "pio.error.metadata.cannot_create_exampleset_metadata", new Object[]{msg});
+                }
+                if (cachedMetaData != null) {
+                    cachedMetaData.addToHistory(outputPort);
+                }
+                cacheDirty = false;
 //                }
                 outputPort.deliverMD(cachedMetaData);
                 if (cachedError != null) {
@@ -83,6 +84,13 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
     public void doWork() throws OperatorException {
         final T result = read();
         outputPort.deliver(result);
+    }
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        ioObjects.add(outputPort.getAnyDataOrNull());
+        return new IOContainer(ioObjects);
     }
 
     @Override

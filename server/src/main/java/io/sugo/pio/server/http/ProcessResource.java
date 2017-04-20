@@ -246,6 +246,30 @@ public class ProcessResource {
     }
 
     @GET
+    @Path("/run/from/{id}/{startOperatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response runFrom(@PathParam("id") final String id, @PathParam("startOperatorId") final String startOperatorId) {
+        try {
+            OperatorProcess process = processManager.runAsyn(id, startOperatorId, null);
+            return Response.ok(process).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/run/to/{id}/{endOperatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response runTo(@PathParam("id") final String id, @PathParam("endOperatorId") final String endOperatorId) {
+        try {
+            OperatorProcess process = processManager.runAsyn(id, null, endOperatorId);
+            return Response.ok(process).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
     @Path("/result/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response getResult(@PathParam("id") final String id) {

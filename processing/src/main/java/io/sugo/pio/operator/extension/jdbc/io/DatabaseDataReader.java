@@ -66,6 +66,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                 throw new UserError(this, "pio.error.cannot_connect_database");
             }
             logger.info("DatabaseDataReader connected to database: " + databaseHandler.getDatabaseUrl());
+            collectLog("DatabaseDataReader connected to database: " + databaseHandler.getDatabaseUrl());
 
             String sqle = this.getQuery(this.databaseHandler.getStatementCreator());
             if (sqle == null) {
@@ -87,6 +88,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     public ExampleSet createExampleSet() throws OperatorException {
         ResultSet resultSet = this.getResultSet();
         logger.info("DatabaseDataReader get result set successfully.");
+        collectLog("DatabaseDataReader get result set successfully.");
 
         ExampleSetBuilder builder;
         try {

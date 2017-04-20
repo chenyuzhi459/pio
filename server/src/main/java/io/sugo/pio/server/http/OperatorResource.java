@@ -208,6 +208,21 @@ public class OperatorResource {
         }
     }
 
+    @GET
+    @Path("/log/{processId}/{operatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getLog(
+            @PathParam("processId") final String processId,
+            @PathParam("operatorId") final String operatorId
+    ) {
+        try {
+            Operator operator = processManager.getOperator(processId, operatorId);
+            return Response.ok(operator.getLog()).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
     @POST
     @Path("/data/{processId}/{operatorId}")
     @Produces({MediaType.APPLICATION_JSON})

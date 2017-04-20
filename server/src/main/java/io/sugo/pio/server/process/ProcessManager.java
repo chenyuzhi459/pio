@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
@@ -237,9 +238,16 @@ public class ProcessManager {
     }
 
     public OperatorProcess runAsyn(String id) {
+        return runAsyn(id, null, null);
+    }
+
+    public OperatorProcess runAsyn(String id, String startOperatorId, String endOperatorId) {
         try {
             OperatorProcess process = getFromCache(id);
-            process.clearStatus();
+            if (Strings.isNullOrEmpty(startOperatorId) && Strings.isNullOrEmpty(endOperatorId)) {
+                process.clearStatus(); // Clear the status only in the case of run the entire process
+            }
+            process.getRootOperator().getExecutionUnit().setStartAndEnd(startOperatorId, endOperatorId);
 
             log.info("Put the will be running process[id:%s] to the queue.", id);
             queue.offer(process, 10, TimeUnit.SECONDS);

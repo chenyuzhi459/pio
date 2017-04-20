@@ -27,6 +27,16 @@ public class ExecutionUnit implements Serializable {
     private List<Operator> operators = new ArrayList<>();
     private List<Operator> executionOrder = new ArrayList<>();
 
+    /**
+     * Indicate which operator that the process begin to run
+     */
+    private String runStartOperatorId;
+
+    /**
+     * Indicate which operator that the process run to end
+     */
+    private String runEndOperatorId;
+
     @JsonCreator
     public ExecutionUnit() {
         for (Operator operator : operators) {
@@ -290,5 +300,18 @@ public class ExecutionUnit implements Serializable {
         for (Operator operator : operators) {
             operator.processFinished();
         }
+    }
+
+    public void setStartAndEnd(String startOperatorId, String endOperatorId) {
+        this.runStartOperatorId = startOperatorId;
+        this.runEndOperatorId = endOperatorId;
+    }
+
+    public String getRunStartOperatorId() {
+        return runStartOperatorId;
+    }
+
+    public String getRunEndOperatorId() {
+        return runEndOperatorId;
     }
 }

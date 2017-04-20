@@ -62,12 +62,6 @@ public final class ProcessRootOperator extends OperatorChain {
         return 0;
     }
 
-    @JsonIgnore
-    @Override
-    public String getErrorMsg() {
-        return null;
-    }
-
     /**
      * Called at the beginning of the process. Notifies all listeners and the children operators
      * (super method).
