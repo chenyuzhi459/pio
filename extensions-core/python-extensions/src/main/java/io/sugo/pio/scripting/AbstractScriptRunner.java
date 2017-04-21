@@ -10,14 +10,18 @@ import java.nio.file.*;
 import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.concurrent.CancellationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
  */
 public abstract class AbstractScriptRunner implements ScriptRunner {
+
     private final String script;
     private Process process;
     private final Operator operator;
+    private Logger logger;
 
     public AbstractScriptRunner(String script, Operator operator) {
         this.script = script;
@@ -34,6 +38,10 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
 
     protected abstract Process start(Path tempFolder, int numberOfOutputPorts) throws IOException;
 
+    public void registerLogger(Logger logger) {
+        this.logger = logger;
+    }
+
     @Override
     public List<IOObject> run(List<IOObject> inputs, int numberOfOutputPorts) throws IOException, CancellationException, OperatorException {
         Path tempFolder = null;
@@ -46,11 +54,13 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
             process = start(tempFolder, numberOfOutputPorts);
 //
             try {
-                int e = process.waitFor();
-                if(e != 0) {
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
                     String errorString = getError(tempFolder);
-                    handleLanguageSpecificExitCode(e, errorString);
-                    if(errorString.isEmpty()) {
+                    logger.log(Level.SEVERE, "Execute python script failed: " + errorString);
+
+                    handleLanguageSpecificExitCode(exitCode, errorString);
+                    if (errorString.isEmpty()) {
                         throw new OperatorException(OperatorException.getErrorMessage("python_scripting.script_failed", new Object[0]));
                     }
 
@@ -81,7 +91,7 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
     protected abstract void handleLanguageSpecificExitCode(int errorCode, String errorString) throws UserError;
 
     public void cancel() {
-        if(process != null) {
+        if (process != null) {
             process.destroy();
 
             try {
@@ -95,7 +105,7 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
         ArrayList<File> inputFiles = new ArrayList(inputs.size());
         int index = 0;
 
-        for(Iterator<IOObject> iterator = inputs.iterator(); iterator.hasNext(); ++index) {
+        for (Iterator<IOObject> iterator = inputs.iterator(); iterator.hasNext(); ++index) {
             IOObject input = iterator.next();
             Path tempPath = Paths.get(tempFolder.toString(), new String[]{"pio_input" + String.format("%03d", new Object[]{Integer.valueOf(index)}) + "." + getFileExtension(input)});
             File tempFile = tempPath.toFile();
@@ -108,15 +118,15 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
 
     private List<IOObject> deserializeResults(Path tempFolder) throws IOException, UserError {
         LinkedList<Path> outputFiles = new LinkedList();
-        Pattern pattern = Pattern.compile("rapidminer_output[0-9]{3}\\..*");
+        Pattern pattern = Pattern.compile("pio_output[0-9]{3}\\..*");
         DirectoryStream comparator = Files.newDirectoryStream(tempFolder);
         Throwable outputs = null;
         Path outputFile;
         try {
             Iterator<Path> iterator = comparator.iterator();
-            while(iterator.hasNext()) {
+            while (iterator.hasNext()) {
                 outputFile = iterator.next();
-                if(pattern.matcher(outputFile.getFileName().toString()).matches()) {
+                if (pattern.matcher(outputFile.getFileName().toString()).matches()) {
                     outputFiles.add(outputFile);
                 }
             }
@@ -124,8 +134,8 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
             outputs = t;
             throw t;
         } finally {
-            if(comparator != null) {
-                if(outputs != null) {
+            if (comparator != null) {
+                if (outputs != null) {
                     try {
                         comparator.close();
                     } catch (Throwable t) {
@@ -148,10 +158,10 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
         LinkedList<IOObject> result = new LinkedList();
         Iterator<Path> iterator = outputFiles.iterator();
 
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             outputFile = iterator.next();
             IOObject object = deserialize(outputFile.toFile());
-            if(object != null) {
+            if (object != null) {
                 result.add(object);
             }
         }
@@ -162,7 +172,7 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
     protected abstract String getFileExtension(IOObject input);
 
     private void deleteTempFolder(Path tempFolder) {
-        if(tempFolder != null) {
+        if (tempFolder != null) {
             try {
                 DirectoryStream directoryStream = Files.newDirectoryStream(tempFolder);
                 Throwable outputs = null;
@@ -170,14 +180,14 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
                 try {
                     Iterator iterator = directoryStream.iterator();
                     label132:
-                    while(true) {
-                        while(true) {
-                            if(!iterator.hasNext()) {
+                    while (true) {
+                        while (true) {
+                            if (!iterator.hasNext()) {
                                 break label132;
                             }
 
-                            Path entry = (Path)iterator.next();
-                            if(Files.isDirectory(entry, new LinkOption[0])) {
+                            Path entry = (Path) iterator.next();
+                            if (Files.isDirectory(entry, new LinkOption[0])) {
                                 deleteTempFolder(entry);
                             } else {
                                 try {
@@ -191,8 +201,8 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
                     outputs = t;
                     throw t;
                 } finally {
-                    if(directoryStream != null) {
-                        if(outputs != null) {
+                    if (directoryStream != null) {
+                        if (outputs != null) {
                             try {
                                 directoryStream.close();
                             } catch (Throwable t) {
@@ -223,6 +233,7 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
         processBuilder.redirectErrorStream(true);
         processBuilder.redirectError(ProcessBuilder.Redirect.PIPE);
         Process process = processBuilder.start();
+        InputStreamLogger.log(process.getInputStream(), logger);
         return process;
     }
 

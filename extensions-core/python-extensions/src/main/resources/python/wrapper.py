@@ -86,12 +86,12 @@ except Exception as e:
 # the number of outputs which the operator expects    
 rapidminer_numberOfOutputs = int(float(sys.argv[1]))
 
-# checks for files of the form 'rapidminer_input*.*', 
+# checks for files of the form 'pio_input*.*',
 # reads those with extension .csv into pandas.DataFrames,
 # reads those with extension .bin into python objects     
 # reads those with extension .foi into file objects
 def deserialize():
-    files = glob('rapidminer_input*.*');
+    files = glob('pio_input*.*');
     files.sort()
     inputs = []
     for file in files:
@@ -161,7 +161,7 @@ def readExampleSet(file):
     return data
 
 
-# writes the result(s) into files of the form rapidminer_output*.*,
+# writes the result(s) into files of the form pio_output*.*,
 # if the result is a tuple, all entries are treated separately
 # exports pandas.DataFrames to csv-files, files to foi-files (containing the file os.path) and other objects except for tuples
 # are serialized and saved in a .bin-file
@@ -175,17 +175,17 @@ def serialize(result):
         if isinstance(entry, pandas.DataFrame):
             handleMetaData(entry,index)
             checkColumnNames(entry)
-            entry.to_csv("rapidminer_output%03d.csv" % index,index=False,encoding='utf-8')
+            entry.to_csv("pio_output%03d.csv" % index,index=False,encoding='utf-8')
         elif isFileObject(entry):
             # write path in foi-file
-            with open("rapidminer_output%03d.foi" % index, 'wb') as foi_file:
+            with open("pio_output%03d.foi" % index, 'wb') as foi_file:
                 if sys.version_info >= (3, 0):
                     foi_file.write(bytes(entry.name, 'UTF-8'))
                 else:
                     foi_file.write(entry.name)
         else:
             try:
-                with open("rapidminer_output%03d.bin" % index, 'wb') as dump_file:
+                with open("pio_output%03d.bin" % index, 'wb') as dump_file:
                     pickle.dump(entry,dump_file)
             except Exception as e:
                 handleException(e)
@@ -242,7 +242,7 @@ def handleMetaData(data,index):
         metadata_list.append((meta_type,meta_role))
     #store as json
     try:
-        with open("rapidminer_output%03d.pmd" % index, 'w') as dump_file:
+        with open("pio_output%03d.pmd" % index, 'w') as dump_file:
             json.dump(metadata_list,dump_file)
     except Exception as e:
         print("Failed to send meta data from Python script to RapidMiner")
