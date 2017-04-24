@@ -583,7 +583,7 @@ public class ProcessManager {
                 newOperator.setName(meta.getName() + "-" + UUID.randomUUID().toString());
                 newOperator.setxPos(dto.getxPos());
                 newOperator.setyPos(dto.getyPos());
-                newOperator.setFullName(operator.getFullName() + "_副本");
+                newOperator.setFullName(operator.getFullName() + I18N.getMessage("pio.Operator.clone_suffix"));
                 newOperator.setStatus(Status.INIT);
                 process.getRootOperator().getExecutionUnit().addOperator(newOperator);
                 process.setUpdateTime(new DateTime());
