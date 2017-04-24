@@ -270,6 +270,18 @@ public class ProcessResource {
     }
 
     @GET
+    @Path("/run/single/{id}/{operatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response runSingle(@PathParam("id") final String id, @PathParam("operatorId") final String operatorId) {
+        try {
+            OperatorProcess process = processManager.runAsyn(id, operatorId, operatorId);
+            return Response.ok(process).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
     @Path("/result/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response getResult(@PathParam("id") final String id) {

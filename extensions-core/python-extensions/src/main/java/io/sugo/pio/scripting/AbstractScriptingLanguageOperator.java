@@ -33,6 +33,7 @@ public abstract class AbstractScriptingLanguageOperator extends Operator {
         ScriptRunner scriptRunner = getScriptRunner();
         List inputs = checkInputTypes(scriptRunner);
         int numberOfOutputPorts = outExtender.getManagedPorts().size() - 1;
+        collectLog("Begin to run python script, the number of output ports are: " + numberOfOutputPorts);
 //
         try {
             List<IOObject> outputs = scriptRunner.run(inputs, numberOfOutputPorts);

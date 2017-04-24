@@ -94,6 +94,7 @@ public class KMeans extends RMAbstractClusterer implements CapabilityProvider {
 
         logger.info("KMeans begin to generate cluster model with parameter k[%d], maxOptimizationSteps[%d], maxRuns[%d].",
                 k, maxOptimizationSteps, maxRuns);
+        collectLog("Begin to generate cluster model...");
 
         // init operator progress
         getProgress().setTotal(maxRuns * maxOptimizationSteps);
@@ -116,6 +117,7 @@ public class KMeans extends RMAbstractClusterer implements CapabilityProvider {
         }
 
         // extracting attribute names
+        collectLog("Extracting attribute names.");
         Attributes attributes = exampleSet.getAttributes();
         ArrayList<String> attributeNames = new ArrayList<>(attributes.size());
         for (Attribute attribute : attributes) {
@@ -220,6 +222,7 @@ public class KMeans extends RMAbstractClusterer implements CapabilityProvider {
         getProgress().complete();
 
         logger.info("KMeans generate cluster model finished.");
+        collectLog("Generate cluster model finished.");
 
         return bestModel;
     }

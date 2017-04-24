@@ -182,6 +182,7 @@ public class SamplingOperator extends AbstractSamplingOperator {
         List<String[]> pairs = null;
         ExampleSet exampleSet = null;
         if (balanceData) {
+            collectLog("Balance data");
             label = originalSet.getAttributes().getLabel();
             if (label != null) {
                 if (label.isNominal()) {
@@ -216,6 +217,8 @@ public class SamplingOperator extends AbstractSamplingOperator {
         } else {
             exampleSet = originalSet;
         }
+
+        collectLog("Begin to sampling...");
 
         // now iterate over all subsets
         for (int i = 0; i < numberOfIterations; i++) {
@@ -302,6 +305,8 @@ public class SamplingOperator extends AbstractSamplingOperator {
         int[] unusedResultIndices = new int[unusedResultSize];
         System.arraycopy(unusedIndices, 0, unusedResultIndices, 0, unusedResultSize);
         unusedExampleSet = new MappedExampleSet(originalSet, unusedResultIndices, true, true);
+
+        collectLog("Sampling finished, selected records: " + resultSize + ", non selected records: " + unusedResultSize);
 
         return new MappedExampleSet(originalSet, resultIndices, true, true);
     }

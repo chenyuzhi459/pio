@@ -311,6 +311,7 @@ public abstract class Operator implements ParameterHandler, Serializable {
             applyCountAtLastExecution = applyCount.incrementAndGet();
             doWork();
             setStatus(Status.SUCCESS);
+            collectLog("Operator '" + fullName + "' run finished.");
         } catch (Exception oe) {
             log.error(oe,"Operator named: %s execute failed.", getName());
             setStatus(Status.FAILED);
@@ -707,13 +708,8 @@ public abstract class Operator implements ParameterHandler, Serializable {
         logList.add(log);
     }
 
-    public String getLog() {
-        String logStr = "";
-        for (OperatorLog log : logList) {
-            logStr += (log.toString() + "\n");
-        }
-
-        return logStr;
+    public List<OperatorLog> getLog() {
+        return logList;
     }
 
     private void clearLog() {

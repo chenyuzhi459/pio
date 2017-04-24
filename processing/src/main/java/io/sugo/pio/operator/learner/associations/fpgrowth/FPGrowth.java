@@ -131,6 +131,7 @@ public class FPGrowth extends Operator {
     public void doWork() throws OperatorException {
         ExampleSet exampleSet = exampleSetInput.getData(ExampleSet.class);
         logger.info("FPGrowth begin to deal with example set, size[%d].", exampleSet.size());
+        collectLog("Begin to deal with example set, size: " + exampleSet.size());
 
         // check
         Tools.onlyNominalAttributes(exampleSet, "FPGrowth");
@@ -153,6 +154,7 @@ public class FPGrowth extends Operator {
             getProgress().setCheckForStop(false);
         }
         logger.info("FPGrowth begin to determine frequent items sets.");
+        collectLog("Begin to determine frequent items sets.");
 
         while (sets == null || sets.size() < minimumNumberOfItemsets && retryCount < maximalNumberOfRetries) {
             int currentMinTotalSupport = (int) Math.ceil(currentSupport * exampleSet.size());
@@ -180,22 +182,27 @@ public class FPGrowth extends Operator {
                 i++;
             }
             logger.info("FPGrowth determine attributes and their positive indices done.");
+            collectLog("Determine attributes and their positive indices done.");
 
             // map attributes to items
             Map<Attribute, Item> itemMapping = getAttributeMapping(workingSet);
             logger.info("FPGrowth map attributes to items done.");
+            collectLog("Map attributes to items done.");
 
             // computing frequency of 1-Item Sets
             getItemFrequency(workingSet, attributes, positiveIndices, itemMapping);
             logger.info("FPGrowth computing frequency of 1-Item Sets done.");
+            collectLog("Computing frequency of 1-Item Sets done.");
 
             // eliminating non frequent items
             removeNonFrequentItems(itemMapping, currentMinTotalSupport, workingSet);
             logger.info("FPGrowth eliminating non frequent items done.");
+            collectLog("Eliminating non frequent items done.");
 
             // generating FP Tree
             FPTree tree = getFPTree(workingSet, attributes, positiveIndices, itemMapping);
             logger.info("FPGrowth generating FP Tree done.");
+            collectLog("Generating FP Tree done.");
 
             // mine tree
             sets = new FrequentItemSets(workingSet.size());
@@ -278,6 +285,7 @@ public class FPGrowth extends Operator {
                 }
 
                 logger.info("FPGrowth mine tree done with 'mustContainItems': %s.", mustContainItems);
+                collectLog("Mine tree done with 'mustContainItems':" + mustContainItems);
             }
 
             currentSupport *= 0.9;
@@ -293,6 +301,7 @@ public class FPGrowth extends Operator {
         frequentSetsOutput.deliver(sets);
 
         logger.info("FPGrowth done and deliver set successfully.");
+        collectLog("FPGrowth done and deliver set successfully.");
     }
 
     /**

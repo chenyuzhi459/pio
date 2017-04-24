@@ -163,6 +163,7 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
     @Override
     public ExampleSet apply(ExampleSet exampleSet) throws OperatorException {
         logger.info("Change attribute role begin to apply example set[%s]...", exampleSet.getName());
+        collectLog("Begin to apply example set, size: " + exampleSet.size());
 
         String name = getParameterAsString(PARAMETER_NAME);
         String newRole = getParameterAsString(PARAMETER_TARGET_ROLE);
@@ -176,6 +177,8 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
                 setRole(exampleSet, pairs[0], pairs[1], PARAMETER_CHANGE_ATTRIBUTES);
             }
         }
+
+        collectLog("Apply example set successfully!");
 
         return exampleSet;
     }
@@ -204,7 +207,8 @@ public class ChangeAttributeRole extends AbstractDataProcessing {
             exampleSet.getAttributes().setSpecialAttribute(attribute, newRole);
         }
 
-        logger.info("Change attribute role set new role[%s] of example set[%s] successfully!", newRole, exampleSet.getName());
+        logger.info("ChangeAttributeRole set new role[%s] of example set[%s] successfully!", newRole, exampleSet.getName());
+        collectLog("Set new role '" + newRole + "' of example set successfully!");
     }
 
     @Override

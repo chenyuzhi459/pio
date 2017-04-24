@@ -49,11 +49,12 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
             if (this.databaseHandler != null && this.databaseHandler.getConnection() != null) {
                 try {
                     this.databaseHandler.getConnection().close();
+                    collectLog("Close database connection.");
                 } catch (SQLException var9) {
                     logger.warn("Error closing database connection: " + var9, var9);
+                    collectWarnLog("Close database connection failed, reason: " + var9.getMessage());
                 }
             }
-
         }
 
         return var2;
@@ -66,7 +67,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                 throw new UserError(this, "pio.error.cannot_connect_database");
             }
             logger.info("DatabaseDataReader connected to database: " + databaseHandler.getDatabaseUrl());
-            collectLog("DatabaseDataReader connected to database: " + databaseHandler.getDatabaseUrl());
+            collectLog("Connected to database: " + databaseHandler.getDatabaseUrl() + " successfully.");
 
             String sqle = this.getQuery(this.databaseHandler.getStatementCreator());
             if (sqle == null) {
@@ -74,6 +75,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
                         new Object[]{"query", "query_file", "table_name"});
             } else {
                 logger.info("DatabaseDataReader begin to execute sql: " + sqle);
+                collectLog("Begin to execute sql: " + sqle);
                 return this.databaseHandler.executeStatement(sqle, true, this, this.getLogger());
             }
         } catch (SQLException var2) {
@@ -88,7 +90,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
     public ExampleSet createExampleSet() throws OperatorException {
         ResultSet resultSet = this.getResultSet();
         logger.info("DatabaseDataReader get result set successfully.");
-        collectLog("DatabaseDataReader get result set successfully.");
+        collectLog("Get result set successfully.");
 
         ExampleSetBuilder builder;
         try {
@@ -203,8 +205,9 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         return tableNamesArr;
     }
 
-    public static ExampleSetBuilder createExampleTable(ResultSet resultSet, List<Attribute> attributes, int dataManagementType, Operator op) throws SQLException, OperatorException {
+    public ExampleSetBuilder createExampleTable(ResultSet resultSet, List<Attribute> attributes, int dataManagementType, Operator op) throws SQLException, OperatorException {
         logger.info("DatabaseDataReader begin to create example table through result set....");
+        collectLog("Begin to create example table through result set...");
 
         ResultSetMetaData metaData = resultSet.getMetaData();
         Attribute[] attributeArray = (Attribute[]) attributes.toArray(new Attribute[attributes.size()]);
@@ -296,6 +299,7 @@ public class DatabaseDataReader extends AbstractExampleSource implements Connect
         }
 
         logger.info("DatabaseDataReader created [%d] example table successfully.", counter);
+        collectLog("Create example table successfully, table size: " + counter);
 
         return builder;
     }

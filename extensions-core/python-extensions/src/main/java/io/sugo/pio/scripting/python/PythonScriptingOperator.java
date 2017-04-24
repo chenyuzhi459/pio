@@ -1,5 +1,6 @@
 package io.sugo.pio.scripting.python;
 
+import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.ParameterType;
@@ -17,17 +18,17 @@ import java.util.logging.Logger;
 public class PythonScriptingOperator extends AbstractScriptingLanguageOperator {
     @Override
     public String getDefaultFullName() {
-        return PythonScriptingOperator.class.getName();
+        return I18N.getMessage("pio.PythonScriptingOperator.name");
     }
 
     @Override
     public OperatorGroup getGroup() {
-        return OperatorGroup.dataSource;
+        return OperatorGroup.script;
     }
 
     @Override
     public String getDescription() {
-        return PythonScriptingOperator.class.getName();
+        return I18N.getMessage("pio.PythonScriptingOperator.description");
     }
 
     @Override
@@ -49,7 +50,8 @@ public class PythonScriptingOperator extends AbstractScriptingLanguageOperator {
     public List<ParameterType> getParameterTypes() {
         List<ParameterType> types = super.getParameterTypes();
 
-        ParameterTypeText type = new ParameterTypeText("script", "The python script to execute.", TextType.PYTHON, false);
+        ParameterTypeText type = new ParameterTypeText("script", I18N.getMessage("pio.PythonScriptingOperator.script"),
+                TextType.PYTHON, false);
         type.setExpert(false);
         String templateText = "import pandas\n\n# rm_main is a mandatory function, \n# the number of arguments has to be the number of input ports (can be none)\ndef rm_main(data):\n    print('Hello, world!')\n    # output can be found in Log View\n    print(type(data))\n\n    #your code goes here\n\n    #for example:\n    data2 = pandas.DataFrame([3,5,77,8])\n\n    # connect 2 output ports to see the results\n    return data, data2";
         type.setTemplateText(templateText);

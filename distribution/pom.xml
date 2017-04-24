@@ -89,6 +89,8 @@
                                 <argument>io.sugo.pio.extensions:dl4j-extensions</argument>
                                 <argument>-c</argument>
                                 <argument>io.sugo.pio.extensions:ffm-extensions</argument>
+                                <argument>-c</argument>
+                                <argument>io.sugo.pio.extensions:python-extensions</argument>
                                 <argument>-e</argument>
                                 <argument>io.sugo.pio.engines:als-engine</argument>
                                 <argument>-e</argument>

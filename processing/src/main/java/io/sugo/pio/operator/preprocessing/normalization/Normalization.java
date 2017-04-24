@@ -89,6 +89,8 @@ public class Normalization extends PreprocessingOperator {
         int method = getParameterAsInt(PARAMETER_NORMALIZATION_METHOD);
         NormalizationMethod normalizationMethod = METHODS.get(method);
         normalizationMethod.init();
+        collectLog("Normalization with method: " + normalizationMethod.getDisplayName());
+
         return normalizationMethod.getNormalizationModel(exampleSet, this);
     }
 

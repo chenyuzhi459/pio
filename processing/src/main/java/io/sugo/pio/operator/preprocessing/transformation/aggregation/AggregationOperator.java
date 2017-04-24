@@ -315,6 +315,7 @@ public class AggregationOperator extends AbstractDataProcessing {
     @Override
     public ExampleSet apply(ExampleSet exampleSet) throws OperatorException {
         // creating data structures for building aggregates
+        collectLog("Creating data structures for building aggregates.");
         List<AggregationFunction> aggregationFunctions = createAggreationFunctions(exampleSet);
         Attribute[] groupAttributes;
 
@@ -378,6 +379,7 @@ public class AggregationOperator extends AbstractDataProcessing {
         boolean useWeights = weightAttribute != null;
 
         // running over exampleSet and aggregate data of each example
+        collectLog("Running over example set and aggregate data of each example.");
         AggregationTreeNode rootNode = new AggregationTreeNode();
         LeafAggregationTreeNode leafNode = null;
         if (groupAttributes.length == 0) {
@@ -421,9 +423,11 @@ public class AggregationOperator extends AbstractDataProcessing {
         }
 
         // now derive new example set from aggregated values
+        collectLog("Derive new example set from aggregated values.");
         boolean isCountingAllCombinations = getParameterAsBoolean(PARAMETER_ALL_COMBINATIONS);
 
         // building new attributes from grouping attributes and aggregation functions
+        collectLog("Building new attributes from grouping attributes and aggregation functions.");
         Attribute[] newAttributes = new Attribute[groupAttributes.length + aggregationFunctions.size()];
         for (int i = 0; i < groupAttributes.length; i++) {
             newAttributes[i] = AttributeFactory.createAttribute(groupAttributes[i]);
@@ -465,6 +469,7 @@ public class AggregationOperator extends AbstractDataProcessing {
         }
 
         // write data into table
+        collectLog("Write data into table.");
         builder.withExpectedSize(allGroupCombinations.size());
         int currentRow = 0;
         for (double[] groupValues : allGroupCombinations) {

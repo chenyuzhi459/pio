@@ -102,6 +102,7 @@ public class AssociationRuleGenerator extends Operator {
         double laplaceK = getParameterAsDouble(PARAMETER_LAPLACE_K);
         FrequentItemSets sets = itemSetsInput.getData(FrequentItemSets.class);
         logger.info("AssociationRuleGenerator begin to create association rules, frequent item sets size[%d].", sets.size());
+        collectLog("Begin to create association rules, frequent item sets size: " + sets.size());
 
         AssociationRules rules = new AssociationRules();
         HashMap<Collection<Item>, Integer> setFrequencyMap = new HashMap<Collection<Item>, Integer>();
@@ -113,6 +114,7 @@ public class AssociationRuleGenerator extends Operator {
         int progressCounter = 0;
         getProgress().setTotal(sets.size());
         logger.info("AssociationRuleGenerator iterating sorted over every frequent set, generating every possible rule and building frequency map.");
+        collectLog("Iterating sorted over every frequent set, generating every possible rule and building frequency map.");
 
         for (FrequentItemSet set : sets) {
             setFrequencyMap.put(set.getItems(), set.getFrequency());
@@ -156,6 +158,7 @@ public class AssociationRuleGenerator extends Operator {
         itemSetsOutput.deliver(sets);
 
         logger.info("AssociationRuleGenerator create association rules and deliver sets successfully.");
+        collectLog("Create association rules and deliver sets successfully!");
     }
 
     private double getCriterionValue(int totalFrequency, int preconditionFrequency, int conclusionFrequency,

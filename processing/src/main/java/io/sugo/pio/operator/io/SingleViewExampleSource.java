@@ -51,6 +51,8 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             druidUrl = "http://" + druidUrl;
         }
 
+        collectLog("Begin to get data from druid...");
+
         String singleViewValue = buildQueryDruidParam();
         String result = httpPost(druidUrl, singleViewValue);
 
@@ -70,6 +72,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
             if (resultList != null && !resultList.isEmpty()) {
                 logger.info("Begin to traverse druid data to example set data. Data size:" + resultList.size());
+                collectLog("Get data from druid successfully, data size: " + resultList.size());
 
                 int attrSize = attributes.size();
 
@@ -119,6 +122,8 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 }
 
                 logger.info("Traverse druid data to example set data successfully.");
+            } else {
+                collectLog("The data from druid is empty.");
             }
 
             return builder.build();

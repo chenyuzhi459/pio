@@ -244,8 +244,8 @@ public class ProcessManager {
     public OperatorProcess runAsyn(String id, String startOperatorId, String endOperatorId) {
         try {
             OperatorProcess process = getFromCache(id);
-            if (Strings.isNullOrEmpty(startOperatorId) && Strings.isNullOrEmpty(endOperatorId)) {
-                process.clearStatus(); // Clear the status only in the case of run the entire process
+            if (Strings.isNullOrEmpty(startOperatorId)) {
+                process.clearStatus(); // Not clear the status only in the case of running from given operator
             }
             process.getRootOperator().getExecutionUnit().setStartAndEnd(startOperatorId, endOperatorId);
 

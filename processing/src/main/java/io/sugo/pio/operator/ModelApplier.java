@@ -96,6 +96,7 @@ public class ModelApplier extends Operator {
         Model model = modelInput.getData(Model.class);
 
         logger.info("Begin to apply model[%s]...", model.getName());
+        collectLog("Begin to apply model " + model.getName());
 
         if (AbstractModel.class.isAssignableFrom(model.getClass())) {
             ((AbstractModel) model).setOperator(this);
@@ -118,6 +119,7 @@ public class ModelApplier extends Operator {
         if (getParameterAsBoolean(PARAMETER_CREATE_VIEW)) {
             try {
                 model.setParameter(PreprocessingOperator.PARAMETER_CREATE_VIEW, true);
+                collectLog("Extra treatment for views.");
             } catch (UnsupportedApplicationParameterError e) {
                 e.setOperator(this);
                 throw e;
@@ -128,6 +130,7 @@ public class ModelApplier extends Operator {
         try {
             result = model.apply(inputExampleSet);
             logger.info("Apply model[%s] to example set[%s]", model.getName(), inputExampleSet.getName());
+            collectLog("Apply model to example set successfully, example size: " + inputExampleSet.size());
         } catch (UserError e) {
             if (e.getOperator() == null) {
                 e.setOperator(this);
@@ -142,6 +145,7 @@ public class ModelApplier extends Operator {
 
         exampleSetOutput.deliver(result);
         modelOutput.deliver(model);
+        collectLog("Deliver the model to the next operator.");
     }
 
     @Override

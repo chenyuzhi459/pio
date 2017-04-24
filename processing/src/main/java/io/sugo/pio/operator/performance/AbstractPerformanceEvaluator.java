@@ -237,6 +237,7 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
     public void doWork() throws OperatorException {
         ExampleSet testSet = exampleSetInput.getData(ExampleSet.class);
         logger.info("AbstractPerformanceEvaluator begin to evaluate test set, size[%d].", testSet.size());
+        collectLog("Begin to evaluate test set, size: " + testSet.size());
 
         checkCompatibility(testSet);
         init(testSet);
@@ -245,6 +246,7 @@ public abstract class AbstractPerformanceEvaluator extends Operator implements C
         exampleSetOutput.deliver(testSet);
 
         logger.info("AbstractPerformanceEvaluator evaluate test set and deliver it successfully.");
+        collectLog("Evaluate test set and deliver it successfully!");
     }
 
     // --------------------------------------------------------------------------------

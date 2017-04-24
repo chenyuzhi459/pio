@@ -49,15 +49,23 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
         List<IOObject> result;
         try {
             tempFolder = Files.createTempDirectory("scripting", new FileAttribute[0]);
+            operator.collectLog("Create temporary directory: " + tempFolder.getFileName());
+
             serializeInputs(inputs, tempFolder);
+            operator.collectLog("Serialize example set inputs to files.");
+
             generateScriptFile(tempFolder);
+            operator.collectLog("Generate python script file by user input.");
+
             process = start(tempFolder, numberOfOutputPorts);
+            operator.collectLog("Create process of python and waiting for the execution results.");
 //
             try {
                 int exitCode = process.waitFor();
                 if (exitCode != 0) {
                     String errorString = getError(tempFolder);
                     logger.log(Level.SEVERE, "Execute python script failed: " + errorString);
+                    operator.collectErrorLog("Execute python script failed: " + errorString);
 
                     handleLanguageSpecificExitCode(exitCode, errorString);
                     if (errorString.isEmpty()) {
@@ -74,6 +82,7 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
             result = deserializeResults(tempFolder);
         } finally {
             deleteTempFolder(tempFolder);
+            operator.collectLog("Delete temporary directory.");
         }
 //
         return result;
@@ -117,6 +126,7 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
     }
 
     private List<IOObject> deserializeResults(Path tempFolder) throws IOException, UserError {
+        operator.collectLog("Execute python script successfully and deserialize results to example set from files.");
         LinkedList<Path> outputFiles = new LinkedList();
         Pattern pattern = Pattern.compile("pio_output[0-9]{3}\\..*");
         DirectoryStream comparator = Files.newDirectoryStream(tempFolder);

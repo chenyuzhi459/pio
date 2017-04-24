@@ -56,7 +56,9 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
                 throw new OperatorException("pio.error.parsing.unresolvable_http_result", e, result);
             }
 
-            logger.info("Get data from url '" + postUrl + "' with parameter '" + queryParam + "'successfully.");
+            String message = "Get data from url '" + postUrl + "' with parameter '" + queryParam + "'successfully.";
+            logger.info(message);
+            collectLog(message);
 
             DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_BYTE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
             List<Attribute> attributes = getAttributes(resultList);
@@ -85,6 +87,7 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
                 }
 
                 logger.info("Traverse sql data to example set data successfully.");
+                collectLog("Traverse sql data to example set data successfully, data size: " + resultList.size());
             }
 
             return builder.build();

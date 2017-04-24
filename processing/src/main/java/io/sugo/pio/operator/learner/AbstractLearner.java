@@ -127,6 +127,7 @@ public abstract class AbstractLearner extends Operator implements Learner {
         ExampleSet exampleSet = exampleSetInput.getData(ExampleSet.class);
         logger.info("Abstract learner begin to learn through example set[%s], which has size[%d]",
                 exampleSet.getName(), exampleSet.size());
+        collectLog("Learn through example set, size: " + exampleSet.size());
 
         // some checks
         if (exampleSet.getAttributes().getLabel() == null) {
@@ -176,6 +177,7 @@ public abstract class AbstractLearner extends Operator implements Learner {
 
         logger.info("Abstract learner learn through example set[%s] and deliver to the next operator finished.",
                 exampleSet.getName(), exampleSet.size());
+        collectLog("Learn finished and deliver the model to the next operator.");
     }
 
     /**

@@ -84,6 +84,7 @@ public abstract class AbstractReader<T extends IOObject> extends Operator {
     public void doWork() throws OperatorException {
         final T result = read();
         outputPort.deliver(result);
+        collectLog("Deliver the result to the next operator.");
     }
 
     @Override
