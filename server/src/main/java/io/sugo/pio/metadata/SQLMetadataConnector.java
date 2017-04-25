@@ -261,7 +261,7 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                 ImmutableList.of(
                         String.format(
                                 "CREATE TABLE %1$s (\n"
-                                        + "  id VARCHAR(50) NOT NULL,\n"
+                                        + "  id VARCHAR(255) NOT NULL,\n"
                                         + "  name VARCHAR(50) NOT NULL,\n"
                                         + "  description VARCHAR(250),\n"
                                         + "  status VARCHAR(20) NOT NULL,\n"
@@ -269,6 +269,11 @@ public abstract class SQLMetadataConnector implements MetadataStorageConnector {
                                         + "  update_date VARCHAR(50) NOT NULL,\n"
                                         + "  operators %2$s,\n"
                                         + "  connections %3$s,\n"
+                                        + "  tenant_id VARCHAR(255) NOT NULL,\n"
+                                        + "  built_in int DEFAULT 0 NOT NULL,\n"
+                                        + "  is_template int DEFAULT 0 NOT NULL,\n"
+                                        + "  type VARCHAR(50),\n"
+                                        + "  is_case int DEFAULT 0 NOT NULL,\n"
                                         + "  PRIMARY KEY (id)\n"
                                         + ")",
                                 tableName, getPayloadType(), getPayloadType()
