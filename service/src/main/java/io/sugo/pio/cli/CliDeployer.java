@@ -1,11 +1,7 @@
 package io.sugo.pio.cli;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.inject.Binder;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.metamx.common.lifecycle.Lifecycle;
@@ -13,17 +9,10 @@ import com.metamx.common.logger.Logger;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
 import io.sugo.pio.client.task.TaskServiceClient;
-import io.sugo.pio.common.task.Task;
-import io.sugo.pio.guice.EnginesConfig;
 import io.sugo.pio.guice.LazySingleton;
-import io.sugo.pio.initialization.Initialization;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.List;
 
 /**

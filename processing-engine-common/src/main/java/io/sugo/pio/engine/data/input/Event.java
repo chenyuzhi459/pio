@@ -9,6 +9,8 @@ public class Event implements Serializable {
     private long timestamp;
     private Map<String, Object> properties;
 
+    public Event() {}
+
     public Event(long timestamp,
                  Map<String, Object> properties) {
         this.timestamp = timestamp;

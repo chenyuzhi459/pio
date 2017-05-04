@@ -28,8 +28,17 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.sugo.pio.engine-demos</groupId>
+            <artifactId>engine-demo</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-yarn_2.11</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>io.airlift</groupId>-->

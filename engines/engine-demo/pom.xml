@@ -8,6 +8,7 @@
         <artifactId>pio</artifactId>
         <groupId>io.sugo</groupId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <groupId>io.sugo.pio.engine-demos</groupId>
@@ -61,6 +62,16 @@
         <dependency>
             <groupId>io.sugo.pio.engines</groupId>
             <artifactId>articleCluster-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>user-extension-engine</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sugo.pio.engines</groupId>
+            <artifactId>user-feature-extraction-engine</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -128,6 +139,10 @@
             <groupId>io.sugo.pio.engines</groupId>
             <artifactId>flow-engine</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
         </dependency>
     </dependencies>
 
