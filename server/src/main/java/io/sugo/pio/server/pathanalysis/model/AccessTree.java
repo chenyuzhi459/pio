@@ -16,7 +16,7 @@ public class AccessTree implements Serializable {
 
     private static final java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
 
-    private PathNode leaf;
+    private TreeNode leaf;
 
     private int weight;
 
@@ -24,7 +24,7 @@ public class AccessTree implements Serializable {
 
     private List<AccessTree> children = Lists.newLinkedList();
 
-    public AccessTree(PathNode leaf, int weight) {
+    public AccessTree(TreeNode leaf, int weight) {
         this.leaf = leaf;
         this.weight = weight;
     }
@@ -60,7 +60,7 @@ public class AccessTree implements Serializable {
             }
             if (weight > totalWeight) {
                 int lostWeight = weight - totalWeight;
-                AccessTree lossTree = new AccessTree(new PathNode(PathAnalysisConstant.LEAF_NAME_LOSS,
+                AccessTree lossTree = new AccessTree(new TreeNode(PathAnalysisConstant.LEAF_NAME_LOSS,
                         children.get(0).getLeaf().getLayer(), PathAnalysisConstant.NODE_TYPE_LOSS),
                         lostWeight);
                 children.add(lossTree);
@@ -80,7 +80,7 @@ public class AccessTree implements Serializable {
             totalWeight += tree.getWeight();
         }
 
-        return new AccessTree(new PathNode(PathAnalysisConstant.LEAF_NAME_OTHER,
+        return new AccessTree(new TreeNode(PathAnalysisConstant.LEAF_NAME_OTHER,
                 trees.get(0).getLeaf().getLayer()), totalWeight);
     }
 
@@ -88,6 +88,11 @@ public class AccessTree implements Serializable {
     public List<AccessTree> getChildren() {
         prune();
         return children;
+    }
+
+    @JsonProperty("stayTime")
+    public double getAverageStayTime() {
+        return leaf.getTotalStayTime() * 1.0 / weight;
     }
 
     @JsonProperty
@@ -101,7 +106,7 @@ public class AccessTree implements Serializable {
     }
 
     @JsonUnwrapped
-    public PathNode getLeaf() {
+    public TreeNode getLeaf() {
         return leaf;
     }
 

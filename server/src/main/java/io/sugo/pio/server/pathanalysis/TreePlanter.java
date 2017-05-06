@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.sugo.pio.jackson.DefaultObjectMapper;
-import io.sugo.pio.server.pathanalysis.model.AccessPath;
-import io.sugo.pio.server.pathanalysis.model.AccessTree;
-import io.sugo.pio.server.pathanalysis.model.PathNode;
+import io.sugo.pio.server.pathanalysis.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -55,7 +53,7 @@ public class TreePlanter {
             AccessTree currentTree = treeHolder.getTree(currentNode);
             if (currentTree == null) {
                 // Create a new sub tree
-                currentTree = new AccessTree(currentNode, 1);
+                currentTree = new AccessTree(TreeNode.convert(currentNode), 1);
                 treeHolder.addTree(currentTree);
 
                 if (parentTree != null) {
@@ -64,6 +62,10 @@ public class TreePlanter {
             } else {
                 // If the sub tree already exists, just increase the weight of it.
                 currentTree.increaseWeight();
+
+                // Accumulate tree leaf's total stay time and record all users who accessed this node
+                currentTree.getLeaf().accumulateStayTime(currentNode.getStayTime());
+                currentTree.getLeaf().addUserId(currentNode.getUserId());
             }
 
             parentTree = currentTree;
@@ -74,7 +76,7 @@ public class TreePlanter {
 
         private Map<String, AccessTree> trees = Maps.newHashMap();
 
-        public AccessTree getTree(PathNode leaf) {
+        public AccessTree getTree(Node leaf) {
             if (leaf == null) {
                 return null;
             }
@@ -84,7 +86,7 @@ public class TreePlanter {
         }
 
         public void addTree(AccessTree tree) {
-            PathNode leaf = tree.getLeaf();
+            TreeNode leaf = tree.getLeaf();
             trees.put(getKey(leaf), tree);
         }
 
@@ -96,7 +98,7 @@ public class TreePlanter {
             return null;
         }
 
-        private String getKey(PathNode leaf) {
+        private String getKey(Node leaf) {
             return leaf.getPageName() + "." + leaf.getLayer();
         }
     }

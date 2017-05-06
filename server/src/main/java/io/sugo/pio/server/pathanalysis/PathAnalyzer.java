@@ -51,6 +51,7 @@ public class PathAnalyzer {
             PageAccessRecordVo preRecord = null;
             AccessPath path = null;
             int layer = 0;
+            Long preAccessTime = null;
 
             for (PageAccessRecordVo record : records) {
                 if (record.getPageName().equals(homePage)) {
@@ -65,8 +66,13 @@ public class PathAnalyzer {
                         // Discard the nodes whose layer greater than depth
                         if (layer <= depth) {
                             PathNode node = new PathNode(record.getPageName(), ++layer);
+                            node.setUserId(null);
+                            if (preAccessTime != null) {
+                                node.setStayTime(record.getAccessTime().getTime() - preAccessTime);
+                            }
                             path.addNode(node);
                             preRecord = record;
+                            preAccessTime = record.getAccessTime().getTime();
                         }
                     } else {
                         // Add path for growing tree
@@ -77,6 +83,7 @@ public class PathAnalyzer {
                         preRecord = null;
                         path = null;
                         layer = 0;
+                        preAccessTime = null;
                     }
                 }
             }

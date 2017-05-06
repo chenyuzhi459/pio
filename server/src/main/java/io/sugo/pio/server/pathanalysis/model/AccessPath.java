@@ -16,16 +16,8 @@ public class AccessPath implements Comparable<AccessPath> {
 
     public void addNode(PathNode node) {
         if (!nodeList.contains(node)) {
-            node.setAccessPath(this);
+//            node.setAccessPath(this);
             nodeList.add(node);
-        }
-    }
-
-    public PathNode getNodeOfLayer(int layer) {
-        try {
-            return nodeList.get(layer);
-        } catch (IndexOutOfBoundsException e) {
-            return null;
         }
     }
 
