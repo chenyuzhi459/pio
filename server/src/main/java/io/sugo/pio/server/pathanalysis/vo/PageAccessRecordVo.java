@@ -27,6 +27,8 @@ public class PageAccessRecordVo {
 
     private String sessionId;
 
+    private String userId;
+
     public String getPageName() {
         return pageName;
     }
@@ -51,4 +53,11 @@ public class PageAccessRecordVo {
         this.sessionId = sessionId;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 }

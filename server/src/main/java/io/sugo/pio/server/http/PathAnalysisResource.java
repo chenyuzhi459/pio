@@ -15,6 +15,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 
 @Path("/pio/process/pa/")
 public class PathAnalysisResource {
@@ -40,7 +41,7 @@ public class PathAnalysisResource {
             AccessTree tree = pathAnalyzer.getAccessTree(queryStr,
                     pathAnalysisDto.getHomePage(), false);
 
-            return Response.ok(tree).build();
+            return Response.ok(tree == null ? Collections.EMPTY_LIST : tree).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
@@ -57,7 +58,7 @@ public class PathAnalysisResource {
             AccessTree tree = pathAnalyzer.getAccessTree(queryStr,
                     pathAnalysisDto.getHomePage(), true);
 
-            return Response.ok(tree).build();
+            return Response.ok(tree == null ? Collections.EMPTY_LIST : tree).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();
         }

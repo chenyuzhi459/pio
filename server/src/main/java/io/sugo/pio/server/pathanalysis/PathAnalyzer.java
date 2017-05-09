@@ -43,7 +43,18 @@ public class PathAnalyzer {
 
     public AccessTree getAccessTree(String queryStr, String homePage, boolean reversed) {
         int depth = reversed ? PathAnalysisConstant.TREE_DEPTH_REVERSE : PathAnalysisConstant.TREE_DEPTH_NORMAL;
+
+        log.info("Begin to fetch path analysis data...");
+        long now = System.currentTimeMillis();
+
         List<PageAccessRecordVo> records = fetchData(queryStr);
+
+        long after = System.currentTimeMillis();
+        log.info("Fetch path analysis data ended, cost %d million seconds.", after-now);
+
+        log.info("Begin to path analysis...");
+        now = System.currentTimeMillis();
+
         records.sort(reversed ? PageAccessRecordVo.ASC_COMPARATOR : PageAccessRecordVo.DESC_COMPARATOR);
 
         if (records.size() > 0) {
@@ -66,7 +77,7 @@ public class PathAnalyzer {
                         // Discard the nodes whose layer greater than depth
                         if (layer <= depth) {
                             PathNode node = new PathNode(record.getPageName(), ++layer);
-                            node.setUserId(null);
+                            node.setUserId(record.getUserId());
                             if (preAccessTime != null) {
                                 node.setStayTime(record.getAccessTime().getTime() - preAccessTime);
                             }
@@ -93,6 +104,9 @@ public class PathAnalyzer {
                 planter.addPath(path);
             }
         }
+
+        after = System.currentTimeMillis();
+        log.info("Path analysis ended, cost %d million seconds.", after-now);
 
         return planter.getRoot();
     }

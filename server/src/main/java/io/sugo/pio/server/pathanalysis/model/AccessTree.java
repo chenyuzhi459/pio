@@ -3,10 +3,12 @@ package io.sugo.pio.server.pathanalysis.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.sugo.pio.server.pathanalysis.PathAnalysisConstant;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 /**
  */
@@ -48,7 +50,7 @@ public class AccessTree implements Serializable {
             List<AccessTree> tailChildren = children.subList(PathAnalysisConstant.MAX_CHILDREN,
                     children.size());
             AccessTree mergedTree = merge(tailChildren);
-            children.removeAll(tailChildren);
+            tailChildren.clear();
             children.add(mergedTree);
         }
 
@@ -76,12 +78,14 @@ public class AccessTree implements Serializable {
 
     private AccessTree merge(List<AccessTree> trees) {
         int totalWeight = 0;
+        Set<String> userIds = Sets.newHashSet();
         for (AccessTree tree : trees) {
             totalWeight += tree.getWeight();
+            userIds.addAll(tree.getLeaf().getUserIds());
         }
 
         return new AccessTree(new TreeNode(PathAnalysisConstant.LEAF_NAME_OTHER,
-                trees.get(0).getLeaf().getLayer()), totalWeight);
+                trees.get(0).getLeaf().getLayer()).setUserIds(userIds), totalWeight);
     }
 
     @JsonProperty

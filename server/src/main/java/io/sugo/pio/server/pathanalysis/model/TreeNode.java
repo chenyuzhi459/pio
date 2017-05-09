@@ -67,6 +67,11 @@ public class TreeNode extends Node {
         return userIds;
     }
 
+    public TreeNode setUserIds(Set<String> userIds) {
+        this.userIds = userIds;
+        return this;
+    }
+
     public void addUserId(String userId) {
         userIds.add(userId);
     }
