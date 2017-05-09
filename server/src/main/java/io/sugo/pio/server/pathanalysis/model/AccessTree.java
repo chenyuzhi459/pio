@@ -46,13 +46,13 @@ public class AccessTree implements Serializable {
                         tom.getWeight() < jack.getWeight() ? 1 : 0);
 
         // Second, merge trees into a tree which beyond the number of 'MAX_CHILDREN'.
-        if (children.size() > PathAnalysisConstant.MAX_CHILDREN) {
+        /*if (children.size() > PathAnalysisConstant.MAX_CHILDREN) {
             List<AccessTree> tailChildren = children.subList(PathAnalysisConstant.MAX_CHILDREN,
                     children.size());
             AccessTree mergedTree = merge(tailChildren);
             tailChildren.clear();
             children.add(mergedTree);
-        }
+        }*/
 
         // Third, add tree which indicate user loss if necessary.
         if (children.size() > 0) {
