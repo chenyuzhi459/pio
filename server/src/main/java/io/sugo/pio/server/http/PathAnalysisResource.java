@@ -1,11 +1,12 @@
 package io.sugo.pio.server.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.guice.annotations.Json;
 import io.sugo.pio.server.http.dto.PathAnalysisDto;
-import io.sugo.pio.server.pathanalysis.PathAnalysisConstant;
 import io.sugo.pio.server.pathanalysis.PathAnalyzer;
 import io.sugo.pio.server.pathanalysis.model.AccessTree;
 
@@ -19,6 +20,8 @@ import java.util.Collections;
 
 @Path("/pio/process/pa/")
 public class PathAnalysisResource {
+
+    private static final Logger log = new Logger(PathAnalysisResource.class);
 
     private final PathAnalyzer pathAnalyzer;
 
@@ -65,6 +68,10 @@ public class PathAnalysisResource {
     }
 
     private void check(PathAnalysisDto pathAnalysisDto) {
+        try {
+            log.info("Path analysis param: %s", jsonMapper.writeValueAsString(pathAnalysisDto));
+        } catch (JsonProcessingException ignore) { }
+
         Preconditions.checkNotNull(pathAnalysisDto.getDataSource(), "Data source can not be null.");
 //        Preconditions.checkNotNull(pathAnalysisDto.getSessionId(), "Session id can not be null.");
         Preconditions.checkNotNull(pathAnalysisDto.getHomePage(), "Home page can not be null.");

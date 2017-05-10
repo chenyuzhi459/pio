@@ -50,12 +50,12 @@ public class PathAnalyzer {
         List<PageAccessRecordVo> records = fetchData(queryStr);
 
         long after = System.currentTimeMillis();
-        log.info("Fetch path analysis data ended, cost %d million seconds.", after-now);
+        log.info("Fetch path analysis data ended, cost %d million seconds.", after - now);
 
         log.info("Begin to path analysis...");
         now = System.currentTimeMillis();
 
-        records.sort(reversed ? PageAccessRecordVo.ASC_COMPARATOR : PageAccessRecordVo.DESC_COMPARATOR);
+        records.sort(reversed ? PageAccessRecordVo.DESC_COMPARATOR : PageAccessRecordVo.ASC_COMPARATOR);
 
         if (records.size() > 0) {
             boolean startAnalysis = false;
@@ -76,12 +76,14 @@ public class PathAnalyzer {
                     if (sameSession(preRecord, record, homePage)) {
                         // Discard the nodes whose layer greater than depth
                         if (layer <= depth) {
-                            PathNode node = new PathNode(record.getPageName(), ++layer);
-                            node.setUserId(record.getUserId());
-                            if (preAccessTime != null) {
-                                node.setStayTime(record.getAccessTime().getTime() - preAccessTime);
+                            if (!sameNode(preRecord, record)) {
+                                PathNode node = new PathNode(record.getPageName(), ++layer);
+                                node.setUserId(record.getUserId());
+                                if (preAccessTime != null) {
+                                    node.setStayTime(record.getAccessTime().getTime() - preAccessTime);
+                                }
+                                path.addNode(node);
                             }
-                            path.addNode(node);
                             preRecord = record;
                             preAccessTime = record.getAccessTime().getTime();
                         }
@@ -106,7 +108,7 @@ public class PathAnalyzer {
         }
 
         after = System.currentTimeMillis();
-        log.info("Path analysis ended, cost %d million seconds.", after-now);
+        log.info("Path analysis ended, cost %d million seconds.", after - now);
 
         return planter.getRoot();
     }
@@ -123,7 +125,7 @@ public class PathAnalyzer {
         final List<PageAccessRecordVo> recordList = new ArrayList<>();
         try {
             List<DruidResult> druidResult = jsonMapper.readValue(resultStr, javaType);
-            if (druidResult.get(0).getResult() != null) {
+            if (druidResult.size() > 0 && druidResult.get(0).getResult() != null) {
                 log.info("Fetch %d path analysis data from druid %s.", druidResult.get(0).getResult().getEvents().size(), queryUrl);
                 druidResult.get(0).getResult().getEvents().forEach(events -> {
                     recordList.add(events.getEvent());
@@ -158,7 +160,16 @@ public class PathAnalyzer {
         Date currentTime = currentRecord.getAccessTime();
         long interval = Math.abs(currentTime.getTime() - preTime.getTime());
 
-        return interval <= PathAnalysisConstant.SESSION_EXPIRED_TIME;
+        return preRecord.getSessionId().equals(currentRecord.getSessionId()) &&
+                interval <= PathAnalysisConstant.SESSION_EXPIRED_TIME;
+    }
+
+    private boolean sameNode(PageAccessRecordVo preRecord, PageAccessRecordVo currentRecord) {
+        if (preRecord == null) {
+            return false;
+        }
+
+        return preRecord.getPageName().equals(currentRecord.getPageName());
     }
 
     private static class DruidResult {

@@ -1,5 +1,6 @@
 package io.sugo.pio.server.http.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,30 +17,37 @@ public class PathAnalysisDto {
 
     private static final ObjectMapper jsonMapper = new ObjectMapper();
 
+    @JsonProperty
     private String dataSource;
-
+    @JsonProperty
     private ColumnName dimension;
-
+    @JsonProperty
     private List<String> pages;
-
+    @JsonProperty
     private List<FilterDimension> filters;
-
+    @JsonProperty
     private String homePage;
 
     /**
      * yyyy-mm-dd
      */
+    @JsonProperty
     private String startDate;
 
     /**
      * yyyy-mm-dd
      */
+    @JsonProperty
     private String endDate;
 
     private static class ColumnName {
+        @JsonProperty
         String sessionId;
+        @JsonProperty
         String pageName;
+        @JsonProperty
         String date;
+        @JsonProperty
         String userId;
 
         public String getSessionId() {
@@ -349,8 +357,11 @@ public class PathAnalysisDto {
     }
 
     private static class FilterDimension {
+        @JsonProperty
         String dimension;
+        @JsonProperty
         String action;
+        @JsonProperty
         Object value;
 
         public String getDimension() {
