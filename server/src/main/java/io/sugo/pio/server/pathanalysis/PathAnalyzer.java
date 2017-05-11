@@ -64,7 +64,8 @@ public class PathAnalyzer {
             int layer = 0;
             Long preAccessTime = null;
 
-            for (PageAccessRecordVo record : records) {
+            for (int i = 0, size = records.size(); i < size; i++) {
+                PageAccessRecordVo record = records.get(i);
                 if (record.getPageName().equals(homePage)) {
                     startAnalysis = true;
                 }
@@ -97,6 +98,9 @@ public class PathAnalyzer {
                         path = null;
                         layer = 0;
                         preAccessTime = null;
+
+                        // Index rollback, otherwise current record will be missed
+                        i--;
                     }
                 }
             }
@@ -140,7 +144,7 @@ public class PathAnalyzer {
 
             try {
                 DruidError errorResult = jsonMapper.readValue(resultStr, DruidError.class);
-                log.error("Fetch path analysis data from druid failed: %s", errorResult.getError());
+                log.error("Fetch path analysis data from druid failed: %s. Result string:%s.", errorResult.getError(), resultStr);
             } catch (IOException e1) {
                 log.warn("Deserialize druid error result to type [" + DruidError.class.getName() +
                         "] failed, details:" + e.getMessage());
