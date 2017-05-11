@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import io.sugo.pio.server.pathanalysis.PathAnalysisConstant;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,13 +17,13 @@ public class AccessTree implements Serializable {
 
     private static final long serialVersionUID = 1004553939220527137L;
 
-    private static final java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
+    private static final java.text.DecimalFormat df = new java.text.DecimalFormat("#.0000");
 
     private TreeNode leaf;
 
     private int weight;
 
-    private String rate = "";
+    private float rate = 0.0f;
 
     private List<AccessTree> children = Lists.newLinkedList();
 
@@ -57,20 +58,23 @@ public class AccessTree implements Serializable {
         // Third, add tree which indicate user loss if necessary.
         if (children.size() > 0) {
             int totalWeight = 0;
+            Set<String> lostUsers = new HashSet(leaf.getUserIds());
             for (AccessTree child : children) {
                 totalWeight += child.getWeight();
+                lostUsers.removeAll(child.getLeaf().getUserIds());
             }
             if (weight > totalWeight) {
                 int lostWeight = weight - totalWeight;
                 AccessTree lossTree = new AccessTree(new TreeNode(PathAnalysisConstant.LEAF_NAME_LOSS,
                         children.get(0).getLeaf().getLayer(), PathAnalysisConstant.NODE_TYPE_LOSS),
                         lostWeight);
+                lossTree.getLeaf().setUserIds(lostUsers);
                 children.add(lossTree);
             }
 
             // Last, calculate the rate of each child.
             for (AccessTree child : children) {
-                String rate = Double.valueOf(df.format(child.getWeight() * 100.0d / weight)) + "%";
+                float rate = Float.valueOf(df.format(child.getWeight() * 1.0f / weight));
                 child.setRate(rate);
             }
         }
@@ -100,7 +104,7 @@ public class AccessTree implements Serializable {
     }
 
     @JsonProperty
-    public String getRate() {
+    public float getRate() {
         return rate;
     }
 
@@ -114,7 +118,7 @@ public class AccessTree implements Serializable {
         return leaf;
     }
 
-    public void setRate(String rate) {
+    public void setRate(float rate) {
         this.rate = rate;
     }
 }
