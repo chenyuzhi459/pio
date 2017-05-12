@@ -67,4 +67,16 @@ public class AccessPath implements Comparable<AccessPath> {
         return nodeList;
     }
 
+    @Override
+    public String toString() {
+        StringBuffer pathStr = new StringBuffer("");
+        String delimiter = "";
+        for (PathNode pathNode : nodeList) {
+            pathStr.append(delimiter).append(pathNode.getPageName());
+            delimiter = " -> ";
+        }
+
+        return pathStr.toString();
+    }
+
 }
