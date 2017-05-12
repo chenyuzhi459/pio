@@ -19,6 +19,8 @@ public class AccessTree implements Serializable {
 
     private static final java.text.DecimalFormat df = new java.text.DecimalFormat("#.0000");
 
+    private AccessTree parent;
+
     private TreeNode leaf;
 
     private int weight;
@@ -27,8 +29,9 @@ public class AccessTree implements Serializable {
 
     private List<AccessTree> children = Lists.newLinkedList();
 
-    public AccessTree(TreeNode leaf, int weight) {
+    public AccessTree(TreeNode leaf, AccessTree parent, int weight) {
         this.leaf = leaf;
+        this.parent = parent;
         this.weight = weight;
     }
 
@@ -67,7 +70,7 @@ public class AccessTree implements Serializable {
                 int lostWeight = weight - totalWeight;
                 AccessTree lossTree = new AccessTree(new TreeNode(PathAnalysisConstant.LEAF_NAME_LOSS,
                         children.get(0).getLeaf().getLayer(), PathAnalysisConstant.NODE_TYPE_LOSS),
-                        lostWeight);
+                        this, lostWeight);
                 lossTree.getLeaf().setUserIds(lostUsers);
                 children.add(lossTree);
             }
@@ -89,7 +92,7 @@ public class AccessTree implements Serializable {
         }
 
         return new AccessTree(new TreeNode(PathAnalysisConstant.LEAF_NAME_OTHER,
-                trees.get(0).getLeaf().getLayer()).setUserIds(userIds), totalWeight);
+                trees.get(0).getLeaf().getLayer()).setUserIds(userIds), this, totalWeight);
     }
 
     @JsonProperty
@@ -116,6 +119,10 @@ public class AccessTree implements Serializable {
     @JsonUnwrapped
     public TreeNode getLeaf() {
         return leaf;
+    }
+
+    public AccessTree getParent() {
+        return parent;
     }
 
     public void setRate(float rate) {

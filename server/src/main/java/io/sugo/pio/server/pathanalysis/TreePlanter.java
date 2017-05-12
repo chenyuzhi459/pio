@@ -50,11 +50,11 @@ public class TreePlanter {
 
         AccessTree parentTree = null;
         for (PathNode currentNode : nodeList) {
-            AccessTree currentTree = treeHolder.getTree(currentNode);
+            AccessTree currentTree = treeHolder.getTree(parentTree, currentNode);
             if (currentTree == null) {
                 // Create a new sub tree
-                currentTree = new AccessTree(TreeNode.convert(currentNode), 1);
-                treeHolder.addTree(currentTree);
+                currentTree = new AccessTree(TreeNode.convert(currentNode), parentTree,1);
+                treeHolder.addTree(parentTree, currentTree);
 
                 if (parentTree != null) {
                     parentTree.addChild(currentTree);
@@ -76,30 +76,46 @@ public class TreePlanter {
 
         private Map<String, AccessTree> trees = Maps.newHashMap();
 
-        public AccessTree getTree(Node leaf) {
+        public AccessTree getTree(AccessTree parentTree, Node leaf) {
             if (leaf == null) {
                 return null;
             }
 
-            String key = getKey(leaf);
+            String key = getKey(parentTree, leaf);
             return trees.get(key);
         }
 
-        public void addTree(AccessTree tree) {
+        public void addTree(AccessTree parentTree, AccessTree tree) {
             TreeNode leaf = tree.getLeaf();
-            trees.put(getKey(leaf), tree);
+            trees.put(getKey(parentTree, leaf), tree);
         }
 
         public AccessTree getRoot() {
             if (accessPaths.size() > 0) {
-                return getTree(accessPaths.iterator().next().getNodeList().get(0));
+                return getTree(null, accessPaths.iterator().next().getNodeList().get(0));
             }
 
             return null;
         }
 
-        private String getKey(Node leaf) {
-            return leaf.getPageName() + "." + leaf.getLayer();
+        /**
+         * To ensure a node only has unique parent, the generate rule of key used the whole chain.
+         */
+        private String getKey(AccessTree parentTree, Node leaf) {
+            StringBuilder sb = new StringBuilder("");
+            while (parentTree != null) {
+                sb.append(parentTree.getLeaf().getPageName())
+                        .append(".")
+                        .append(parentTree.getLeaf().getLayer())
+                        .append("_");
+                parentTree = parentTree.getParent();
+            }
+
+            sb.append(leaf.getPageName())
+                    .append(".")
+                    .append(leaf.getLayer());
+
+            return sb.toString();
         }
     }
 

@@ -91,6 +91,7 @@ public class PathAnalyzer {
                     } else {
                         // Add path for growing tree
                         planter.addPath(path);
+                        log.debug("Path: %s", path);
 
                         // Clear all variables to initiate status
                         startAnalysis = false;
@@ -108,6 +109,7 @@ public class PathAnalyzer {
             // The last path that is not cleaned
             if (path != null) {
                 planter.addPath(path);
+                log.debug("Path: %s", path);
             }
         }
 
