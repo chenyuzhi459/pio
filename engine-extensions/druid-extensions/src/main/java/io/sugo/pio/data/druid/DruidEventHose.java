@@ -9,6 +9,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.joda.time.DateTime;
 import scala.Tuple2;
 
 import java.util.Map;
@@ -39,8 +40,8 @@ public class DruidEventHose implements BatchEventHose {
         Configuration conf = new Configuration();
         conf.set(DruidInputFormat.DRUID_COORDINATOR_URL, coordinatorUrl);
         conf.set(DruidInputFormat.DRUID_DATASOURCE, datasource);
-        conf.set(DruidInputFormat.DRUID_STARTTIME, Long.toString(starttime));
-        conf.set(DruidInputFormat.DRUID_ENDTIME, Long.toString(endTime));
+        conf.set(DruidInputFormat.DRUID_STARTTIME, new DateTime(starttime).toString());
+        conf.set(DruidInputFormat.DRUID_ENDTIME, new DateTime(endTime).toString());
 
         JavaPairRDD<Long, Map> rdd = sc.newAPIHadoopRDD(conf, DruidInputFormat.class, Long.class, Map.class);
         return rdd.map(new Function<Tuple2<Long,Map>, Event>() {
