@@ -89,6 +89,7 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
         logger.info("AbstractDataResultSetReader begin to load data result set...");
+        collectLog("Begin to load data result set...");
 
         String metaData = getParameterAsString(PARAMETER_META_DATA);
         if (Strings.isNullOrEmpty(metaData)) {
@@ -112,6 +113,8 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         }
 
         logger.info("AbstractDataResultSetReader load data of size[%d].", exampleSet.size());
+        collectLog("Load data of size: " + exampleSet.size());
+
         return exampleSet;
     }
 

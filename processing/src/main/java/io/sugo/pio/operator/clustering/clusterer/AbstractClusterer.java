@@ -98,6 +98,7 @@ public abstract class AbstractClusterer extends Operator {
         exampleSetOutput.deliver(input); // generateClusterModel() may have added cluster attribute
 
         logger.info("AbstractClusterer generate clusters and deliver to the next operator successfully.");
+        collectLog("Generate clusters and deliver to the next operator successfully!");
     }
 
     /**

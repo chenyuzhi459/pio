@@ -2,7 +2,6 @@ package io.sugo.pio.example.table;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.util.ExampleSets;
 
@@ -18,10 +17,11 @@ public class MemoryExampleTable extends AbstractExampleTable implements GrowingE
 
     private static final long serialVersionUID = -3000023475208774934L;
 
+    private static final int TOP_N = 1000;
+
     /**
      * List of {@link DataRow}s.
      */
-    @JsonProperty
     private List<DataRow> dataList = new ArrayList<DataRow>();
 
     /**
@@ -171,6 +171,23 @@ public class MemoryExampleTable extends AbstractExampleTable implements GrowingE
     @Override
     public int size() {
         return dataList.size();
+    }
+
+    /**
+     * Returns only top N data rows for page display.
+     */
+    @JsonProperty("dataList")
+    public List<DataRow> getTopNDataRow() {
+        if (dataList.size() > TOP_N) {
+            List<DataRow> dataRows = new ArrayList<DataRow>();
+            for (int i = 0; i < TOP_N; i++) {
+                dataRows.add(dataList.get(i));
+            }
+
+            return dataRows;
+        }
+
+        return dataList;
     }
 
     /**

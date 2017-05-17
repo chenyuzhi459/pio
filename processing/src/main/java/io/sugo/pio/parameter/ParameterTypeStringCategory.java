@@ -79,6 +79,10 @@ public class ParameterTypeStringCategory extends ParameterTypeSingle {
         return categories;
     }
 
+    public void setCategories(String[] categories) {
+        this.categories = categories;
+    }
+
     /**
      * Returns false.
      */

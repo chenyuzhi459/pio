@@ -126,6 +126,7 @@ public abstract class PreprocessingOperator extends AbstractDataProcessing {
 
         modelOutput.deliver(model);
         logger.info("PreprocessingOperator apply and deliver model successfully.");
+        collectLog("Apply and deliver model successfully!");
 
         return exampleSet;
     }

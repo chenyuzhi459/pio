@@ -100,12 +100,14 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
         }
 
         // learn base models
+        collectLog("Learn base models.");
         List<TreeModel> baseModels = new LinkedList<TreeModel>();
         int numberOfTrees = getParameterAsInt(PARAMETER_NUMBER_OF_TREES);
 
         RandomGenerator random = RandomGenerator.getRandomGenerator(this);
 
         // create callables that build a random tree each
+        collectLog("Create callables that build a random tree each.");
         List<Callable<TreeModel>> tasks = new ArrayList<>(numberOfTrees);
         for (int i = 0; i < numberOfTrees; i++) {
             tasks.add(new TreeCallable(exampleSet, random.nextInt()));
@@ -113,6 +115,7 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
 
         if (Resources.getConcurrencyContext(this).getParallelism() > 1 && tasks.size() > 1) {
             logger.info("ParallelRandomForestLearner execute in parallel of %d trees.", numberOfTrees);
+            collectLog("Execute in parallel of " + numberOfTrees + " trees.");
 
             // execute in parallel
             List<TreeModel> results = null;
@@ -135,6 +138,7 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
             }
         } else {
             logger.info("ParallelRandomForestLearner execute in sequential of %d trees.", numberOfTrees);
+            collectLog("Execute in sequential of " + numberOfTrees + " trees.");
 
             // execute sequential
             for (Callable<TreeModel> task : tasks) {
@@ -159,9 +163,11 @@ public class ParallelRandomForestLearner extends ParallelDecisionTreeLearner {
         if (VotingStrategy.CONFIDENCE_VOTE.toString().equals(strategyParameter)) {
             strategy = VotingStrategy.CONFIDENCE_VOTE;
         }
+        collectLog("Use voting strategy of " + strategy.toString());
 //        }
 
         // create and return model
+        collectLog("Create and return model.");
         return new ConfigurableRandomForestModel(exampleSet, baseModels, strategy);
     }
 

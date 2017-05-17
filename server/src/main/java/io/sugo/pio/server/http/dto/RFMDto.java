@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class RFMDto {
 
-    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private static final ObjectMapper jsonMapper = new ObjectMapper();
 
     private String datasource;
 

@@ -105,6 +105,7 @@ public class LinearRegression extends AbstractLearner {
         logger.info("Linear regression begin to learn through example set[%s]...", exampleSet.getName());
 
         // initializing data and parameter values.
+        collectLog("Initializing data and parameter values.");
         Attribute label = exampleSet.getAttributes().getLabel();
         Attribute workingLabel = label;
         boolean cleanUpLabel = false;
@@ -127,6 +128,7 @@ public class LinearRegression extends AbstractLearner {
         // prepare for classification by translating into 0-1 coding.
         if (label.isNominal()) {
             logger.info("Linear regression of nominal label.");
+            collectLog("For nominal label prepare for classification by translating into 0-1 coding.");
 
             if (label.getMapping().size() == 2) {
                 firstClassName = label.getMapping().getNegativeString();
@@ -154,6 +156,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().step();
 
         logger.info("Linear regression@progress [search all attributes and keep numerical].");
+        collectLog("Search all attributes and keep numerical.");
 
         // search all attributes and keep numerical
         int numberOfAttributes = exampleSet.getAttributes().size();
@@ -168,7 +171,8 @@ public class LinearRegression extends AbstractLearner {
 
         getProgress().step();
 
-        logger.info("Linear regression@progress [compute and store statistics and turn off attributes with zero].");
+        logger.info("Linear regression@progress [compute and store statistics and turn off attributes with zero standard deviation].");
+        collectLog("Compute and store statistics and turn off attributes with zero standard deviation.");
 
         // compute and store statistics and turn off attributes with zero
         // standard deviation
@@ -197,6 +201,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().step();
 
         logger.info("Linear regression@progress [determine the number of used attributes + 1].");
+        collectLog("Determine the number of used attributes.");
 
         // determine the number of used attributes + 1
         int numberOfUsedAttributes = 1;
@@ -209,6 +214,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().step();
 
         logger.info("Linear regression@progress [remove collinear attributes].");
+        collectLog("Remove collinear attributes.");
 
         // remove collinear attributes
         double[] coefficientsOnFullData = performRegression(exampleSet, isUsedAttribute, means, labelMean, ridge);
@@ -255,6 +261,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().setCompleted(14);
 
         logger.info("Linear regression@progress [calculate error on full data].");
+        collectLog("Calculate error on full data.");
 
         // calculate error on full data
         double errorOnFullData = getSquaredError(exampleSet, isUsedAttribute, coefficientsOnFullData, useBias);
@@ -262,6 +269,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().step();
 
         logger.info("Linear regression@progress [apply attribute selection method].");
+        collectLog("Apply attribute selection method.");
 
         // apply attribute selection method
 
@@ -282,6 +290,7 @@ public class LinearRegression extends AbstractLearner {
         }
 
         logger.info("Linear regression@progress [apply feature selection technique].");
+        collectLog("Apply feature selection technique.");
 
         // apply feature selection technique
         LinearRegressionResult result = method.applyMethod(this, useBias, ridge, exampleSet, isUsedAttribute,
@@ -298,6 +307,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().step();
 
         logger.info("Linear regression@progress [calculating statistics of the resulting model].");
+        collectLog("Calculating statistics of the resulting model.");
 
         // +++++++++++++++++++++++++++++++++++++++++++++
         // calculating statistics of the resulting model
@@ -327,6 +337,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().step();
 
         logger.info("Linear regression@progress [calculating standard error matrix].");
+        collectLog("Calculating standard error matrix, (containing the error of intercept and estimated coefficients)");
 
         // calculating standard error matrix, (containing the error of
         // intercept and estimated coefficients)
@@ -447,6 +458,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().setCompleted(47);
 
         logger.info("Linear regression@progress [Set all values for intercept].");
+        collectLog("Set all values for intercept.");
 
         // Set all values for intercept
         if (invertedMatrix == null) {
@@ -490,6 +502,7 @@ public class LinearRegression extends AbstractLearner {
         getProgress().complete();
 
         logger.info("Linear regression all progress complete.");
+        collectLog("Delivering weights and build linear regression model.");
 
         return new LinearRegressionModel(exampleSet, result.isUsedAttribute, result.coefficients, standardErrors,
                 standardizedCoefficients, tolerances, tStatistics, pValues, useBias, firstClassName, secondClassName);

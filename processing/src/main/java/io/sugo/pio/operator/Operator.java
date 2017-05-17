@@ -45,9 +45,9 @@ public abstract class Operator implements ParameterHandler, Serializable {
     private boolean isRunning = false;
 
     /**
-     * Record the runtime error message of this operator.
+     * The list which stores the logs of this operator at runtime
      */
-    private String errorMsg;
+    private List<OperatorLog> logList = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * The values for this operator. The current value of a Value can be asked by the
@@ -166,15 +166,6 @@ public abstract class Operator implements ParameterHandler, Serializable {
         } else {
             this.status = Status.QUEUE;
         }
-    }
-
-    @JsonProperty
-    public String getErrorMsg() {
-        return errorMsg;
-    }
-
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
     }
 
     /**
@@ -314,20 +305,17 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     public void execute() {
         try {
+            clearLog();
             setStatus(Status.RUNNING);
             isRunning = true;
             applyCountAtLastExecution = applyCount.incrementAndGet();
             doWork();
             setStatus(Status.SUCCESS);
-        } catch (OperatorException oe) {
-            log.error(oe,"Operator named: %s execute failed.", getName());
-            setStatus(Status.FAILED);
-            setErrorMsg(oe.getMessage());
-            throw oe;
+            collectLog("Operator '" + fullName + "' run finished.");
         } catch (Exception oe) {
             log.error(oe,"Operator named: %s execute failed.", getName());
             setStatus(Status.FAILED);
-            setErrorMsg(oe.getMessage());
+            collectErrorLog(oe.getMessage());
             throw oe;
         } finally {
             isRunning = false;
@@ -703,6 +691,29 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     public void addError(ProcessSetupError error) {
         errorList.add(error);
+    }
+
+    public void collectLog(String message) {
+        OperatorLog log = new OperatorLog(message, OperatorLog.INFO);
+        logList.add(log);
+    }
+
+    public void collectWarnLog(String message) {
+        OperatorLog log = new OperatorLog(message, OperatorLog.WARN);
+        logList.add(log);
+    }
+
+    public void collectErrorLog(String message) {
+        OperatorLog log = new OperatorLog(message, OperatorLog.ERROR);
+        logList.add(log);
+    }
+
+    public List<OperatorLog> getLog() {
+        return logList;
+    }
+
+    private void clearLog() {
+        logList.clear();
     }
 
     /**

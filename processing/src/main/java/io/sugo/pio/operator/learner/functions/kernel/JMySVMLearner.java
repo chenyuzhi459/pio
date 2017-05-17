@@ -153,11 +153,13 @@ public class JMySVMLearner extends AbstractMySVMLearner {
                                   io.sugo.pio.example.ExampleSet examples) throws OperatorException {
         if (label.isNominal()) {
             logger.info("JMySVMLearner create svm[SVMpattern] with nominal label.");
+            collectLog("Create SVM with nominal label.");
 
             this.pattern = true;
             return new SVMpattern(this, kernel, sVMExamples, examples, RandomGenerator.getGlobalRandomGenerator());
         } else {
             logger.info("JMySVMLearner create svm[SVMregression] with none nominal label.");
+            collectLog("Create SVM with none nominal label.");
 
             this.pattern = false;
             return new SVMregression(this, kernel, sVMExamples, examples,

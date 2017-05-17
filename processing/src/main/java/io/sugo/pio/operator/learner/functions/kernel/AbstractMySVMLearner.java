@@ -328,11 +328,13 @@ public abstract class AbstractMySVMLearner extends AbstractKernelBasedLearner {
                     getParameterAsDouble(PARAMETER_KERNEL_SHIFT));
         }*/
         kernel.init(svmExamples, cacheSize);
+        collectLog("Create and init kernel successfully!");
 
         // SVM
         svm = createSVM(label, kernel, svmExamples, exampleSet);
         svm.init(kernel, svmExamples);
         svm.train();
+        collectLog("SVM training finished.");
 
         return createSVMModel(exampleSet, svmExamples, kernel, kernelType);
     }

@@ -15,7 +15,7 @@ import java.util.Iterator;
 /**
  * This is a generic example set (view on the view stack of the data) which can be used to apply any
  * preprocessing model and create a view from it.
- * 
+ *
  */
 public class ModelViewExampleSet extends AbstractExampleSet {
 
@@ -76,7 +76,7 @@ public class ModelViewExampleSet extends AbstractExampleSet {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see io.sugo.pio.operator.ResultObjectAdapter#getAnnotations()
 	 */
 	@Override

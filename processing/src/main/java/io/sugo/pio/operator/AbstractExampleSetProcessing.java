@@ -84,6 +84,7 @@ public abstract class AbstractExampleSetProcessing extends Operator {
 
         logger.info("Begin to process example set [%s], size:%d", inputExampleSet.getName(),
                 inputExampleSet.size());
+        collectLog("Begin to process example set, size: " + inputExampleSet.size());
 
         // check for needed copy of original exampleset
         if (writesIntoExistingData()) {
@@ -112,6 +113,7 @@ public abstract class AbstractExampleSetProcessing extends Operator {
 
         logger.info("Process example set [%s] and deliver to the next operator successfully!",
                 inputExampleSet.getName());
+        collectLog("Process example set and deliver to the next operator successfully!");
     }
 
     /**

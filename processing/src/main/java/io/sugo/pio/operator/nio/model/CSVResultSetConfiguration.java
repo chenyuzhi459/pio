@@ -96,6 +96,7 @@ public class CSVResultSetConfiguration implements DataResultSetFactory {
     public DataResultSet makeDataResultSet(Operator operator) throws OperatorException {
         if (!operator.getParameters().getExternalData().isEmpty()) {
             logger.info("CSVResultSetConfiguration found csv content in memory, and initiate the mode that read csv from memory.");
+            operator.collectLog("Load data from memory.");
             return new CSVMemoryResultSet(this, operator);
         }
 
@@ -105,6 +106,8 @@ public class CSVResultSetConfiguration implements DataResultSetFactory {
 
         logger.info("CSVResultSetConfiguration found csv file[%s], and initiate the mode that read csv from " +
                 "file.", csvFile);
+        operator.collectLog("Load data from csv file: " + csvFile);
+
         return new CSVResultSet(this, operator);
     }
 

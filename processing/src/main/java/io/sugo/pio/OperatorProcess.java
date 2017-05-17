@@ -401,7 +401,7 @@ public class OperatorProcess {
         // Continue search end ports, if the operator chain have
         List<InputPort> endPorts = getEndPorts(toOperator);
         for (InputPort input : endPorts) {
-            if (input.getName().equals(toOperator)) {
+            if (input.getName().equals(toPort)) {
                 return input;
             }
         }

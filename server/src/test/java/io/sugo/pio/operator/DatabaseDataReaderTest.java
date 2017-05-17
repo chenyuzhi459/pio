@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sugo.pio.guice.ProcessPioModule;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DatabaseDataReaderTest {
@@ -18,6 +19,7 @@ public class DatabaseDataReaderTest {
         }
     }
 
+    @Ignore
     @Test
     public void test() throws JsonProcessingException {
 

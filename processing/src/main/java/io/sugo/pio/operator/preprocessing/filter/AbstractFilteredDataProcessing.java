@@ -155,7 +155,9 @@ public abstract class AbstractFilteredDataProcessing extends AbstractDataProcess
                 resultSet.getAttributes().add(role);
             }
         } else {
-            logger.warn("Underlying example table has changed: data copy into new table is necessary in order to keep non-processed attributes.");
+            String message = "Underlying example table has changed: data copy into new table is necessary in order to keep non-processed attributes.";
+            logger.warn(message);
+            collectWarnLog(message);
             for (Attribute oldAttribute : unusedAttributes) {
                 AttributeRole oldRole = exampleSet.getAttributes().getRole(oldAttribute);
 

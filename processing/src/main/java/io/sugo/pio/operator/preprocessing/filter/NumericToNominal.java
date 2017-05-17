@@ -65,6 +65,7 @@ public abstract class NumericToNominal extends AbstractFilteredDataProcessing {
     public ExampleSet applyOnFiltered(ExampleSet exampleSet) throws OperatorException {
         Map<Attribute, Attribute> translationMap = new LinkedHashMap<Attribute, Attribute>();
         // creating new nominal attributes
+        collectLog("Creating new nominal attributes");
         for (Attribute originalAttribute : exampleSet.getAttributes()) {
 
             if (originalAttribute.isNumerical()) {
@@ -73,6 +74,7 @@ public abstract class NumericToNominal extends AbstractFilteredDataProcessing {
             }
         }
         // adding to table and exampleSet
+        collectLog("Adding new attributes to example set");
         for (Entry<Attribute, Attribute> replacement : translationMap.entrySet()) {
             Attribute newAttribute = replacement.getValue();
             exampleSet.getExampleTable().addAttribute(newAttribute);
@@ -89,6 +91,7 @@ public abstract class NumericToNominal extends AbstractFilteredDataProcessing {
         int progressCompletedCounter = 0;
 
         // over all examples change attribute values
+        collectLog("Changing over all examples attribute values");
         for (Example example : exampleSet) {
             for (Entry<Attribute, Attribute> replacement : translationMap.entrySet()) {
                 Attribute oldAttribute = replacement.getKey();
@@ -109,6 +112,7 @@ public abstract class NumericToNominal extends AbstractFilteredDataProcessing {
         cleanUp();
 
         // removing old attributes
+        collectLog("Removing old attributes");
         for (Entry<Attribute, Attribute> entry : translationMap.entrySet()) {
             Attribute originalAttribute = entry.getKey();
             exampleSet.getAttributes().remove(originalAttribute);

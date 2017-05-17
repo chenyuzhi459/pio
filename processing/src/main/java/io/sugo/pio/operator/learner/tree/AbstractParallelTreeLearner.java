@@ -120,6 +120,7 @@ public abstract class AbstractParallelTreeLearner extends AbstractLearner {
     @Override
     public Model learn(ExampleSet eSet) throws OperatorException {
         logger.info("Parallel tree learner begin to learn through example set[%s]...", eSet.getName());
+        collectLog("Begin to learn through example set...");
 
         ExampleSet exampleSet = (ExampleSet) eSet.clone();
 
@@ -131,11 +132,13 @@ public abstract class AbstractParallelTreeLearner extends AbstractLearner {
         }
 
         // create tree builder
+        collectLog("Create tree builder.");
         AbstractParallelTreeBuilder builder = getTreeBuilder(exampleSet);
         // learn tree
         Tree root = builder.learnTree(exampleSet);
 
         logger.info("Parallel tree learner learn through example set[%s] finished, and return the model.", eSet.getName());
+        collectLog("Learn tree and return the model.");
 
         // create and return model
         return new TreeModel(exampleSet, root);

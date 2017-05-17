@@ -80,6 +80,11 @@ public class ProcessResource {
             Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.name_can_not_null"));
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
 
+            boolean processExist = processManager.isProcessExist(tenantId, name);
+            if (processExist) {
+                throw new RuntimeException(I18N.getMessage("pio.error.process.process_already_exist"));
+            }
+
             OperatorProcess process = processManager.create(tenantId, name, description);
             return Response.ok(process).build();
         } catch (Throwable e) {
@@ -128,6 +133,11 @@ public class ProcessResource {
             String description = JsonUtil.getString(jsonObject, "description");
             Preconditions.checkNotNull(name, I18N.getMessage("pio.error.process.name_can_not_null"));
             Preconditions.checkNotNull(tenantId, I18N.getMessage("pio.error.process.tenant_id_can_not_null"));
+
+            boolean processExist = processManager.isProcessExist(tenantId, name);
+            if (processExist) {
+                throw new RuntimeException(I18N.getMessage("pio.error.process.case_already_exist"));
+            }
 
             OperatorProcess process = processManager.create(tenantId, name, description, null,
                     ProcessConstant.IsTemplate.NO, ProcessConstant.IsCase.YES);
@@ -229,6 +239,42 @@ public class ProcessResource {
     public Response run(@PathParam("id") final String id) {
         try {
             OperatorProcess process = processManager.runAsyn(id);
+            return Response.ok(process).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/run/from/{id}/{startOperatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response runFrom(@PathParam("id") final String id, @PathParam("startOperatorId") final String startOperatorId) {
+        try {
+            OperatorProcess process = processManager.runAsyn(id, startOperatorId, null);
+            return Response.ok(process).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/run/to/{id}/{endOperatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response runTo(@PathParam("id") final String id, @PathParam("endOperatorId") final String endOperatorId) {
+        try {
+            OperatorProcess process = processManager.runAsyn(id, null, endOperatorId);
+            return Response.ok(process).build();
+        } catch (Throwable e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/run/single/{id}/{operatorId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response runSingle(@PathParam("id") final String id, @PathParam("operatorId") final String operatorId) {
+        try {
+            OperatorProcess process = processManager.runAsyn(id, operatorId, operatorId);
             return Response.ok(process).build();
         } catch (Throwable e) {
             return Response.serverError().entity(e.getMessage()).build();

@@ -108,9 +108,9 @@ public class CSVExampleSource extends AbstractDataResultSetReader {
     }
 
     @Override
-    public void processFinished() throws OperatorException {
-	    super.processFinished();
-	    this.getParameters().clearExternalData();
+    public void freeMemory() {
+	    super.freeMemory();
+        this.getParameters().clearExternalData();
     }
 
     @Override

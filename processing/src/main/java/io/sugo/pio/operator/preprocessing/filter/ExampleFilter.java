@@ -143,6 +143,7 @@ public class ExampleFilter extends AbstractDataProcessing {
     @Override
     public ExampleSet apply(final ExampleSet inputSet) throws OperatorException {
         logger.info(getName() + ": input set has " + inputSet.size() + " examples.");
+        collectLog("Begin to filter example set, original size: " + inputSet.size());
 //		String className = getParameterAsString(PARAMETER_CONDITION_CLASS);
 //		String parameter = getParameterAsString(PARAMETER_PARAMETER_STRING);
 //		getLogger().fine("Creating condition '" + className + "' with parameter '" + parameter + "'");
@@ -169,6 +170,7 @@ public class ExampleFilter extends AbstractDataProcessing {
             }
 
             logger.info(getName() + ": remained " + result.size() + " examples after filtered.");
+            collectLog("Remained " + result.size() + " examples after filtered.");
 
             return result;
         } catch (AttributeTypeException e) {

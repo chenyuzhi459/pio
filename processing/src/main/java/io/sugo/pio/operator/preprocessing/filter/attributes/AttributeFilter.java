@@ -64,6 +64,7 @@ public class AttributeFilter extends AbstractFeatureSelection {
     @Override
     public ExampleSet apply(ExampleSet exampleSet) throws OperatorException {
         logger.info("AttributeFilter begin to apply example set[%s]", exampleSet.getName());
+        collectLog("Begin to apply example set, size: " + exampleSet.size());
 
         Attributes attributes = exampleSet.getAttributes();
         Set<Attribute> attributeSubset = attributeSelector.getAttributeSubset(exampleSet, true);
@@ -76,6 +77,7 @@ public class AttributeFilter extends AbstractFeatureSelection {
         }
 
         logger.info("AttributeFilter apply example set[%s] successfully!", exampleSet.getName());
+        collectLog("Apply example set successfully!");
 
         return exampleSet;
     }

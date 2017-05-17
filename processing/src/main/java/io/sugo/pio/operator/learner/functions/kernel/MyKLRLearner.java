@@ -65,6 +65,7 @@ public class MyKLRLearner extends AbstractMySVMLearner {
     @Override
     public AbstractMySVMModel createSVMModel(ExampleSet exampleSet, SVMExamples sVMExamples, Kernel kernel, int kernelType) {
         logger.info("MyKLRLearner begin to create SVM model...");
+        collectLog("Creating SVM model.");
         return new MyKLRModel(exampleSet, sVMExamples, kernel, kernelType);
     }
 
@@ -72,6 +73,7 @@ public class MyKLRLearner extends AbstractMySVMLearner {
     public SVMInterface createSVM(Attribute label, Kernel kernel, SVMExamples sVMExamples,
                                   io.sugo.pio.example.ExampleSet rapidMinerExamples) throws OperatorException {
         logger.info("MyKLRLearner begin to create SVM...");
+        collectLog("Creating SVM.");
         if (!label.isNominal()) {
             throw new UserError(this, "pio.error.attribute_must_nominal", new Object[]{"MyKLR", label.getName()});
         }

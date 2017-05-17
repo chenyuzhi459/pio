@@ -7,14 +7,13 @@ import com.google.inject.name.Names;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Command;
 import io.sugo.pio.data.fetcher.DataFetcherConfig;
+import io.sugo.pio.engine.demo.conf.UserExtensionConfig;
+import io.sugo.pio.engine.demo.http.UserExtensionResource;
 import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.JsonConfigProvider;
 import io.sugo.pio.guice.LazySingleton;
 import io.sugo.pio.guice.LifecycleModule;
-import io.sugo.pio.server.http.DrainPrediction;
-import io.sugo.pio.server.http.OperatorResource;
-import io.sugo.pio.server.http.ProcessResource;
-import io.sugo.pio.server.http.RFMResource;
+import io.sugo.pio.server.http.*;
 import io.sugo.pio.server.initialization.jetty.JettyServerInitializer;
 import org.eclipse.jetty.server.Server;
 
@@ -43,12 +42,15 @@ public class CliProcess extends ServerRunnable {
                         binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_NAME)).to(CliConst.PROCESS_NAME);
                         binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.PROCESS_PORT);
 
+                        JsonConfigProvider.bind(binder, "pio.user.extension", UserExtensionConfig.class);
                         JsonConfigProvider.bind(binder, "pio.broker.data.fetcher", DataFetcherConfig.class);
 
                         Jerseys.addResource(binder, ProcessResource.class);
                         Jerseys.addResource(binder, OperatorResource.class);
                         Jerseys.addResource(binder, DrainPrediction.class);
                         Jerseys.addResource(binder, RFMResource.class);
+                        Jerseys.addResource(binder, UserExtensionResource.class);
+                        Jerseys.addResource(binder, PathAnalysisResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);
                         LifecycleModule.register(binder, Server.class);
