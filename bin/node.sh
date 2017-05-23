@@ -10,6 +10,9 @@ if [ $# -le 2 ]; then
   exit 1
 fi
 
+JAVA=$JAVA_HOME/bin/java
+$JAVA -version
+
 cmdGroup=$1
 shift
 
@@ -36,7 +39,7 @@ case $startStop in
       fi
     fi
 
-    nohup java `cat conf/jvm.config | xargs` -cp conf/:conf/$nodeType:lib/*:extlibs/* io.sugo.pio.cli.Main $cmdGroup $nodeType $1 &
+    nohup $JAVA `cat conf/jvm.config | xargs` -cp conf/:conf/$nodeType:lib/*:extlibs/* io.sugo.pio.cli.Main $cmdGroup $nodeType $1 &
     nodeType_PID=$!
     echo $nodeType_PID > $pid
     echo "Started $nodeType node ($nodeType_PID)"
