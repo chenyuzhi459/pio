@@ -13,6 +13,8 @@ fi
 JAVA=$JAVA_HOME/bin/java
 $JAVA -version
 
+WEBROOT=`cd .. & pwd`
+
 cmdGroup=$1
 shift
 
@@ -39,7 +41,8 @@ case $startStop in
       fi
     fi
 
-    nohup $JAVA `cat conf/jvm.config | xargs` -cp conf/:conf/$nodeType:lib/*:extlibs/* io.sugo.pio.cli.Main $cmdGroup $nodeType $1 &
+    #nohup java `cat conf/jvm.config | xargs` -cp conf/:conf/$nodeType:lib/* io.sugo.pio.cli.Main $cmdGroup $nodeType $1 &
+    nohup $JAVA `cat conf/jvm.config | xargs` -Dwebapp.root=$WEBROOT -cp conf/:conf/$nodeType:lib/*:spark-dependencies-new/* io.sugo.pio.cli.Main $cmdGroup $nodeType $1 &
     nodeType_PID=$!
     echo $nodeType_PID > $pid
     echo "Started $nodeType node ($nodeType_PID)"
