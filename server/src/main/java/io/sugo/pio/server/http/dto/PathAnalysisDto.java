@@ -144,16 +144,18 @@ public class PathAnalysisDto {
         query.setDataSource(this.dataSource);
 
         // Set filters
-        InField inField = new InField();
-        inField.setDimension(this.getDimension().getPageName());
-        inField.setValues(this.pages);
+        if (this.pages == null || this.pages.isEmpty()) {
+            InField inField = new InField();
+            inField.setDimension(this.getDimension().getPageName());
+            inField.setValues(this.pages);
+            query.getFilter().getFields().add(inField);
+        }
 
         BetweenEqualField boundField = new BetweenEqualField();
         boundField.setDimension(this.getDimension().getDate());
         boundField.setLower(this.startDate);
         boundField.setUpper(this.endDate);
 
-        query.getFilter().getFields().add(inField);
         query.getFilter().getFields().add(boundField);
 
         if (this.filters != null && this.filters.size() > 0) {
