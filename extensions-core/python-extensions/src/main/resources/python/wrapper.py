@@ -286,7 +286,7 @@ if __name__ == "__main__":
             result = wrapper(rm_main, *inputs)
         except Exception as e:
             handleException(e)
-            sys.exit(60)
+            sys.exit(60)		
         if not result is None and rapidminer_numberOfOutputs > 0:
             serialize(result)
     except Exception as e:

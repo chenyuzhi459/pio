@@ -10,6 +10,9 @@
         <!-- 控制台日志输出 -->
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{ISO8601} %p [%t] %c - %m%n"/>
+            <Filters>
+                <ThresholdFilter level="INFO"/>
+            </Filters>
         </Console>
         <!-- INFO级别日志输出 -->
         <RollingFile name="RollingFileInfo" fileName="${LOG_HOME}/info.log"

@@ -91,10 +91,10 @@ public abstract class AbstractDataResultSetReader extends AbstractExampleSource 
         logger.info("AbstractDataResultSetReader begin to load data result set...");
         collectLog("Begin to load data result set...");
 
-        String metaData = getParameterAsString(PARAMETER_META_DATA);
+        /*String metaData = getParameterAsString(PARAMETER_META_DATA);
         if (Strings.isNullOrEmpty(metaData)) {
             throw new OperatorException("pio.error.file_metadata_not_set");
-        }
+        }*/
 
         // loading data result set
         final ExampleSet exampleSet;

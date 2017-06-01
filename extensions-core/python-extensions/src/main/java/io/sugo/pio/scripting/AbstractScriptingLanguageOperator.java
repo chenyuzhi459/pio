@@ -1,16 +1,16 @@
 package io.sugo.pio.scripting;
 
 import io.sugo.pio.constant.PortConstant;
-import io.sugo.pio.operator.IOObject;
-import io.sugo.pio.operator.Operator;
-import io.sugo.pio.operator.OperatorException;
-import io.sugo.pio.operator.UserError;
+import io.sugo.pio.operator.*;
 import io.sugo.pio.parameter.UndefinedParameterError;
 import io.sugo.pio.ports.InputPortExtender;
+import io.sugo.pio.ports.OutputPort;
 import io.sugo.pio.ports.OutputPortExtender;
+import io.sugo.pio.ports.metadata.MDTransformationRule;
 import io.sugo.pio.scripting.metadata.MetaDataCachingRule;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
@@ -24,7 +24,26 @@ public abstract class AbstractScriptingLanguageOperator extends Operator {
     public AbstractScriptingLanguageOperator() {
         inExtender.start();
         outExtender.start();
+
+        /*getTransformer().addRule(new MDTransformationRule() {
+            public void transformMD() {
+                AbstractScriptingLanguageOperator.this.showSetupProblems();
+            }
+        });*/
+        getTransformer().addRule(this.cachingRule);
     }
+
+    @Override
+    public IOContainer getResult() {
+        List<IOObject> ioObjects = new ArrayList<>();
+        List<OutputPort> outputPorts = getOutputPorts().getAllPorts();
+        for (OutputPort outputPort : outputPorts) {
+            ioObjects.add(outputPort.getAnyDataOrNull());
+        }
+        return new IOContainer(ioObjects);
+    }
+
+//    protected abstract void showSetupProblems();
 
     protected abstract ScriptRunner getScriptRunner() throws UndefinedParameterError;
 
@@ -32,13 +51,14 @@ public abstract class AbstractScriptingLanguageOperator extends Operator {
     public void doWork() throws OperatorException {
         ScriptRunner scriptRunner = getScriptRunner();
         List inputs = checkInputTypes(scriptRunner);
-        int numberOfOutputPorts = outExtender.getManagedPorts().size() - 1;
+//        int numberOfOutputPorts = outExtender.getManagedPorts().size() - 1;
+        int numberOfOutputPorts = outExtender.getManagedPorts().size();
         collectLog("Begin to run python script, the number of output ports are: " + numberOfOutputPorts);
 //
         try {
             List<IOObject> outputs = scriptRunner.run(inputs, numberOfOutputPorts);
             outExtender.deliver(outputs);
-//            cachingRule.setOperatorWorked();
+            cachingRule.setOperatorWorked();
         } catch (CancellationException e) {
             this.checkForStop();
             throw new OperatorException("python_scripting.execution_interruption", e, new Object[0]);

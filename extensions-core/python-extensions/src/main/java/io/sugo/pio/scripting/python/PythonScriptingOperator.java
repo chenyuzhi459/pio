@@ -3,6 +3,7 @@ package io.sugo.pio.scripting.python;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
+import io.sugo.pio.operator.UserError;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeText;
 import io.sugo.pio.parameter.TextType;
@@ -39,9 +40,48 @@ public class PythonScriptingOperator extends AbstractScriptingLanguageOperator {
         return runner;
     }
 
+    /*protected void showSetupProblems() {
+        PythonSetupTester tester = PythonSetupTester.INSTANCE;
+        if (tester.wasPythonFound()) {
+            if (this.configurationLink != null) {
+                this.configurationLink.setHidden(true);
+            }
+            if (!tester.wasPandasFound()) {
+                QuickFix fix = new AbstractQuickFix(1, true, "python_scripting.pandas", new Object[0]) {
+                    public void apply() {
+                        try {
+                            RMUrlHandler.openInBrowser(new URI(
+                                    I18N.getGUIMessage("gui.label.python_scripting.download_anaconda.url", new Object[0])));
+                        } catch (Exception ex) {
+                            SwingTools.showSimpleErrorMessage("cannot_open_browser", ex, new Object[0]);
+                        }
+                    }
+                };
+                addError(new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, getPortOwner(), Collections.singletonList(fix), "python_scripting.pandas", new Object[0]));
+            } else if (!tester.wasPandasVersionSufficient()) {
+                addError(new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, getPortOwner(), "python_scripting.pandas_version", new Object[]{"0.12.0"}));
+            }
+            if (!tester.wasCpickleFound()) {
+                addError(new SimpleProcessSetupError(ProcessSetupError.Severity.WARNING, getPortOwner(), "python_scripting.cpickle", new Object[0]));
+            }
+        } else {
+            QuickFix fix = new AbstractQuickFix(1, true, "python_scripting.configure", new Object[0]) {
+                public void apply() {
+                    new SettingsDialog("python_scripting").setVisible(true);
+                }
+            };
+            SimpleProcessSetupError error = new SimpleProcessSetupError(ProcessSetupError.Severity.ERROR, getPortOwner(), Collections.singletonList(fix), "python_scripting.not_found", new Object[]{ParameterService.getParameterValue("rapidminer.python_scripting.path")});
+
+            addError(error);
+            if (this.configurationLink != null) {
+                this.configurationLink.setHidden(false);
+            }
+        }
+    }*/
+
     public void doWork() throws OperatorException {
-//        if(PythonSetupTester.INSTANCE.isPythonInstalled()) {
-        super.doWork();
+//        if (PythonSetupTester.INSTANCE.isPythonInstalled()) {
+            super.doWork();
 //        } else {
 //            throw new UserError(this, "python_scripting.setup_test.failure");
 //        }
