@@ -58,6 +58,8 @@ public class LuceneCursor {
                 return makeFloatDimensionSelector(dimension, field.isHasMultipleValues());
             case "long":
                 return makeLongDimensionSelector(dimension, field.isHasMultipleValues());
+            case "date":
+                return makeLongDimensionSelector(dimension, field.isHasMultipleValues());
             default:
                 return null;
         }
@@ -94,5 +96,4 @@ public class LuceneCursor {
             return new FloatSingleDimensionSelector(this, leafReader, dimension);
         }
     }
-
 }
