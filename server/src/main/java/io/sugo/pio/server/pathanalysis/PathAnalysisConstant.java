@@ -19,4 +19,8 @@ public class PathAnalysisConstant {
     public static final int TREE_DEPTH_NORMAL = 20;
 
     public static final int TREE_DEPTH_REVERSE = 10;
+
+    public static final int DEFAULT_BATCH_SIZE = 20000;
+
+    public static final int DEFAULT_LIMIT_SIZE = 500000;
 }

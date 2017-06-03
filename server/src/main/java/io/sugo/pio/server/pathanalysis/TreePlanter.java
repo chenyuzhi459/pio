@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class TreePlanter {
 
-    private Set<AccessPath> accessPaths = Sets.newHashSet();
+    public Set<AccessPath> accessPaths = Sets.newHashSet();
 
     private TreeHolder treeHolder = new TreeHolder();
 

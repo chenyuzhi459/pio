@@ -40,7 +40,8 @@ public class PathAnalysisResource {
     public Response normalPath(PathAnalysisDto pathAnalysisDto) {
         check(pathAnalysisDto);
         try {
-            String queryStr = pathAnalysisDto.buildQuery();
+//            String queryStr = pathAnalysisDto.buildQuery();
+            String queryStr = pathAnalysisDto.buildScanQuery();
             AccessTree tree = pathAnalyzer.getAccessTree(queryStr,
                     pathAnalysisDto.getHomePage(), false);
 
@@ -57,7 +58,8 @@ public class PathAnalysisResource {
     public Response reversePath(PathAnalysisDto pathAnalysisDto) {
         check(pathAnalysisDto);
         try {
-            String queryStr = pathAnalysisDto.buildQuery();
+//            String queryStr = pathAnalysisDto.buildQuery();
+            String queryStr = pathAnalysisDto.buildScanQuery();
             AccessTree tree = pathAnalyzer.getAccessTree(queryStr,
                     pathAnalysisDto.getHomePage(), true);
 
@@ -70,14 +72,11 @@ public class PathAnalysisResource {
     private void check(PathAnalysisDto pathAnalysisDto) {
         try {
             log.info("Path analysis param: %s", jsonMapper.writeValueAsString(pathAnalysisDto));
-        } catch (JsonProcessingException ignore) { }
+        } catch (JsonProcessingException ignore) {
+        }
 
         Preconditions.checkNotNull(pathAnalysisDto.getDataSource(), "Data source can not be null.");
-//        Preconditions.checkNotNull(pathAnalysisDto.getSessionId(), "Session id can not be null.");
         Preconditions.checkNotNull(pathAnalysisDto.getHomePage(), "Home page can not be null.");
-        if (pathAnalysisDto.getPages() == null || pathAnalysisDto.getPages().isEmpty()) {
-            throw new IllegalArgumentException("Pages can not be empty.");
-        }
     }
 
 }

@@ -1,24 +1,22 @@
 package io.sugo.pio.server.pathanalysis;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.metamx.common.logger.Logger;
-import io.sugo.pio.common.utils.HttpClientUtil;
+import io.sugo.pio.common.utils.JsonObjectIterator;
 import io.sugo.pio.data.fetcher.DataFetcherConfig;
 import io.sugo.pio.server.pathanalysis.model.AccessPath;
 import io.sugo.pio.server.pathanalysis.model.AccessTree;
 import io.sugo.pio.server.pathanalysis.model.PathNode;
 import io.sugo.pio.server.pathanalysis.vo.PageAccessRecordVo;
+import okhttp3.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  */
@@ -27,8 +25,6 @@ public class PathAnalyzer {
     private static final Logger log = new Logger(PathAnalyzer.class);
 
     private static final ObjectMapper jsonMapper = new ObjectMapper();
-
-    private static final JavaType javaType = jsonMapper.getTypeFactory().constructParametrizedType(List.class, ArrayList.class, DruidResult.class);
 
     private final String queryUrl;
 
@@ -42,21 +38,50 @@ public class PathAnalyzer {
     }
 
     public AccessTree getAccessTree(String queryStr, String homePage, boolean reversed) {
+        long before = System.currentTimeMillis();
+        log.info("Begin to path analysis...");
+
         int depth = reversed ? PathAnalysisConstant.TREE_DEPTH_REVERSE : PathAnalysisConstant.TREE_DEPTH_NORMAL;
 
-        log.info("Begin to fetch path analysis data...");
-        long now = System.currentTimeMillis();
+        try {
+            OkHttpClient client = new OkHttpClient();
+            RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), queryStr);
+            Request request = new Request.Builder().url(queryUrl).post(body).build();
 
-        List<PageAccessRecordVo> records = fetchData(queryStr);
+            Response response = client.newCall(request).execute();
+            InputStream stream = response.body().byteStream();
 
-        long after = System.currentTimeMillis();
-        log.info("Fetch path analysis data ended, cost %d million seconds.", after - now);
+            JsonObjectIterator iterator = new JsonObjectIterator(stream);
 
-        log.info("Begin to path analysis...");
-        now = System.currentTimeMillis();
+            while (iterator.hasNext()) {
+                HashMap resultValue = iterator.next();
+                if (resultValue != null) {
+                    List<PageAccessRecordVo> records = Lists.newArrayList();
+                    List<List<Object>> events = (List<List<Object>>) resultValue.get("events");
+                    for (List<Object> event : events) {
+                        PageAccessRecordVo record = new PageAccessRecordVo();
+                        record.setSessionId(event.get(1).toString());
+                        record.setUserId(event.get(2).toString());
+                        record.setPageName(event.get(3).toString());
+                        record.setAccessTime(new Date((Long) (event.get(4))));
+                        records.add(record);
+                    }
+                    records.sort(reversed ? PageAccessRecordVo.DESC_COMPARATOR : PageAccessRecordVo.ASC_COMPARATOR);
+                    analyze(records, homePage, depth);
+                }
+            }
 
-        records.sort(reversed ? PageAccessRecordVo.DESC_COMPARATOR : PageAccessRecordVo.ASC_COMPARATOR);
+            long after = System.currentTimeMillis();
+            log.info("Path analysis total cost %d million seconds.", after - before);
+        } catch (Throwable t) {
+            log.error("Path analysis error: %s", t.getMessage());
+        }
 
+//        log.info("Total path: %d", planter.accessPaths.size());
+        return planter.getRoot();
+    }
+
+    private void analyze(List<PageAccessRecordVo> records, String homePage, int depth) {
         if (records.size() > 0) {
             boolean startAnalysis = false;
             PageAccessRecordVo preRecord = null;
@@ -91,7 +116,6 @@ public class PathAnalyzer {
                     } else {
                         // Add path for growing tree
                         planter.addPath(path);
-                        log.debug("Path: %s", path);
 
                         // Clear all variables to initiate status
                         startAnalysis = false;
@@ -109,52 +133,10 @@ public class PathAnalyzer {
             // The last path that is not cleaned
             if (path != null) {
                 planter.addPath(path);
-                log.debug("Path: %s", path);
             }
         }
-
-        after = System.currentTimeMillis();
-        log.info("Path analysis ended, cost %d million seconds.", after - now);
-
-        return planter.getRoot();
     }
 
-    private List<PageAccessRecordVo> fetchData(String queryStr) {
-        String resultStr = "";
-        try {
-            log.info("Begin to fetch path analysis data from url: [%s], params: [%s].", queryUrl, queryStr);
-            resultStr = HttpClientUtil.post(queryUrl, queryStr);
-        } catch (IOException e) {
-            log.error("Query druid '%s' with parameter '%s' failed: ", queryUrl, queryStr);
-        }
-
-        final List<PageAccessRecordVo> recordList = new ArrayList<>();
-        try {
-            List<DruidResult> druidResult = jsonMapper.readValue(resultStr, javaType);
-            if (druidResult.size() > 0 && druidResult.get(0).getResult() != null) {
-                log.info("Fetch %d path analysis data from druid %s.", druidResult.get(0).getResult().getEvents().size(), queryUrl);
-                druidResult.get(0).getResult().getEvents().forEach(events -> {
-                    recordList.add(events.getEvent());
-                });
-            } else {
-                log.info("Fetch empty path analysis data from druid %s.", queryUrl);
-            }
-
-        } catch (IOException e) {
-            log.warn("Deserialize druid result to type [" + DruidResult.class.getName() +
-                    "] list failed, details:" + e.getMessage());
-
-            try {
-                DruidError errorResult = jsonMapper.readValue(resultStr, DruidError.class);
-                log.error("Fetch path analysis data from druid failed: %s. Result string:%s.", errorResult.getError(), resultStr);
-            } catch (IOException e1) {
-                log.warn("Deserialize druid error result to type [" + DruidError.class.getName() +
-                        "] failed, details:" + e.getMessage());
-            }
-        }
-
-        return recordList;
-    }
 
     private boolean sameSession(PageAccessRecordVo preRecord, PageAccessRecordVo currentRecord, String firstPage) {
         // First page
@@ -176,73 +158,5 @@ public class PathAnalyzer {
         }
 
         return preRecord.getPageName().equals(currentRecord.getPageName());
-    }
-
-    private static class DruidResult {
-        ResultDetail result;
-        Date timestamp;
-
-        public ResultDetail getResult() {
-            return result;
-        }
-
-        public void setResult(ResultDetail result) {
-            this.result = result;
-        }
-
-        public Date getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(Date timestamp) {
-            this.timestamp = timestamp;
-        }
-
-    }
-
-    private static class ResultDetail {
-        Map<String, Integer> pagingIdentifiers = Maps.newHashMap();
-        private List<Events> events;
-
-        public Map<String, Integer> getPagingIdentifiers() {
-            return pagingIdentifiers;
-        }
-
-        public void setPagingIdentifiers(Map<String, Integer> pagingIdentifiers) {
-            this.pagingIdentifiers = pagingIdentifiers;
-        }
-
-        public List<Events> getEvents() {
-            return events;
-        }
-
-        public void setEvents(List<Events> events) {
-            this.events = events;
-        }
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class Events {
-        PageAccessRecordVo event;
-
-        public PageAccessRecordVo getEvent() {
-            return event;
-        }
-
-        public void setEvent(PageAccessRecordVo event) {
-            this.event = event;
-        }
-    }
-
-    private static class DruidError {
-        String error;
-
-        public String getError() {
-            return error;
-        }
-
-        public void setError(String error) {
-            this.error = error;
-        }
     }
 }

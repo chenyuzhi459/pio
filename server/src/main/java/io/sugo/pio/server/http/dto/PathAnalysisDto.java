@@ -1,18 +1,19 @@
 package io.sugo.pio.server.http.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.sugo.pio.server.pathanalysis.PathAnalysisConstant;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PathAnalysisDto {
 
     private static final ObjectMapper jsonMapper = new ObjectMapper();
@@ -27,6 +28,8 @@ public class PathAnalysisDto {
     private List<FilterDimension> filters;
     @JsonProperty
     private String homePage;
+    @JsonProperty
+    private Integer limit;
 
     /**
      * yyyy-mm-dd
@@ -44,11 +47,11 @@ public class PathAnalysisDto {
         @JsonProperty
         String sessionId;
         @JsonProperty
+        String userId;
+        @JsonProperty
         String pageName;
         @JsonProperty
         String date;
-        @JsonProperty
-        String userId;
 
         public String getSessionId() {
             return sessionId;
@@ -139,6 +142,14 @@ public class PathAnalysisDto {
         this.filters = filters;
     }
 
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
     public String buildQuery() {
         Query query = new Query();
         query.setDataSource(this.dataSource);
@@ -159,7 +170,7 @@ public class PathAnalysisDto {
         query.getFilter().getFields().add(boundField);
 
         if (this.filters != null && this.filters.size() > 0) {
-            query.getFilter().getFields().addAll(buildFilterFieldsd(this.filters));
+            query.getFilter().getFields().addAll(buildFilterFields(this.filters));
         }
 
         // Set dimensions
@@ -187,72 +198,119 @@ public class PathAnalysisDto {
         return queryStr;
     }
 
-    private List<FieldType> buildFilterFieldsd(List<FilterDimension> filters) {
-        List<FieldType> fields = new ArrayList<>(filters.size());
-        for (FilterDimension filter : filters) {
-            switch (filter.getAction()) {
-                case "=":
-                    EqualField equalField = new EqualField();
-                    equalField.setDimension(filter.getDimension());
-                    equalField.setValue(filter.getValue().toString());
-                    fields.add(equalField);
-                    break;
-                case "!=":
-                    NotEqualField notEqualField = new NotEqualField();
-                    notEqualField.getField().setDimension(filter.getDimension());
-                    notEqualField.getField().setValue(filter.getValue().toString());
-                    fields.add(notEqualField);
-                    break;
-                case ">":
-                    GreaterThanField greaterThanField = new GreaterThanField();
-                    greaterThanField.setDimension(filter.getDimension());
-                    greaterThanField.setLower(filter.getValue().toString());
-                    fields.add(greaterThanField);
-                    break;
-                case "<":
-                    LessThanField lessThanField = new LessThanField();
-                    lessThanField.setDimension(filter.getDimension());
-                    lessThanField.setUpper(filter.getValue().toString());
-                    fields.add(lessThanField);
-                    break;
-                case ">=":
-                    GreaterThanEqualField greaterThanEqualField = new GreaterThanEqualField();
-                    greaterThanEqualField.setDimension(filter.getDimension());
-                    greaterThanEqualField.setLower(filter.getValue().toString());
-                    fields.add(greaterThanEqualField);
-                    break;
-                case "<=":
-                    LessThanEqualField lessThanEqualField = new LessThanEqualField();
-                    lessThanEqualField.setDimension(filter.getDimension());
-                    lessThanEqualField.setUpper(filter.getValue().toString());
-                    fields.add(lessThanEqualField);
-                    break;
-                case "between":
-                    List<String> valuePair = (List) filter.getValue();
-                    BetweenField betweenField = new BetweenField();
-                    betweenField.setDimension(filter.getDimension());
-                    betweenField.setLower(valuePair.get(0));
-                    betweenField.setUpper(valuePair.get(1));
-                    fields.add(betweenField);
-                    break;
-                case "in":
-                    List<String> listValues = (List) filter.getValue();
-                    InField inField = new InField();
-                    inField.setDimension(filter.getDimension());
-                    inField.setValues(listValues);
-                    fields.add(inField);
-                    break;
-                case "not in":
-                    List<String> listValuesNotIn = (List) filter.getValue();
-                    NotInField notInField = new NotInField();
-                    notInField.getField().setDimension(filter.getDimension());
-                    notInField.getField().setValues(listValuesNotIn);
-                    fields.add(notInField);
-                    break;
-            }
+    public String buildScanQuery() {
+        ScanQuery query = new ScanQuery();
+        query.setDataSource(this.dataSource);
+        query.setBatchSize(PathAnalysisConstant.DEFAULT_BATCH_SIZE);
+        query.setLimit(this.limit == null ? PathAnalysisConstant.DEFAULT_LIMIT_SIZE : this.limit);
+
+        // Set filters
+        if (this.pages != null && !this.pages.isEmpty()) {
+            InField inField = new InField();
+            inField.setDimension(this.getDimension().getPageName());
+            inField.setValues(this.pages);
+            query.getFilter().getFields().add(inField);
+        }
+        if (this.filters != null && this.filters.size() > 0) {
+            query.getFilter().getFields().addAll(buildFilterFields(this.filters));
+        }
+        BetweenEqualField boundField = new BetweenEqualField();
+        boundField.setDimension(this.getDimension().getDate());
+        boundField.setLower(this.startDate);
+        boundField.setUpper(this.endDate);
+        query.getFilter().getFields().add(boundField);
+
+        // Set columns
+        query.getColumns().add(this.getDimension().getSessionId());
+        query.getColumns().add(this.getDimension().getUserId());
+        query.getColumns().add(this.getDimension().getPageName());
+        query.getColumns().add(this.getDimension().getDate());
+
+        // Set intervals
+        query.getIntervals().add(this.startDate + "/" + this.endDate);
+
+        String queryStr = "";
+        try {
+            queryStr = jsonMapper.writeValueAsString(query);
+        } catch (JsonProcessingException ignore) {
         }
 
-        return fields;
+        return queryStr;
+    }
+
+    private static class ScanQuery {
+        String queryType = "lucene_scan";
+        String dataSource;
+        String resultFormat = "compactedList";
+        int batchSize;
+        int limit;
+        List<String> columns = new ArrayList<>();
+        List<String> intervals = new ArrayList<>();
+        Filter filter = new Filter();
+
+        public String getQueryType() {
+            return queryType;
+        }
+
+        public void setQueryType(String queryType) {
+            this.queryType = queryType;
+        }
+
+        public String getDataSource() {
+            return dataSource;
+        }
+
+        public void setDataSource(String dataSource) {
+            this.dataSource = dataSource;
+        }
+
+        public String getResultFormat() {
+            return resultFormat;
+        }
+
+        public void setResultFormat(String resultFormat) {
+            this.resultFormat = resultFormat;
+        }
+
+        public int getBatchSize() {
+            return batchSize;
+        }
+
+        public void setBatchSize(int batchSize) {
+            this.batchSize = batchSize;
+        }
+
+        public int getLimit() {
+            return limit;
+        }
+
+        public void setLimit(int limit) {
+            this.limit = limit;
+        }
+
+        public List<String> getColumns() {
+            return columns;
+        }
+
+        public void setColumns(List<String> columns) {
+            this.columns = columns;
+        }
+
+        public List<String> getIntervals() {
+            return intervals;
+        }
+
+        public void setIntervals(List<String> intervals) {
+            this.intervals = intervals;
+        }
+
+        public Filter getFilter() {
+            return filter;
+        }
+
+        public void setFilter(Filter filter) {
+            this.filter = filter;
+        }
     }
 
     private static class Query {
@@ -650,6 +708,74 @@ public class PathAnalysisDto {
         public void setThreshold(Integer threshold) {
             this.threshold = threshold;
         }
+    }
+
+    private List<FieldType> buildFilterFields(List<FilterDimension> filters) {
+        List<FieldType> fields = new ArrayList<>(filters.size());
+        for (FilterDimension filter : filters) {
+            switch (filter.getAction()) {
+                case "=":
+                    EqualField equalField = new EqualField();
+                    equalField.setDimension(filter.getDimension());
+                    equalField.setValue(filter.getValue().toString());
+                    fields.add(equalField);
+                    break;
+                case "!=":
+                    NotEqualField notEqualField = new NotEqualField();
+                    notEqualField.getField().setDimension(filter.getDimension());
+                    notEqualField.getField().setValue(filter.getValue().toString());
+                    fields.add(notEqualField);
+                    break;
+                case ">":
+                    GreaterThanField greaterThanField = new GreaterThanField();
+                    greaterThanField.setDimension(filter.getDimension());
+                    greaterThanField.setLower(filter.getValue().toString());
+                    fields.add(greaterThanField);
+                    break;
+                case "<":
+                    LessThanField lessThanField = new LessThanField();
+                    lessThanField.setDimension(filter.getDimension());
+                    lessThanField.setUpper(filter.getValue().toString());
+                    fields.add(lessThanField);
+                    break;
+                case ">=":
+                    GreaterThanEqualField greaterThanEqualField = new GreaterThanEqualField();
+                    greaterThanEqualField.setDimension(filter.getDimension());
+                    greaterThanEqualField.setLower(filter.getValue().toString());
+                    fields.add(greaterThanEqualField);
+                    break;
+                case "<=":
+                    LessThanEqualField lessThanEqualField = new LessThanEqualField();
+                    lessThanEqualField.setDimension(filter.getDimension());
+                    lessThanEqualField.setUpper(filter.getValue().toString());
+                    fields.add(lessThanEqualField);
+                    break;
+                case "between":
+                    List<String> valuePair = (List) filter.getValue();
+                    BetweenField betweenField = new BetweenField();
+                    betweenField.setDimension(filter.getDimension());
+                    betweenField.setLower(valuePair.get(0));
+                    betweenField.setUpper(valuePair.get(1));
+                    fields.add(betweenField);
+                    break;
+                case "in":
+                    List<String> listValues = (List) filter.getValue();
+                    InField inField = new InField();
+                    inField.setDimension(filter.getDimension());
+                    inField.setValues(listValues);
+                    fields.add(inField);
+                    break;
+                case "not in":
+                    List<String> listValuesNotIn = (List) filter.getValue();
+                    NotInField notInField = new NotInField();
+                    notInField.getField().setDimension(filter.getDimension());
+                    notInField.getField().setValues(listValuesNotIn);
+                    fields.add(notInField);
+                    break;
+            }
+        }
+
+        return fields;
     }
 
     public static void main(String[] args) {
