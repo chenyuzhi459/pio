@@ -28,8 +28,8 @@ public class PathAnalysisDto {
     private List<FilterDimension> filters;
     @JsonProperty
     private String homePage;
-    @JsonProperty
-    private Integer limit;
+//    @JsonProperty
+//    private Integer limit;
 
     /**
      * yyyy-mm-dd
@@ -142,13 +142,13 @@ public class PathAnalysisDto {
         this.filters = filters;
     }
 
-    public Integer getLimit() {
-        return limit;
-    }
-
-    public void setLimit(Integer limit) {
-        this.limit = limit;
-    }
+//    public Integer getLimit() {
+//        return limit;
+//    }
+//
+//    public void setLimit(Integer limit) {
+//        this.limit = limit;
+//    }
 
     public String buildQuery() {
         Query query = new Query();
@@ -202,7 +202,8 @@ public class PathAnalysisDto {
         ScanQuery query = new ScanQuery();
         query.setDataSource(this.dataSource);
         query.setBatchSize(PathAnalysisConstant.DEFAULT_BATCH_SIZE);
-        query.setLimit(this.limit == null ? PathAnalysisConstant.DEFAULT_LIMIT_SIZE : this.limit);
+//        query.setLimit(this.limit == null ? PathAnalysisConstant.DEFAULT_LIMIT_SIZE : this.limit);
+        query.setLimit(PathAnalysisConstant.DEFAULT_LIMIT_SIZE);
 
         // Set filters
         if (this.pages != null && !this.pages.isEmpty()) {

@@ -12,6 +12,7 @@ import io.sugo.pio.server.pathanalysis.model.AccessTree;
 import io.sugo.pio.server.pathanalysis.model.PathNode;
 import io.sugo.pio.server.pathanalysis.vo.PageAccessRecordVo;
 import okhttp3.*;
+import org.joda.time.DateTime;
 
 import java.io.InputStream;
 import java.util.Date;
@@ -40,6 +41,7 @@ public class PathAnalyzer {
     public AccessTree getAccessTree(String queryStr, String homePage, boolean reversed) {
         long before = System.currentTimeMillis();
         log.info("Begin to path analysis...");
+        log.info("Scan query url: %s . Param: %s", queryUrl, queryStr);
 
         int depth = reversed ? PathAnalysisConstant.TREE_DEPTH_REVERSE : PathAnalysisConstant.TREE_DEPTH_NORMAL;
 
@@ -63,7 +65,13 @@ public class PathAnalyzer {
                         record.setSessionId(event.get(1).toString());
                         record.setUserId(event.get(2).toString());
                         record.setPageName(event.get(3).toString());
-                        record.setAccessTime(new Date((Long) (event.get(4))));
+                        Object accessTime = event.get(4);
+                        if (accessTime != null) {
+                            record.setAccessTime(new Date((Long) (accessTime)));
+                        } else { // If the data generation time is null, then use the data ingestion time.
+                            accessTime = event.get(0);
+                            record.setAccessTime(new DateTime(accessTime).toDate());
+                        }
                         records.add(record);
                     }
                     records.sort(reversed ? PageAccessRecordVo.DESC_COMPARATOR : PageAccessRecordVo.ASC_COMPARATOR);
