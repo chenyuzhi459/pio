@@ -33,6 +33,21 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
 
     public static final ObjectMapper jsonMapper = new ObjectMapper();
 
+    protected InputStream streamHttpPost(String url, String requestJson) {
+        if (!isValidUrl(url)) {
+            throw new OperatorException("pio.error.parsing.invalid_url", url);
+        }
+
+        InputStream result;
+        try {
+            result = HttpClientUtil.streamPost(url, requestJson);
+        } catch (Exception e) {
+            throw new OperatorException("pio.error.http_request_failed",url , e);
+        }
+
+        return result;
+    }
+
     protected String httpGet(String url) {
         if (!isValidUrl(url)) {
             throw new OperatorException("pio.error.parsing.invalid_url", url);
@@ -130,4 +145,5 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
             throw Throwables.propagate(e);
         }
     }
+
 }

@@ -5,6 +5,7 @@ import okhttp3.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 public class HttpClientUtil {
@@ -33,6 +34,15 @@ public class HttpClientUtil {
         String result = response.body().string();
 
         return result;
+    }
+
+    public static InputStream streamPost(String url, String jsonData) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        RequestBody body = RequestBody.create(DEFAULT_MEDIA_TYPE, jsonData);
+        Request request = new Request.Builder().url(url).post(body).build();
+
+        Response response = client.newCall(request).execute();
+        return response.body().byteStream();
     }
 
     public static String getWithTimeout(String url, Integer connectTimeout, Integer readTimeout) throws IOException {

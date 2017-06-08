@@ -9,6 +9,7 @@ import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.jackson.DefaultObjectMapper;
 import io.sugo.pio.operator.clustering.clusterer.KMeans;
 import io.sugo.pio.operator.extension.jdbc.io.DatabaseDataReader;
+import io.sugo.pio.operator.io.ScanExampleSource;
 import io.sugo.pio.operator.learner.associations.AssociationRuleGenerator;
 import io.sugo.pio.operator.learner.associations.fpgrowth.FPGrowth;
 import io.sugo.pio.operator.learner.functions.kernel.JMySVMLearner;
@@ -737,6 +738,25 @@ public class ProcessTest {
         IOContainer set = process.run();
         set = process.getRootOperator().getResults(true);
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(ef.getResult()));
+        System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
+    }
+
+    @Test
+    public void scanTest() throws JsonProcessingException {
+        OperatorProcess process = new OperatorProcess("csv");
+        process.setDescription("scan test.");
+
+        ScanExampleSource scanExampleSource = new ScanExampleSource();
+        scanExampleSource.setName("operator_csv");
+        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_URL, "http://192.168.0.212:8082/druid/v2?pretty");
+        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_DATA_SOURCE, "wuxianjiRT");
+        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_META_DATA,
+                "0:id.true.attribute_value.id;1:amount.true.real.attribute;2:sex.true.binominal.label;3:age.true.integer.attribute;4:country.true.nominal.attribute");
+
+        process.getRootOperator().getExecutionUnit().addOperator(scanExampleSource);
+
+        IOContainer set = process.run();
+        set = process.getRootOperator().getResults(true);
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
 
