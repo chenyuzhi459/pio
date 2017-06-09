@@ -749,14 +749,14 @@ public class ProcessTest {
         ScanExampleSource scanExampleSource = new ScanExampleSource();
         scanExampleSource.setName("operator_csv");
         scanExampleSource.setParameter(ScanExampleSource.PARAMETER_URL, "http://192.168.0.212:8082/druid/v2?pretty");
-        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_DATA_SOURCE, "wuxianjiRT");
+        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_DATA_SOURCE, "com_HyoaKhQMl_project_SyOxsTckZ");
         scanExampleSource.setParameter(ScanExampleSource.PARAMETER_META_DATA,
-                "0:id.true.attribute_value.id;1:amount.true.real.attribute;2:sex.true.binominal.label;3:age.true.integer.attribute;4:country.true.nominal.attribute");
+                "0:price.true.real.attribute;1:brand.true.nominal.attribute");
 
         process.getRootOperator().getExecutionUnit().addOperator(scanExampleSource);
 
         IOContainer set = process.run();
-        set = process.getRootOperator().getResults(true);
+        set = scanExampleSource.getResult();
         System.out.println(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(set));
     }
 

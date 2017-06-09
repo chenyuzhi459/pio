@@ -50,5 +50,6 @@ public class ProcessConstant {
         public static final String CSVExampleSetWriter = "csv_writer";
         public static final String HttpSqlExampleSource = "http_sql_source";
         public static final String SingleViewExampleSource = "single_view_source";
+        public static final String ScanExampleSource = "scan_source";
     }
 }

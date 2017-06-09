@@ -1,6 +1,9 @@
 package io.sugo.pio.operator.io;
 
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.common.utils.JsonObjectIterator;
 import io.sugo.pio.example.Attribute;
@@ -17,21 +20,21 @@ import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.tools.Ontology;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  */
 public class ScanExampleSource extends AbstractHttpExampleSource {
-    private static final Logger logger = new Logger(SingleViewExampleSource.class);
+    private static final Logger logger = new Logger(ScanExampleSource.class);
 
     public static final String PARAMETER_URL = "url";
 
     public static final String PARAMETER_DATA_SOURCE = "data_source";
+
+    public static final String PARAMETER_INTERVALS = "intervals";
 
     public static final String PARAMETER_BATCH_SIZE = "batch_size";
 
@@ -49,13 +52,27 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
     public ExampleSet createExampleSet() throws OperatorException {
         String druidUrl = getParameterAsString(PARAMETER_URL);
         String datasource = getParameterAsString(PARAMETER_DATA_SOURCE);
+        String intervals = getParameterAsString(PARAMETER_INTERVALS);
         int batchSize = getParameterAsInt(PARAMETER_BATCH_SIZE);
         int limit = getParameterAsInt(PARAMETER_LIMIT);
+        List<Attribute> attributes = getAttributes();
+        if(attributes.isEmpty()) {
+            return null;
+        }
 
+        List<String> columns = Lists.transform(attributes, new Function<Attribute, String>() {
+            @Nullable
+            @Override
+            public String apply(@Nullable Attribute input) {
+                return input.getName();
+            }
+        });
         ScanQuery query = new ScanQuery();
         query.setDataSource(datasource);
         query.setBatchSize(batchSize);
         query.setLimit(limit);
+        query.setColumns(columns);
+        query.setIntervals(ImmutableList.of(intervals));
 
         String queryStr;
         try {
@@ -67,7 +84,6 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         InputStream stream = streamHttpPost(druidUrl, queryStr);
         JsonObjectIterator iterator = new JsonObjectIterator(stream);
         DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
-        List<Attribute> attributes = getAttributes();
         ExampleSetBuilder builder = ExampleSets.from(attributes);
 
         int attrSize = attributes.size();
@@ -81,7 +97,7 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
                     for (int i = 0; i < attrSize; i++) {
                         Attribute attr = attributes.get(i);
                         int valueType = attr.getValueType();
-                        Object attrValue = row.get(i);
+                        Object attrValue = row.get(i+1);
 
                         if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NOMINAL)) {
                             String attrValueStr = attrValue == null ? null : attrValue.toString();
@@ -97,8 +113,6 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
                             dataRow.set(attr, value);
                         } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.DATE_TIME)) {
                             // TODO: parse datetime value
-                            double value = 0.0D / 0.0;
-                            dataRow.set(attr, value);
                         } else {
 
                         }
@@ -130,7 +144,8 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
             maxUsedColumnIndex = Math.max(maxUsedColumnIndex, columnIndex);
         }
         // initialize with values from settings
-        List<Attribute> attributes = new ArrayList<>(maxUsedColumnIndex + 1);
+        List<Attribute> attributes = new ArrayList<>(maxUsedColumnIndex + 2);
+//        attributes.add(AttributeFactory.createAttribute("timestamp", Ontology.DATE_TIME));
 
         for (String[] metaDataDefinition : metaDataSettings) {
             String[] metaDataDefintionValues = ParameterTypeTupel.transformString2Tupel(metaDataDefinition[1]);
@@ -188,6 +203,10 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         ParameterTypeInt limit = new ParameterTypeInt(PARAMETER_LIMIT, I18N.getMessage("pio.ScanExampleSource.limit"), 10000, 2000000, 10000);
         types.add(limit);
 
+        ParameterTypeString intervals = new ParameterTypeString(PARAMETER_INTERVALS,
+                I18N.getMessage("pio.ScanExampleSource.interval"), "1000/3000", false);
+        types.add(intervals);
+
         ParameterTypeList attributes = new ParameterTypeList(PARAMETER_META_DATA, "The meta data information", //
                 new ParameterTypeInt(PARAMETER_COLUMN_INDEX, "The column index", 0, Integer.MAX_VALUE), //
                 new ParameterTypeTupel(PARAMETER_COLUMN_META_DATA, "The meta data definition of one column", //
@@ -198,6 +217,7 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
                         new ParameterTypeStringCategory(PARAMETER_COLUMN_ROLE, "Indicates the role of an attribute",
                                 Attributes.KNOWN_ATTRIBUTE_TYPES_VALUE, Attributes.KNOWN_ATTRIBUTE_TYPES, Attributes.ATTRIBUTE_NAME, true)));
         types.add(attributes);
+
         return types;
     }
 
@@ -209,7 +229,7 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         private int limit;
         private List<String> columns = new ArrayList<>();
         private List<String> intervals = new ArrayList<>();
-        private String filter;
+        private String filter = "*:*";
 
         public String getQueryType() {
             return queryType;
