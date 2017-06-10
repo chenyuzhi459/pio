@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
@@ -38,11 +39,11 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     public static final String PARAMETER_PARAM = "param";
 
-//    private static final String SINGLE_VIEW_URL_PREFIX = "http://192.168.0.101:8080/api";
-
     private static final String URI_QUERY_DRUID = "/api/slices/query-druid";
 
     private static final String URI_QUERY_DIMENSION = "/api/dimension";
+
+    private static final String GROUP_BY_DEMENSION_SURFIX = "_GROUP";
 
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
@@ -67,59 +68,18 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             logger.info("Get druid data from url '" + druidUrl + "' successfully.");
 
             DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
-            List<Attribute> attributes = getAttributes();
-            ExampleSetBuilder builder = ExampleSets.from(attributes);
 
+            List<Attribute> dimensionAttrs = Lists.newArrayList();
+            List<Attribute> metricAttrs = Lists.newArrayList();
+            List<Attribute> allAttrs = obtainAttributes(dimensionAttrs, metricAttrs);
+
+            ExampleSetBuilder builder = ExampleSets.from(allAttrs);
             if (resultList != null && !resultList.isEmpty()) {
                 logger.info("Begin to traverse druid data to example set data. Data size:" + resultList.size());
                 collectLog("Get data from druid successfully, data size: " + resultList.size());
 
-                int attrSize = attributes.size();
-
-                // traverse all rows to store data
-                for (Object resultObj : resultList) {
-                    String resultStr = null;
-                    Map resultMap = null;
-                    try {
-                        resultStr = jsonMapper.writeValueAsString(resultObj);
-                        if (Objects.nonNull(resultStr)) {
-                            resultMap = jsonMapper.readValue(resultStr, Map.class);
-                        }
-                    } catch (IOException e) {
-                        throw new OperatorException("pio.error.parsing.unresolvable_druid_row", resultStr, e);
-                    }
-
-                    // one result corresponds to one data row
-                    DataRow dataRow = factory.create(attrSize);
-                    for (int i = 0; i < attrSize; i++) {
-                        Attribute attr = attributes.get(i);
-                        int valueType = attr.getValueType();
-                        String attrName = attr.getName();
-                        Object attrValue = resultMap.get(attrName);
-
-                        if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NOMINAL)) {
-                            String attrValueStr = attrValue == null ? null : attrValue.toString();
-                            double value = attr.getMapping().mapString(attrValueStr);
-                            dataRow.set(attr, value);
-                        } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NUMERICAL)) {
-                            double value;
-                            if (attrValue == null || Strings.isNullOrEmpty(attrValue.toString()))  {
-                                value = 0.0D / 0.0;
-                            } else {
-                                value = Double.valueOf(attrValue.toString());
-                            }
-                            dataRow.set(attr, value);
-                        } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.DATE_TIME)) {
-                            // TODO: parse datetime value
-                            double value = 0.0D / 0.0;
-                            dataRow.set(attr, value);
-                        } else {
-
-                        }
-                    }
-
-                    builder.addDataRow(dataRow);
-                }
+                AttributeTree tree = buildTree(resultList, dimensionAttrs, new AttributeTree());
+                buildExampleSet(tree, Lists.newArrayList(), allAttrs, factory, builder);
 
                 logger.info("Traverse druid data to example set data successfully.");
             } else {
@@ -180,7 +140,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
     @Override
     public MetaData getGeneratedMetaData() throws OperatorException {
         ExampleSetMetaData metaData = new ExampleSetMetaData();
-        List<Attribute> attributes = getAttributes();
+        List<Attribute> attributes = obtainAttributes(Lists.newArrayList(), Lists.newArrayList());
         if (attributes != null && !attributes.isEmpty()) {
             attributes.forEach(attribute -> {
                 metaData.addAttribute(new AttributeMetaData(attribute));
@@ -241,11 +201,12 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 HashMap<String, Object> map = resList.get(0); // only has one result
                 if (map != null && !map.isEmpty()) {
                     Object resultSetObj = map.get("resultSet"); // only get key named "resultSet"
-                    String resultSetStr = resultSetObj == null ? null : jsonMapper.writeValueAsString(resultSetObj);
+                    return (List) resultSetObj;
+                    /*String resultSetStr = resultSetObj == null ? null : jsonMapper.writeValueAsString(resultSetObj);
                     if (Objects.nonNull(resultSetStr)) {
                         List resultList = jsonMapper.readValue(resultSetStr, List.class);
                         return resultList;
-                    }
+                    }*/
                 }
             }
         }
@@ -253,35 +214,158 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         return null;
     }
 
-    private List<Attribute> getAttributes(List<Object> resultList) {
-        List<Attribute> attributes = new ArrayList<>();
+    private void buildExampleSet(AttributeTree tree, List<AttributeValuePair> breadcrumbs, List<Attribute> allAttrs, DataRowFactory factory, ExampleSetBuilder builder) {
+        List<AttributeTree> subTrees = tree.getSubTrees();
+        if (subTrees != null && !subTrees.isEmpty()) {
+            List<AttributeValuePair> tempBreadcrumbs = new ArrayList<>(breadcrumbs);
+            for (AttributeTree subTree : subTrees) {
+                if (subTree instanceof AttributeLeaf) {
+                    AttributeLeaf leaf = (AttributeLeaf) subTree;
+                    String leafName = leaf.getAttributeName();
+                    Attribute leafAttribute = getAttributeByName(allAttrs, leafName);
 
-        if (resultList == null || resultList.isEmpty()) {
-            return attributes;
-        }
+                    AttributeValuePair pair = new AttributeValuePair();
+                    pair.setAttribute(leafAttribute);
+                    pair.setValue(leaf.getAttributeValue());
+                    tempBreadcrumbs.add(pair);
 
-        try {
-            // create table based on the first row
-            Object firstRow = resultList.get(0);
-            String resultStr = firstRow == null ? null : jsonMapper.writeValueAsString(firstRow);
-            if (Objects.nonNull(resultStr)) {
-                Map resultSetMap = jsonMapper.readValue(resultStr, Map.class);
+                    DataRow dataRow = factory.create(allAttrs.size());
+                    // 1.dimensions
+                    for (AttributeValuePair breadcrumb : tempBreadcrumbs) {
+                        setDataRow(dataRow, breadcrumb.getAttribute(), breadcrumb.getValue());
+                    }
 
-                Iterator<String> keyIterator = resultSetMap.keySet().iterator();
-                while (keyIterator.hasNext()) {
-                    String key = keyIterator.next();
-                    attributes.add(AttributeFactory.createAttribute(key, Ontology.STRING));
+                    // 2. metrics
+                    Iterator keyIter = leaf.getMetricMap().keySet().iterator();
+                    while (keyIter.hasNext()) {
+                        String attrName = (String) keyIter.next();
+                        Attribute attribute = getAttributeByName(allAttrs, attrName);
+                        Object value = leaf.getMetricMap().get(attrName);
+                        setDataRow(dataRow, attribute, value);
+                    }
+
+                    builder.addDataRow(dataRow);
+
+                    // Take back current breadcrumb when function exit
+                    tempBreadcrumbs.remove(pair);
+                } else {
+                    String attrName = subTree.getAttributeName();
+                    Attribute attribute = getAttributeByName(allAttrs, attrName);
+
+                    AttributeValuePair pair = new AttributeValuePair();
+                    pair.setAttribute(attribute);
+                    pair.setValue(subTree.getAttributeValue());
+                    tempBreadcrumbs.add(pair);
+
+                    buildExampleSet(subTree, tempBreadcrumbs, allAttrs, factory, builder);
+
+                    // Take back current breadcrumb when function exit
+                    tempBreadcrumbs.remove(pair);
                 }
             }
-        } catch (IOException e) {
-            return attributes;
         }
-
-        return attributes;
     }
 
-    private List<Attribute> getAttributes() {
-        List<Attribute> attributes = new ArrayList<>();
+    private AttributeTree buildTree(List values, List<Attribute> attributes, AttributeTree parentTree) {
+        List<Attribute> tempAttrs = new ArrayList<>(attributes);
+        if (tempAttrs.size() == 1) {
+            List<AttributeTree> leaves = Lists.newArrayList();
+            String attrName = tempAttrs.get(0).getName();
+            if (values != null) {
+                for (Object ele : values) {
+                    AttributeLeaf leaf = new AttributeLeaf();
+                    Map metricMap = (Map) ele;
+                    leaf.setAttributeName(attrName);
+                    leaf.setAttributeValue(metricMap.get(attrName));
+
+                    metricMap.remove(attrName);
+                    leaf.setMetricMap(metricMap);
+
+                    leaves.add(leaf);
+                }
+            }
+            parentTree.setSubTrees(leaves);
+            return parentTree;
+        }
+
+        if (values.size() > 0) {
+            int attrSize = tempAttrs.size();
+            Map firstEle = (Map) values.get(0);
+
+            // Find current layer attribute
+            String currentLayerAttribute = null;
+            for (int i = 0; i < attrSize; i++) {
+                String attrName = tempAttrs.get(i).getName();
+                if (firstEle.keySet().contains(attrName)) {
+                    currentLayerAttribute = attrName;
+                    tempAttrs.remove(i);
+                    break;
+                }
+            }
+
+            List<AttributeTree> subTrees = Lists.newArrayList();
+            for (Object ele : values) {
+                AttributeTree subTree = new AttributeTree();
+                Map valueMap = (Map) ele;
+                subTree.setAttributeName(currentLayerAttribute);
+                subTree.setAttributeValue(valueMap.get(currentLayerAttribute));
+
+                Iterator keyIter = valueMap.keySet().iterator();
+                while (keyIter.hasNext()) {
+                    String groupKey = (String) keyIter.next();
+                    if (groupKey.endsWith(GROUP_BY_DEMENSION_SURFIX) &&
+                            valueMap.get(groupKey) instanceof List) {
+                        // Recursive build tree
+                        buildTree((List) valueMap.get(groupKey), tempAttrs, subTree);
+                    }
+                }
+
+                subTrees.add(subTree);
+                parentTree.setSubTrees(subTrees);
+            }
+        }
+
+        return parentTree;
+    }
+
+    private void setDataRow(DataRow dataRow, Attribute attribute, Object attrValue) {
+        int valueType = attribute.getValueType();
+
+        if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NOMINAL)) {
+            String attrValueStr = attrValue == null ? null : attrValue.toString();
+            double value = attribute.getMapping().mapString(attrValueStr);
+            dataRow.set(attribute, value);
+        } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NUMERICAL)) {
+            double value;
+            if (attrValue == null || Strings.isNullOrEmpty(attrValue.toString())) {
+                value = 0.0D / 0.0;
+            } else {
+                value = Double.valueOf(attrValue.toString());
+            }
+            dataRow.set(attribute, value);
+        } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.DATE_TIME)) {
+            // TODO: parse datetime value
+            double value = 0.0D / 0.0;
+            dataRow.set(attribute, value);
+        } else {
+
+        }
+    }
+
+    private Attribute getAttributeByName(List<Attribute> attributes, String attrName) {
+        if (!attributes.isEmpty()) {
+            for (Attribute attribute : attributes) {
+                if (attribute.getName().equals(attrName)) {
+                    return attribute;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private List<Attribute> obtainAttributes(final List<Attribute> dimensionAttrs, final List<Attribute> metricAttrs) {
+        List<Attribute> allAttrs = Lists.newArrayList();
         String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
         String param = getParameterAsString(PARAMETER_PARAM);
         String url = getParameterAsString(PARAMETER_URL);
@@ -314,7 +398,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                     dimensionList.forEach(dimensionVo -> {
                         String name = dimensionVo.getName();
                         String type = dimensionVo.getType();
-                        attributes.add(AttributeFactory.createAttribute(name, convertType(type)));
+                        dimensionAttrs.add(AttributeFactory.createAttribute(name, convertType(type)));
                     });
                 }
 
@@ -322,13 +406,16 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 List<String> metrics = paramVo.getMetrics();
                 if (metrics != null) {
                     metrics.forEach(metric -> {
-                        attributes.add(AttributeFactory.createAttribute(metric, Ontology.NUMERICAL));
+                        metricAttrs.add(AttributeFactory.createAttribute(metric, Ontology.NUMERICAL));
                     });
                 }
             }
         }
 
-        return attributes;
+        allAttrs.addAll(dimensionAttrs);
+        allAttrs.addAll(metricAttrs);
+
+        return allAttrs;
     }
 
     private int convertType(String dimensionType) {
@@ -345,27 +432,6 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 return Ontology.STRING;
         }
     }
-
-    /*private static class DataSourceWrapperVo {
-        List<DataSourceVo> result;
-        Integer code;
-
-        public List<DataSourceVo> getResult() {
-            return result;
-        }
-
-        public void setResult(List<DataSourceVo> result) {
-            this.result = result;
-        }
-
-        public Integer getCode() {
-            return code;
-        }
-
-        public void setCode(Integer code) {
-            this.code = code;
-        }
-    }*/
 
     private static class DimensionQueryVo {
         String parentId;
@@ -506,97 +572,6 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         }
     }
 
-    /*private static class SingleMapWrapperVo {
-        List<SingleMapVo> result;
-        Integer code;
-
-        public List<SingleMapVo> getResult() {
-            return result;
-        }
-
-        public void setResult(List<SingleMapVo> result) {
-            this.result = result;
-        }
-
-        public Integer getCode() {
-            return code;
-        }
-
-        public void setCode(Integer code) {
-            this.code = code;
-        }
-    }
-
-    private static class SingleMapDetailWrapperVo {
-        SingleMapVo result;
-        Integer code;
-
-        public SingleMapVo getResult() {
-            return result;
-        }
-
-        public void setResult(SingleMapVo result) {
-            this.result = result;
-        }
-
-        public Integer getCode() {
-            return code;
-        }
-
-        public void setCode(Integer code) {
-            this.code = code;
-        }
-    }
-
-    private static class SingleMapVo {
-        String id;
-        String slice_name;
-        String druid_datasource_id;
-        String datasource_name;
-        Object params;
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getSlice_name() {
-            return slice_name;
-        }
-
-        public void setSlice_name(String slice_name) {
-            this.slice_name = slice_name;
-        }
-
-        public String getDruid_datasource_id() {
-            return druid_datasource_id;
-        }
-
-        public void setDruid_datasource_id(String druid_datasource_id) {
-            this.druid_datasource_id = druid_datasource_id;
-        }
-
-        public String getDatasource_name() {
-            return datasource_name;
-        }
-
-        public void setDatasource_name(String datasource_name) {
-            this.datasource_name = datasource_name;
-        }
-
-        public Object getParams() {
-            return params;
-        }
-
-        public void setParams(Object params) {
-            this.params = params;
-        }
-
-    }*/
-
     private static class DruidResultVo {
         List<HashMap<String, Object>> result;
         Integer code;
@@ -640,10 +615,67 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     }
 
-    public static void main(String[] args) {
-        SingleViewExampleSource instance = new SingleViewExampleSource();
-        instance.getAttributes();
+    private static class AttributeValuePair {
+        Attribute attribute;
+        Object value;
+
+        public Attribute getAttribute() {
+            return attribute;
+        }
+
+        public void setAttribute(Attribute attribute) {
+            this.attribute = attribute;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
     }
 
+    private static class AttributeTree {
+        String attributeName;
+        Object attributeValue;
+        List<AttributeTree> subTrees;
+
+        public String getAttributeName() {
+            return attributeName;
+        }
+
+        public void setAttributeName(String attributeName) {
+            this.attributeName = attributeName;
+        }
+
+        public Object getAttributeValue() {
+            return attributeValue;
+        }
+
+        public void setAttributeValue(Object attributeValue) {
+            this.attributeValue = attributeValue;
+        }
+
+        public List<AttributeTree> getSubTrees() {
+            return subTrees;
+        }
+
+        public void setSubTrees(List<AttributeTree> subTrees) {
+            this.subTrees = subTrees;
+        }
+    }
+
+    private static class AttributeLeaf extends AttributeTree {
+        Map<String, Object> metricMap;
+
+        public Map<String, Object> getMetricMap() {
+            return metricMap;
+        }
+
+        public void setMetricMap(Map<String, Object> metricMap) {
+            this.metricMap = metricMap;
+        }
+    }
 
 }
