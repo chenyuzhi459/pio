@@ -51,7 +51,8 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
         String druidUrl = getParameterAsString(PARAMETER_URL);
-        String datasource = getParameterAsString(PARAMETER_DATA_SOURCE);
+//        String datasource = getParameterAsString(PARAMETER_DATA_SOURCE);
+        String datasource = "wuxianjiRT";
         String intervals = getParameterAsString(PARAMETER_INTERVALS);
         int batchSize = getParameterAsInt(PARAMETER_BATCH_SIZE);
         int limit = getParameterAsInt(PARAMETER_LIMIT);
@@ -138,31 +139,28 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         }
 
         // find largest used column index
-        int maxUsedColumnIndex = -1;
+        /*int maxUsedColumnIndex = -1;
         for (String[] metaDataDefinition : metaDataSettings) {
             int columnIndex = Integer.parseInt(metaDataDefinition[0]);
             maxUsedColumnIndex = Math.max(maxUsedColumnIndex, columnIndex);
-        }
+        }*/
         // initialize with values from settings
-        List<Attribute> attributes = new ArrayList<>(maxUsedColumnIndex + 2);
+        List<Attribute> attributes = new ArrayList<>();
 //        attributes.add(AttributeFactory.createAttribute("timestamp", Ontology.DATE_TIME));
 
         for (String[] metaDataDefinition : metaDataSettings) {
-            String[] metaDataDefintionValues = ParameterTypeTupel.transformString2Tupel(metaDataDefinition[1]);
-            boolean isSelected = Boolean.parseBoolean(metaDataDefintionValues[1]);
-            if (isSelected) { // otherwise details don't matter
-                String name = metaDataDefintionValues[0].trim();
+//            String[] metaDataDefintionValues = ParameterTypeTupel.transformString2Tupel(metaDataDefinition[1]);
+                String name = metaDataDefinition[0].trim();
 
-                int valueType = Ontology.ATTRIBUTE_VALUE_TYPE.mapName(metaDataDefintionValues[2]);
+                int valueType = Ontology.ATTRIBUTE_VALUE_TYPE.mapName(metaDataDefinition[1]);
                 // fallback for old processes where attribute value type was saved as index
                 // rather than as string
                 try {
                     if (valueType == -1) {
-                        valueType = Integer.parseInt(metaDataDefintionValues[2]);
+                        valueType = Integer.parseInt(metaDataDefinition[1]);
                     }
                     attributes.add(AttributeFactory.createAttribute(name, valueType));
                 } catch (Exception ignore) {}
-            }
         }
 
         return attributes;
@@ -188,7 +186,6 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         List types = super.getParameterTypes();
         ParameterTypeString urlType = new ParameterTypeString(PARAMETER_URL,
                 I18N.getMessage("pio.ScanExampleSource.url"), false);
-        urlType.setHidden(true);
         types.add(urlType);
 
         ParameterTypeDynamicCategory dataSourceType = new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, null,

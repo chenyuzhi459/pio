@@ -2,6 +2,7 @@ package io.sugo.pio.ports;
 
 import io.sugo.pio.operator.IOContainer;
 import io.sugo.pio.operator.Operator;
+import io.sugo.pio.tools.Observable;
 
 import java.io.Serializable;
 import java.util.List;
@@ -9,9 +10,48 @@ import java.util.Observer;
 
 /**
  */
-public interface Ports<T> extends Serializable {
+public interface Ports<T extends Port> extends Observable<Port> {
     /** Returns all input port names registered with these ports. */
     public String[] getPortNames();
+
+    /** Returns the number of ports. */
+    public int getNumberOfPorts();
+
+    /**
+     * Should be used in apply method to retrieve desired ports. name should be a constant defined
+     * in the operator. If a port with the given name does not exist, but a {@link PortExtender}
+     * with a suitable prefix is registered, ports will be created accordingly. In this case, the
+     * user must call {@link #unlockPortExtenders()} to guarantee that ports can be removed again.
+     */
+    public T getPortByName(String name);
+
+    /** Should only be used by GUI. */
+    public T getPortByIndex(int index);
+
+    /** Returns an immutable view of the ports. */
+    public List<T> getAllPorts();
+
+    /**
+     * Add a port and notify the {@link Observer}s.
+     */
+    public void addPort(T port);
+
+    /**
+     * Remove a port and notify the {@link Observer}s.
+     *
+     * @throws PortException
+     *             if port is not registered with this Ports instance.
+     */
+    public void removePort(T port) throws PortException;
+
+    /** Removes all ports. */
+    public void removeAll() throws PortException;
+
+    /** Returns true if this port is contained within this Ports object. */
+    public boolean containsPort(T port);
+
+    /** Returns the operator and process to which these ports are attached. */
+    public PortOwner getOwner();
 
     /** Creates a new port and adds it to these Ports. */
     public T createPort(String name, String description);
@@ -19,10 +59,29 @@ public interface Ports<T> extends Serializable {
     /** Creates a new port and adds it to these Ports if add is true.. */
     public T createPort(String name, String description, boolean add);
 
-    /** Creates (and adds) a new port whose {@link Port#simulatesStack()} returns false. */
+    /** Creates (and adds) a new port whose { Port#simulatesStack()} returns false. */
     public T createPassThroughPort(String name, String description);
 
     public T createPassThroughPort(String name);
+
+    /** Renames the given port. */
+    public void renamePort(T port, String newName);
+
+    /** Renames the given port's description. */
+    public void renamePortDesc(T port, String newDescription);
+
+    /**
+     * Clears the input, meta data, and error messages.
+     *
+     * @see Ports#clear(int)
+     */
+    public void clear(int clearFlags);
+
+    /**
+     * This is a backport method to generate IOContainers containing all output objects of the given
+     * ports.
+     */
+    public IOContainer createIOContainer(boolean onlyConnected);
 
     /**
      * This is a backport method to generate IOContainers containing all output objects of the given
@@ -38,32 +97,10 @@ public interface Ports<T> extends Serializable {
      */
     public void disconnectAllBut(List<Operator> exception);
 
-    /** Returns an immutable view of the ports. */
-    public List<T> getAllPorts();
-
-    public T getPort(String name);
-
-    /**
-     * Add a port and notify the {@link Observer}s.
-     */
-    public void addPort(T port);
-
-    /**
-     * Remove a port and notify the {@link Observer}s.
-     *
-     * @throws PortException
-     *             if port is not registered with this Ports instance.
-     */
-    public void removePort(T port) throws PortException;
-
     /** Re-adds this port as the last port in this collection. */
     public void pushDown(T port);
 
-    /** Returns the operator and process to which these ports are attached. */
-    public PortOwner getOwner();
-
-    /** Renames the given port. */
-    public void renamePort(T port, String newName);
+    public T getPort(String name);
 
     /** Registers a port extender with this ports. */
     public void registerPortExtender(PortExtender extender);
@@ -73,4 +110,7 @@ public interface Ports<T> extends Serializable {
 
     /** Frees memory occupied by references to ioobjects. */
     public void freeMemory();
+
+    /** Returns the number of ports in these Ports that are actually connected. */
+    int getNumberOfConnectedPorts();
 }

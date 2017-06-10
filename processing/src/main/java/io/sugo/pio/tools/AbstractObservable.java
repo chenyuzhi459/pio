@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 
 
 /**
- * @author Simon Fischer
  */
 public class AbstractObservable<A> implements Observable<A> {
 

@@ -4,12 +4,13 @@ import io.sugo.pio.operator.IOObject;
 import io.sugo.pio.operator.UserError;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.ports.metadata.MetaDataError;
+import io.sugo.pio.tools.Observable;
 
 import java.io.Serializable;
 
 /**
  */
-public interface Port extends Serializable {
+public interface Port extends Observable<Port> {
     public static final int CLEAR_META_DATA_ERRORS = 1 << 0;
     public static final int CLEAR_METADATA = 1 << 1;
     public static final int CLEAR_DATA = 1 << 2;
@@ -81,6 +82,14 @@ public interface Port extends Serializable {
      * Returns the set of ports to which this port belongs.
      */
     Ports<? extends Port> getPorts();
+
+    /**
+     * Clears data, meta data and errors at this port.
+     *
+     * @param clearFlags
+     *            disjunction of the CLEAR_XX constants.
+     */
+    public void clear(int clearFlags);
 
     /**
      * Returns the string "OperatorName.PortName".

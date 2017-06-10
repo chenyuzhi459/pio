@@ -18,6 +18,7 @@ import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeDynamicCategory;
+import io.sugo.pio.parameter.ParameterTypeInt;
 import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
@@ -38,6 +39,8 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
     public static final String PARAMETER_SINGLE_VIEW = "single_view";
 
     public static final String PARAMETER_PARAM = "param";
+
+    public static final String PARAMETER_LIMIT = "limit";
 
     private static final String URI_QUERY_DRUID = "/api/slices/query-druid";
 
@@ -79,8 +82,9 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 collectLog("Get data from druid successfully, data size: " + resultList.size());
 
                 AttributeTree tree = buildTree(resultList, dimensionAttrs, new AttributeTree());
-                buildExampleSet(tree, Lists.newArrayList(), allAttrs, factory, builder);
+                collectLog("Build attribute tree finished.");
 
+                buildExampleSet(tree, Lists.newArrayList(), allAttrs, factory, builder);
                 logger.info("Traverse druid data to example set data successfully.");
             } else {
                 collectLog("The data from druid is empty.");
@@ -134,6 +138,10 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         param.setHidden(true);
         types.add(param);
 
+        ParameterTypeInt limit = new ParameterTypeInt(PARAMETER_LIMIT, I18N.getMessage("pio.SingleViewExampleSource.single_view_limit"),
+                10, 1000000, 100);
+        types.add(limit);
+
         return types;
     }
 
@@ -155,6 +163,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
     private String buildQueryDruidParam() {
         String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE);
         String param = getParameterAsString(PARAMETER_PARAM);
+        Integer limit = getParameterAsInt(PARAMETER_LIMIT);
 
         Preconditions.checkNotNull(dataSource, I18N.getMessage("pio.error.operator.data_source_can_not_null"));
         Preconditions.checkNotNull(param, I18N.getMessage("pio.error.operator.param_can_not_null"));
@@ -167,6 +176,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             requestVo.setDruid_datasource_id(dataSource);
             requestVo.setParams(paramVo);
             String requestStr = jsonMapper.writeValueAsString(requestVo);
+            requestStr = requestStr.replaceAll("\"limit\":10", "\"limit\":" + limit);
 
             return requestStr;
         } catch (IOException e) {
@@ -240,8 +250,10 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                     while (keyIter.hasNext()) {
                         String attrName = (String) keyIter.next();
                         Attribute attribute = getAttributeByName(allAttrs, attrName);
-                        Object value = leaf.getMetricMap().get(attrName);
-                        setDataRow(dataRow, attribute, value);
+                        if (attribute != null) {
+                            Object value = leaf.getMetricMap().get(attrName);
+                            setDataRow(dataRow, attribute, value);
+                        }
                     }
 
                     builder.addDataRow(dataRow);

@@ -46,6 +46,12 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
         return (T) metaData;
     }
 
+    protected void assertConnected() throws PortException {
+        if (this.connectedTo == null) {
+            throw new PortException(this, "Not connected.");
+        }
+    }
+
     @Override
     public void connectTo(InputPort inputPort) {
         if (this.connectedTo == inputPort) {
@@ -54,12 +60,16 @@ public abstract class AbstractOutputPort extends AbstractPort implements OutputP
 
         this.connectedTo = inputPort;
         ((AbstractInputPort) inputPort).connect(this);
+        fireUpdate(this);
     }
 
     @Override
     public void disconnect() {
+        assertConnected();
         ((AbstractInputPort) this.connectedTo).connect(null);
         this.connectedTo.receive(null);
+        this.connectedTo.receiveMD(null);
         this.connectedTo = null;
+        fireUpdate(this);
     }
 }

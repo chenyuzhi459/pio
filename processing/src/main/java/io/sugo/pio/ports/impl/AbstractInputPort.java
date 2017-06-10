@@ -64,6 +64,7 @@ public abstract class AbstractInputPort extends AbstractPort implements InputPor
 
     public void connect(OutputPort outputPort) {
         this.sourceOutputPort = outputPort;
+        fireUpdate(this);
     }
 
 

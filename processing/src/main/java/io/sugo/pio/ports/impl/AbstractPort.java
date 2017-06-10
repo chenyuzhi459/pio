@@ -7,6 +7,7 @@ import io.sugo.pio.operator.error.PortUserError;
 import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.Ports;
 import io.sugo.pio.ports.metadata.MetaDataError;
+import io.sugo.pio.tools.AbstractObservable;
 import io.sugo.pio.util.ReferenceCache;
 
 import java.util.LinkedList;
@@ -14,7 +15,7 @@ import java.util.List;
 
 /**
  */
-public abstract class AbstractPort implements Port {
+public abstract class AbstractPort extends AbstractObservable<Port> implements Port {
 
     private final List<MetaDataError> errorList = new LinkedList<>();
     private final Ports<? extends Port> ports;
@@ -114,9 +115,24 @@ public abstract class AbstractPort implements Port {
         this.name = newName;
     }
 
+    protected void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+
     @Override
     public void addError(MetaDataError metaDataError) {
         errorList.add(metaDataError);
+    }
+
+    @Override
+    public void clear(int clearFlags) {
+        if ((clearFlags & CLEAR_META_DATA_ERRORS) > 0) {
+            this.errorList.clear();
+        }
+        if ((clearFlags & CLEAR_DATA) > 0) {
+            this.weakDataReference = null;
+            this.hardDataReference = null;
+        }
     }
 
     @Override
