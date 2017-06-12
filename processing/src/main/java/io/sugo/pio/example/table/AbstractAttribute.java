@@ -246,6 +246,7 @@ public abstract class AbstractAttribute implements Attribute {
      * @see io.sugo.pio.tools.Ontology#ATTRIBUTE_VALUE_TYPE
      */
     @Override
+    @JsonProperty
     public int getValueType() {
         return this.attributeDescription.getValueType();
     }

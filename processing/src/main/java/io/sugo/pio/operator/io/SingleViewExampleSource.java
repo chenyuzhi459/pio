@@ -24,6 +24,7 @@ import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.tools.Ontology;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.*;
@@ -46,7 +47,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private static final String URI_QUERY_DIMENSION = "/api/dimension";
 
-    private static final String GROUP_BY_DEMENSION_SURFIX = "_GROUP";
+    private static final String GROUP_BY_DIMENSION_SUFFIX = "_GROUP";
 
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
@@ -169,14 +170,14 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         Preconditions.checkNotNull(param, I18N.getMessage("pio.error.operator.param_can_not_null"));
 
         try {
-
             ParamVo paramVo = deserialize(param, ParamVo.class);
 
             SingleMapRequestVo requestVo = new SingleMapRequestVo();
             requestVo.setDruid_datasource_id(dataSource);
             requestVo.setParams(paramVo);
             String requestStr = jsonMapper.writeValueAsString(requestVo);
-            requestStr = requestStr.replaceAll("\"limit\":10", "\"limit\":" + limit);
+            // Replace limit with user inputs: ["limit"  : 10] -> ["limit":XXX]
+            requestStr = requestStr.replaceAll("\"limit\"(\\s)*:(\\s)*\\d+", "\"limit\":" + limit);
 
             return requestStr;
         } catch (IOException e) {
@@ -325,7 +326,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
                 Iterator keyIter = valueMap.keySet().iterator();
                 while (keyIter.hasNext()) {
                     String groupKey = (String) keyIter.next();
-                    if (groupKey.endsWith(GROUP_BY_DEMENSION_SURFIX) &&
+                    if (groupKey.endsWith(GROUP_BY_DIMENSION_SUFFIX) &&
                             valueMap.get(groupKey) instanceof List) {
                         // Recursive build tree
                         buildTree((List) valueMap.get(groupKey), tempAttrs, subTree);
@@ -356,11 +357,13 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             }
             dataRow.set(attribute, value);
         } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.DATE_TIME)) {
-            // TODO: parse datetime value
-            double value = 0.0D / 0.0;
+            double value;
+            if (attrValue == null || Strings.isNullOrEmpty(attrValue.toString())) {
+                value = 0.0D / 0.0;
+            } else {
+                value = new DateTime(attrValue).getMillis();
+            }
             dataRow.set(attribute, value);
-        } else {
-
         }
     }
 
@@ -689,5 +692,4 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             this.metricMap = metricMap;
         }
     }
-
 }

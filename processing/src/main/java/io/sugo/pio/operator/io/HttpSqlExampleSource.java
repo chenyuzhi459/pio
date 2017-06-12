@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.common.base.Strings;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.common.utils.HttpClientUtil;
 import io.sugo.pio.example.Attribute;
@@ -24,6 +25,7 @@ import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.tools.Ontology;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.*;
@@ -60,7 +62,8 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
             logger.info(message);
             collectLog(message);
 
-            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_BYTE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
+//            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_BYTE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
+            DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
             List<Attribute> attributes = getAttributes(resultList);
             ExampleSetBuilder builder = ExampleSets.from(attributes);
 
@@ -77,10 +80,30 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
                         Attribute attr = attributes.get(i);
                         String attrName = attr.getName();
                         Object attrValue = map.get(attrName); // 当该字段为日期类型时，此值为json串，需要进一步反序列化取出真正的日期值
-                        String attrValueStr = extractAttrValue(attrName, attrValue);
+                        Object exactAttrValue = extractAttrValue(attrName, attrValue);
 
-                        double value = attr.getMapping().mapString(attrValueStr);
-                        dataRow.set(attr, value);
+                        int valueType = attr.getValueType();
+                        if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NOMINAL)) {
+                            String attrValueStr = exactAttrValue == null ? null : exactAttrValue.toString();
+                            double value = attr.getMapping().mapString(attrValueStr);
+                            dataRow.set(attr, value);
+                        } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NUMERICAL)) {
+                            double value;
+                            if (exactAttrValue == null || Strings.isNullOrEmpty(exactAttrValue.toString())) {
+                                value = 0.0D / 0.0;
+                            } else {
+                                value = Double.valueOf(exactAttrValue.toString());
+                            }
+                            dataRow.set(attr, value);
+                        } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.DATE_TIME)) {
+                            double value;
+                            if (exactAttrValue == null || Strings.isNullOrEmpty(exactAttrValue.toString())) {
+                                value = 0.0D / 0.0;
+                            } else {
+                                value = new DateTime(exactAttrValue).getMillis();
+                            }
+                            dataRow.set(attr, value);
+                        }
                     }
 
                     builder.addDataRow(dataRow);
@@ -173,7 +196,34 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
         Iterator<String> keyIterator = firstRow.keySet().iterator();
         while (keyIterator.hasNext()) {
             String key = keyIterator.next();
-            attributes.add(AttributeFactory.createAttribute(key, Ontology.STRING));
+            Object value = firstRow.get(key);
+            int valueType = Ontology.NOMINAL;
+            if (value != null) {
+                if (value instanceof LinkedHashMap) {
+                    try {
+                        String type = (String) ((LinkedHashMap) value).get("type");
+                        if ("TIME".equals(type)) {
+                            valueType = Ontology.DATE_TIME;
+                        }
+                    } catch (Exception ignore) {}
+                } else {
+                    switch (value.getClass().getSimpleName()) {
+                        case "Short":
+                        case "Integer":
+                            valueType = Ontology.INTEGER;
+                            break;
+                        case "Long":
+                            valueType = Ontology.NUMERICAL;
+                            break;
+                        case "Float":
+                        case "Double":
+                            valueType = Ontology.REAL;
+                            break;
+                    }
+                }
+            }
+
+            attributes.add(AttributeFactory.createAttribute(key, valueType));
         }
 
         return attributes;
@@ -203,7 +253,7 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
         return resultVo == null ? null : resultVo.getResult();
     }
 
-    private String extractAttrValue(String attrName, Object originValue) {
+    private Object extractAttrValue(String attrName, Object originValue) {
         if (Objects.nonNull(originValue)) {
             for (String datetimeFieldName : DATETIME_FIELD_NAME) {
                 if (datetimeFieldName.equals(attrName)) {
@@ -220,7 +270,7 @@ public class HttpSqlExampleSource extends AbstractHttpExampleSource {
                 }
             }
 
-            return originValue.toString();
+            return originValue;
         }
 
         return null;
