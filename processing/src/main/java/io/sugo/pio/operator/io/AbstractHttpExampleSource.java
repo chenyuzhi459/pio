@@ -15,6 +15,7 @@ import com.metamx.http.client.Request;
 import com.metamx.http.client.response.InputStreamResponseHandler;
 import io.sugo.pio.common.utils.HttpClientUtil;
 import io.sugo.pio.operator.OperatorException;
+import io.sugo.pio.tools.Ontology;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 
 import java.io.IOException;
@@ -32,6 +33,21 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
     private static final Logger logger = new Logger(AbstractHttpExampleSource.class);
 
     public static final ObjectMapper jsonMapper = new ObjectMapper();
+
+    protected int convertType(String dimensionType) {
+        switch (dimensionType.toUpperCase()) {
+            case "STRING":
+                return Ontology.STRING;
+            case "INT":
+            case "LONG":
+            case "FLOAT":
+                return Ontology.NUMERICAL;
+            case "DATE":
+                return Ontology.DATE_TIME;
+            default:
+                return Ontology.STRING;
+        }
+    }
 
     protected InputStream streamHttpPost(String url, String requestJson) {
         if (!isValidUrl(url)) {

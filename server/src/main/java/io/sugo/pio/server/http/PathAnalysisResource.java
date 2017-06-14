@@ -40,7 +40,6 @@ public class PathAnalysisResource {
     public Response normalPath(PathAnalysisDto pathAnalysisDto) {
         check(pathAnalysisDto);
         try {
-//            String queryStr = pathAnalysisDto.buildQuery();
             String queryStr = pathAnalysisDto.buildScanQuery();
             AccessTree tree = pathAnalyzer.getAccessTree(queryStr,
                     pathAnalysisDto.getHomePage(), false);
@@ -58,7 +57,6 @@ public class PathAnalysisResource {
     public Response reversePath(PathAnalysisDto pathAnalysisDto) {
         check(pathAnalysisDto);
         try {
-//            String queryStr = pathAnalysisDto.buildQuery();
             String queryStr = pathAnalysisDto.buildScanQuery();
             AccessTree tree = pathAnalyzer.getAccessTree(queryStr,
                     pathAnalysisDto.getHomePage(), true);
@@ -77,6 +75,9 @@ public class PathAnalysisResource {
 
         Preconditions.checkNotNull(pathAnalysisDto.getDataSource(), "Data source can not be null.");
         Preconditions.checkNotNull(pathAnalysisDto.getHomePage(), "Home page can not be null.");
+        Preconditions.checkNotNull(pathAnalysisDto.getDimension().getSessionId(), "SessionId can not be null.");
+        Preconditions.checkNotNull(pathAnalysisDto.getDimension().getUserId(), "UserId can not be null.");
+        Preconditions.checkNotNull(pathAnalysisDto.getDimension().getPageName(), "PageName can not be null.");
     }
 
 }

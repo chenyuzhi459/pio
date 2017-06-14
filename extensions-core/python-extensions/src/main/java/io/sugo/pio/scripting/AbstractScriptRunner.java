@@ -243,7 +243,7 @@ public abstract class AbstractScriptRunner implements ScriptRunner {
         processBuilder.redirectErrorStream(true);
         processBuilder.redirectError(ProcessBuilder.Redirect.PIPE);
         Process process = processBuilder.start();
-        InputStreamLogger.log(process.getInputStream(), logger);
+        InputStreamLogger.log(operator, process.getInputStream(), logger);
         return process;
     }
 

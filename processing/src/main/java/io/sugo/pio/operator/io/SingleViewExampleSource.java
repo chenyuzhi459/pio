@@ -55,6 +55,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         if (!druidUrl.startsWith("http")) {
             druidUrl = "http://" + druidUrl;
         }
+        logger.info("Single view query url: %s", druidUrl);
 
         collectLog("Begin to get data from druid...");
 
@@ -179,6 +180,7 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             // Replace limit with user inputs: ["limit"  : 10] -> ["limit":XXX]
             requestStr = requestStr.replaceAll("\"limit\"(\\s)*:(\\s)*\\d+", "\"limit\":" + limit);
 
+            logger.info("Single view query druid json: %s", requestStr);
             return requestStr;
         } catch (IOException e) {
             logger.error("Build druid query parameter failed, details:" + e.getMessage());
@@ -431,21 +433,6 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         allAttrs.addAll(metricAttrs);
 
         return allAttrs;
-    }
-
-    private int convertType(String dimensionType) {
-        switch (dimensionType) {
-            case "String":
-                return Ontology.STRING;
-            case "Int":
-            case "Long":
-            case "Float":
-                return Ontology.NUMERICAL;
-            case "Date":
-                return Ontology.DATE_TIME;
-            default:
-                return Ontology.STRING;
-        }
     }
 
     private static class DimensionQueryVo {

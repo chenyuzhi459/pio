@@ -10,6 +10,7 @@ import io.sugo.pio.parameter.ParameterHandler;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeString;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.MetaDataInfo;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -199,7 +200,7 @@ public class NumericValueAttributeFilter extends AbstractAttributeFilterConditio
 	}
 
 	@Override
-	public List<ParameterType> getParameterTypes(ParameterHandler operator, InputPort inPort, int... valueTypes) {
+	public List<ParameterType> getParameterTypes(ParameterHandler operator, Port inPort, int... valueTypes) {
 		LinkedList<ParameterType> types = new LinkedList<ParameterType>();
 		types.add(new ParameterTypeString(PARAMETER_NUMERIC_CONDITION,
 				I18N.getMessage("pio.NumericValueAttributeFilter.numeric_condition"),

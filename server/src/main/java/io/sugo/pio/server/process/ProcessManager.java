@@ -26,6 +26,7 @@ import io.sugo.pio.operator.Status;
 import io.sugo.pio.ports.Connection;
 import io.sugo.pio.server.http.dto.OperatorDto;
 import io.sugo.pio.server.http.dto.OperatorParamDto;
+import io.sugo.pio.common.config.RuntimeConfig;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -90,6 +91,7 @@ public class ProcessManager {
     @LifecycleStart
     public void start() {
         I18N.loadResources();
+        RuntimeConfig.loadResource();
 
         operatorMetaMap = OperatorMapHelper.getAllOperatorMetas(jsonMapper);
         try {

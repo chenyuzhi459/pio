@@ -82,7 +82,7 @@ public class PathAnalyzer {
             long after = System.currentTimeMillis();
             log.info("Path analysis total cost %d million seconds.", after - before);
         } catch (Throwable t) {
-            log.error("Path analysis error: %s", t.getMessage());
+            log.error("Path analysis error: %s", t);
         }
 
 //        log.info("Total path: %d", planter.accessPaths.size());

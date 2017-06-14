@@ -9,6 +9,7 @@ import io.sugo.pio.parameter.ParameterHandler;
 import io.sugo.pio.parameter.ParameterType;
 import io.sugo.pio.parameter.ParameterTypeAttribute;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.MetaDataInfo;
 
@@ -54,7 +55,7 @@ public class SingleAttributeFilter extends AbstractAttributeFilterCondition {
 	}
 
 	@Override
-	public List<ParameterType> getParameterTypes(ParameterHandler operator, InputPort inPort, int... valueTypes) {
+	public List<ParameterType> getParameterTypes(ParameterHandler operator, Port inPort, int... valueTypes) {
 		List<ParameterType> types = new LinkedList<>();
 		ParameterType type = new ParameterTypeAttribute(PARAMETER_ATTRIBUTE,
 				I18N.getMessage("pio.SingleAttributeFilter.attribute"),

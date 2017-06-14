@@ -11,6 +11,7 @@ import io.sugo.pio.parameter.ParameterTypeBoolean;
 import io.sugo.pio.parameter.ParameterTypeRegexp;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
@@ -98,7 +99,7 @@ public class RegexpAttributeFilter extends AbstractAttributeFilterCondition {
 	}
 
 	@Override
-	public List<ParameterType> getParameterTypes(ParameterHandler operator, final InputPort inPort, final int... valueTypes) {
+	public List<ParameterType> getParameterTypes(ParameterHandler operator, final Port inPort, final int... valueTypes) {
 		List<ParameterType> types = new LinkedList<ParameterType>();
 		types.add(new ParameterTypeRegexp(PARAMETER_REGULAR_EXPRESSION,
 				I18N.getMessage("pio.RegexpAttributeFilter.regular_expression"), true) {

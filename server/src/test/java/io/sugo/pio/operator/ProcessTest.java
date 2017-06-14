@@ -743,15 +743,15 @@ public class ProcessTest {
 
     @Test
     public void scanTest() throws JsonProcessingException {
-        OperatorProcess process = new OperatorProcess("csv");
+        OperatorProcess process = new OperatorProcess("scan");
         process.setDescription("scan test.");
 
         ScanExampleSource scanExampleSource = new ScanExampleSource();
-        scanExampleSource.setName("operator_csv");
-        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_URL, "http://192.168.0.212:8082/druid/v2?pretty");
-        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_DATA_SOURCE, "com_HyoaKhQMl_project_SyOxsTckZ");
-        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_META_DATA,
-                "0:price.true.real.attribute;1:brand.true.nominal.attribute");
+        scanExampleSource.setName("operator_scan");
+        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_DATA_SOURCE_NAME, "wuxianjiRT");
+        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_LIMIT, "1000");
+        scanExampleSource.setParameter(ScanExampleSource.PARAMETER_COLUMNS,
+                "IP;Nation;Province;UserID;SessionID");
 
         process.getRootOperator().getExecutionUnit().addOperator(scanExampleSource);
 

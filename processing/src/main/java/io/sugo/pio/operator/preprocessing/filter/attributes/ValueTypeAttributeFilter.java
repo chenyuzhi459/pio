@@ -10,6 +10,7 @@ import io.sugo.pio.parameter.ParameterTypeBoolean;
 import io.sugo.pio.parameter.ParameterTypeCategory;
 import io.sugo.pio.parameter.conditions.BooleanParameterCondition;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.MetaDataInfo;
 import io.sugo.pio.tools.Ontology;
@@ -74,7 +75,7 @@ public class ValueTypeAttributeFilter extends AbstractAttributeFilterCondition {
 	}
 
 	@Override
-	public List<ParameterType> getParameterTypes(ParameterHandler operator, InputPort inPort, int... valueTypes) {
+	public List<ParameterType> getParameterTypes(ParameterHandler operator, Port inPort, int... valueTypes) {
 		List<ParameterType> types = new LinkedList<ParameterType>();
 		Set<String> valueTypeSet = new LinkedHashSet<String>();
 		for (String valueTypeName : Ontology.ATTRIBUTE_VALUE_TYPE.getNames()) {

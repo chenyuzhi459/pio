@@ -3,15 +3,12 @@ package io.sugo.pio.server.http.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.sugo.pio.server.pathanalysis.PathAnalysisConstant;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PathAnalysisDto {
@@ -43,7 +40,7 @@ public class PathAnalysisDto {
     @JsonProperty
     private String endDate;
 
-    private static class ColumnName {
+    public static class ColumnName {
         @JsonProperty
         String sessionId;
         @JsonProperty
@@ -149,54 +146,6 @@ public class PathAnalysisDto {
 //    public void setLimit(Integer limit) {
 //        this.limit = limit;
 //    }
-
-    public String buildQuery() {
-        Query query = new Query();
-        query.setDataSource(this.dataSource);
-
-        // Set filters
-        if (this.pages == null || this.pages.isEmpty()) {
-            InField inField = new InField();
-            inField.setDimension(this.getDimension().getPageName());
-            inField.setValues(this.pages);
-            query.getFilter().getFields().add(inField);
-        }
-
-        BetweenEqualField boundField = new BetweenEqualField();
-        boundField.setDimension(this.getDimension().getDate());
-        boundField.setLower(this.startDate);
-        boundField.setUpper(this.endDate);
-
-        query.getFilter().getFields().add(boundField);
-
-        if (this.filters != null && this.filters.size() > 0) {
-            query.getFilter().getFields().addAll(buildFilterFields(this.filters));
-        }
-
-        // Set dimensions
-        query.getDimensions().get(0).setDimension(this.getDimension().getSessionId());
-        query.getDimensions().get(0).setOutputName("sessionId");
-        query.getDimensions().get(1).setDimension(this.getDimension().getPageName());
-        query.getDimensions().get(1).setOutputName("pageName");
-        query.getDimensions().get(2).setDimension(this.getDimension().getDate());
-        query.getDimensions().get(2).setOutputName("accessTime");
-
-        String userId = this.getDimension().getUserId();
-        if (userId != null && !userId.isEmpty()) {
-            Dimension userIdDimension = new Dimension();
-            userIdDimension.setDimension(userId);
-            userIdDimension.setOutputName("userId");
-            query.getDimensions().add(userIdDimension);
-        }
-
-        String queryStr = "";
-        try {
-            queryStr = jsonMapper.writeValueAsString(query);
-        } catch (JsonProcessingException ignore) {
-        }
-
-        return queryStr;
-    }
 
     public String buildScanQuery() {
         ScanQuery query = new ScanQuery();
@@ -311,109 +260,6 @@ public class PathAnalysisDto {
 
         public void setFilter(Filter filter) {
             this.filter = filter;
-        }
-    }
-
-    private static class Query {
-        String queryType = "lucene_select";
-        String dataSource;
-        String intervals = "1000/3000";
-        String granularity = "all";
-        Context context = new Context();
-        Filter filter = new Filter();
-        List<Dimension> dimensions = new ArrayList<>();
-        PagingSpec pagingSpec = new PagingSpec();
-
-        public Query() {
-            for (int i = 0; i < 3; i++) {
-                Dimension dimension = new Dimension();
-                dimensions.add(dimension);
-            }
-        }
-
-        public String getQueryType() {
-            return queryType;
-        }
-
-        public void setQueryType(String queryType) {
-            this.queryType = queryType;
-        }
-
-        public String getDataSource() {
-            return dataSource;
-        }
-
-        public void setDataSource(String dataSource) {
-            this.dataSource = dataSource;
-        }
-
-        public String getIntervals() {
-            return intervals;
-        }
-
-        public void setIntervals(String intervals) {
-            this.intervals = intervals;
-        }
-
-        public String getGranularity() {
-            return granularity;
-        }
-
-        public void setGranularity(String granularity) {
-            this.granularity = granularity;
-        }
-
-        public Context getContext() {
-            return context;
-        }
-
-        public void setContext(Context context) {
-            this.context = context;
-        }
-
-        public Filter getFilter() {
-            return filter;
-        }
-
-        public void setFilter(Filter filter) {
-            this.filter = filter;
-        }
-
-        public List<Dimension> getDimensions() {
-            return dimensions;
-        }
-
-        public void setDimensions(List<Dimension> dimensions) {
-            this.dimensions = dimensions;
-        }
-
-        public PagingSpec getPagingSpec() {
-            return pagingSpec;
-        }
-
-        public void setPagingSpec(PagingSpec pagingSpec) {
-            this.pagingSpec = pagingSpec;
-        }
-    }
-
-    private static class Context {
-        int timeout = 180000;
-        boolean useOffheap = true;
-
-        public int getTimeout() {
-            return timeout;
-        }
-
-        public void setTimeout(int timeout) {
-            this.timeout = timeout;
-        }
-
-        public boolean isUseOffheap() {
-            return useOffheap;
-        }
-
-        public void setUseOffheap(boolean useOffheap) {
-            this.useOffheap = useOffheap;
         }
     }
 
@@ -660,54 +506,19 @@ public class PathAnalysisDto {
         }
     }
 
-    private static class Dimension {
-        String type = "default";
-        String dimension;
-        String outputName;
-
-        public String getType() {
-            return type;
+    private static class LookupField extends Field {
+        public LookupField() {
+            super.type = "lookup";
         }
 
-        public void setType(String type) {
-            this.type = type;
+        String lookup;
+
+        public String getLookup() {
+            return lookup;
         }
 
-        public String getDimension() {
-            return dimension;
-        }
-
-        public void setDimension(String dimension) {
-            this.dimension = dimension;
-        }
-
-        public String getOutputName() {
-            return outputName;
-        }
-
-        public void setOutputName(String outputName) {
-            this.outputName = outputName;
-        }
-    }
-
-    private static class PagingSpec {
-        Map<String, Integer> pagingIdentifiers = Maps.newHashMap();
-        Integer threshold = 5000;
-
-        public Map<String, Integer> getPagingIdentifiers() {
-            return pagingIdentifiers;
-        }
-
-        public void setPagingIdentifiers(Map<String, Integer> pagingIdentifiers) {
-            this.pagingIdentifiers = pagingIdentifiers;
-        }
-
-        public Integer getThreshold() {
-            return threshold;
-        }
-
-        public void setThreshold(Integer threshold) {
-            this.threshold = threshold;
+        public void setLookup(String lookup) {
+            this.lookup = lookup;
         }
     }
 
@@ -772,6 +583,11 @@ public class PathAnalysisDto {
                     notInField.getField().setDimension(filter.getDimension());
                     notInField.getField().setValues(listValuesNotIn);
                     fields.add(notInField);
+                    break;
+                case "lookup":
+                    LookupField lookupField = new LookupField();
+                    lookupField.setDimension(filter.getDimension());
+                    lookupField.setLookup(filter.getValue().toString());
                     break;
             }
         }

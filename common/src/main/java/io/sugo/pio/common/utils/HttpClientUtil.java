@@ -12,6 +12,8 @@ public class HttpClientUtil {
 
     private static final Logger logger = new Logger(HttpClientUtil.class);
 
+    private static final long DEFAULT_TIME_OUT = 30 * 60; // 30 minutes
+
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
     private static final MediaType TEXT_PLAIN_TYPE = MediaType.parse("text/plain; charset=utf-8");
 
@@ -26,7 +28,11 @@ public class HttpClientUtil {
     }
 
     public static String post(String url, String jsonData) throws IOException {
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(DEFAULT_TIME_OUT, TimeUnit.SECONDS)
+                .readTimeout(DEFAULT_TIME_OUT, TimeUnit.SECONDS)
+                .build();
+
         RequestBody body = RequestBody.create(DEFAULT_MEDIA_TYPE, jsonData);
         Request request = new Request.Builder().url(url).post(body).build();
 
@@ -37,7 +43,10 @@ public class HttpClientUtil {
     }
 
     public static InputStream streamPost(String url, String jsonData) throws IOException {
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(DEFAULT_TIME_OUT, TimeUnit.SECONDS)
+                .readTimeout(DEFAULT_TIME_OUT, TimeUnit.SECONDS)
+                .build();
         RequestBody body = RequestBody.create(DEFAULT_MEDIA_TYPE, jsonData);
         Request request = new Request.Builder().url(url).post(body).build();
 

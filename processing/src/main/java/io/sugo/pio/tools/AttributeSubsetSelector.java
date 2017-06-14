@@ -11,6 +11,7 @@ import io.sugo.pio.operator.preprocessing.filter.attributes.AttributeFilterCondi
 import io.sugo.pio.parameter.*;
 import io.sugo.pio.parameter.conditions.EqualTypeCondition;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.metadata.*;
 
 import java.util.*;
@@ -75,15 +76,15 @@ public class AttributeSubsetSelector {
 
     private final ParameterHandler operator;
 
-    private final InputPort inPort;
+    private final Port inPort;
 
     private int[] valueTypes;
 
-    public AttributeSubsetSelector(ParameterHandler operator, InputPort inPort) {
+    public AttributeSubsetSelector(ParameterHandler operator, Port inPort) {
         this(operator, inPort, Ontology.ATTRIBUTE_VALUE);
     }
 
-    public AttributeSubsetSelector(ParameterHandler operator, InputPort inPort, int... valueTypes) {
+    public AttributeSubsetSelector(ParameterHandler operator, Port inPort, int... valueTypes) {
         this.operator = operator;
         this.inPort = inPort;
         if (valueTypes.length == 0) {
@@ -582,6 +583,10 @@ public class AttributeSubsetSelector {
      */
     public List<ParameterType> getSubsetAttributeFilterParamTypes() {
         return new SubsetAttributeFilter().getParameterTypes(operator, inPort, valueTypes);
+    }
+
+    public List<ParameterType> getSubsetAttributeFilterParamTypes(String key, String description) {
+        return new SubsetAttributeFilter().getParameterTypes(key, description, operator, inPort, valueTypes);
     }
 
     public Precondition makePrecondition() {

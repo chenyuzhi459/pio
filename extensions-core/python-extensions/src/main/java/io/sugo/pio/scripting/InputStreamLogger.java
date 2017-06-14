@@ -1,5 +1,7 @@
 package io.sugo.pio.scripting;
 
+import io.sugo.pio.operator.Operator;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +12,7 @@ import java.util.logging.Logger;
 
 public final class InputStreamLogger {
 
-    public static void log(InputStream stream, final Logger logger) {
+    public static void log(Operator operator, InputStream stream, final Logger logger) {
         Runnable outputReader = new Runnable() {
             public void run() {
                 String line;
@@ -18,9 +20,12 @@ public final class InputStreamLogger {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
                     Throwable localThrowable3 = null;
                     try {
+                        operator.collectLog("-----------------------------");
                         while ((line = bufferedReader.readLine()) != null) {
                             logger.log(Level.INFO, line);
+                            operator.collectLog("<Script print> " + line);
                         }
+                        operator.collectLog("-----------------------------");
                     } catch (Throwable localThrowable1) {
                         localThrowable3 = localThrowable1;
                         throw localThrowable1;

@@ -1,13 +1,14 @@
 package io.sugo.pio.operator.io;
 
-import com.google.common.base.Function;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.common.config.RuntimeConfig;
 import io.sugo.pio.common.utils.JsonObjectIterator;
 import io.sugo.pio.example.Attribute;
-import io.sugo.pio.example.Attributes;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
 import io.sugo.pio.example.table.DataRow;
@@ -17,10 +18,17 @@ import io.sugo.pio.example.util.ExampleSets;
 import io.sugo.pio.i18n.I18N;
 import io.sugo.pio.operator.OperatorException;
 import io.sugo.pio.operator.OperatorGroup;
-import io.sugo.pio.parameter.*;
+import io.sugo.pio.parameter.ParameterType;
+import io.sugo.pio.parameter.ParameterTypeDynamicCategory;
+import io.sugo.pio.parameter.ParameterTypeInt;
+import io.sugo.pio.parameter.ParameterTypeString;
+import io.sugo.pio.ports.metadata.AttributeMetaData;
+import io.sugo.pio.ports.metadata.ExampleSetMetaData;
+import io.sugo.pio.ports.metadata.MetaData;
+import io.sugo.pio.tools.AttributeSubsetSelector;
 import io.sugo.pio.tools.Ontology;
+import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -30,49 +38,36 @@ import java.util.*;
 public class ScanExampleSource extends AbstractHttpExampleSource {
     private static final Logger logger = new Logger(ScanExampleSource.class);
 
-    public static final String PARAMETER_URL = "url";
+    private static final int BATCH_SIZE = 20000;
 
-    public static final String PARAMETER_DATA_SOURCE = "data_source";
+    public static final String PARAMETER_DATA_SOURCE_NAME = "data_source_name";
 
     public static final String PARAMETER_INTERVALS = "intervals";
 
-    public static final String PARAMETER_BATCH_SIZE = "batch_size";
-
     public static final String PARAMETER_LIMIT = "limit";
 
-    public static final String PARAMETER_META_DATA = "data_set_meta_data_information";
-    public static final String PARAMETER_COLUMN_INDEX = "column_index";
-    public static final String PARAMETER_COLUMN_META_DATA = "attribute_meta_data_information";
-    public static final String PARAMETER_COLUMN_NAME = "attribute name";
-    public static final String PARAMETER_COLUMN_SELECTED = "column_selected";
-    public static final String PARAMETER_COLUMN_VALUE_TYPE = "attribute_value_type";
-    public static final String PARAMETER_COLUMN_ROLE = "attribute_role";
+    public static final String PARAMETER_COLUMNS = "columns";
+
+    private static final String druidUrl = RuntimeConfig.get("pio.broker.data.fetcher.url");
+
+    private final AttributeSubsetSelector attributeSelector = new AttributeSubsetSelector(this, getOutputPort());
 
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
-        String druidUrl = getParameterAsString(PARAMETER_URL);
-//        String datasource = getParameterAsString(PARAMETER_DATA_SOURCE);
-        String datasource = "wuxianjiRT";
+        String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE_NAME);
         String intervals = getParameterAsString(PARAMETER_INTERVALS);
-        int batchSize = getParameterAsInt(PARAMETER_BATCH_SIZE);
+        String columns = getParameterAsString(PARAMETER_COLUMNS);
         int limit = getParameterAsInt(PARAMETER_LIMIT);
-        List<Attribute> attributes = getAttributes();
-        if(attributes.isEmpty()) {
-            return null;
-        }
 
-        List<String> columns = Lists.transform(attributes, new Function<Attribute, String>() {
-            @Nullable
-            @Override
-            public String apply(@Nullable Attribute input) {
-                return input.getName();
-            }
-        });
+        List<String> selectedColumns = Lists.newArrayList();
+        if (!Strings.isNullOrEmpty(columns)) {
+            String[] sc = columns.split(";");
+            selectedColumns = Arrays.asList(sc);
+        }
         ScanQuery query = new ScanQuery();
-        query.setDataSource(datasource);
-        query.setBatchSize(batchSize);
+        query.setDataSource(dataSource);
         query.setLimit(limit);
-        query.setColumns(columns);
+        query.setColumns(selectedColumns);
         query.setIntervals(ImmutableList.of(intervals));
 
         String queryStr;
@@ -85,8 +80,9 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         InputStream stream = streamHttpPost(druidUrl, queryStr);
         JsonObjectIterator iterator = new JsonObjectIterator(stream);
         DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, DataRowFactory.POINT_AS_DECIMAL_CHARACTER);
-        ExampleSetBuilder builder = ExampleSets.from(attributes);
 
+        List<Attribute> attributes = getSelectedAttributes(selectedColumns);
+        ExampleSetBuilder builder = ExampleSets.from(attributes);
         int attrSize = attributes.size();
 
         while (iterator.hasNext()) {
@@ -98,7 +94,7 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
                     for (int i = 0; i < attrSize; i++) {
                         Attribute attr = attributes.get(i);
                         int valueType = attr.getValueType();
-                        Object attrValue = row.get(i+1);
+                        Object attrValue = row.get(i + 1);
 
                         if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NOMINAL)) {
                             String attrValueStr = attrValue == null ? null : attrValue.toString();
@@ -106,16 +102,20 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
                             dataRow.set(attr, value);
                         } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.NUMERICAL)) {
                             double value;
-                            if (attrValue == null || Strings.isNullOrEmpty(attrValue.toString()))  {
+                            if (attrValue == null || Strings.isNullOrEmpty(attrValue.toString())) {
                                 value = 0.0D / 0.0;
                             } else {
                                 value = Double.valueOf(attrValue.toString());
                             }
                             dataRow.set(attr, value);
                         } else if (Ontology.ATTRIBUTE_VALUE_TYPE.isA(valueType, Ontology.DATE_TIME)) {
-                            // TODO: parse datetime value
-                        } else {
-
+                            double value;
+                            if (attrValue == null || Strings.isNullOrEmpty(attrValue.toString())) {
+                                value = 0.0D / 0.0;
+                            } else {
+                                value = new DateTime(attrValue).getMillis();
+                            }
+                            dataRow.set(attr, value);
                         }
                     }
                     builder.addDataRow(dataRow);
@@ -126,44 +126,61 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         return builder.build();
     }
 
-    private List<Attribute> getAttributes() {
-        List<String[]> metaDataSettings;
-        if (isParameterSet(PARAMETER_META_DATA)) {
-            try {
-                metaDataSettings = getParameterList(PARAMETER_META_DATA);
-            } catch (UndefinedParameterError e) {
-                metaDataSettings = Collections.emptyList();
+    @Override
+    public MetaData getGeneratedMetaData() throws OperatorException {
+        return getScanMetaData();
+    }
+
+    private List<Attribute> getSelectedAttributes(List<String> selectedColumns) {
+        ExampleSetMetaData metaData = getOutputPort().getMetaData() == null ? null :
+                (ExampleSetMetaData) getOutputPort().getMetaData();
+        List<Attribute> selectedAttributes = Lists.newArrayList();
+        if (metaData != null) {
+            for (String selectedColumn : selectedColumns) {
+                AttributeMetaData attrMetaData = metaData.getAttributeByName(selectedColumn);
+                if (attrMetaData != null) {
+                    Attribute attribute = AttributeFactory.createAttribute(attrMetaData.getName(), attrMetaData.getValueType());
+                    selectedAttributes.add(attribute);
+                }
             }
-        } else {
-            metaDataSettings = Collections.emptyList();
         }
 
-        // find largest used column index
-        /*int maxUsedColumnIndex = -1;
-        for (String[] metaDataDefinition : metaDataSettings) {
-            int columnIndex = Integer.parseInt(metaDataDefinition[0]);
-            maxUsedColumnIndex = Math.max(maxUsedColumnIndex, columnIndex);
-        }*/
-        // initialize with values from settings
-        List<Attribute> attributes = new ArrayList<>();
-//        attributes.add(AttributeFactory.createAttribute("timestamp", Ontology.DATE_TIME));
+        return selectedAttributes;
+    }
 
-        for (String[] metaDataDefinition : metaDataSettings) {
-//            String[] metaDataDefintionValues = ParameterTypeTupel.transformString2Tupel(metaDataDefinition[1]);
-                String name = metaDataDefinition[0].trim();
+    private MetaData getScanMetaData() {
+        ExampleSetMetaData metaData = new ExampleSetMetaData();
+        String dataSource = getParameterAsString(PARAMETER_DATA_SOURCE_NAME);
+//        dataSource = "wuxianjiRT";
+        if (!Strings.isNullOrEmpty(dataSource) && !Strings.isNullOrEmpty(dataSource)) {
+            MetadataQuery metadataQuery = new MetadataQuery();
+            metadataQuery.setDataSource(dataSource);
 
-                int valueType = Ontology.ATTRIBUTE_VALUE_TYPE.mapName(metaDataDefinition[1]);
-                // fallback for old processes where attribute value type was saved as index
-                // rather than as string
-                try {
-                    if (valueType == -1) {
-                        valueType = Integer.parseInt(metaDataDefinition[1]);
-                    }
-                    attributes.add(AttributeFactory.createAttribute(name, valueType));
-                } catch (Exception ignore) {}
+            String queryStr = null;
+            try {
+                queryStr = jsonMapper.writeValueAsString(metadataQuery);
+            } catch (JsonProcessingException ignore) {
+            }
+
+            String result = httpPost(druidUrl, queryStr);
+            List<MetadataInfo> metadataInfoList = deserialize2list(result, MetadataInfo.class);
+
+            if (metadataInfoList != null && !metadataInfoList.isEmpty()) {
+                MetadataInfo metadataInfo = metadataInfoList.get(0);
+                Map<String, ColumnInfo> columnInfoMap = metadataInfo.getColumns();
+                Iterator keyIter = columnInfoMap.keySet().iterator();
+                while (keyIter.hasNext()) {
+                    String columnName = (String) keyIter.next();
+                    String columnType = columnInfoMap.get(columnName).getType();
+                    Attribute attribute = AttributeFactory.createAttribute(columnName, convertType(columnType));
+                    metaData.addAttribute(new AttributeMetaData(attribute));
+                }
+            }
+
+            logger.info("Dynamic get scan query metadata successfully.");
         }
 
-        return attributes;
+        return metaData;
     }
 
     @Override
@@ -184,18 +201,10 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
     @Override
     public List<ParameterType> getParameterTypes() {
         List types = super.getParameterTypes();
-        ParameterTypeString urlType = new ParameterTypeString(PARAMETER_URL,
-                I18N.getMessage("pio.ScanExampleSource.url"), false);
-        types.add(urlType);
-
-        ParameterTypeDynamicCategory dataSourceType = new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE, null,
-                I18N.getMessage("pio.ScanExampleSource.data_source"),
+        ParameterTypeDynamicCategory dataSourceName = new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE_NAME, null,
+                I18N.getMessage("pio.ScanExampleSource.data_source_name"),
                 new String[0], null);
-        types.add(dataSourceType);
-
-        ParameterTypeInt batchSize = new ParameterTypeInt(PARAMETER_BATCH_SIZE,
-                I18N.getMessage("pio.ScanExampleSource.batch_size"), 5000, 20000, 5000);
-        types.add(batchSize);
+        types.add(dataSourceName);
 
         ParameterTypeInt limit = new ParameterTypeInt(PARAMETER_LIMIT, I18N.getMessage("pio.ScanExampleSource.limit"), 10000, 2000000, 10000);
         types.add(limit);
@@ -204,16 +213,7 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
                 I18N.getMessage("pio.ScanExampleSource.interval"), "1000/3000", false);
         types.add(intervals);
 
-        ParameterTypeList attributes = new ParameterTypeList(PARAMETER_META_DATA, "The meta data information", //
-                new ParameterTypeInt(PARAMETER_COLUMN_INDEX, "The column index", 0, Integer.MAX_VALUE), //
-                new ParameterTypeTupel(PARAMETER_COLUMN_META_DATA, "The meta data definition of one column", //
-                        new ParameterTypeString(PARAMETER_COLUMN_NAME, "Describes the attributes name.", ""), //
-                        new ParameterTypeBoolean(PARAMETER_COLUMN_SELECTED, "Indicates if a column is selected", true), //
-                        new ParameterTypeStringCategory(PARAMETER_COLUMN_VALUE_TYPE, "Indicates the value type of an attribute",
-                                Ontology.VALUE_TYPE_NAMES_VALUE, Ontology.VALUE_TYPE_NAMES, "attribute_value", true), //
-                        new ParameterTypeStringCategory(PARAMETER_COLUMN_ROLE, "Indicates the role of an attribute",
-                                Attributes.KNOWN_ATTRIBUTE_TYPES_VALUE, Attributes.KNOWN_ATTRIBUTE_TYPES, Attributes.ATTRIBUTE_NAME, true)));
-        types.add(attributes);
+        types.addAll(attributeSelector.getSubsetAttributeFilterParamTypes(PARAMETER_COLUMNS, I18N.getMessage("pio.ScanExampleSource.columns")));
 
         return types;
     }
@@ -222,7 +222,7 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         private String queryType = "lucene_scan";
         private String dataSource;
         private String resultFormat = "compactedList";
-        private int batchSize;
+        private int batchSize = BATCH_SIZE;
         private int limit;
         private List<String> columns = new ArrayList<>();
         private List<String> intervals = new ArrayList<>();
@@ -290,6 +290,89 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
 
         public void setFilter(String filter) {
             this.filter = filter;
+        }
+    }
+
+    private static class MetadataQuery {
+        private String queryType = "lucene_segmentMetadata";
+        private String dataSource;
+        private boolean merge = true;
+
+        public String getQueryType() {
+            return queryType;
+        }
+
+        public void setQueryType(String queryType) {
+            this.queryType = queryType;
+        }
+
+        public String getDataSource() {
+            return dataSource;
+        }
+
+        public void setDataSource(String dataSource) {
+            this.dataSource = dataSource;
+        }
+
+        public boolean isMerge() {
+            return merge;
+        }
+
+        public void setMerge(boolean merge) {
+            this.merge = merge;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class MetadataInfo {
+        String id;
+        Long size;
+        Long numRows;
+        Map<String, ColumnInfo> columns;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public Long getSize() {
+            return size;
+        }
+
+        public void setSize(Long size) {
+            this.size = size;
+        }
+
+        public Long getNumRows() {
+            return numRows;
+        }
+
+        public void setNumRows(Long numRows) {
+            this.numRows = numRows;
+        }
+
+        public Map<String, ColumnInfo> getColumns() {
+            return columns;
+        }
+
+        public void setColumns(Map<String, ColumnInfo> columns) {
+            this.columns = columns;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class ColumnInfo {
+        String type;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
     }
 }

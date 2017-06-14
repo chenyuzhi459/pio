@@ -3,6 +3,7 @@ package io.sugo.pio.parameter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.sugo.pio.ports.InputPort;
+import io.sugo.pio.ports.Port;
 import io.sugo.pio.ports.metadata.AttributeMetaData;
 import io.sugo.pio.ports.metadata.ExampleSetMetaData;
 import io.sugo.pio.ports.metadata.MetaData;
@@ -29,24 +30,24 @@ public class ParameterTypeAttribute extends ParameterTypeString {
      */
     public static final class InputPortMetaDataProvider implements MetaDataProvider {
 
-        private final InputPort inPort;
+        private final Port port;
 
-        private InputPortMetaDataProvider(InputPort inPort) {
-            this.inPort = inPort;
+        private InputPortMetaDataProvider(Port port) {
+            this.port = port;
         }
 
         @JsonProperty
         @Override
         public MetaData getMetaData() {
-            if (inPort != null) {
-                return inPort.getMetaData();
+            if (port != null) {
+                return port.getMetaData();
             } else {
                 return new MetaData();
             }
         }
 
-        public InputPort getInputPort() {
-            return inPort;
+        public Port getInputPort() {
+            return port;
         }
     }
 
@@ -62,20 +63,20 @@ public class ParameterTypeAttribute extends ParameterTypeString {
 
     private int[] allowedValueTypes;
 
-    public ParameterTypeAttribute(final String key, String description, InputPort inPort) {
-        this(key, description, inPort, false);
+    public ParameterTypeAttribute(final String key, String description, Port port) {
+        this(key, description, port, false);
     }
 
-    public ParameterTypeAttribute(final String key, String description, InputPort inPort, int... valueTypes) {
-        this(key, description, inPort, false, valueTypes);
+    public ParameterTypeAttribute(final String key, String description, Port port, int... valueTypes) {
+        this(key, description, port, false, valueTypes);
     }
 
-    public ParameterTypeAttribute(final String key, String description, InputPort inPort, boolean optional) {
-        this(key, description, inPort, optional, Ontology.ATTRIBUTE_VALUE);
+    public ParameterTypeAttribute(final String key, String description, Port port, boolean optional) {
+        this(key, description, port, optional, Ontology.ATTRIBUTE_VALUE);
     }
 
-    public ParameterTypeAttribute(final String key, String description, InputPort inPort, boolean optional, boolean expert) {
-        this(key, description, inPort, optional, Ontology.ATTRIBUTE_VALUE);
+    public ParameterTypeAttribute(final String key, String description, Port port, boolean optional, boolean expert) {
+        this(key, description, port, optional, Ontology.ATTRIBUTE_VALUE);
     }
 
     public ParameterTypeAttribute(final String key, String description, InputPort inPort, boolean optional, boolean expert,
@@ -84,9 +85,9 @@ public class ParameterTypeAttribute extends ParameterTypeString {
         allowedValueTypes = valueTypes;
     }
 
-    public ParameterTypeAttribute(final String key, String description, final InputPort inPort, boolean optional,
+    public ParameterTypeAttribute(final String key, String description, final Port port, boolean optional,
                                   int... valueTypes) {
-        this(key, description, new InputPortMetaDataProvider(inPort), optional, valueTypes);
+        this(key, description, new InputPortMetaDataProvider(port), optional, valueTypes);
     }
 
     public ParameterTypeAttribute(final String key, String description, MetaDataProvider metaDataProvider, boolean optional,
