@@ -5,9 +5,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.common.config.RuntimeConfig;
 import io.sugo.pio.common.utils.JsonObjectIterator;
+import io.sugo.pio.constant.ScanQueryConstant;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
@@ -37,8 +39,6 @@ import java.util.*;
  */
 public class ScanExampleSource extends AbstractHttpExampleSource {
     private static final Logger logger = new Logger(ScanExampleSource.class);
-
-    private static final int BATCH_SIZE = 10000;
 
     public static final String PARAMETER_DATA_SOURCE_NAME = "data_source_name";
 
@@ -222,11 +222,16 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
         private String queryType = "lucene_scan";
         private String dataSource;
         private String resultFormat = "compactedList";
-        private int batchSize = BATCH_SIZE;
+        private int batchSize = ScanQueryConstant.BATCH_SIZE;
         private int limit;
         private List<String> columns = new ArrayList<>();
         private List<String> intervals = new ArrayList<>();
         private String filter = "*:*";
+        Map<String, Object> context = Maps.newHashMap();
+
+        public ScanQuery() {
+            context.put(ScanQueryConstant.TIME_OUT_KEY, ScanQueryConstant.TIME_OUT);
+        }
 
         public String getQueryType() {
             return queryType;
@@ -290,6 +295,14 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
 
         public void setFilter(String filter) {
             this.filter = filter;
+        }
+
+        public Map<String, Object> getContext() {
+            return context;
+        }
+
+        public void setContext(Map<String, Object> context) {
+            this.context = context;
         }
     }
 

@@ -5,10 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import io.sugo.pio.constant.ScanQueryConstant;
 import io.sugo.pio.server.pathanalysis.PathAnalysisConstant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PathAnalysisDto {
@@ -150,9 +153,9 @@ public class PathAnalysisDto {
     public String buildScanQuery() {
         ScanQuery query = new ScanQuery();
         query.setDataSource(this.dataSource);
-        query.setBatchSize(PathAnalysisConstant.DEFAULT_BATCH_SIZE);
+        query.setBatchSize(ScanQueryConstant.BATCH_SIZE);
 //        query.setLimit(this.limit == null ? PathAnalysisConstant.DEFAULT_LIMIT_SIZE : this.limit);
-        query.setLimit(PathAnalysisConstant.DEFAULT_LIMIT_SIZE);
+        query.setLimit(ScanQueryConstant.LIMIT_SIZE);
 
         // Set filters
         if (this.pages != null && !this.pages.isEmpty()) {
@@ -197,6 +200,11 @@ public class PathAnalysisDto {
         List<String> columns = new ArrayList<>();
         List<String> intervals = new ArrayList<>();
         Filter filter = new Filter();
+        Map<String, Object> context = Maps.newHashMap();
+
+        public ScanQuery() {
+            context.put(ScanQueryConstant.TIME_OUT_KEY, ScanQueryConstant.TIME_OUT);
+        }
 
         public String getQueryType() {
             return queryType;
@@ -260,6 +268,14 @@ public class PathAnalysisDto {
 
         public void setFilter(Filter filter) {
             this.filter = filter;
+        }
+
+        public Map<String, Object> getContext() {
+            return context;
+        }
+
+        public void setContext(Map<String, Object> context) {
+            this.context = context;
         }
     }
 
