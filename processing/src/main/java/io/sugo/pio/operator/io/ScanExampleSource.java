@@ -38,7 +38,7 @@ import java.util.*;
 public class ScanExampleSource extends AbstractHttpExampleSource {
     private static final Logger logger = new Logger(ScanExampleSource.class);
 
-    private static final int BATCH_SIZE = 20000;
+    private static final int BATCH_SIZE = 10000;
 
     public static final String PARAMETER_DATA_SOURCE_NAME = "data_source_name";
 
@@ -202,8 +202,8 @@ public class ScanExampleSource extends AbstractHttpExampleSource {
     public List<ParameterType> getParameterTypes() {
         List types = super.getParameterTypes();
         ParameterTypeDynamicCategory dataSourceName = new ParameterTypeDynamicCategory(PARAMETER_DATA_SOURCE_NAME, null,
-                I18N.getMessage("pio.ScanExampleSource.data_source_name"),
-                new String[0], null);
+                I18N.getMessage("pio.ScanExampleSource.data_source_name"));
+        dataSourceName.setOptional(false);
         types.add(dataSourceName);
 
         ParameterTypeInt limit = new ParameterTypeInt(PARAMETER_LIMIT, I18N.getMessage("pio.ScanExampleSource.limit"), 10000, 2000000, 10000);
