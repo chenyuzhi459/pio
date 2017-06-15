@@ -2,10 +2,12 @@ package io.sugo.pio.operator.io;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.metamx.common.logger.Logger;
+import io.sugo.pio.common.config.RuntimeConfig;
 import io.sugo.pio.example.Attribute;
 import io.sugo.pio.example.ExampleSet;
 import io.sugo.pio.example.table.AttributeFactory;
@@ -26,6 +28,7 @@ import io.sugo.pio.ports.metadata.MetaData;
 import io.sugo.pio.tools.Ontology;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
@@ -47,25 +50,25 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
 
     private static final String URI_QUERY_DIMENSION = "/api/dimension";
 
+    private static final String URI_QUERY_DRUID_JSON = "/api/plyql/get-query";
+
     private static final String GROUP_BY_DIMENSION_SUFFIX = "_GROUP";
+
+    private static final String druidUrl = RuntimeConfig.get("pio.broker.data.fetcher.url");
 
     @Override
     public ExampleSet createExampleSet() throws OperatorException {
-        String druidUrl = getParameterAsString(PARAMETER_URL) + URI_QUERY_DRUID;
-        if (!druidUrl.startsWith("http")) {
-            druidUrl = "http://" + druidUrl;
-        }
-        logger.info("Single view query url: %s", druidUrl);
+        String druidGroupByJson = buildQueryDruidParam();
 
-        collectLog("Begin to get data from druid...");
+        logger.info("Begin to query druid.");
+        collectLog("Begin to query druid.");
 
-        String singleViewValue = buildQueryDruidParam();
-        String result = httpPost(druidUrl, singleViewValue);
+        String result = httpPost(druidUrl, druidGroupByJson);
 
         if (result != null) {
-            List<Object> resultList;
+            List<Map<String, Object>> eventList;
             try {
-                resultList = parseResult(result);
+                eventList = parseResult(result);
             } catch (IOException e) {
                 throw new OperatorException("pio.error.parsing.unresolvable_druid_result", result, e);
             }
@@ -79,15 +82,27 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
             List<Attribute> allAttrs = obtainAttributes(dimensionAttrs, metricAttrs);
 
             ExampleSetBuilder builder = ExampleSets.from(allAttrs);
-            if (resultList != null && !resultList.isEmpty()) {
-                logger.info("Begin to traverse druid data to example set data. Data size:" + resultList.size());
+            if (eventList != null && !eventList.isEmpty()) {
+                /*logger.info("Begin to traverse druid data to example set data. Data size:" + resultList.size());
                 collectLog("Get data from druid successfully, data size: " + resultList.size());
 
                 AttributeTree tree = buildTree(resultList, dimensionAttrs, new AttributeTree());
                 collectLog("Build attribute tree finished.");
 
                 buildExampleSet(tree, Lists.newArrayList(), allAttrs, factory, builder);
-                logger.info("Traverse druid data to example set data successfully.");
+                logger.info("Traverse druid data to example set data successfully.");*/
+
+                collectLog("Get " + eventList.size() + " data from druid.");
+
+                for (Map<String, Object> event : eventList) {
+                    DataRow dataRow = factory.create(allAttrs.size());
+                    for (Attribute attribute : allAttrs) {
+                        Object value = event.get(attribute.getName());
+                        setDataRow(dataRow, attribute, value);
+                    }
+
+                    builder.addDataRow(dataRow);
+                }
             } else {
                 collectLog("The data from druid is empty.");
             }
@@ -173,58 +188,42 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         try {
             ParamVo paramVo = deserialize(param, ParamVo.class);
 
-            SingleMapRequestVo requestVo = new SingleMapRequestVo();
-            requestVo.setDruid_datasource_id(dataSource);
-            requestVo.setParams(paramVo);
-            String requestStr = jsonMapper.writeValueAsString(requestVo);
-            // Replace limit with user inputs: ["limit"  : 10] -> ["limit":XXX]
-            requestStr = requestStr.replaceAll("\"limit\"(\\s)*:(\\s)*\\d+", "\"limit\":" + limit);
+            QueryDruidJsonVo queryDruidJsonVo = new QueryDruidJsonVo();
+            queryDruidJsonVo.setQs(paramVo);
+            String requestStr = jsonMapper.writeValueAsString(queryDruidJsonVo);
 
-            logger.info("Single view query druid json: %s", requestStr);
-            return requestStr;
+            String queryDruidJsonUrl = getParameterAsString(PARAMETER_URL) + URI_QUERY_DRUID_JSON;
+            if (!queryDruidJsonUrl.startsWith("http")) {
+                queryDruidJsonUrl = "http://" + queryDruidJsonUrl;
+            }
+            logger.info("Single view query url to get original druid json: %s", queryDruidJsonUrl);
+            collectLog("Begin to get original query druid json.");
+
+            String result = httpPost(queryDruidJsonUrl, requestStr);
+
+            // Replace limit with user inputs: ["limit"  : 10] -> ["limit":XXX]
+            result = result.replaceAll("\"limit\"(\\s)*:(\\s)*\\d+", "\"limit\":" + limit);
+            logger.info("Original query druid group by json: %s", result);
+
+            return result;
         } catch (IOException e) {
-            logger.error("Build druid query parameter failed, details:" + e.getMessage());
+            logger.error("Get original query druid json failed, details:" + e);
             return null;
         }
     }
 
-    /**
-     * {
-     * "result": [
-     * {
-     * "wuxianjiRT_total": 224058,
-     * "resultSet": [
-     * {
-     * "wuxianjiRT_total": 32185,
-     * "Province": "海南省"
-     * },
-     * ......
-     * ]
-     * }
-     * ],
-     * "code": 0
-     * }
-     */
-    private List<Object> parseResult(String result) throws IOException {
-        DruidResultVo resultVo = deserialize(result, DruidResultVo.class);
+    private List<Map<String, Object>> parseResult(String result) throws IOException {
+        List<DruidResultVo> resultVo = deserialize2list(result, DruidResultVo.class);
 
-        if (resultVo != null) {
-            List<HashMap<String, Object>> resList = resultVo.getResult();
-            if (resList != null && !resList.isEmpty()) {
-                HashMap<String, Object> map = resList.get(0); // only has one result
-                if (map != null && !map.isEmpty()) {
-                    Object resultSetObj = map.get("resultSet"); // only get key named "resultSet"
-                    return (List) resultSetObj;
-                    /*String resultSetStr = resultSetObj == null ? null : jsonMapper.writeValueAsString(resultSetObj);
-                    if (Objects.nonNull(resultSetStr)) {
-                        List resultList = jsonMapper.readValue(resultSetStr, List.class);
-                        return resultList;
-                    }*/
-                }
+        List<Map<String, Object>> events = Lists.transform(resultVo, new Function<DruidResultVo, Map<String, Object>>() {
+            @Nullable
+            @Override
+            public Map<String, Object> apply(@Nullable DruidResultVo result) {
+                return result.getEvent();
             }
-        }
+        });
 
-        return null;
+        return events;
     }
 
     private void buildExampleSet(AttributeTree tree, List<AttributeValuePair> breadcrumbs, List<Attribute> allAttrs, DataRowFactory factory, ExampleSetBuilder builder) {
@@ -507,6 +506,18 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         }
     }
 
+    private static class QueryDruidJsonVo {
+        ParamVo qs;
+
+        public ParamVo getQs() {
+            return qs;
+        }
+
+        public void setQs(ParamVo qs) {
+            this.qs = qs;
+        }
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class ParamVo {
         List<Object> filters;
@@ -516,6 +527,9 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         List<String> dimensions;
         Object dimensionExtraSettingDict;
         String selectedDataSourceId;
+        int autoReloadInterval;
+        String druid_datasource_id;
+        String datasource_name;
 
         public List<Object> getFilters() {
             return filters;
@@ -572,26 +586,42 @@ public class SingleViewExampleSource extends AbstractHttpExampleSource {
         public void setSelectedDataSourceId(String selectedDataSourceId) {
             this.selectedDataSourceId = selectedDataSourceId;
         }
+
+        public int getAutoReloadInterval() {
+            return autoReloadInterval;
+        }
+
+        public void setAutoReloadInterval(int autoReloadInterval) {
+            this.autoReloadInterval = autoReloadInterval;
+        }
+
+        public String getDruid_datasource_id() {
+            return druid_datasource_id;
+        }
+
+        public void setDruid_datasource_id(String druid_datasource_id) {
+            this.druid_datasource_id = druid_datasource_id;
+        }
+
+        public String getDatasource_name() {
+            return datasource_name;
+        }
+
+        public void setDatasource_name(String datasource_name) {
+            this.datasource_name = datasource_name;
+        }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class DruidResultVo {
-        List<HashMap<String, Object>> result;
-        Integer code;
+        Map<String, Object> event;
 
-        public List<HashMap<String, Object>> getResult() {
-            return result;
+        public Map<String, Object> getEvent() {
+            return event;
         }
 
-        public void setResult(List<HashMap<String, Object>> result) {
-            this.result = result;
-        }
-
-        public Integer getCode() {
-            return code;
-        }
-
-        public void setCode(Integer code) {
-            this.code = code;
+        public void setEvent(Map<String, Object> event) {
+            this.event = event;
         }
     }
 

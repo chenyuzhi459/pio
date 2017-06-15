@@ -604,6 +604,7 @@ public class PathAnalysisDto {
                     LookupField lookupField = new LookupField();
                     lookupField.setDimension(filter.getDimension());
                     lookupField.setLookup(filter.getValue().toString());
+                    fields.add(lookupField);
                     break;
             }
         }
