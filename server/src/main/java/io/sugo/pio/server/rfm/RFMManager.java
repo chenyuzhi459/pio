@@ -1,5 +1,6 @@
 package io.sugo.pio.server.rfm;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -114,26 +115,9 @@ public class RFMManager {
         return rfmModelList;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class DruidResult {
-        String version;
-        Date timestamp;
         RFMModel event;
-
-        public String getVersion() {
-            return version;
-        }
-
-        public void setVersion(String version) {
-            this.version = version;
-        }
-
-        public Date getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(Date timestamp) {
-            this.timestamp = timestamp;
-        }
 
         public RFMModel getEvent() {
             return event;

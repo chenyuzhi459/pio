@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -110,9 +111,11 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
             try {
                 T instance = reader.readValue(json);
                 return instance;
-            } catch (IOException e) {
-                logger.warn("Deserialize '" + json + "' to type [" + clazz.getName() +
+            } catch (Exception e) {
+                logger.error("Deserialize '" + json + "' to type [" + clazz.getName() +
                         "] failed, details:" + e.getMessage());
+                collectErrorLog("Deserialize '" + json + "' to type [" + clazz.getName() +
+                        "] list failed.");
                 return null;
             }
         }
@@ -126,14 +129,16 @@ public abstract class AbstractHttpExampleSource extends AbstractExampleSource {
             try {
                 List<T> instance = jsonMapper.readValue(json, javaType);
                 return instance;
-            } catch (IOException e) {
-                logger.warn("Deserialize '" + json + "' to type [" + clazz.getName() +
+            } catch (Exception e) {
+                logger.error("Deserialize '" + json + "' to type [" + clazz.getName() +
                         "] list failed, details:" + e.getMessage());
-                return null;
+                collectErrorLog("Deserialize '" + json + "' to type [" + clazz.getName() +
+                        "] list failed.");
+                return Collections.emptyList();
             }
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
     protected boolean isValidUrl(String url) {

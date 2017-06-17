@@ -305,13 +305,17 @@ public abstract class Operator implements ParameterHandler, Serializable {
 
     public void execute() {
         try {
+            long before = System.currentTimeMillis();
+
             clearLog();
             setStatus(Status.RUNNING);
             isRunning = true;
             applyCountAtLastExecution = applyCount.incrementAndGet();
             doWork();
             setStatus(Status.SUCCESS);
-            collectLog("Operator '" + fullName + "' run finished.");
+
+            long after = System.currentTimeMillis();
+            collectLog("Operator '" + fullName + "' run finished. Cost [" + (after-before) + "] million seconds.");
         } catch (Exception oe) {
             log.error(oe,"Operator named: %s execute failed.", getName());
             setStatus(Status.FAILED);
