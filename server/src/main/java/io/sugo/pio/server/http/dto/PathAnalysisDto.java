@@ -6,8 +6,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.metamx.common.logger.Logger;
 import io.sugo.pio.constant.ScanQueryConstant;
-import io.sugo.pio.server.pathanalysis.PathAnalysisConstant;
+import io.sugo.pio.core.io.data.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PathAnalysisDto {
 
+    private static final Logger logger = new Logger(PathAnalysisDto.class);
     private static final ObjectMapper jsonMapper = new ObjectMapper();
 
     @JsonProperty
@@ -150,7 +152,7 @@ public class PathAnalysisDto {
 //        this.limit = limit;
 //    }
 
-    public String buildScanQuery() {
+    public String buildScanQuery() throws Exception {
         ScanQuery query = new ScanQuery();
         query.setDataSource(this.dataSource);
         query.setBatchSize(ScanQueryConstant.BATCH_SIZE);
@@ -185,7 +187,9 @@ public class PathAnalysisDto {
         String queryStr = "";
         try {
             queryStr = jsonMapper.writeValueAsString(query);
-        } catch (JsonProcessingException ignore) {
+        } catch (JsonProcessingException e) {
+            logger.error("Serialize path analysis query object failed: %s", e);
+            throw new Exception("Parse query json failed.");
         }
 
         return queryStr;
@@ -279,6 +283,7 @@ public class PathAnalysisDto {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class FilterDimension {
         @JsonProperty
         String dimension;
@@ -286,6 +291,8 @@ public class PathAnalysisDto {
         String action;
         @JsonProperty
         Object value;
+        @JsonProperty
+        String actionType;
 
         public String getDimension() {
             return dimension;
@@ -309,6 +316,14 @@ public class PathAnalysisDto {
 
         public void setValue(Object value) {
             this.value = value;
+        }
+
+        public String getActionType() {
+            return actionType;
+        }
+
+        public void setActionType(String actionType) {
+            this.actionType = actionType;
         }
     }
 
@@ -394,17 +409,17 @@ public class PathAnalysisDto {
     }
 
     private static class InField extends Field {
-        List<String> values = new ArrayList<>();
+        List values = new ArrayList<>();
 
         public InField() {
             super.type = "in";
         }
 
-        public List<String> getValues() {
+        public List getValues() {
             return values;
         }
 
-        public void setValues(List<String> values) {
+        public void setValues(List values) {
             this.values = values;
         }
     }
@@ -587,7 +602,7 @@ public class PathAnalysisDto {
                     fields.add(betweenField);
                     break;
                 case "in":
-                    List<String> listValues = (List) filter.getValue();
+                    List listValues = (List) filter.getValue();
                     InField inField = new InField();
                     inField.setDimension(filter.getDimension());
                     inField.setValues(listValues);
