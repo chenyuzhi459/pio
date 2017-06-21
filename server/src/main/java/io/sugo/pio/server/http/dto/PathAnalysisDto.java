@@ -490,22 +490,22 @@ public class PathAnalysisDto {
     }
 
     private static class BetweenField extends BoundField {
-        String lower;
-        String upper;
+        Object lower;
+        Object upper;
 
-        public String getLower() {
+        public Object getLower() {
             return lower;
         }
 
-        public void setLower(String lower) {
+        public void setLower(Object lower) {
             this.lower = lower;
         }
 
-        public String getUpper() {
+        public Object getUpper() {
             return upper;
         }
 
-        public void setUpper(String upper) {
+        public void setUpper(Object upper) {
             this.upper = upper;
         }
     }
@@ -594,7 +594,7 @@ public class PathAnalysisDto {
                     fields.add(lessThanEqualField);
                     break;
                 case "between":
-                    List<String> valuePair = (List) filter.getValue();
+                    List valuePair = (List) filter.getValue();
                     BetweenField betweenField = new BetweenField();
                     betweenField.setDimension(filter.getDimension());
                     betweenField.setLower(valuePair.get(0));
@@ -609,7 +609,7 @@ public class PathAnalysisDto {
                     fields.add(inField);
                     break;
                 case "not in":
-                    List<String> listValuesNotIn = (List) filter.getValue();
+                    List listValuesNotIn = (List) filter.getValue();
                     NotInField notInField = new NotInField();
                     notInField.getField().setDimension(filter.getDimension());
                     notInField.getField().setValues(listValuesNotIn);
