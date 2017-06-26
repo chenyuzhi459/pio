@@ -3,13 +3,15 @@ package io.sugo.pio.server.http.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.metamx.common.logger.Logger;
 import io.sugo.pio.constant.ScanQueryConstant;
-import io.sugo.pio.core.io.data.ParseException;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +29,8 @@ public class PathAnalysisDto {
     @JsonProperty
     private List<String> pages;
     @JsonProperty
-    private List<FilterDimension> filters;
+//    private List<FilterDimension> filters;
+    private Object filters;
     @JsonProperty
     private String homePage;
 //    @JsonProperty
@@ -136,21 +139,13 @@ public class PathAnalysisDto {
         this.homePage = homePage;
     }
 
-    public List<FilterDimension> getFilters() {
+    public Object getFilters() {
         return filters;
     }
 
-    public void setFilters(List<FilterDimension> filters) {
+    public void setFilters(Object filters) {
         this.filters = filters;
     }
-
-//    public Integer getLimit() {
-//        return limit;
-//    }
-//
-//    public void setLimit(Integer limit) {
-//        this.limit = limit;
-//    }
 
     public String buildScanQuery() throws Exception {
         ScanQuery query = new ScanQuery();
@@ -160,20 +155,49 @@ public class PathAnalysisDto {
         query.setLimit(ScanQueryConstant.LIMIT_SIZE);
 
         // Set filters
-        if (this.pages != null && !this.pages.isEmpty()) {
-            InField inField = new InField();
-            inField.setDimension(this.getDimension().getPageName());
-            inField.setValues(this.pages);
-            query.getFilter().getFields().add(inField);
+        if (this.filters != null) {
+            if (filters instanceof List) { // Compatible with previous versions
+                Filter filter = new Filter();
+                query.setFilter(filter);
+                if (this.pages != null && !this.pages.isEmpty()) {
+                    InField inField = new InField();
+                    inField.setDimension(this.getDimension().getPageName());
+                    inField.setValues(this.pages);
+                    filter.getFields().add(inField);
+                }
+
+                try {
+                    List<FilterDimension> dimFilters = Lists.transform((List) filters, new Function<Object, FilterDimension>() {
+                        @Nullable
+                        @Override
+                        public FilterDimension apply(@Nullable Object input) {
+                            Map obj = (Map) input;
+                            FilterDimension filterDimension = new FilterDimension();
+                            filterDimension.setDimension(obj.get("dimension").toString());
+                            filterDimension.setAction(obj.get("action").toString());
+                            filterDimension.setValue(obj.get("value"));
+                            if (obj.get("actionType") != null) {
+                                filterDimension.setActionType(obj.get("actionType").toString());
+                            }
+                            return filterDimension;
+                        }
+                    });
+                    if (dimFilters.size() > 0) {
+                        filter.getFields().addAll(buildFilterFields(dimFilters));
+                    }
+                } catch (Exception e) {
+                    logger.error("Deserialize path analysis filters %s failed: %s", filters.toString(), e.getMessage());
+                }
+            } else { // New version
+                query.setFilter(filters);
+            }
         }
-        if (this.filters != null && this.filters.size() > 0) {
-            query.getFilter().getFields().addAll(buildFilterFields(this.filters));
-        }
-        BetweenEqualField boundField = new BetweenEqualField();
+
+        /*BetweenEqualField boundField = new BetweenEqualField();
         boundField.setDimension(this.getDimension().getDate());
         boundField.setLower(this.startDate);
         boundField.setUpper(this.endDate);
-        query.getFilter().getFields().add(boundField);
+        query.getFilter().getFields().add(boundField);*/
 
         // Set columns
         query.getColumns().add(this.getDimension().getSessionId());
@@ -195,6 +219,7 @@ public class PathAnalysisDto {
         return queryStr;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class ScanQuery {
         String queryType = "lucene_scan";
         String dataSource;
@@ -203,7 +228,7 @@ public class PathAnalysisDto {
         int limit;
         List<String> columns = new ArrayList<>();
         List<String> intervals = new ArrayList<>();
-        Filter filter = new Filter();
+        Object filter;
         Map<String, Object> context = Maps.newHashMap();
 
         public ScanQuery() {
@@ -266,11 +291,11 @@ public class PathAnalysisDto {
             this.intervals = intervals;
         }
 
-        public Filter getFilter() {
+        public Object getFilter() {
             return filter;
         }
 
-        public void setFilter(Filter filter) {
+        public void setFilter(Object filter) {
             this.filter = filter;
         }
 
