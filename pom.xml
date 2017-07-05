@@ -26,7 +26,7 @@
 
         <module>extensions-core/mysql-metadata-storage</module>
         <module>extensions-core/postgresql-metadata-storage</module>
-        <module>extensions-core/oracle-metadata-storage</module>
+        <!--<module>extensions-core/oracle-metadata-storage</module>-->
 
         <!--engines-->
         <module>engines/engine-common</module>
@@ -565,13 +565,13 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.38</version>
             </dependency>
-            <dependency>
+            <!--<dependency>
                 <groupId>com.oracle</groupId>
                 <artifactId>ojdbc14</artifactId>
                 <version>11</version>
                 <scope>system</scope>
                 <systemPath>${basedir}/extensions-core/oracle-metadata-storage/src/main/resources/lib/ojdbc14.jar</systemPath>
-            </dependency>
+            </dependency>-->
             <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
