@@ -61,18 +61,20 @@ public class PathAnalyzer {
                     List<PageAccessRecordVo> records = Lists.newArrayList();
                     List<List<Object>> events = (List<List<Object>>) resultValue.get("events");
                     for (List<Object> event : events) {
-                        PageAccessRecordVo record = new PageAccessRecordVo();
-                        record.setSessionId(event.get(1).toString());
-                        record.setUserId(event.get(2).toString());
-                        record.setPageName(event.get(3).toString());
-                        Object accessTime = event.get(4);
-                        if (accessTime != null) {
-                            record.setAccessTime(new Date((Long) (accessTime)));
-                        } else { // If the data generation time is null, then use the data ingestion time.
-                            accessTime = event.get(0);
-                            record.setAccessTime(new DateTime(accessTime).toDate());
-                        }
-                        records.add(record);
+                        try {
+                            PageAccessRecordVo record = new PageAccessRecordVo();
+                            record.setSessionId(event.get(1).toString());
+                            record.setUserId(event.get(2).toString());
+                            record.setPageName(event.get(3).toString());
+                            Object accessTime = event.get(4);
+                            if (accessTime != null) {
+                                record.setAccessTime(new Date((Long) (accessTime)));
+                            } else { // If the data generation time is null, then use the data ingestion time.
+                                accessTime = event.get(0);
+                                record.setAccessTime(new DateTime(accessTime).toDate());
+                            }
+                            records.add(record);
+                        } catch (Exception ignore) {}
                     }
                     records.sort(reversed ? PageAccessRecordVo.DESC_COMPARATOR : PageAccessRecordVo.ASC_COMPARATOR);
                     analyze(records, homePage, depth);
