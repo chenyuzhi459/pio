@@ -45,9 +45,6 @@ public class CliProcess extends ServerRunnable {
                         JsonConfigProvider.bind(binder, "pio.user.extension", UserExtensionConfig.class);
                         JsonConfigProvider.bind(binder, "pio.broker.data.fetcher", DataFetcherConfig.class);
 
-                        Jerseys.addResource(binder, ProcessResource.class);
-                        Jerseys.addResource(binder, OperatorResource.class);
-                        Jerseys.addResource(binder, DrainPrediction.class);
                         Jerseys.addResource(binder, RFMResource.class);
                         Jerseys.addResource(binder, UserExtensionResource.class);
                         Jerseys.addResource(binder, PathAnalysisResource.class);

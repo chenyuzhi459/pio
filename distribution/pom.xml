@@ -109,8 +109,6 @@
                                 <argument>io.sugo.pio.engine-extensions:druid-extensions</argument>
                                 <argument>-ee</argument>
                                 <argument>io.sugo.pio.engine-extensions:hdfs-extensions</argument>
-                                <argument>-ed</argument>
-                                <argument>io.sugo.pio.engine-demos:engine-demo</argument>
                                 <argument>--no-default-spark</argument>
                                 <argument>-s</argument>
                                 <argument>org.apache.spark:spark-yarn_2.11:${spark.version}</argument>

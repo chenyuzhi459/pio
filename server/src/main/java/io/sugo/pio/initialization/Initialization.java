@@ -374,8 +374,6 @@ public class Initialization {
                 new ServerViewModule(),
                 new MetadataConfigModule(),
                 new DerbyMetadataStoragePioModule(),
-                new ProcessPioModule(),
-//                new DL4JModule(),
                 new JacksonConfigManagerModule(),
                 new TaskServiceDiscoveryModule(),
                 new BrokerServiceDiscoveryModule()

@@ -11,14 +11,14 @@
     <modules>
         <module>common</module>
         <module>api</module>
-        <module>processing</module>
+        <!--<module>processing</module>-->
         <module>processing-engine-common</module>
         <module>server</module>
         <module>service</module>
         <module>task-service</module>
 
         <!--extensions-->
-        <module>extensions-core/python-extensions</module>
+        <!--<module>extensions-core/python-extensions</module>-->
 
         <module>extensions-core/mysql-metadata-storage</module>
         <module>extensions-core/postgresql-metadata-storage</module>
