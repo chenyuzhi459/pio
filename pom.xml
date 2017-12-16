@@ -12,17 +12,13 @@
         <module>common</module>
         <module>api</module>
         <module>processing</module>
-        <module>processing-spark-common</module>
         <module>processing-engine-common</module>
-        <module>processing-spark</module>
         <module>server</module>
         <module>service</module>
         <module>task-service</module>
 
         <!--extensions-->
-        <module>extensions-core/dl4j-extensions</module>
         <module>extensions-core/python-extensions</module>
-        <module>extensions-core/ffm-extensions</module>
 
         <module>extensions-core/mysql-metadata-storage</module>
         <module>extensions-core/postgresql-metadata-storage</module>
@@ -38,17 +34,6 @@
         <module>engine-extensions/druid-extensions</module>
         <module>engine-extensions/jdbc-extensions</module>
 
-        <module>engines/popular-recommend-engine</module>
-        <module>engines/detail-engine</module>
-        <module>engines/als-engine</module>
-        <module>engines/fp-engine</module>
-        <module>engines/search-engine</module>
-        <module>engines/online-content-based-engine</module>
-        <module>engines/userHistory-engine</module>
-        <module>engines/textSimilar-engine</module>
-        <module>engines/articleCluster-engine</module>
-        <module>engines/bbs-recommend-engine</module>
-        <module>engines/flow-engine</module>
         <module>engines/user-extension-engine</module>
         <module>engines/user-feature-extraction-engine</module>
         <module>engines/user-feature-extraction-engine-new</module>

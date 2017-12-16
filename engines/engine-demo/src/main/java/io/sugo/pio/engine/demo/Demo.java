@@ -3,7 +3,6 @@ package io.sugo.pio.engine.demo;
 import io.airlift.airline.Cli;
 import io.airlift.airline.Help;
 import io.airlift.airline.ParseException;
-import io.sugo.pio.engine.demo.http.ALSEval;
 
 import java.io.IOException;
 
@@ -29,11 +28,4 @@ public class Demo {
             System.out.println("===");
         }
     }
-
-    private static void eval() throws IOException {
-        ALSEval alsEval = new ALSEval();
-        alsEval.eval();
-    }
-
-
 }
