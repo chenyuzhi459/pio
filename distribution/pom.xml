@@ -99,7 +99,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>${project.parent.artifactId}-${project.parent.version}</finalName>
+                            <finalName>${project.parent.artifactId}</finalName>
                             <tarLongFileMode>posix</tarLongFileMode>
                             <descriptors>
                                 <descriptor>src/assembly/assembly.xml</descriptor>
