@@ -11,8 +11,6 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import com.metamx.common.ISE;
 import com.metamx.common.logger.Logger;
-import io.sugo.pio.curator.CuratorModule;
-import io.sugo.pio.curator.discovery.DiscoveryModule;
 import io.sugo.pio.engine.EngineExtensionModule;
 import io.sugo.pio.engine.EngineModule;
 import io.sugo.pio.guice.*;
@@ -22,7 +20,6 @@ import io.sugo.pio.guice.http.HttpClientModule;
 import io.sugo.pio.metadata.storage.derby.DerbyMetadataStoragePioModule;
 import io.sugo.pio.server.initialization.jetty.JettyServerModule;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.aether.artifact.DefaultArtifact;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -161,18 +158,11 @@ public class Initialization {
                 new LifecycleModule(),
                 HttpClientModule.global(),
                 new HttpClientModule("pio.broker.http", Client.class),
-                new CuratorModule(),
-                new AnnouncerModule(),
                 new ServerModule(),
-                new StorageNodeModule(),
-                new DiscoveryModule(),
                 new JettyServerModule(),
-                new ServerViewModule(),
                 new MetadataConfigModule(),
                 new DerbyMetadataStoragePioModule(),
-                new JacksonConfigManagerModule(),
-                new TaskServiceDiscoveryModule(),
-                new BrokerServiceDiscoveryModule()
+                new JacksonConfigManagerModule()
         );
 
         ModuleList actualModules = new ModuleList(baseInjector);

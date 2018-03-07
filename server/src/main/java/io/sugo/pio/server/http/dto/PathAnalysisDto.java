@@ -29,12 +29,11 @@ public class PathAnalysisDto {
     @JsonProperty
     private List<String> pages;
     @JsonProperty
-//    private List<FilterDimension> filters;
     private Object filters;
     @JsonProperty
     private String homePage;
-//    @JsonProperty
-//    private Integer limit;
+    @JsonProperty
+    private Integer limit;
 
     /**
      * yyyy-mm-dd
@@ -139,6 +138,14 @@ public class PathAnalysisDto {
         this.homePage = homePage;
     }
 
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
     public Object getFilters() {
         return filters;
     }
@@ -151,8 +158,7 @@ public class PathAnalysisDto {
         ScanQuery query = new ScanQuery();
         query.setDataSource(this.dataSource);
         query.setBatchSize(ScanQueryConstant.BATCH_SIZE);
-//        query.setLimit(this.limit == null ? PathAnalysisConstant.DEFAULT_LIMIT_SIZE : this.limit);
-        query.setLimit(ScanQueryConstant.LIMIT_SIZE);
+        query.setLimit(this.limit == null ? ScanQueryConstant.LIMIT_SIZE : this.limit);
 
         // Set filters
         if (this.filters != null) {
@@ -192,12 +198,6 @@ public class PathAnalysisDto {
                 query.setFilter(filters);
             }
         }
-
-        /*BetweenEqualField boundField = new BetweenEqualField();
-        boundField.setDimension(this.getDimension().getDate());
-        boundField.setLower(this.startDate);
-        boundField.setUpper(this.endDate);
-        query.getFilter().getFields().add(boundField);*/
 
         // Set columns
         query.getColumns().add(this.getDimension().getSessionId());
