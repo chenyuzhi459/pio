@@ -69,10 +69,6 @@
                                 <argument>-Dpio.extensions.loadList=[]</argument>
                                 <argument>-Dpio.extensions.directory=${project.build.directory}/extensions</argument>
                                 <argument>-Dpio.extensions.sparkDependenciesDir=${project.build.directory}/spark-dependencies</argument>
-                                <argument>-Dpio.engines.loadList=[]</argument>
-                                <argument>-Dpio.engines.enginesDirectory=${project.build.directory}/engines</argument>
-                                <argument>-Dpio.engines.extensionsDirectory=${project.build.directory}/engine-extensions</argument>
-                                <argument>-Dpio.engines.demosDirectory=${project.build.directory}/demos</argument>
                                 <argument>io.sugo.pio.cli.Main</argument>
                                 <argument>tools</argument>
                                 <argument>pull-deps</argument>
@@ -87,31 +83,6 @@
                                 <argument>io.sugo.pio.extensions:postgresql-metadata-storage</argument>
                                 <!--<argument>-c</argument>
                                 <argument>io.sugo.pio.extensions:oracle-metadata-storage</argument>-->
-                                <argument>-c</argument>
-                                <argument>io.sugo.pio.extensions:dl4j-extensions</argument>
-                                <argument>-c</argument>
-                                <argument>io.sugo.pio.extensions:ffm-extensions</argument>
-                                <argument>-c</argument>
-                                <argument>io.sugo.pio.extensions:python-extensions</argument>
-                                <argument>-e</argument>
-                                <argument>io.sugo.pio.engines:als-engine</argument>
-                                <argument>-e</argument>
-                                <argument>io.sugo.pio.engines:detail-engine</argument>
-                                <argument>-e</argument>
-                                <argument>io.sugo.pio.engines:fp-engine</argument>
-                                <argument>-e</argument>
-                                <argument>io.sugo.pio.engines:popular-recommender-engine</argument>
-                                <argument>-e</argument>
-                                <argument>io.sugo.pio.engines:search-engine</argument>
-                                <argument>-ee</argument>
-                                <argument>io.sugo.pio.engine-extensions:jdbc-extensions</argument>
-                                <argument>-ee</argument>
-                                <argument>io.sugo.pio.engine-extensions:druid-extensions</argument>
-                                <argument>-ee</argument>
-                                <argument>io.sugo.pio.engine-extensions:hdfs-extensions</argument>
-                                <argument>--no-default-spark</argument>
-                                <argument>-s</argument>
-                                <argument>org.apache.spark:spark-yarn_2.11:${spark.version}</argument>
                             </arguments>
                         </configuration>
                     </execution>

@@ -15,33 +15,8 @@
             </includes>
             <excludes>
                 <exclude>mysql-metadata-storage/**</exclude>
-                <exclude>oracle-metadata-storage/**</exclude>
             </excludes>
             <outputDirectory>extensions</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${project.build.directory}/engines</directory>
-            <includes>
-                <include>*/*</include>
-            </includes>
-            <outputDirectory>engines</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${project.build.directory}/engine-extensions</directory>
-            <includes>
-                <include>*/*</include>
-            </includes>
-            <outputDirectory>engine-extensions</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${project.build.directory}/spark-dependencies</directory>
-            <includes>
-                <include>*/*/*</include>
-            </includes>
-            <outputDirectory>spark-dependencies</outputDirectory>
         </fileSet>
 
         <fileSet>

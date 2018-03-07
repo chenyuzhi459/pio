@@ -12,7 +12,6 @@
         <module>common</module>
         <module>api</module>
         <!--<module>processing</module>-->
-        <module>processing-engine-common</module>
         <module>server</module>
         <module>service</module>
         <module>task-service</module>
@@ -24,19 +23,6 @@
         <module>extensions-core/postgresql-metadata-storage</module>
         <!--<module>extensions-core/oracle-metadata-storage</module>-->
 
-        <!--engines-->
-        <module>engines/engine-common</module>
-        <module>engines/engine-demo</module>
-        <module>engines/engine-server</module>
-
-        <!--engine-extensions-->
-        <module>engine-extensions/hdfs-extensions</module>
-        <module>engine-extensions/druid-extensions</module>
-        <module>engine-extensions/jdbc-extensions</module>
-
-        <module>engines/user-extension-engine</module>
-        <module>engines/user-feature-extraction-engine</module>
-        <module>engines/user-feature-extraction-engine-new</module>
         <!-- distribution packaging -->
         <module>distribution</module>
     </modules>
