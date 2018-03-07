@@ -6,7 +6,7 @@ public class ScanQueryConstant {
 
     public static final int BATCH_SIZE = 10000;
 
-    public static final int LIMIT_SIZE = 500000;
+    public static final int LIMIT_SIZE = 2000000;
 
     public static final String TIME_OUT_KEY = "timeout";
 

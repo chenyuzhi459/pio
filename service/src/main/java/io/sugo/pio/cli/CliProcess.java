@@ -7,8 +7,6 @@ import com.google.inject.name.Names;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Command;
 import io.sugo.pio.data.fetcher.DataFetcherConfig;
-import io.sugo.pio.engine.demo.conf.UserExtensionConfig;
-import io.sugo.pio.engine.demo.http.UserExtensionResource;
 import io.sugo.pio.guice.Jerseys;
 import io.sugo.pio.guice.JsonConfigProvider;
 import io.sugo.pio.guice.LazySingleton;
@@ -42,11 +40,9 @@ public class CliProcess extends ServerRunnable {
                         binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_NAME)).to(CliConst.PROCESS_NAME);
                         binder.bindConstant().annotatedWith(Names.named(CliConst.SERVICE_PORT)).to(CliConst.PROCESS_PORT);
 
-                        JsonConfigProvider.bind(binder, "pio.user.extension", UserExtensionConfig.class);
                         JsonConfigProvider.bind(binder, "pio.broker.data.fetcher", DataFetcherConfig.class);
 
                         Jerseys.addResource(binder, RFMResource.class);
-                        Jerseys.addResource(binder, UserExtensionResource.class);
                         Jerseys.addResource(binder, PathAnalysisResource.class);
 
                         binder.bind(JettyServerInitializer.class).to(UIJettyServerInitializer.class).in(LazySingleton.class);

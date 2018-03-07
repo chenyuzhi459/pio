@@ -21,10 +21,8 @@ public class Main {
                 .withDefaultCommand(Help.class)
                 .withCommands(
                         CliProcess.class,
-                        CliBroker.class,
                         CliOverlord.class,
-                        CliMiddleManager.class,
-                        CliProxy.class
+                        CliMiddleManager.class
                 );
 
         builder.withGroup("tools")
@@ -39,13 +37,12 @@ public class Main {
                 .withDescription("Engine commands for pio")
                 .withDefaultCommand(Help.class)
                 .withCommands(
-                        CliTrainer.class,
                         CliDeployer.class);
 
         builder.withGroup("internal")
                 .withDescription("Processes that pio runs \"internally\", you should rarely use these directly")
                 .withDefaultCommand(Help.class)
-                .withCommands(CliPeon.class, CliInternalPeon.class, CliInternalTrainer.class);
+                .withCommands(CliPeon.class, CliInternalPeon.class);
 
         final Injector injector = GuiceInjectors.makeStartupInjector();
 //        final ExtensionsConfig config = injector.getInstance(ExtensionsConfig.class);
