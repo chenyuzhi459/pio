@@ -14,7 +14,6 @@
         <!--<module>processing</module>-->
         <module>server</module>
         <module>service</module>
-        <module>task-service</module>
 
         <!--extensions-->
         <!--<module>extensions-core/python-extensions</module>-->

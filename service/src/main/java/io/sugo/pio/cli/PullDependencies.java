@@ -10,7 +10,6 @@ import com.metamx.common.StringUtils;
 import com.metamx.common.logger.Logger;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
-import io.sugo.pio.guice.EnginesConfig;
 import io.sugo.pio.guice.ExtensionsConfig;
 import io.tesla.aether.Repository;
 import io.tesla.aether.TeslaAether;
@@ -116,9 +115,6 @@ public class PullDependencies implements Runnable
   @Inject
   public ExtensionsConfig extensionsConfig;
 
-  @Inject
-  public EnginesConfig enginesConfig;
-
   @Option(
       name = {"-c", "--coordinate"},
       title = "coordinate",
@@ -211,17 +207,11 @@ public class PullDependencies implements Runnable
 
     final File extensionsDir = new File(extensionsConfig.getDirectory());
     final File sparkDependenciesDir = new File(extensionsConfig.getSparkDependenciesDir());
-    final File enginesDir = new File(enginesConfig.getEnginesDirectory());
-    final File engineExtensionsDir = new File(enginesConfig.getExtensionsDirectory());
-    final File engineDemosDir = new File(enginesConfig.getDemosDirectory());
 
     if (clean) {
       try {
         FileUtils.deleteDirectory(extensionsDir);
         FileUtils.deleteDirectory(sparkDependenciesDir);
-        FileUtils.deleteDirectory(enginesDir);
-        FileUtils.deleteDirectory(engineExtensionsDir);
-        FileUtils.deleteDirectory(engineDemosDir);
       }
       catch (IOException e) {
         log.error("Unable to clear extension directory at [%s]", extensionsConfig.getDirectory());
@@ -231,9 +221,6 @@ public class PullDependencies implements Runnable
 
     createRootExtensionsDirectory(extensionsDir);
     createRootExtensionsDirectory(sparkDependenciesDir);
-    createRootExtensionsDirectory(enginesDir);
-    createRootExtensionsDirectory(engineExtensionsDir);
-    createRootExtensionsDirectory(engineDemosDir);
 
     log.info(
         "Start pull-deps with local repository [%s] and remote repositories [%s]",
@@ -252,36 +239,6 @@ public class PullDependencies implements Runnable
         downloadExtension(versionedArtifact, currExtensionDir);
       }
       log.info("Finish downloading dependencies for extension coordinates: [%s]", coordinates);
-
-      for (final String coordinate : engineCoordinates) {
-        final Artifact versionedArtifact = getArtifact(coordinate);
-
-        File currEngineDir = new File(enginesDir, versionedArtifact.getArtifactId());
-        createExtensionDirectory(coordinate, currEngineDir);
-
-        downloadExtension(versionedArtifact, currEngineDir);
-      }
-      log.info("Finish downloading dependencies for engine coordinates: [%s]", engineCoordinates);
-
-      for (final String coordinate : engineExtensionCoordinates) {
-        final Artifact versionedArtifact = getArtifact(coordinate);
-
-        File currEngineDir = new File(engineExtensionsDir, versionedArtifact.getArtifactId());
-        createExtensionDirectory(coordinate, currEngineDir);
-
-        downloadExtension(versionedArtifact, currEngineDir);
-      }
-      log.info("Finish downloading dependencies for engine extension coordinates: [%s]", engineExtensionCoordinates);
-
-      for (final String coordinate : engineDemoCoordinates) {
-        final Artifact versionedArtifact = getArtifact(coordinate);
-
-        File currEngineDir = new File(engineDemosDir, versionedArtifact.getArtifactId());
-        createExtensionDirectory(coordinate, currEngineDir);
-
-        downloadExtension(versionedArtifact, currEngineDir);
-      }
-      log.info("Finish downloading dependencies for engine demo coordinates: [%s]", engineDemoCoordinates);
 
       if (!noDefaultSpark && sparkCoordinates.isEmpty()) {
         sparkCoordinates.addAll(ImmutableList.of(

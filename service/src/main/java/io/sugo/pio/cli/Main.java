@@ -20,9 +20,7 @@ public class Main {
                 .withDescription("Run one of the Pio server types.")
                 .withDefaultCommand(Help.class)
                 .withCommands(
-                        CliProcess.class,
-                        CliOverlord.class,
-                        CliMiddleManager.class
+                        CliProcess.class
                 );
 
         builder.withGroup("tools")
@@ -33,27 +31,7 @@ public class Main {
                         CreateTables.class
                 );
 
-        builder.withGroup("engine")
-                .withDescription("Engine commands for pio")
-                .withDefaultCommand(Help.class)
-                .withCommands(
-                        CliDeployer.class);
-
-        builder.withGroup("internal")
-                .withDescription("Processes that pio runs \"internally\", you should rarely use these directly")
-                .withDefaultCommand(Help.class)
-                .withCommands(CliPeon.class, CliInternalPeon.class);
-
         final Injector injector = GuiceInjectors.makeStartupInjector();
-//        final ExtensionsConfig config = injector.getInstance(ExtensionsConfig.class);
-//        final Collection<CliCommandCreator> extensionCommands = Initialization.getFromExtensions(
-//                config,
-//                CliCommandCreator.class
-//        );
-
-//        for (CliCommandCreator creator : extensionCommands) {
-//            creator.addCommands(builder);
-//        }
 
         final Cli<Runnable> cli = builder.build();
         try {

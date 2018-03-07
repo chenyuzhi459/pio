@@ -24,7 +24,6 @@ public class GuiceInjectors {
                     public void configure(Binder binder) {
                         binder.bind(PioSecondaryModule.class);
                         JsonConfigProvider.bind(binder, "pio.extensions", ExtensionsConfig.class);
-                        JsonConfigProvider.bind(binder, "pio.engines", EnginesConfig.class);
                     }
                 }
         );
