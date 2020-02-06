@@ -31,7 +31,7 @@
         <hadoop.version>2.7.2</hadoop.version>
         <metamx.java-util.version>0.27.9</metamx.java-util.version>
         <apache.curator.version>2.10.0</apache.curator.version>
-        <jetty.version>9.2.5.v20141112</jetty.version>
+        <jetty.version>9.4.26.v20200117</jetty.version>
         <jersey.version>1.19</jersey.version>
         <jackson.version>2.6.7</jackson.version>
         <log4j.version>2.5</log4j.version>
